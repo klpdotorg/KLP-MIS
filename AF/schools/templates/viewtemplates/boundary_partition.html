@@ -1,0 +1,46 @@
+<div class="detailHead">
+<span class="hedText">Boundary Partition</span>
+</div>
+<form method="post" class="niceform" id="partitionForm" name="partitionForm" onsubmit="return false;">{% csrf_token %} 
+    <!--input type="hidden" name="selBoundary" id="selBoundary" value="{{boundary.id}}"/-->
+    <div style="width:95%;padding:5px;">    
+    {% for school in schoolsList%}
+        <span style="width:15%; padding:8px;">
+            <input type="checkbox" name="schools" id="{{school.id}}" value="{{school.id}}"/>{{school.name}}
+        </span>
+    {% endfor %}                                                          
+    </div>
+    <div style="width:95%;padding:5px;">
+        <table class="tblprofile">
+            <tr>
+      		    <td class="rightprofile">New Boundary</td>
+      		    <td class="leftprofile">
+      		        <input type="text" name="newBoundary" id="newBoundary"/>
+      		    </td>
+      		</tr>
+      		<!--tr>
+      		    <td class="rightprofile">New Boundary2</td>
+      		    <td class="leftprofile">
+      		        <input type="text" name="newBoundary2" id="newBoundary2" value="{{boundary.name}}" />      		        
+      		    </td>
+      		</tr-->
+      		<tr>
+      		    <td class="rightprofile">
+                    <input type="submit" value="Submit" />
+      			</td>
+      		</tr>                
+    </div>
+</form> 
+<script>
+  $(document).ready(function(){     
+   $("#partitionForm").submit(function(){    
+    $.post(  
+        '/boundary/{{boundary.id}}/partition/',  
+        $("#partitionForm").serialize(),  
+                function(data){                                                                              
+                    window.location.reload();			                    
+               }  
+           );  
+       });  
+});  
+</script>

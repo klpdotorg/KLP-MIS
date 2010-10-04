@@ -1,0 +1,36 @@
+<form action="." method="POST" enctype="multipart/form-data" class="niceform" name="academicForm" id="academicForm" onsubmit="return false;">{% csrf_token %}
+      			<table class="tblprofile">
+      				<tr>
+      					<td class="rightprofile">Year</td>
+      					<td class="leftprofile">{{ form.name }}
+      					{% for error in form.name.errors %}
+              	<span style="color:red">{{ error }}</span>
+              {% endfor %}</td>
+      				</tr>      				
+      				
+      				<tr>
+      					<td class="rightprofile">      					 
+						<input type="submit" value="Add Academic Year" />
+      					</td>
+      				</tr>
+      			</table>
+</form>
+<script>
+  $(document).ready(function(){     
+   $("#academicForm").submit(function(){       
+   var formInputs = $("form#academicForm :input");
+   formInputs.each(function(index) {
+         if ($(this).attr("id") =="id_name")
+            newlyAdded = $(this).val();
+    });   
+    $.post(  
+        '/academic/creator/',  
+        $("#academicForm").serialize(),  
+                function(data){                 
+                     $("#id_academic").append("<option value="+data+">"+newlyAdded+"</option>");
+                    $("#subForm").html(''); 
+               }  
+           );  
+       });  
+});  
+</script> 

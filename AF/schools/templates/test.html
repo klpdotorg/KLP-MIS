@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Class Form</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<script type="text/javascript" src="/static_media/js/jquery.js"></script>
+<script type="text/javascript" src="/static_media/js/jquery.autocomplete.js"></script>
+</head>
+<body>
+ 
+ <script type='text/javascript'>
+var options, a;
+jQuery(function(){
+  options = { serviceUrl:'/Akshara/class-entry/'};
+  a = $('#query').autocomplete(options);
+});
+ </script>
+ 
+<script type='text/javascript'>
+var a = $('#query').autocomplete({ 
+    serviceUrl:'/Akshara/class-entry/',
+    minChars:2, 
+    delimiter: /(,|;)\s*/, // regex or character
+    maxHeight:400,
+    width:300,
+    zIndex: 9999,
+    deferRequestBy: 0, //miliseconds
+    params: { country:'Yes' }, //aditional parameters
+    noCache: false, //default is false, set to true to disable caching
+    // callback function:
+    onSelect: function(value, data){ alert('You selected: ' + value + ', ' + data); },
+    // local autosugest options:
+    lookup: ['January', 'February', 'March', 'April', 'May'] //local lookup values 
+  });
+
+ </script>
+
+<form action="." method="POST" enctype="multipart/form-data">{% csrf_token %}
+
+<div class="">
+ <fieldset class="profile">
+      <legend>
+		<b>Add Class<b>
+      </legend>
+      <table>
+      	<tr>
+      		<td>
+      			<table class="tblprofile">
+      				<tr>
+      					<td class="rightprofile">School</td>
+      					<td class="leftprofile"><input type="text" name="q" id="query" />
+      					{% for error in form.sid.errors %}
+              	<span style="color:red">{{ error }}</span>
+              {% endfor %}</td>
+      				</tr>
+      				<tr>
+      					<td class="rightprofile">Name</td>
+      					<td class="leftprofile">{{form.name}}
+      					{% for error in form.name.errors %}
+              	<span style="color:red">{{ error }}</span>
+              {% endfor %}</div></td>
+      				</tr>
+      				<tr>
+      					<td class="rightprofile">Section</td>
+      					<td class="leftprofile">{{ form.section }}
+      					{% for error in form.section.errors %}
+              	<span style="color:red">{{ error }}</span>
+              {% endfor %}</td>
+      				</tr>
+      				
+      				<tr>
+      					<td class="rightprofile">      					 
+						<input type="submit" value="Add Class" />
+      					</td>
+      				</tr>
+      			</table>
+      		</td>
+      	</tr>
+     </table>
+</fieldset>
+</div>
+</form>
+</body>
+
+</html>

@@ -1,0 +1,39 @@
+        
+    <form method="POST" enctype="multipart/form-data" class="niceform" name="boundaryTyp" id="boundaryTyp" onsubmit="return false;">{% csrf_token %}
+        <table>
+            <tr>
+      		    <td>
+      		        <table>
+      		            <tr>
+      		                <td class="rightprofile">Boundary Type</td>
+      		                <td class="leftprofile">
+      		                    {{form.boundary_type}}
+      		                    {% for error in form.boundary_type.errors %}
+      		                        <span style="color:red">{{ error }}</span>
+      		                    {% endfor %}
+      		                </td>
+      		            </tr>
+      		            <tr>
+      					    <td class="rightprofile">
+                    		    <input type="submit" value="Add Boundary Type" />
+      				        </td>
+      				    </tr>
+      		        </table>
+      		    </td>
+      		</tr>
+        </table>
+    </form>
+   <script>
+  $(document).ready(function(){     
+   $("#boundaryTyp").submit(function(){       
+    $.post(  
+        '/boundary-type/creator/',  
+        $("#boundaryTyp").serialize(),  
+                function(data){                                                          
+                    //parent.location.href='/akshara/boundary-list/';             
+                    $("#subForm").html(''); 
+               }  
+           );  
+       });  
+});  
+</script> 

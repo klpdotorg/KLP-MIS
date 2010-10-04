@@ -1,0 +1,29 @@
+{% extends "index.html" %}
+{% block leftpart%}{% endblock %}
+{% block midpart %}
+	<div class="boundRow">
+	    <div class="boundLink">
+	        Boundary
+	    </div>	    
+	    <div class="boundLink">
+	        <a href='/akshara/boundary-entry/'>Add</a>
+	    </div>	 
+	    <div class="boundLink">
+	        <a href='/akshara/boundary-list/?selView=partition'>Partition</a>
+	    </div>
+	    <div class="boundLink">
+	        <a href='/akshara/boundary-list/?selView=merge'>Merge</a>
+	    </div>	    
+	    <div class="boundLink">
+	        <a href='/akshara/boundary-list/?selView=view'>View</a>
+	    </div>
+    </div>	   
+    <div class="boundRow">
+        <div class="boundLink">
+	        Child
+	    </div>
+	    <div class="boundLink">
+	        <a href='/akshara/child-entry/?redUrl=homePage'>Add</a>
+	    </div>
+    </div> 	    
+{% endblock %}

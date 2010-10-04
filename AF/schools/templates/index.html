@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>{{title}}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="/static_media/js/jquery.js"></script>
+<script language="javascript" type="text/javascript" src="/static_media/js/niceforms.js"></script>
+<script type="text/javascript" src="/static_media/js/jquery.autocomplete.js"></script>
+<script type="text/javascript" src="/static_media/js/call_autocomplete.js"></script>
+<script type="text/javascript" src="/static_media/js/jquery.treeview.js"></script>
+<script type="text/javascript" src="/static_media/js/cleanup_hidden.js"></script>
+<script src="/static_media/js/jquery.treeview.async.js" type="text/javascript"></script>
+
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/form.css" />
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/style.css" />
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/jquery.treeview.css" />
+
+
+</head>
+
+<body>
+<div id="container">
+
+{% if entry == "Add" %}
+<fieldset>
+    <legend>{{legend}}</legend>
+{% else %}
+<div class="tablebg">
+{% endif %}
+	{% block leftpart %}
+	<script type="text/javascript">
+	$(document).ready(function(){
+		$("#treeBlk").treeview({
+			url: "/tree/",
+		})
+	});
+	
+	</script>
+	<div class="leftPane">
+           
+            <div class="treeMen">
+                   <ul id="treeBlk" class="filetree treeview-famfamfam"></ul>
+            </div>
+            <div class="addBound">
+                <div class="boundLink">
+                    <a href='/boundary/creator/' onclick="return schoolView(this);">Add Root Boundary <img src="/static_media/images/boundary_add.gif" title="Add Boundary" /></a>
+                </div>
+            </div>
+       </div>
+    {% endblock %}
+	{% block midpart %}{% endblock %}
+
+{% if entry == "Add" %}
+</fieldset>
+{% else %}
+</div>
+{% endif %}
+
+<script>
+        function deleteSchool(referKey,type){
+            var conf = confirm("Are You Sure, You Want to delete "+type);
+            if (conf==true){                                
+                $.ajax({                    
+                    url: '/'+type+'/'+referKey+'/delete/',
+                    success: function(data) {
+			if (type=='section')
+				$("#sections_"+referKey).remove();
+			else
+                        	$("#"+type+'_'+referKey).remove();
+                    }
+                });
+
+            }
+        }
+</script>
+
+    <script>
+function schoolView(thisObj){
+	    $.ajax({
+            url: thisObj.href,
+            success: function(data) {
+                $("#dyncData").html(data);
+		NFInit();
+		$("#subForm").html('');
+            }
+        });
+	return false;
+	}
+
+function subForm(thisObj){
+	    $.ajax({
+            url: thisObj.href,
+            success: function(data) {
+		NFDo('stop');
+                $("#subForm").html(data);
+		NFDo('start');
+            }
+        });  
+          
+	    return false;
+	}
+
+function schoolAdd(thisObj){
+	currentId=$(thisObj).attr('id');
+	addId=$('#'+currentId).parent().parent().attr('id').split('_')[1];
+	$.ajax({
+            url: thisObj.href,
+            success: function(data) {
+                $("#dyncData").html(data); 
+		NFInit();
+                $('#id_parent').val(addId);
+            }
+        });
+	return false;
+	}
+
+function call_js(thisObj,ObjValue){
+	currentId=$(thisObj).attr('id');
+          if (typeof currentId=='undefined' ){
+                currentId='treeBlk';
+                 ObjValue='boundary';
+                 ObjId = $('#'+ObjValue+'_id').val();
+		}
+        else
+           {
+         //curOb=$('#'+currentId)
+	       ObjId = $('#'+ObjValue+'_id').val();
+                 }
+	newChildId = (ObjValue+'_'+$('#'+ObjValue+'_id').val());
+	    $.ajax({
+            url: '/createnew/'+ObjValue+'/'+ObjId+'/',
+            success: function(data) {
+		     var topbranch = $("#"+currentId+" ul").append("<li id="+newChildId+" class='last'>"+data+"</li>");
+			curentHtml=$('#'+currentId).html();
+		     findStr='<div class="hitarea hasChildren-hitarea  collapsable-hitarea"></div>'
+		     indexval=curentHtml.indexOf('hitarea');
+		     if (indexval!=12 && currentId!='treeBlk'){
+		             //alterHtml=findStr+curentHtml;
+                                topbranch=$("#"+currentId).append("<ul> <li id="+newChildId+" class='last'>"+data+"</li></ul>");
+		         }
+                        if (currentId=='treeBlk')
+                                var topbranch = $("<li id="+newChildId+" class='last'>"+data+"</li>").appendTo("#"+currentId);
+			 $('#'+currentId).treeview({
+			  add: topbranch,
+			 }); 
+                        if (currentId!='treeBlk'){
+			      $('#'+currentId).attr('class','collapsable');
+                        }
+			return false;
+			}
+		});
+	}
+
+</script>
+</div>
+</body>
+</html>

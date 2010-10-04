@@ -1,0 +1,28 @@
+{% extends "index.html" %}
+{% block leftpart%}{% endblock %}
+{% block midpart %}        
+    <form action="." method="POST" enctype="multipart/form-data" class="niceform">{% csrf_token %}
+        <table>
+            <tr>
+      		    <td>
+      		        <table>
+      		            <tr>
+      		                <td class="rightprofile">School Category</td>
+      		                <td class="leftprofile">
+      		                    {{form.name}}
+      		                    {% for error in form.name.errors %}
+      		                        <span style="color:red">{{ error }}</span>
+      		                    {% endfor %}
+      		                </td>
+      		            </tr>
+      		            <tr>
+      					    <td class="rightprofile">
+                    		    <input type="submit" value="Add School Category" />
+      				        </td>
+      				    </tr>
+      		        </table>
+      		    </td>
+      		</tr>
+        </table>
+    </form>
+{% endblock %}

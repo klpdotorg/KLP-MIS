@@ -1,0 +1,16 @@
+{% for  boundary in boundary_list  %}
+    <div class="selBoundary" id="boundary-{{boundary.id}}">
+        <div class="boundLink">{{boundary.name}}</div>
+        <div class="boundLink">
+            <span class="gallery clearfix">
+                <a href='/akshara/boundary/{{boundary.id}}/edit/?iframe=true&amp;width=500&amp;height=300' rel="prettyPhoto[iframe]">Edit</a>
+            </span>
+        </div>
+        <div class="boundLink">                                
+            <span class="delConf" onclick="deleteConfiramtion('{{boundary.id}}')">Delete</span>
+        </div>
+        <div class="boundLink">
+            <a href='/akshara/boundary/{{boundary.id}}/view/'>View</a>
+        </div>
+    </div>
+{% endfor %}                                           

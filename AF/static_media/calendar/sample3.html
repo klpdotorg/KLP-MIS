@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+	<title>Tigra Calendar Sample #3 - Initial Settings</title>
+
+	<!-- link calendar files  -->
+	<script language="JavaScript" src="calendar_us.js"></script>
+	<link rel="stylesheet" href="calendar.css">
+
+	</head>
+<body>
+
+<form name="testform">
+
+	<!-- calendar can be preset by specifying the value in the input box -->
+	<input type="text" name="testinput" value="11/26/2008" />
+	<script language="JavaScript">
+
+	new tcal ({
+		// form name
+		'formname': 'testform',
+		// input name
+		'controlname': 'testinput',
+	});
+	</script>
+
+	<br />
+	<input type="text" name="testinput2" />
+	<script language="JavaScript">
+
+	// sample of date calculations:
+	// - set selected day to 3 days from now
+	var d_selected = new Date();
+	d_selected.setDate(d_selected.getDate() + 3);
+	var s_selected = f_tcalGenerDate(d_selected);
+	
+	// - set today as yesterday
+	var d_yesterday = new Date();
+	d_yesterday.setDate(d_yesterday.getDate() - 1);
+	var s_yesterday = f_tcalGenerDate(d_yesterday);
+
+	new tcal ({
+		// form name
+		'formname': 'testform',
+		// input name
+		'controlname': 'testinput2',
+		'selected' : s_selected,
+		'today' : s_yesterday
+	});
+	
+	</script>
+	
+	</form>
+
+</body>
+</html>

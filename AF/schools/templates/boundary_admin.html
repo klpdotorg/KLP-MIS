@@ -1,0 +1,88 @@
+{% extends "index.html" %}
+{% block leftpart%}{% endblock %}
+{% block midpart %}                        
+                        
+            <form action="." method="POST" enctype="multipart/form-data" class="niceform" id="boundaryForm" name="boundaryForm" onsubmit="return false;">{% csrf_token %}                
+                <input type="hidden" name="url" value="{{url}}" id="url" />    
+                <input type="hidden" name="redUrl" value="{{redUrl}}" id="redUrl" />    
+                <input type="hidden" name="selBoundary" value="{{selBoundary}}" id="selBoundary"/>                
+                    <table>
+      	                <tr>
+      		                <td>
+      			                <table class="tblprofile">
+      				                <tr>
+      					                <td class="rightprofile">Parent</td>
+      					                <td class="leftprofile">
+                                            <input type="text" size="15" id="boundary" value="{{boundaryobj.parent.name}}" / >
+                                            <input type="hidden" name="parent" id="id_boundary" size="15" value="{{boundaryobj.parent.id}}" / >
+                                        </td>
+      				                </tr>
+      				                <tr>
+      					                <td class="rightprofile">Name</td>
+      					                <td class="leftprofile">
+                                            <input type="text" size="15" id="id_name" name="name" value="{{boundaryobj.name}}" / >
+                                        </td>
+      				                </tr>
+      				                <tr>
+      					                <td class="rightprofile">Boundary Type</td>
+      					                <td class="leftprofile">
+                                            <input type="text" size="15" id="boundary_type" value="{{boundaryobj.boundary_type}}" / >
+                                            <input type="hidden" name="boundary_type" id="id_boundary_type" size="15" value="{{boundaryobj.boundary_type.id}}" />
+                                            <!--span onclick="openbox('Add Type',0)" class="adNewBoundTyp"> + </span-->
+                                            <td class="gallery clearfix">
+                                                {% if entry %}
+                                                    <span class="adNewBoundTyp">
+                                                        <a href="/akshara/boundary-type/?iframe=true&amp;width=500&amp;height=200" rel="prettyPhoto[iframe]" oncontextmenu="return false">+</a>
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                        </td>
+      				                </tr>
+      				                <tr>
+      					                <td class="rightprofile">Geo Code</td>
+      					                <td class="leftprofile">
+                                            <input type="text" size="15" id="id_geo_code" name="geo_code" value="{{boundaryobj.geo_code}}" / >
+                                        </td>
+      				                </tr>
+      				
+      				                <tr>
+                      					<td class="rightprofile">Active</td>
+      			                		<td class="leftprofile">
+      			                		    {{ form.active }}
+      			                		    {% for error in form.active.errors %}
+                                              	<span style="color:red">{{ error }}</span>
+                                            {% endfor %}
+                                        </td>
+      			                	</tr>
+      			            	    <tr>
+      					                <td class="rightprofile">
+                    						<input type="submit" value="{{legend}}" />
+      				                	</td>
+      				                </tr>
+      			                </table>
+      		                </td>
+      	                </tr>
+                    </table>
+               
+            </div>
+        </form>         
+<script>
+ (function($) { $(function() {
+  autoCompleteCall('/akshara/get-info/','boundary,boundary_type','true,true','1,1')
+
+});})(jQuery);
+</script>
+<script>
+  $(document).ready(function(){  
+   $("#boundaryForm").submit(function(){            
+    $.post(  
+        $('#url').val(),  
+        $("#boundaryForm").serialize(),  
+                function(data){                                                          
+                    parent.location.href='/akshara/boundary-list/';             
+               }  
+           );  
+       });  
+});  
+</script>
+{% endblock %}

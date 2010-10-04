@@ -1,0 +1,29 @@
+{% extends "index.html" %}
+{% block leftpart%}{% endblock %}
+{% block midpart %}        
+    <form action="." method="POST" enctype="multipart/form-data" class="niceform" name="myForm" id="myForm" onsubmit="return false;">{% csrf_token %}
+      		        <table>
+      				<input type="hidden" name="classname" id="id_classname" value = '{{class_id}}' / >
+      				<input type="hidden" name="url" id="url" value = '{{url}}' / >
+      		            <tr>
+      					<td class="rightprofile">Section</td>
+      					<td class="leftprofile">
+					{{form.active}}
+					<select size="8" name="section" id="id_section" multiple="multiple">
+					{% for section in sectionnames %}
+						{% if section not in sections %}
+							<option value="{{section}}">{{section}}</option>
+						{% endif %}
+					{% endfor %}
+					</select>
+					</td>
+      				</tr>
+      				
+      		            <tr>
+      				<td class="rightprofile">
+                    		    <input type="submit" value="Add Section" />
+      				        </td>
+      			</tr>
+      		        </table>
+    </form>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends "index.html" %}
+{% block leftpart%}{% endblock %}
+{% block midpart %}
+
+<form action="." method="POST" enctype="multipart/form-data" class="niceform" id="myForm" onsubmit="return false;">{% csrf_token %}
+                            <input type="hidden" name="url" value="{{url}}" id="url" />
+                            <input type="hidden" name="parentId" value="{{boundary_id}}" id="parentId" />
+                            <table class="tblprofile">                
+                                <tr>
+                                    <td><label for="address">Address:</label></td>
+                                    <td>					
+       	        			<input type="hidden" name="boundary" id="id_boundary" size="15" value='{{boundary_id}}'/>
+                                        <input type="text" size="15" id="address" value='{{schoolobj.address.address}}' />
+                                        <input type="hidden" name="address" id="id_address" size="15" value='{{schoolobj.address.id}}' />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><label for="address">Dise Code:</label></td>
+                                    <td>
+                                        <input type="text" name="dise_code" id="id_dise_code" size="15" value='{{schoolobj.dise_code}}' />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><label for="address">Name:</label></td>
+                                    <td>
+                                        <input type="text" name="name" id="id_name" size="15" value='{{schoolobj.name}}' />
+                                    </td>
+                                </tr>
+                                <tr>
+					<td><label for="address">Category:</label></td>
+					<td>
+					{{form.cat}}</td>
+					<td class="gallery clearfix">
+					    {% if entry %}
+						<span class="adNewBoundTyp">
+						    <a href="/akshara/category-entry/?iframe=true&amp;width=500&amp;height=200" rel="prettyPhoto[iframe]" oncontextmenu="return false">+</a>
+						</span>
+					    {% endif %}
+					</td>
+					
+                                </tr>
+                                <tr>
+                                    <td><label for="address">School Type:</label></td>
+                                    <td>
+                                        <input type="text" name="school_type" id="school_type" autocomplete="off" class="ac_input" size="15" value='{{schoolobj.school_type}}' />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><label for="address">Language:</label></td>
+                                    <td>
+                                        {{form.languages}}
+					<td class="gallery clearfix">
+					    {% if entry %}
+						<span class="adNewBoundTyp">
+						    <a href="/akshara/language-entry/?iframe=true&amp;width=500&amp;height=200" rel="prettyPhoto[iframe]" oncontextmenu="return false">+</a>
+						</span>
+					    {% endif %}
+					</td>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><label for="address">Management:</label></td>
+                                    <td>
+                                        {{form.mgmt}}
+					<td class="gallery clearfix">
+					    {% if entry %}
+						<span class="adNewBoundTyp">
+						    <a href="/akshara/management-entry/?iframe=true&amp;width=500&amp;height=200" rel="prettyPhoto[iframe]" oncontextmenu="return false">+</a>
+						</span>
+					    {% endif %}
+					</td>
+                                    </td>
+                                </tr>    
+                                <tr>
+                                    <td>
+                                        {{form.active}}
+                                        <input type="submit" value="Submit" />
+                                    </td>
+                                </tr>        
+                            </table>
+        </form>
+<script>
+(function($) { $(function() {
+  autoCompleteCall('/akshara/get-info/','boundary,address,school_type','false,false,false,false,true,false','1,1,0')
+
+
+});})(jQuery);
+</script>
+
+
+{% endblock %}

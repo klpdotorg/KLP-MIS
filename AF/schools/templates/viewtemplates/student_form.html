@@ -1,0 +1,59 @@
+<div class="detailHead">
+<span class="hedText">Student Entry Form</span>
+</div>
+<form action="." method="POST" enctype="multipart/form-data" class="niceform" name="studentForm" id="studentForm" onsubmit="return false;">{% csrf_token %}
+
+      			<table class="tblprofile">
+      			    <input type="hidden" name="url" value="/sections/{{referKey}}/student/creator/" id="url" />                    
+      			    <input type="hidden" id="id_class_section" name="class_section" value="{{referKey}}"/>      				
+      				<tr>
+      					<td class="rightprofile">Child</td>
+      					<td class="leftprofile">
+					<input type="text" size="15" id="child" value='{{studentobj.name}}' />
+       	        			<input type="hidden" name="name" id="id_child" size="15" value='{{studentobj.name.id}}' />
+					
+					</td>
+      				</tr>
+      				<tr>
+      					<td class="rightprofile">Academic</td>{{form.active}}
+      					<td class="leftprofile">{{ form.academic }}
+      					{% for error in form.academic.errors %}
+					<span style="color:red">{{ error }}</span>
+					{% endfor %}
+					<td class="gallery clearfix">					    
+						<span class="adNewBoundTyp">
+						    <a href="/academic/creator/" onclick="return subForm(this)">+</a>
+						</span>					    
+					</td></td>
+      				</tr>
+      				
+      				<tr>
+      					<td class="rightprofile">      					 
+						<input type="submit" value="Add Student" />
+      					</td>
+      				</tr>
+      			</table>
+</form>
+<script>
+(function($) { $(function() {
+  autoCompleteCall('/akshara/get-info/','child','false','1','1')
+  Cleanuphidden('child');
+});})(jQuery);
+</script>
+<script>
+  $(document).ready(function(){     
+   $("#studentForm").submit(function(){
+    parentId=$('#id_class_section').val();
+    $.post(  
+        $('#url').val(),  
+        $("#studentForm").serialize(),  
+                function(data){                                                                              
+                    $("#dyncData").html(data); 
+			ObjId='#sections_'+parentId
+            		Obj=$(ObjId)                          
+                    	call_js(Obj,'student');
+               }  
+           );  
+       });  
+});  
+</script>

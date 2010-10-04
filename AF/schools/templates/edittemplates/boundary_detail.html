@@ -1,0 +1,91 @@
+    <div class="detailHead">
+<span class="hedText">Boundary Edit Form</span>
+</div>
+            <form action="." method="POST" enctype="multipart/form-data" class="niceform" id="boundaryForm" name="boundaryForm" onsubmit="return false;">{% csrf_token %}                                                
+                    <table>
+      	                <tr>
+      		                <td>
+      			                <table class="tblprofile">
+      				                <tr>
+      					                <td class="rightprofile">Parent</td>
+      					                <td class="leftprofile">
+                                            <input type="text" size="15" id="boundary" value="{{boundary.parent.name}}" / >
+                                            <input type="hidden" name="parent" id="id_boundary" size="15" value="{{boundary.parent.id}}" / >
+						
+                                        </td>
+      				                </tr>
+      				                <tr>
+      					                <td class="rightprofile">Name</td>
+      					                <td class="leftprofile">
+                                            <input type="text" size="15" id="id_name" name="name" value="{{boundary.name}}" / >
+                                            <input type="hidden" size="15" id="id_old" name="old" value="{{boundary.name}}" / >
+                                        </td>
+      				                </tr>
+      				                <tr>
+      					                <td class="rightprofile">Boundary Type</td>
+      					                <td class="leftprofile">
+                                            <input type="text" size="15" id="boundary_type" name:int="boundary_type" value="{{boundary.boundary_type}}" / >
+                                            <input type="hidden" name="boundary_type" id="id_boundary_type" size="15" value="{{boundary.boundary_type.id}}" />
+                                            <!--span onclick="openbox('Add Type',0)" class="adNewBoundTyp"> + </span-->
+                                            <td class="gallery clearfix">
+                                                {% if entry %}
+                                                    <span class="adNewBoundTyp">
+                                                        <a href="/akshara/boundary-type/?iframe=true&amp;width=500&amp;height=200" rel="prettyPhoto[iframe]" oncontextmenu="return false">+</a>
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                        </td>
+      				                </tr>
+      				                <tr>
+      					                <td class="rightprofile">Geo Code</td>
+      					                <td class="leftprofile">
+                                            <input type="text" size="15" id="id_geo_code" name="geo_code" value="{{boundary.geo_code}}" / >
+                                        </td>
+      				                </tr>
+      				
+      				                <tr>
+                      					<td class="rightprofile">Active</td>
+      			                		<td class="leftprofile">
+      			                		    
+                                            <input type="checkbox" id="id_active" name="active" checked="checked">
+                                        </td>
+      			                	</tr>
+      			            	    <tr>
+      					                <td class="rightprofile">
+                    						<input type="submit" value="Submit" />
+      				                	</td>
+      				                </tr>
+      			                </table>
+      		                </td>
+      	                </tr>
+                    </table>
+               
+            </div>
+        </form>         
+<script>
+ (function($) { $(function() {
+  autoCompleteCall('/akshara/get-info/','boundary,boundary_type','true,true','1,1','0')
+
+});})(jQuery);
+    
+    $("#boundaryForm").submit(function(){
+    oldName = $('#id_old').val();
+    newName = $('#id_name').val();
+    $.post(  
+        '{{boundary.get_update_url}}',
+        $("#boundaryForm").serialize(),
+                function(data){
+                    //parent.location.reload();
+                    $('#dyncData').html(data);
+                    ChangeHtml=$("#boundary_{{boundary.id}}").children('span').html();
+                    ChangeHtml=ChangeHtml.replace(oldName, newName);
+                    $("#boundary_{{boundary.id}}").children('span').html(ChangeHtml);
+                    
+               } 
+               
+           );  
+           
+       });
+
+</script>
+

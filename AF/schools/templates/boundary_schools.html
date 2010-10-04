@@ -1,0 +1,35 @@
+{% extends "index.html" %}
+{% block leftpart%}{% endblock %}
+{% block midpart %}           
+    <form action="/akshara/boundary-partition/" method="post" class="niceform" id="partitionForm" name="partitionForm">{% csrf_token %} 
+    <input type="hidden" name="selBoundary" id="selBoundary" value="{{selBoundary}}"/>
+    <div style="width:95%;padding:5px;">    
+    {% for school in schoolsList%}
+        <span style="width:15%; padding:8px;">
+            <input type="checkbox" name="schools" id="{{school.id}}" value="{{school.id}}"/>{{school.name}}
+        </span>
+    {% endfor %}                                                          
+    </div>
+    <div style="width:95%;padding:5px;">
+        <table class="tblprofile">
+            <tr>
+      		    <td class="rightprofile">New Boundary1</td>
+      		    <td class="leftprofile">
+      		        <input type="text" name="newBoundary1" id="newBoundary1"/>
+      		    </td>
+      		</tr>
+      		<tr>
+      		    <td class="rightprofile">New Boundary2</td>
+      		    <td class="leftprofile">
+      		        <input type="text" name="newBoundary2" id="newBoundary2" value="{{title}}" />      		        
+      		    </td>
+      		</tr>
+      		<tr>
+      		    <td class="rightprofile">
+                    <input type="submit" value="Submit" />
+      			</td>
+      		</tr>                
+    </div>
+    </form> 
+    
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "index.html" %}
+{% block leftpart%}{% endblock %}
+{% block midpart %}                                 
+    <form action="/akshara/boundary-schools/" name="mergeForm" id="mergeForm" class="niceform" >
+        <div style="width:95%;text-align:center;">
+        <span style="padding:5px 10px;">
+        <select size="10" name="selBoundary" id="id_selBoundary" multiple="multiple">
+            {% for boundary in boundaryList %}
+                <option value="{{boundary.id}}">{{boundary.name}}</option>
+            {% endfor %}            
+        </select>
+        </span>
+        <span style="padding:5px 10px;">        
+            <input type="submit" value="Submit"/>
+        </span>
+        </div>
+    </form>                                                        
+
+{% endblock %}

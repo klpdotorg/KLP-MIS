@@ -1,0 +1,44 @@
+       
+    <form action="." method="POST" enctype="multipart/form-data" class="niceform" id="mgmtForm" onsubmit="return false;">{% csrf_token %}
+        <table>
+            <tr>
+      		    <td>
+      		        <table>
+      		            <tr>
+      		                <td class="rightprofile">Management</td>
+      		                <td class="leftprofile">
+      		                    {{form.name}}
+      		                    {% for error in form.name.errors %}
+      		                        <span style="color:red">{{ error }}</span>
+      		                    {% endfor %}
+      		                </td>
+      		            </tr>
+      		            <tr>
+      					    <td class="rightprofile">
+                    		    <input type="submit" value="Add Management" />
+      				        </td>
+      				    </tr>
+      		        </table>
+      		    </td>
+      		</tr>
+        </table>
+    </form>
+<script>
+  $(document).ready(function(){     
+   $("#mgmtForm").submit(function(){       
+   var formInputs = $("form#mgmtForm :input");
+   formInputs.each(function(index) {
+         if ($(this).attr("id") =="id_name")
+            newlyAdded = $(this).val();
+    });   
+    $.post(  
+        '/school-management/creator/',  
+        $("#mgmtForm").serialize(),  
+                function(data){                                                                                                      
+                    $("#id_mgmt").append("<option value="+data+">"+newlyAdded+"</option>");
+                    $("#subForm").html(''); 
+               }  
+           );  
+       });  
+});  
+</script> 

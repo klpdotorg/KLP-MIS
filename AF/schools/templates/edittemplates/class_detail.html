@@ -1,0 +1,43 @@
+<div class="detailHead">
+<span class="hedText">Class Edit Form</span>
+</div>
+			<form action="." method="POST" enctype="multipart/form-data" class="niceform" id="classForm" name="classForm" onsubmit="return false;">{% csrf_token %}
+			    <input type="hidden" name="url" value="{{url}}" id="url" />                
+      			<table class="tblprofile">
+      			    <input type="hidden" name="sid" id="id_school" value = '{{classObj.sid.id}}' / >      				
+      				<tr>
+      					<td class="rightprofile">Name</td>
+      					<td class="leftprofile">
+      					    <input type="text" name="name" id="id_name" value="{{classObj.name}}"/>
+      					    <input type="hidden" name="old" id="id_old" value="{{classObj.name}}"/>
+      					</td>
+      				</tr>      				      				
+      				<tr>
+      					<td class="rightprofile">
+      					<span style="display:none"><input type="checkbox" id="id_active" name="active" checked="checked"></span>
+						<input type="submit" value="Submit" />
+      					</td>
+      				</tr>
+      			</table>      		
+</form>
+<script >
+
+$("#classForm").submit(function(){       
+    oldName = $('#id_old').val(); 
+    newName = $('#id_name').val();     
+    $.post(  
+        '{{classObj.get_update_url}}',  
+        $("#classForm").serialize(),  
+                function(data){                                                          
+                    //parent.location.reload();             
+                    $('#dyncData').html(data);    
+                    ChangeHtml=$("#class_{{classObj.id}}").children('span').html();
+                    ChangeHtml=ChangeHtml.replace(oldName, newName);                    
+                    $("#class_{{classObj.id}}").children('span').html(ChangeHtml);                  
+               } 
+               
+           );  
+       });
+
+</script>
+

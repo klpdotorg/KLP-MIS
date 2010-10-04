@@ -1,0 +1,35 @@
+{% extends "index.html" %}
+
+{% block midpart %}
+<form action="." method="POST" enctype="multipart/form-data">{% csrf_token %}
+      			<table class="tblprofile">
+      				<tr>
+      					<td>Address</td>
+      					<td>{{ form.address }}
+      					{% for error in form.address.errors %}
+              	<span style="color:red">{{ error }}</span>
+              {% endfor %}</td>
+      				</tr>
+      				<tr>
+      					<td>Landmark</td>
+      					<td>{{form.landmark}}
+      					{% for error in form.landmark.errors %}
+              	<span style="color:red">{{ error }}</span>
+              {% endfor %}</div></td>
+      				</tr>
+      				<tr>
+      					<td>Pin</td>
+      					<td>{{ form.pin }}
+      					{% for error in form.pin.errors %}
+              	<span style="color:red">{{ error }}</span>
+              {% endfor %}</td>
+      				</tr>
+      				
+      				<tr>
+      					<td>
+						<input type="submit" value="Add Address" />
+      					</td>
+      				</tr>
+      			</table>
+</form>
+{% endblock %}

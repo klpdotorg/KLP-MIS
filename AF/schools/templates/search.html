@@ -1,0 +1,32 @@
+<html>
+    <head>
+	<title>Akshara Foundation</title>
+	<link rel="stylesheet" type="text/css" href="/static_media/css/base.css"/>
+    </head>
+<body>
+    <div style="margin:10px auto 0;width:996px;">
+	<div align="center"><h1>Akshara Foundation</h1></div>
+	
+	<form action="." method="GET" enctype="multipart/form-data">{% csrf_token %}
+		<div align="center">
+		    <input type="text" name="search" />
+		    <select name="category">
+			<option value="school">School</option>			
+			<option value="child">Child</option>
+			<option value="student">Student</option>			
+		    </select>
+		    <input type="submit" value="submit" />
+		</div>
+	</form>
+	
+	<div align="center" >
+	    <div style="padding-top:20px;">
+	    {% for info in information %}
+	    	 <a href="/akshara/{{category}}-edit/{{info.id}}/" target=_blank>{{info.name}}</a></br />
+	    {% endfor %}
+	    </div>
+	</div>
+    </div>	
+</body>	
+</html>
+

@@ -1,0 +1,146 @@
+<div class="detailHead">
+<span class="hedText">School Edit Form</span>
+</div>
+<form action="." method="POST" enctype="multipart/form-data" class="niceform" id="schoolForm" onsubmit="return false;">{% csrf_token %}
+                            <input type="hidden" name="url" value="{{url}}" id="url" />
+                            <input type="hidden" name="parentId" value="{{boundary_id}}" id="parentId" />
+                            <table class="tblprofile">
+                                <tr>
+                                    <td><label for="address">Name:</label></td>
+                                    <td>
+                                        <input type="text" name="name" id="id_name" size="15" value='{{school.name}}' />
+                                        <input type="hidden" name="old" id="id_old" size="15" value='{{school.name}}' />
+                                    </td>
+                                </tr>
+                                <tr>
+					<td><label for="address">Category:</label></td>
+					<td>					
+					    <select id="id_cat" name="cat">
+					        {% for category in school.get_all_cat%}
+					            {% if category == school.cat %}
+					                <option value="{{category.id}}" selected>{{category}}</option>
+					            {% else %}
+					                <option value="{{category.id}}">{{category}}</option>
+					            {% endif %}
+					        {% endfor %}
+					    </select>
+					</td>
+					<td class="gallery clearfix">
+					    {% if entry %}
+						<span class="adNewBoundTyp">
+						    <a href="/akshara/category-entry/?iframe=true&amp;width=500&amp;height=200" rel="prettyPhoto[iframe]" oncontextmenu="return false">+</a>
+						</span>
+					    {% endif %}
+					</td>
+					
+                                </tr>
+				<tr>
+                                    <td><label for="address">Dise Code:</label></td>
+                                    <td>
+                                        <input type="text" name="dise_code" id="id_dise_code" size="15" value='{{school.dise_code}}' />
+                                    </td>
+                                </tr>
+				
+                                <tr>
+                                    <td><label for="address">School Type:</label></td>
+                                    <td>
+                                        <input type="text" name="school_type" id="school_type" autocomplete="off" class="ac_input" size="15" value='{{school.school_type}}' />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><label for="address">Language:</label></td>
+                                    <td>                                        
+                                        <select id="id_languages" name="languages" multiple="multiple">
+                                            {% for langauge in school.get_all_languages%}
+                                                {% if langauge in school.languages.all %}
+                                                    <option value="{{langauge.id}}" selected>{{langauge}}</option>
+                                                {% else %}
+                                                    <option value="{{langauge.id}}">{{langauge}}</option>
+                                                {% endif %}    
+                                            {% endfor %}
+                                        </select>
+					<td class="gallery clearfix">
+					    {% if entry %}
+						<span class="adNewBoundTyp">
+						    <a href="/akshara/language-entry/?iframe=true&amp;width=500&amp;height=200" rel="prettyPhoto[iframe]" oncontextmenu="return false">+</a>
+						</span>
+					    {% endif %}
+					</td>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><label for="address">Management:</label></td>
+                                    <td>
+                                        {{form.mgmt}}
+                                        
+                                        <select id="id_mgmt" name="mgmt">
+                                            {% for mgmt in school.get_all_mgmt%}
+					                            {% if mgmt == school.mgmt %}
+					                                <option value="{{mgmt.id}}" selected>{{mgmt}}</option>
+					                            {% else %}
+					                                <option value="{{mgmt.id}}">{{mgmt}}</option>
+					                            {% endif %}
+					                        {% endfor %}
+                                        </select>
+					<td class="gallery clearfix">
+					    {% if entry %}
+						<span class="adNewBoundTyp">
+						    <a href="/akshara/management-entry/?iframe=true&amp;width=500&amp;height=200" rel="prettyPhoto[iframe]" oncontextmenu="return false">+</a>
+						</span>
+					    {% endif %}
+					</td>
+                                    </td>
+                                </tr>
+				<tr>
+                                    <td><label for="address">Address:</label></td>
+                                    <td>					
+       	        			<input type="hidden" name="boundary" id="id_boundary" size="15" value='{{school.boundary.id}}'/>
+                                        <input type="text" size="15" name="address" id="id_address" value='{{school.address}}' />
+                                    </td>
+                                </tr>
+				<tr>
+                                    <td><label for="address">Landmark:</label></td>
+                                    <td>
+                                        <input type="text" size="15" name="landmark" id="id_landmark" value='{{school.landmark}}' />
+                                    </td>
+                                </tr>
+				<tr>
+                                    <td><label for="address">Pincode:</label></td>
+                                    <td>
+                                        <input type="text" size="15" name="pincode" id="id_pincode" value='{{school.pincode}}' />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span style="display:none"><input type="checkbox" id="id_active" name="active" checked="checked"></span>
+                                        <input type="submit" value="Submit" />
+                                    </td>
+                                </tr>        
+                            </table>
+        </form>
+<script>
+(function($) { $(function() {
+  autoCompleteCall('/akshara/get-info/','boundary,school_type','false,false,false,true,false','1,0','0')
+
+
+});})(jQuery);
+
+$("#schoolForm").submit(function(){ 
+    oldName = $('#id_old').val(); 
+    newName = $('#id_name').val();       
+    $.post(  
+        '{{school.get_update_url}}',  
+        $("#schoolForm").serialize(),  
+                function(data){                                                          
+                    //parent.location.reload();             
+                    $('#dyncData').html(data);
+                    ChangeHtml=$("#school_{{school.id}}").children('span').html();
+                    ChangeHtml=ChangeHtml.replace(oldName, newName);                    
+                    $("#school_{{school.id}}").children('span').html(ChangeHtml);                    
+               } 
+               
+           );  
+       });
+</script>
+
+

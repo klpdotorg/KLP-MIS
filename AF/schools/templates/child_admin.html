@@ -1,0 +1,55 @@
+{% extends "index.html" %}
+{% block leftpart%}{% endblock %}
+{% block midpart %}
+<script type="text/javascript" src="/static_media/calendar/calendar_us.js"></script>
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/calendar/calendar.css" />
+<form action="." method="POST" enctype="multipart/form-data" class="niceform" name="childForm" id="childForm">{% csrf_token %}
+<input type="hidden" name="redUrl" id="redUrl" value="{{redUrl}}"/>
+      			<table class="tblprofile">
+      				<tr>
+      					<td class="rightprofile">Name</td>
+      					<td class="leftprofile">{{ form.name }}
+      					{% for error in form.name.errors %}
+              	<span style="color:red">{{ error }}</span>
+              {% endfor %}</td>
+      				</tr>
+      				<tr>
+      					<td class="rightprofile">Date of Birth</td>
+      					<td class="leftprofile">{{form.dob}}
+      					<script language="JavaScript">
+                            new tcal ({
+                                // form name
+                                'formname': 'childForm',
+                                // input name
+                                'controlname': 'dob'
+                            });
+
+                        </script>  (yyyy-mm-dd)
+      					</td>
+      				</tr>
+      				<tr>
+      					<td class="rightprofile">Sex</td>
+      					<td class="leftprofile">{{ form.sex }}</td>
+      				</tr>
+      				<tr>
+      					<td class="rightprofile">Mother Tounge</td>
+      					<td class="leftprofile">{{ form.mt }}
+					<td class="gallery clearfix">
+					    {% if entry %}
+						<span class="adNewBoundTyp">
+						    <a href="/akshara/language-entry/?iframe=true&amp;width=500&amp;height=200" rel="prettyPhoto[iframe]" oncontextmenu="return false">+</a>
+						</span>
+					    {% endif %}
+					</td>
+					</td>
+      				</tr>
+      				
+      				<tr>
+      					<td class="rightprofile">
+						<input type="submit" value="Add Child" />
+      					</td>
+      				</tr>
+      			</table>
+</form>
+
+{% endblock %}

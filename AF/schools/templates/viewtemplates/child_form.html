@@ -1,0 +1,75 @@
+<div class="detailHead">
+	<span class="hedText">Child Entry Form</span>
+</div>
+<form action="." method="POST" enctype="multipart/form-data" class="niceform" name="childForm" id="childForm" onsubmit="return false;">{% csrf_token %}
+<script type="text/javascript" src="/static_media/js/jquery-ui-1.8.5.custom.min.js"></script>
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/ui-lightness/jquery-ui-1.8.5.custom.css"/>
+      			<table class="tblprofile">
+      				<tr>
+      					<td class="rightprofile">First Name</td>
+      					<td class="leftprofile">{{ form.firstName }}
+      					{% for error in form.name.errors %}
+              	<span style="color:red">{{ error }}</span>
+              {% endfor %}
+              <input type="hidden" name="boundary" id="id_boundary" size="15" value='{{referKey}}'/>
+              </td>
+      				</tr>
+      				<tr>
+      					<td class="rightprofile">Last Name</td>
+      					<td class="leftprofile">{{ form.lastName }}</td>
+      				</tr>
+      				<tr>
+      					<td class="rightprofile">Date of Birth</td>
+      					<td class="leftprofile">{{form.dob}}
+      					
+                        <script>
+                    	    $(function() {
+		                        $( "#id_dob" ).datepicker();
+	                        });
+	                    </script>
+      					</td>
+      				</tr>
+      				<tr>
+      					<td class="rightprofile">Sex</td>
+      					<td class="leftprofile">{{ form.gender }}</td>
+      				</tr>
+      				<tr>
+      					<td class="rightprofile">Mother Tounge</td>
+      					<td class="leftprofile">{{ form.mt }}
+					<td class="gallery clearfix">
+					    {% if entry %}
+						<span class="adNewBoundTyp">
+						    <a href="/akshara/language-entry/?iframe=true&amp;width=500&amp;height=200" rel="prettyPhoto[iframe]" oncontextmenu="return false">+</a>
+						</span>
+					    {% endif %}
+					</td>
+					</td>
+      				</tr>
+      				<tr>
+      					<td class="rightprofile">Father Name</td>
+      					<td class="leftprofile">{{ form.father }}</td>
+      				</tr>
+      				<tr>
+      					<td class="rightprofile">Mother Name</td>
+      					<td class="leftprofile">{{ form.mother }}</td>
+      				</tr>
+      				<tr>
+      					<td class="rightprofile">
+						<input type="submit" value="Add Child" />
+      					</td>
+      				</tr>
+      			</table>
+</form>
+<script>
+  $(document).ready(function(){     
+   $("#childForm").submit(function(){       
+    $.post(  
+        '/child/{{referKey}}/creator/',  
+        $("#childForm").serialize(),  
+                function(data){                                                                                
+                    $("#dyncData").html(''); 
+               }  
+           );  
+       });  
+});  
+</script> 
