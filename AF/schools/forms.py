@@ -37,10 +37,6 @@ class Boundary_Type_Form(ModelForm):
     class Meta:
         model = Boundary_Type
 
-class Address_Form(ModelForm):
-
-    class Meta:
-	model = Address
 
 class School_Form(ModelForm):
     active = forms.BooleanField(initial=True, widget=forms.HiddenInput)
@@ -71,3 +67,31 @@ class Student_Form(ModelForm):
     class Meta:
 	model = student
 
+class Programme_Form(ModelForm):
+    description = forms.CharField(widget=forms.Textarea(attrs={'rows':4, 'cols':20}))
+    active = forms.BooleanField(initial=True, widget=forms.HiddenInput)
+    
+    class Meta:
+        model = Programme
+    
+class Assessment_Form(ModelForm):
+    query = forms.CharField(widget=forms.Textarea(attrs={'rows':4, 'cols':20}))
+    active = forms.BooleanField(initial=True, widget=forms.HiddenInput)       
+    
+    class Meta:
+        model = Assessment
+    
+class Question_Form(ModelForm):
+    tags = forms.CharField(widget=forms.Textarea(attrs={'rows':4, 'cols':20}))
+    class Meta:
+        model = Question
+        
+class Answer_Form(ModelForm):
+
+    class Meta:
+        model = Answer        
+        
+class AssessmentDetail_Form(ModelForm):      
+    active = forms.BooleanField(initial=True, widget=forms.HiddenInput)  
+    class Meta:
+        model = AssessmentDetail

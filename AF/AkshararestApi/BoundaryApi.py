@@ -1,7 +1,7 @@
 from django.conf.urls.defaults import *
 from django_restapi.model_resource import Collection, Entry, reverse
 from django_restapi.responder import *
-from Akshara.schools.models import Boundary_Type, Boundary
+from schools.models import Boundary_Type, Boundary
 from django_restapi.resource import Resource
 
 from django_restapi.authentication import *

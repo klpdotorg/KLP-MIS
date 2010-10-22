@@ -24,8 +24,8 @@
                                 </tr>
                                 <tr>
                                     <td><label for="address">School Type:</label></td>
-                                    <td>
-                                        <input type="text" name="school_type" id="school_type" autocomplete="off" class="ac_input" size="15" value='{{schoolobj.school_type}}' />
+                                    <td>                                        
+                                        {{form.school_type}}
                                     </td>
                                 </tr>
 				<tr>
@@ -60,14 +60,13 @@
                                     <td><label for="address">Address:</label></td>
                                     <td>
        	        			<input type="hidden" name="boundary" id="id_boundary" size="15" value='{{referKey}}'/>
-                                        <input type="text" name="address" id="id_address" size="15" value='{{schoolobj.address}}' />
+                                        <textarea name="address" id="id_address" rows="4" cols="20"></textarea>
                                     </td>
                                 </tr>
 				<tr>
                                     <td><label for="address">Lamdmark:</label></td>
-                                    <td>
-       	        			
-                                        <input type="text" name="landmark" id="id_landmark" size="15" value='{{schoolobj.landmark}}' />
+                                    <td>       	        			
+                                        <textarea name="landmark" id="id_landmark" rows="4" cols="20"></textarea>
                                     </td>
                                 </tr>
 				<tr>
@@ -86,14 +85,7 @@
         </form>
         <div id="subForm">
         </div>
-<script>
-(function($) { $(function() {
-  autoCompleteCall('/akshara/get-info/','boundary,school_type','false,false,false,true,false','1,0','0')
 
-
-});})(jQuery);
-
-</script>
 <script>
   $(document).ready(function(){     
    $("#schoolForm").submit(function(){

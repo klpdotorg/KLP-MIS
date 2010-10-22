@@ -10,15 +10,44 @@
 <script type="text/javascript" src="/static_media/js/jquery.treeview.js"></script>
 <script type="text/javascript" src="/static_media/js/cleanup_hidden.js"></script>
 <script src="/static_media/js/jquery.treeview.async.js" type="text/javascript"></script>
+<script src="/static_media/js/lightbox-form.js" type="text/javascript"></script>
+<script type="text/javascript" src="/static_media/js/jquery.datepick.js"></script>
+<!--script type="text/javascript" src="/static_media/js/jquery.prettyPhoto.js" charset="utf-8"></script>
 
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/prettyPhoto.css" charset="utf-8"/-->
+<script type="text/javascript" src="/static_media/js/thickbox.js" charset="utf-8"></script>
+
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/thickbox.css" charset="utf-8"/>
 <link rel="stylesheet" type="text/css" media="all" href="/static_media/css/form.css" />
 <link rel="stylesheet" type="text/css" media="all" href="/static_media/css/style.css" />
 <link rel="stylesheet" type="text/css" media="all" href="/static_media/css/jquery.treeview.css" />
-
-
+<link rel="stylesheet" type="text/css" href="/static_media/css/jquery.autocomplete.css" />
+<link rel="stylesheet" type="text/css" href="/static_media/css/lightbox-form.css" />
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/jquery.datepick.css"/>
 </head>
 
 <body>
+<script type="text/javascript">
+	$(document).ready(function(){
+	    treeUrl = '/tree/?home={{home}}&filter=None';
+	    treeBlk(treeUrl);
+	    
+	    $("#filterPrg").click(function(){
+	        treeUrl = '/tree/?home={{home}}&filter='+$("#filtProg").val();
+	        $("#treeStruc").html('<ul id="treeBlk" class="filetree treeview-famfamfam"></ul>');
+	        treeBlk(treeUrl);
+	    });
+	    
+	});
+
+	function treeBlk(treeUrl){
+	    $("#treeBlk").treeview({
+			url: treeUrl,
+		});
+	}
+	
+	
+</script>
 <div id="container">
 
 {% if entry == "Add" %}
@@ -28,24 +57,52 @@
 <div class="tablebg">
 {% endif %}
 	{% block leftpart %}
-	<script type="text/javascript">
-	$(document).ready(function(){
-		$("#treeBlk").treeview({
-			url: "/tree/",
-		})
-	});
 	
-	</script>
 	<div class="leftPane">
+	
+	        
            
-            <div class="treeMen">
+            <div class="treeMen" id="treeStruc">
                    <ul id="treeBlk" class="filetree treeview-famfamfam"></ul>
             </div>
+            
+            
+            {% if filter %}
+	            <div class="addBound">
+	                <select id="filtProg" name="filtProg">
+	                    <option value="None">--</option>
+	                    {% for prg in prgsList %}
+	                        <option value="{{prg.id}}">{{prg}}</option>
+	                    {% endfor %}
+	                </select>
+	                <input type="button" name="filterPrg" id="filterPrg" value="Filter"/>
+	            </div>
+	        {% endif %}
+            
+            
+            {% if home and not filter%}
             <div class="addBound">
                 <div class="boundLink">
                     <a href='/boundary/creator/' onclick="return schoolView(this);">Add Root Boundary <img src="/static_media/images/boundary_add.gif" title="Add Boundary" /></a>
                 </div>
             </div>
+            {% endif %}
+            {% if programme %}
+            <div class="addBound">
+                <div class="boundLink">
+                    <a href='/programme/creator/' onclick="return schoolView(this);">Add Programme <img src="/static_media/images/programme_add.gif" title="Add Programme" /></a> | 
+                    <a href='/question/creator/' onclick="return schoolView(this);">Add Question <img src="/static_media/images/question_add.gif" title="Add Question" /></a>
+                </div>
+            </div>
+            {% endif %}
+            <div class="addBound" style="margin:5px 0px;font-size:13px;">
+                <div class="boundLink">
+                    <a href='/home/' style="{% if home and not filter%}color:#75ad0a;{%endif%}">Home</a>   |
+                    <a href='/home/?respType=programme' style="{% if programme%}color:#75ad0a;{%endif%}">Programme</a>   |          
+                    <a href='/home/?respType=filter' style="{% if filter%}color:#75ad0a;{%endif%}">Filter By Programme</a>                    
+                </div>
+            </div>
+		
        </div>
     {% endblock %}
 	{% block midpart %}{% endblock %}
@@ -56,12 +113,16 @@
 </div>
 {% endif %}
 
+
+
+
 <script>
+
         function deleteSchool(referKey,type){
             var conf = confirm("Are You Sure, You Want to delete "+type);
             if (conf==true){                                
                 $.ajax({                    
-                    url: '/'+type+'/'+referKey+'/delete/',
+                    url: '/delete/'+type+'/'+referKey+'/',
                     success: function(data) {
 			if (type=='section')
 				$("#sections_"+referKey).remove();
@@ -74,14 +135,17 @@
         }
 </script>
 
+
     <script>
+    
 function schoolView(thisObj){
 	    $.ajax({
             url: thisObj.href,
             success: function(data) {
                 $("#dyncData").html(data);
-		NFInit();
-		$("#subForm").html('');
+		        NFInit();
+		        tb_init('a.thickbox, area.thickbox, input.thickbox');
+		        $("#subForm").html('');
             }
         });
 	return false;
@@ -115,10 +179,12 @@ function schoolAdd(thisObj){
 	}
 
 function call_js(thisObj,ObjValue){
+    
 	currentId=$(thisObj).attr('id');
+	//alert(currentId);
           if (typeof currentId=='undefined' ){
                 currentId='treeBlk';
-                 ObjValue='boundary';
+                 ObjValue=ObjValue;
                  ObjId = $('#'+ObjValue+'_id').val();
 		}
         else

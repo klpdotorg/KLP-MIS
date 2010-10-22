@@ -43,8 +43,16 @@
 				
                                 <tr>
                                     <td><label for="address">School Type:</label></td>
-                                    <td>
-                                        <input type="text" name="school_type" id="school_type" autocomplete="off" class="ac_input" size="15" value='{{school.school_type}}' />
+                                    <td>                                        
+                                        <select id="id_school_type" name="school_type">
+                                        {% for schType in school.get_school_types %}
+                                            {% if schType == school.school_type %}
+                                                <option value="{{schType}}" selected>{{schType}}</option>
+                                            {% else %}
+                                                <option value="{{schType}}">{{schType}}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                        </select>
                                     </td>
                                 </tr>
                                 <tr>
@@ -95,13 +103,13 @@
                                     <td><label for="address">Address:</label></td>
                                     <td>					
        	        			<input type="hidden" name="boundary" id="id_boundary" size="15" value='{{school.boundary.id}}'/>
-                                        <input type="text" size="15" name="address" id="id_address" value='{{school.address}}' />
+                                        <textarea name="address" id="id_address" rows="4" cols="20">{{school.address}}</textarea>
                                     </td>
                                 </tr>
 				<tr>
                                     <td><label for="address">Landmark:</label></td>
                                     <td>
-                                        <input type="text" size="15" name="landmark" id="id_landmark" value='{{school.landmark}}' />
+                                        <textarea name="landmark" id="id_landmark" rows="4" cols="20">{{school.landmark}}</textarea>
                                     </td>
                                 </tr>
 				<tr>
@@ -119,11 +127,6 @@
                             </table>
         </form>
 <script>
-(function($) { $(function() {
-  autoCompleteCall('/akshara/get-info/','boundary,school_type','false,false,false,true,false','1,0','0')
-
-
-});})(jQuery);
 
 $("#schoolForm").submit(function(){ 
     oldName = $('#id_old').val(); 

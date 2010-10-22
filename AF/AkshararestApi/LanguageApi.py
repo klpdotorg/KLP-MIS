@@ -1,13 +1,14 @@
 from django.conf.urls.defaults import *
 from django_restapi.resource import Resource
-from Akshara.schools.models import *
-from Akshara.schools.forms import *
+from schools.models import *
+from schools.forms import *
 from django_restapi.model_resource import Collection, Entry
 from django_restapi.responder import *
 from django_restapi.receiver import *
 from AkshararestApi.BoundaryApi import ChoiceEntry
 
-class LanguageView(Collection):    
+class LanguageView(Collection):  
+    """ To create new language language/creator/""" 
     def get_entry(self,language_id):        
         language = Moi_Type.objects.all(id=language_id)          
         return ChoiceEntry(self, language)   

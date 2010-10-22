@@ -1,3 +1,6 @@
+{% extends "index.html" %}
+{% block leftpart %}{% endblock %}
+{% block midpart %}
 <div class="detailHead">
 <span class="hedText">Student Edit Form</span>
 </div>
@@ -5,25 +8,52 @@
 
       			<table class="tblprofile">
       			    <input type="hidden" name="url" value="{{url}}" id="url" />                    
-      			    <input type="hidden" id="id_class_section" name="class_section" value="{{studentObj.class_section.id}}"/>      				
-      				<tr>
-      					<td class="rightprofile">Child</td>
+      			    <input type="hidden" id="id_boundary" name="boundary" value="{{studentObj.name.boundary.id}}"/>
+			    <input type="hidden" id="studId" name="studId" value="{{studentObj.id}}"/>
+      				
+					<td>First Name</td>
+					<td><input type="text" name="firstName" size="15" id="id_firstName" value='{{studentObj.name.firstName}}' /></td>
+				</tr>
+				<tr>
+					<td>Last Name</td>
+					<td><input type="text" name="lastName" size="15" id="id_lastName" value='{{studentObj.name.lastName}}' /></td>
+				</tr>
+				<tr>
+					<td>Dirth of Birth</td>
+					<td><input type="text" name="dob" size="15" id="id_dob" value="{% if studentObj.name.dob %}{{studentObj.name.dob|date:'m'}}/{{studentObj.name.dob|date:'j'}}/{{studentObj.name.dob|date:'Y'}}{% endif %}"  />
+					<script>
+		                        	$( "#id_dob" ).datepick();
+	                    		</script></td>
+				</tr>
+				<tr>
+					<td>Gender</td>
+					<td><input type="text" name="gender" size="15" id="id_gender" value='{{studentObj.name.gender}}' /></td>
+				</tr>
+				<tr>
+					<td>Mother Tonuge</td>
       					<td class="leftprofile">
-					<input type="text" size="15" id="child" value='{{studentObj.name}}' />
-					<input type="hidden" size="15" id="id_old" name="old" value='{{studentObj.name}}' />
-       	        			<input type="hidden" name="name" id="id_child" size="15" value='{{studentObj.name.id}}' />
-					<td class="gallery clearfix">
-					    {% if entry %}
-						<span class="adNewBoundTyp">
-						    <a href="/akshara/child-entry/?iframe=true&amp;width=500&amp;height=300" rel="prettyPhoto[iframe]" oncontextmenu="return false">+</a>
-						</span>
-					    {% endif %}
+      					    <select id="id_mt" name="mt">
+      					        {% for language in studentObj.get_all_languages %}
+      					            {% if studentObj.name.mt == language %}
+      					                <option value="{{language.id}}" selected>{{language}}</option>
+      					            {% else %}
+      					                <option value="{{language.id}}">{{language}}</option>
+      					            {% endif %}    
+      					        {% endfor %}
+      					    </select>
 					</td>
-					</td>
+				</tr>
+				<tr>
+					<td>Mother</td>
+					<td><input type="text" name="mother" size="15" id="id_mother" value='{{studentObj.name.mother}}' /></td>
+				</tr>
+				<tr>
+					<td>Father</td>
+					<td><input type="text" name="father" size="15" id="id_father" value='{{studentObj.name.father}}' /></td>
       				</tr>
       				<tr>
-      					<td class="rightprofile">Academic</td>
-      					<td class="leftprofile">
+      					<td>Academic</td>
+      					<td>
       					    <select id="id_academic" name="academic">
       					        {% for academic in studentObj.get_all_academic_years %}
       					            {% if studentObj.academic == academic %}
@@ -34,43 +64,36 @@
       					        {% endfor %}
       					    </select>
       					    <span style="display:none"><input type="checkbox" id="id_active" name="active" checked="checked"></span>
-					<td class="gallery clearfix">
-					    {% if entry %}
-						<span class="adNewBoundTyp">
-						    <a href="/akshara/child-entry/?iframe=true&amp;width=500&amp;height=300" rel="prettyPhoto[iframe]" oncontextmenu="return false">+</a>
-						</span>
-					    {% endif %}
-					</td></td>
+					</td>
       				</tr>
       				
       				<tr>
-      					<td class="rightprofile">      					 
+      					<td colspan=2 style="text-align:center;">
 						<input type="submit" value="Submit" />
       					</td>
       				</tr>
       			</table>
 </form>
 <script>
-(function($) { $(function() {
-  autoCompleteCall('/akshara/get-info/','child','false','1','1')
-  Cleanuphidden('child');
-});})(jQuery);
+function closeEdit(){
+	$('#box').hide();
+}
 
-$("#studentForm").submit(function(){       
-    oldName = $('#id_old').val(); 
-    newName = $('#child').val();  
-    $.post(  
-        '{{studentObj.get_update_url}}',  
-        $("#studentForm").serialize(),  
-                function(data){                                                          
-                    //parent.location.reload();             
-                    $('#dyncData').html(data);   
-                    ChangeHtml=$("#student_{{studentObj.id}}").children('span').html();
-                    ChangeHtml=ChangeHtml.replace(oldName, newName);                    
-                    $("#student_{{studentObj.id}}").children('span').html(ChangeHtml);                 
-               } 
-               
-           );  
-       });
+
+$("#studentForm").submit(function(){
+	studId = $('#studId').val();
+	$.post(  
+	'{{studentObj.get_update_url}}',
+	$("#studentForm").serialize(),
+	function(data){
+               window.parent.tb_remove();
+		$('#student_'+studId, self.parent.document).html(data);
+		
+		window.parent.tb_init('#student_'+studId+' a.thickbox, area.thickbox, input.thickbox');
+		
+                return false;
+		}
+	);
+	});
 </script>
-
+{% endblock %}

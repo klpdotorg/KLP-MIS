@@ -4,8 +4,8 @@
 <form action="." method="POST" enctype="multipart/form-data" class="niceform" name="studentForm" id="studentForm" onsubmit="return false;">{% csrf_token %}
 
       			<table class="tblprofile">
-      			    <input type="hidden" name="url" value="/sections/{{referKey}}/student/creator/" id="url" />                    
-      			    <input type="hidden" id="id_class_section" name="class_section" value="{{referKey}}"/>      				
+      			    <input type="hidden" name="url" value="/sections/{{referKey}}/student/creator/" id="url" />
+      			    <input type="hidden" id="id_class_section" name="class_section" value="{{referKey}}"/>
       				<tr>
       					<td class="rightprofile">Child</td>
       					<td class="leftprofile">
@@ -20,15 +20,15 @@
       					{% for error in form.academic.errors %}
 					<span style="color:red">{{ error }}</span>
 					{% endfor %}
-					<td class="gallery clearfix">					    
+					<td class="gallery clearfix">
 						<span class="adNewBoundTyp">
 						    <a href="/academic/creator/" onclick="return subForm(this)">+</a>
-						</span>					    
+						</span>
 					</td></td>
       				</tr>
       				
       				<tr>
-      					<td class="rightprofile">      					 
+      					<td class="rightprofile">
 						<input type="submit" value="Add Student" />
       					</td>
       				</tr>
@@ -36,7 +36,7 @@
 </form>
 <script>
 (function($) { $(function() {
-  autoCompleteCall('/akshara/get-info/','child','false','1','1')
+  autoCompleteCall('/get-info/','child','false','1','1')
   Cleanuphidden('child');
 });})(jQuery);
 </script>
@@ -47,11 +47,11 @@
     $.post(  
         $('#url').val(),  
         $("#studentForm").serialize(),  
-                function(data){                                                                              
+                function(data){
                     $("#dyncData").html(data); 
-			ObjId='#sections_'+parentId
-            		Obj=$(ObjId)                          
-                    	call_js(Obj,'student');
+			//ObjId='#sections_'+parentId
+            		//Obj=$(ObjId)
+                    	//call_js(Obj,'student');
                }  
            );  
        });  

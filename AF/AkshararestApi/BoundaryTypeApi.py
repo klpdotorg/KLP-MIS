@@ -1,14 +1,15 @@
 from django.conf.urls.defaults import *
 from django.shortcuts import render_to_response
 from django_restapi.resource import Resource
-from Akshara.schools.models import *
-from Akshara.schools.forms import *
+from schools.models import *
+from schools.forms import *
 from django_restapi.model_resource import Collection, Entry
 from django_restapi.responder import *
 from django_restapi.receiver import *
 from AkshararestApi.BoundaryApi import ChoiceEntry
 
-class BoundaryTypeView(Collection):    
+class BoundaryTypeView(Collection): 
+    """ To Create New Boundary Type boundary-type/creator/"""   
     def get_entry(self,boundary_type_id):        
         boundary_type = Boundary_Type.objects.all(id=boundary_type_id)          
         return ChoiceEntry(self, boundary_type)   

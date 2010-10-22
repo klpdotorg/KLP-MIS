@@ -2,8 +2,6 @@
 	<span class="hedText">Child Entry Form</span>
 </div>
 <form action="." method="POST" enctype="multipart/form-data" class="niceform" name="childForm" id="childForm" onsubmit="return false;">{% csrf_token %}
-<script type="text/javascript" src="/static_media/js/jquery-ui-1.8.5.custom.min.js"></script>
-<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/ui-lightness/jquery-ui-1.8.5.custom.css"/>
       			<table class="tblprofile">
       				<tr>
       					<td class="rightprofile">First Name</td>
@@ -23,14 +21,12 @@
       					<td class="leftprofile">{{form.dob}}
       					
                         <script>
-                    	    $(function() {
-		                        $( "#id_dob" ).datepicker();
-	                        });
-	                    </script>
+                    	    $( "#id_dob" ).datepick();
+	                </script>
       					</td>
       				</tr>
       				<tr>
-      					<td class="rightprofile">Sex</td>
+      					<td class="rightprofile">Gender</td>
       					<td class="leftprofile">{{ form.gender }}</td>
       				</tr>
       				<tr>
@@ -67,7 +63,7 @@
         '/child/{{referKey}}/creator/',  
         $("#childForm").serialize(),  
                 function(data){                                                                                
-                    $("#dyncData").html(''); 
+                    $("#dyncData").html(data); 
                }  
            );  
        });  

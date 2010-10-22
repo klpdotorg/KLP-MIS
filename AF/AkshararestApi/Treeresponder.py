@@ -58,7 +58,8 @@ class TreeSerializeResponder(object):
         
         response1 = serializers.serialize(self.format, object_list,use_natural_keys=True)
        
-        response1= json.loads(response)
+        response1= simplejson.loads(response)
+        
         for k in response1:
 		   modelName = k['model'].split('.')[-1]
                    childkey= modelName+'_'+str(k['pk'])
@@ -76,7 +77,8 @@ class TreeSerializeResponder(object):
                           titleval=names['section']
                    if modelName=='student':
                        titleval=temval[4]
-		   k['text'] = '<img src="/static_media/tree-images/reicons/'+modelName+'.gif"/>'+str(titleval)+temval[1]+temval[2]+temval[3]
+                   
+		   k['text'] = '<img src="/static_media/tree-images/reicons/'+modelName+'.gif" title='+modelName+' /> &nbsp;'+temval[1]+temval[2]+temval[3]
         response=simplejson.dumps(response1)
         for field in hidden_fields:
             field.serialize = True

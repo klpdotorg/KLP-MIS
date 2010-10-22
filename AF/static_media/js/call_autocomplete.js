@@ -1,25 +1,47 @@
-function autoCompleteCall(url,FieldNames,multiSelects,databaseSelects){
-var myArray = new Array();
+function autoCompleteCall(url,FieldNames,multiSelects,databaseSelects,extraParam){
+
+if (extraParam =='1')
+    extValue = $("#id_class_section").val();
+else
+    extValue = 0
+    
 databaseSelects=databaseSelects.split(',')
 multiSelects=multiSelects.split(',')
 FieldNames=FieldNames.split(',')
   for(i=0;i<FieldNames.length;i++){
-    FieldName=FieldNames[i];
-           options = { serviceUrl:url,
-   
-           minChars:1,
+    FieldName=FieldNames[i]; 
+       
+    mutiVal = false
+    if (multiSelects[i]=='true')
+        mutiVal = true                    
+	$("#"+FieldName).autocomplete(url, {
+		width: 300,
+		
+		multiple: mutiVal,
+		mustMatch: true,
+		matchContains: true,
+		//formatItem: formatItem,
+		formatResult: formatResult,
+		extraParams: { 'fieldName':FieldName,'Database':databaseSelects[i],'extraPram':extValue},
+	});
+	$("#"+FieldName).result(function(event, data, formatted) {		
+		hiddenId=$(this).attr('id');		
+		var hidden = $("#id_"+hiddenId);
+		if (mutiVal){		   
+		    $("#id_"+hiddenId).append($('<option selected></option>').val(data[1]).html(data[0]));
+		}
+		else{
+		    //hidden.val( (hidden.val() ? hidden.val() + "," : hidden.val()) +data[1]);
+		    hidden.val(data[1]);
+		}		
+	});
 
-   delimiter: /(,|;)\s*/, // regex or character
-   maxHeight:400,
-   width:300,
-   zIndex: 9999,
-   onSelect: function(fieldName,value, data){  $('#'+fieldName).val(data) },
-   deferRequestBy: 0, //miliseconds
-   params: { 'fieldName':FieldName,'Database':databaseSelects[i]}, //aditional parameters
-   noCache: false, //default is false, set to true to disable caching
-   multiple:false,
- };
- myArray[i] = $('#'+FieldName).autocomplete(options);
- 
- }
 }
+
+}
+function formatItem(row) {
+		return row[0] + " (<strong>id: " + row[1] + "</strong>)";
+	}
+	function formatResult(row) {
+		return row[0].replace(/(<.+?>)/gi, '');
+	}
