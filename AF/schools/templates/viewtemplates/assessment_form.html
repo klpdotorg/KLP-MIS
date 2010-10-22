@@ -1,0 +1,81 @@
+<div class="detailHead">
+    <span class="hedText">Assessment Entry Form</span>
+</div>
+<form action="." method="POST" enctype="multipart/form-data" class="niceform" id="assessmentForm" name="assessmentForm" onsubmit="return false;">{% csrf_token %}
+    <table>
+        <tr>
+      	    <td>
+      		    <table class="tblprofile">      			          				  				
+      				<tr>
+      				    <td class="rightprofile">Name</td>
+      					<td class="leftprofile">
+                            {{form.name}}
+                            <input type="hidden" name="programme" id="id_programme" value="{{referKey}}" />
+                            <input type="hidden" name="duplKey" id="id_duplKey" size="15" value="{{duplKey}}" />    
+                        </td>
+      				</tr>
+      				<tr>
+      				    <td class="rightprofile">Start Date</td>
+      					<td class="leftprofile">
+                            {{form.startDate}}
+                        </td>
+                        <script>
+                    	    
+		        	$( "#id_startDate" ).datepick();
+	                       
+	                    </script>
+      				</tr>
+      				<tr>
+      				    <td class="rightprofile">End Date</td>
+      					<td class="leftprofile">
+                            {{form.endDate}}
+                        </td>
+                        <script>
+		                        $( "#id_endDate" ).datepick();
+	                    </script>
+      				</tr>
+      				<tr>
+      				    <td class="rightprofile">Assessment Type</td>
+      					<td class="leftprofile">
+                            {{form.assessmentType}}
+                        </td>
+      				</tr>   
+      				<tr>
+      				    <td class="rightprofile">Query</td>
+      					<td class="leftprofile">
+                            {{form.query}}
+                        </td>                                                    
+      				</tr>   				
+      				<tr>      				    
+      			        <td class="leftprofile">
+      			            {{ form.active }}
+      			        </td>
+      			    </tr>
+      			    <tr>
+      				    <td class="rightprofile">
+                    	    <input type="submit" value="Submit" />
+      				    </td>
+      				</tr>
+      			</table>
+      		</td>
+      	</tr>
+    </table>
+</form>
+<script>
+  $(document).ready(function(){  
+  
+   $("#assessmentForm").submit(function(){   
+   parentId=$('#id_programme').val();
+    $.post(  
+        '/assessment/{{referKey}}/creator/',  
+        $("#assessmentForm").serialize(),  
+                function(data){                                                                              
+                    $("#dyncData").html(data); 
+                    ObjId='#programme_'+parentId
+                    Obj=$(ObjId)   
+                    call_js(Obj,'assessment'); 			
+               }  
+           );  
+       });  
+});  
+</script>

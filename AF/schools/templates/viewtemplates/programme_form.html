@@ -1,0 +1,72 @@
+<div class="detailHead">
+    <span class="hedText">Programme Entry Form</span>
+</div>
+<form action="." method="POST" enctype="multipart/form-data" class="niceform" id="programmeForm" name="programmeForm" onsubmit="return false;">{% csrf_token %}    
+    
+    <table>
+        <tr>
+      	    <td>
+      		    <table class="tblprofile">
+      			    <tr>
+      				    <td class="rightprofile">Name</td>
+      					<td class="leftprofile">
+                            {{form.name}}
+                            <input type="hidden" name="parent" id="id_parent" size="15" value="" / >
+                        </td>                                                    
+      				</tr>
+      				<tr>
+      				    <td class="rightprofile">Description</td>
+      					<td class="leftprofile">
+                            {{form.description}}
+                        </td>                                                    
+      				</tr>
+      				<tr>
+      				    <td class="rightprofile">Start Date</td>
+      					<td class="leftprofile">
+                            {{form.startDate}}
+                        </td>
+                            
+      				</tr>
+      				<tr>
+      				    <td class="rightprofile">End Date</td>
+      					<td class="leftprofile">
+                            {{form.endDate}}
+                        </td>                        
+	                    <script>
+	                        $("#id_startDate").datepick();
+	                        $( "#id_endDate" ).datepick();
+	                    </script>
+      				</tr>     
+      				 				
+      				<tr>      				    
+      			        <td class="leftprofile">
+      			            {{ form.active }}
+      			        </td>
+      			    </tr>
+      			    <tr>
+      				    <td class="rightprofile">
+                    	    <input type="submit" value="Submit" />
+      				    </td>
+      				</tr>
+      			</table>
+      		</td>
+      	</tr>
+    </table>
+</form>
+
+<script>
+  $(document).ready(function(){   
+   $("#programmeForm").submit(function(){     
+    $.post(
+        '/programme/creator/',
+        $("#programmeForm").serialize(),
+                function(data){
+                    $("#dyncData").html(data);
+                    ObjId='#treeBlk'
+                    Obj=$(ObjId)   
+                    call_js(Obj,'programme');                        
+               }
+           );
+       });
+});
+</script>

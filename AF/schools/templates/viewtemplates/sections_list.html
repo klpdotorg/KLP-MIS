@@ -1,0 +1,31 @@
+<div class="detailHead">
+<span class="hedText">Section Details</span>
+</div>
+-------------------------------------------------------
+
+<div class="boundDetail">
+    <label>Boundary Name</label>
+    <span>{{student.id}}{% for i in student %}
+{{i.name}}
+{% endfor %}{{request}}</span><input type="hidden" name="id" id="sections_id" size="15" value="{{section.id}}" / >
+</div>
+<div class="boundDetail">    
+    <label>School Name</label>
+    <span>{{student.name}}</span>
+</div>
+<div class="boundDetail">    
+    <label>Class Name</label>
+    <span>{{section.classname}}</span>
+</div>
+<div class="boundDetail">    
+    <label>Section Name</label>
+    <span>{{section}}</span>
+</div>
+<!--div class="boundDetail"> 
+    <span class=" gallery clearfix">   
+        <a href="/sections/{{section.id}}/student/creator/" onclick="return schoolView(this)">
+            Add Student
+        </a> 
+    </span>
+</div-->    
+

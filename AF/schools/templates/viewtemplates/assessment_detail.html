@@ -1,0 +1,35 @@
+<div class="detailHead">
+<span class="hedText">Assessment Details</span>
+</div>
+
+<div class="boundDetail">
+    <label>Programme Name</label>
+    <span>{{assessment.programme}}</span>	
+</div>
+
+<div class="boundDetail">
+    <label>Assessment Name</label>
+    <span>
+        {{assessment}}
+        <input type="hidden" name="id" id="assessment_id" size="15" value="{{assessment.id}}" / >
+    </span>	
+</div>
+<div class="boundDetail">    
+    <label>Start Date</label>
+    <span>{{assessment.startDate}}</span>
+</div>
+<div class="boundDetail">
+    <label>End Date</label>
+    <span>{{assessment.endDate}}</span>
+</div>
+
+<div class="boundDetail">    
+    <label>Assessment Type</label>
+    <span>{{assessment.assessmentType}}</span>
+</div>
+<div class="boundDetail">    
+    <label>Quesry</label>
+    <span>{{assessment.query}}</span>
+</div>
+
+

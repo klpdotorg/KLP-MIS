@@ -1,0 +1,89 @@
+<div class="detailHead">
+    <span class="hedText">Assessment Edit Form</span>
+</div>
+<form action="." method="POST" enctype="multipart/form-data" class="niceform" id="assessmentForm" name="assessmentForm" onsubmit="return false;">{% csrf_token %}
+    <table>
+        <tr>
+      	    <td>
+      		    <table class="tblprofile">      			          				  				
+      				<tr>
+      				    <td class="rightprofile">Name</td>
+      					<td class="leftprofile">
+                            {{form.name}}
+                            <input type="text" name="name" id="id_name" size="15" value="{{assessment.name}}" />    
+                            <input type="hidden" name="old" id="id_old" value="{{assessment.name}}" size="15"/>
+                            <input type="hidden" name="programme" id="id_programme" value="{{assessment.programme.id}}" />    
+                        </td>
+      				</tr>
+      				<tr>
+      				    <td class="rightprofile">Start Date</td>
+      					<td class="leftprofile">                            
+                            <input type="text" name="startDate" id="id_startDate" size="15" value="{% if assessment.startDate %}{{assessment.startDate|date:'m'}}/{{assessment.startDate|date:'j'}}/{{assessment.startDate|date:'Y'}}{% endif %}" />
+                        </td>
+                        <script>
+                    	    
+		        	$( "#id_startDate" ).datepick();
+	                       
+	                    </script>
+      				</tr>
+      				<tr>
+      				    <td class="rightprofile">End Date</td>
+      					<td class="leftprofile">                            
+                            <input type="text" name="endDate" id="id_endDate" size="15" value="{% if assessment.endDate %}{{assessment.endDate|date:'m'}}/{{assessment.endDate|date:'j'}}/{{assessment.endDate|date:'Y'}}{% endif %}" />
+                        </td>
+                        <script>
+		                        $( "#id_endDate" ).datepick();
+	                    </script>
+      				</tr>
+      				<tr>
+      				    <td class="rightprofile">Assessment Type</td>
+      					<td class="leftprofile">
+                            <select name="assessmentType" id="id_assessmentType">
+                            {% for assessType in assessment.getAllAssessmentTypes %}
+                                {% if assessment.assessmentType == assessType %}
+                                    <option selected value="{{assessType}}">{{assessType}}</option>
+                                {% else %}
+                                    <option value="{{assessType}}">{{assessType}}</option>
+                                {% endif %}    
+                            {% endfor %}
+                        </td>
+      				</tr>      	
+      				<tr>
+      				    <td class="rightprofile">Query</td>
+      					<td class="leftprofile">
+			                <textarea name="query" id="id_query" rows=4 cols=20>{{assessment.query}}</textarea>
+                        </td>                                                    
+      				</tr>			
+      				<tr>      				    
+      			        <td class="leftprofile">
+      			            <span style="display:none"><input type="checkbox" id="id_active" name="active" checked="checked"></span>
+      			        </td>
+      			    </tr>
+      			    <tr>
+      				    <td class="rightprofile">
+                    	    <input type="submit" value="Update" />
+      				    </td>
+      				</tr>
+      			</table>
+      		</td>
+      	</tr>
+    </table>
+</form>
+<script>
+  $(document).ready(function(){     
+   $("#assessmentForm").submit(function(){    
+   oldName = $('#id_old').val();  
+   newName = $('#id_name').val();
+    $.post(  
+        '/assessment/{{assessment.id}}/update/',  
+        $("#assessmentForm").serialize(),  
+                function(data){                                                                              
+                    $("#dyncData").html(data); 	
+                    ChangeHtml=$("#assessment_{{assessment.id}}").children('span').html();        
+                    ChangeHtml=ChangeHtml.replace(oldName, newName);
+                    $("#assessment_{{assessment.id}}").children('span').html(ChangeHtml); 		
+               }  
+           );  
+       });  
+});  
+</script>

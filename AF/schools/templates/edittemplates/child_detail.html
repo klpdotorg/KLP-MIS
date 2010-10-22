@@ -1,0 +1,103 @@
+<div class="detailHead">
+<span class="hedText">Student Edit Form</span>
+</div>
+<form action="." method="POST" enctype="multipart/form-data" class="niceform" name="studentForm" id="studentForm" onsubmit="return false;">{% csrf_token %}
+
+      			<table class="tblprofile">
+      			    <input type="hidden" name="url" value="{{url}}" id="url" />                    
+      			    <input type="hidden" id="id_class_section" name="class_section" value="{{child.class_section.id}}"/>
+      				<tr>
+      					<td class="rightprofile">Child</td>
+      					<td class="leftprofile">
+					<input type="text" size="15" id="child" value='{{child.name}}' />
+					<input type="hidden" size="15" id="id_old" name="old" value='{{child.name}}' />
+       	        			<input type="hidden" name="name" id="id_child" size="15" value='{{child.name.id}}' />
+					<td class="gallery clearfix">
+					    {% if entry %}
+						<span class="adNewBoundTyp">
+						    <a href="/akshara/child-entry/?iframe=true&amp;width=500&amp;height=300" rel="prettyPhoto[iframe]" oncontextmenu="return false">+</a>
+						</span>
+					    {% endif %}
+					</td>
+					</td>
+				<tr>
+					<td>First Name</td>
+					<td><input type="text" size="15" id="id_firstName" value='{{child.name.firstName}}' /></td>
+				</tr>
+				<tr>
+					<td>Last Name</td>
+					<td><input type="text" size="15" id="id_lastName" value='{{child.lastName}}' /></td>
+				</tr>
+				<tr>
+					<td>Dirth of Birth</td>
+					<td><input type="text" size="15" id="id_dob" value='{{child.dob}}' /></td>
+				</tr>
+				<tr>
+					<td>Gender</td>
+					<td><input type="text" size="15" id="id_gender" value='{{child.gender}}' /></td>
+				</tr>
+				<tr>
+					<td>Mother Tonuge</td>
+					<td><input type="text" size="15" id="id_mt" value='{{child.mt}}' /></td>
+				</tr>
+				<tr>
+					<td>Mother</td>
+					<td><input type="text" size="15" id="id_mother" value='{{child.mother}}' /></td>
+				</tr>
+				<tr>
+					<td>Father</td>
+					<td><input type="text" size="15" id="id_father" value='{{child.father}}' /></td>
+      				</tr>
+      				<tr>
+      					<td class="rightprofile">Academic</td>
+      					<td class="leftprofile">
+      					    <select id="id_academic" name="academic">
+      					        {% for academic in child.get_all_academic_years %}
+      					            {% if child.academic == academic %}
+      					                <option value="{{academic.id}}" selected>{{academic}}</option>
+      					            {% else %}
+      					                <option value="{{academic.id}}">{{academic}}</option>
+      					            {% endif %}    
+      					        {% endfor %}
+      					    </select>
+      					    <span style="display:none"><input type="checkbox" id="id_active" name="active" checked="checked"></span>
+					<td class="gallery clearfix">
+					    {% if entry %}
+						<span class="adNewBoundTyp">
+						    <a href="/akshara/child-entry/?iframe=true&amp;width=500&amp;height=300" rel="prettyPhoto[iframe]" oncontextmenu="return false">+</a>
+						</span>
+					    {% endif %}
+					</td></td>
+      				</tr>
+      				
+      				<tr>
+      					<td class="rightprofile">      					 
+						<input type="submit" value="Submit" />
+      					</td>
+      				</tr>
+      			</table>
+</form>
+<script>
+(function($) { $(function() {
+  autoCompleteCall('/akshara/get-info/','child','false','1','1')
+  Cleanuphidden('child');
+});})(jQuery);
+
+$("#studentForm").submit(function(){       
+    oldName = $('#id_old').val(); 
+    newName = $('#child').val();  
+    $.post(  
+        '{{child.get_update_url}}',  
+        $("#studentForm").serialize(),  
+                function(data){                                                          
+                    //parent.location.reload();             
+                    $('#dyncData').html(data);   
+                    ChangeHtml=$("#student_{{child.id}}").children('span').html();
+                    ChangeHtml=ChangeHtml.replace(oldName, newName);                    
+                    $("#student_{{child.id}}").children('span').html(ChangeHtml);                 
+               } 
+               
+           );  
+       });
+</script>
+

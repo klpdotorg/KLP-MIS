@@ -1,0 +1,93 @@
+{% load template_tags %}
+
+<div class="detailHead">
+<span class="hedText">Section Details</span>
+</div>
+<div id="box">
+
+</div>
+<div class="boundDetail">    
+    <table width=100%>
+	    <th>Boundary Name</th>  <th>School Name</th>  <th>Class Name</th>  <th>Section Name</th>
+	    <tr style="text-align:center;">
+	    {% with students_list|first as first_student %}
+		<td>{{first_student.class_section.getBoundarys}}</td>
+		<td>{{first_student.class_section.classname.sid}}</td>
+		<td>{{first_student.class_section.classname}}</td>
+		<td>{{first_student.class_section}}</td>
+		{% endwith %}
+	    </tr>
+	</table>
+</div><br/>
+
+<div  id="searchRes">
+<div class="detailHead">
+<span class="hedText">Student Details</span>
+</div>
+<form action="." method="POST" enctype="multipart/form-data" id="studentAns" name="studentAns" onsubmit="return false;">{% csrf_token %} 
+<div class="boundDetail" style="width:620px;height:250px;overflow:auto;">
+	<table cellspacing="0" cellpadding="0" border="1" width="100%">
+	    <th rowspan="2">First&nbsp;Name</th>  <th rowspan="2" width="200">Last&nbsp;Name</th> <th rowspan="2" width="200">Father&nbsp;Name</th> <th rowspan="2" width="200">Mother&nbsp;Name</th>  <th rowspan="2" width="200">Date&nbsp;of&nbsp;Birth</th>  <th rowspan="2" width="200">Gender</th>  <th rowspan="2" width="200">Mother&nbsp;Tounge</th>  <th rowspan="2" width="200">Academic&nbsp;Year</th>
+	     {% for assessment in filter_id|getAssessments %}
+	        <th colspan="{{assessment|getAssessmentQuestions:'length'}}" width="200">{{assessment}}</th>
+	     {% endfor %}
+	     
+	     <tr>
+	        {% for assessment in filter_id|getAssessments %}
+	            {% if assessment|getAssessmentQuestions:'length' %}
+	                {% for ques in assessment|getAssessmentQuestions:'list' %}
+	                    <td><span style="width:200px;">{{ques}}</span></td>
+	                {% endfor %}
+	            {% else %}
+	                <td>&nbsp;</td>
+	            {% endif %}    
+	        {% endfor %}
+	        <input type="hidden" name="programId" value="{{filter_id}}"/>
+	     </tr>
+	     
+	     {% for i in students_list%}
+		<tr style="text-align:center;">
+			<td>{{i.name.firstName}} <input type="hidden" name="student" value="{{i.id}}"/></td>
+			<td>{{i.name.lastName}}</td>
+			<td>{{i.name.father}}</td>
+			<td>{{i.name.mother}}</td>
+			<td>{{i.name.dob}}</td>
+			<td>{{i.name.gender}}</td>
+			<td>{{i.name.mt}}</td>
+			<td>{{i.academic}}</td>
+			{% for assessment in filter_id|getAssessments %}
+	            {% if assessment|getAssessmentQuestions:'length' %}
+	                {% for ans in assessment|getAnswers:i %}
+	                    <td>
+	                        <input type="text" name="student_{{i.id}}_{{ans.id}}" value="{{ans.answer}}"/>
+	                    </td>
+	                {% endfor %}
+	            {% else %}
+	                <td>&nbsp;</td>
+	            {% endif %}    
+	        {% endfor %}
+			<!--td><a onclick="return studentEdit(this)" href="/boundary/{{i.name.boundary.id}}/schools/{{section.classname.sid.id}}/classes/{{section.classname.id}}/sections/{{section.id}}/students/{{i.id}}/edit/"> <img title="Edit" src="/static_media/images/pagebuilder_edit.gif"></a><span class="delConf" onclick="deleteSchool({{i.id}}, 'student')"><img width="11" title="Delete" src="/static_media/images/PageRow_delete.gif" title="Delete"></span></td-->
+			
+		</tr>
+	    {% endfor %}
+	</table>
+	
+	<input type="submit" name="ans" value="Submit" />
+</div>
+
+</form>
+</div><br/>
+
+<script>
+  $(document).ready(function(){
+   $("#studentAns").submit(function(){
+    $.post(
+        '/answer/student/edit/',
+        $("#studentAns").serialize(),
+                function(data){
+                    $("#dyncData").html(data);
+               }
+           );
+       });
+});
+</script>

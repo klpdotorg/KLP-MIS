@@ -1,0 +1,49 @@
+<div class="detailHead">
+    <span class="hedText">Question Entry Form</span>
+</div>
+<form action="." method="POST" enctype="multipart/form-data" class="niceform" id="questionForm" name="questionForm" onsubmit="return false;">{% csrf_token %}    
+    <table>
+        <tr>
+      	    <td>
+      		    <table class="tblprofile">      			        				
+      				<tr>
+      				    <td class="rightprofile">Question</td>
+      					<td class="leftprofile">
+                            {{form.question}}
+                        </td>
+      				</tr>   
+      				<tr>
+      				    <td class="rightprofile">Type</td>
+      					<td class="leftprofile">
+                            {{form.questionType}}
+                        </td>
+      				</tr> 
+      				<tr>
+      				    <td class="rightprofile">Tags</td>
+      					<td class="leftprofile">
+                            {{form.tags}}
+                        </td>
+      				</tr>     				
+      			    <tr>
+      				    <td class="rightprofile">
+                    	    <input type="submit" value="Submit" />
+      				    </td>
+      				</tr>
+      			</table>
+      		</td>
+      	</tr>
+    </table>
+</form>
+<script>
+  $(document).ready(function(){     
+   $("#questionForm").submit(function(){    
+    $.post(  
+        '/question/creator/',  
+        $("#questionForm").serialize(),  
+                function(data){                                                                              
+                    $("#dyncData").html(data); 			
+               }  
+           );  
+       });  
+});  
+</script>
