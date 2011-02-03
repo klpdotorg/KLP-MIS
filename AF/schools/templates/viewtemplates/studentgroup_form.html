@@ -1,0 +1,126 @@
+{% load template_tags %}
+<div class="detailHead">
+<span class="hedText">StudentGroup Form</span>
+</div>
+<form action="." method="POST" enctype="multipart/form-data" id="studentgroupForm" onsubmit="return false;" class="niceform">{% csrf_token %}
+                            <input type="hidden" name="url" value="/boundary/institution/{{extra_context|displayValue:'ParentKey'}}/studentgroup/creator/" id="url" />    
+                            <input type="hidden" name="parentId" value="{{extra_context|displayValue:'ParentKey'}}" id="parentId" />
+                            <input type="hidden" name="form-buttonType" id="id_form-buttonType" value="save" />
+                            <input type="hidden" id="success_status" size="15" value="{{extra_context|displayValue:'showsuccess'}}" / >
+			    <input type="hidden" id="studentgroup_id" value="{{extra_context|displayValue:'prevousId'}}" / >
+    			    {{form.management_form}}
+    			    {% with form.forms|last as entryForm %}
+                            <table class="tblprofile">
+				<tr>
+					<td colspan="3"><span class="editErr">{{ entryForm.non_field_errors }}</span></td>
+				</tr>
+                                <tr>
+                                    <td><label class="KLP_required">Name:</label></td>
+                                    <td>
+                                        {% render_field entryForm.name 'tabindex=1' %}
+                                    </td>
+				    <td>
+                                    	{% for error in entryForm.name.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+                                </tr>                                
+                                <tr>
+                                    <td><label for="address">Section:</label></td>
+                                    <td>
+                                        {% render_field entryForm.section 'tabindex=2' %}
+					<input type="hidden" name="form-0-institution" id="id_institution" size="15" value="{{extra_context|displayValue:'ParentKey'}}"/>
+					<input type="hidden" name="contentname" id="id_content_name" size="15" value="{{extra_context|displayValue:'contentname'}}"/>
+					<input type="hidden" name="form-0-object_id" id="id_object_id" size="15" value='{{extra_context|displayValue:'ParentKey'}}'/>
+					<input type="hidden" name="form-0-active" id="id_form-0-active" value="2" />
+                                    </td>
+				    <td>
+                                    	{% for error in entryForm.section.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+                                </tr>
+				<tr>
+                                	<td><label>Group Type</label></td>
+                                	<td>
+                                		{% render_field entryForm.group_type 'tabindex=3' %}
+                                	</td>
+                                	<td>
+                                    		{% for error in entryForm.group_type.errors %}
+	                                		<span class="editErr">{{ error }}</span>
+	                                	{% endfor %}
+                                    	</td>
+                                </tr>
+                                <tr><td> &nbsp;</td></tr>
+                    		<tr><td> &nbsp;</td></tr>
+                    		<tr><td> &nbsp;</td></tr>
+                                <tr>
+                                    <td>
+                                    	<input type="submit" name="save" id="id_save" value="Save" tabindex=4 />
+                                    </td>
+                                    <td>
+                                    	<input type="submit" name="save_and_continue" id="id_save_and_continue" value="Save And Continue" tabindex=5 />
+                                    </td>
+                                    <td>
+                    	    		<input type="submit" name="save_and_create" id="id_save_and_create" value="Save And Create Another" tabindex=6 />
+      				    </td>
+                                </tr>        
+                            </table>
+                            {% endwith %}
+        </form>
+        <div id="subForm">
+        </div>
+
+<script>
+  $(document).ready(function(){  
+  
+   $("#id_save").click(function(){
+	KLP_Hide_Msg();
+	parentVal = $("#id_institution").val();
+   	$("#id_form-buttonType").val('save');
+   	KLP_form_submit(parentVal);
+   });
+   
+   $("#id_save_and_continue").click(function(){
+	KLP_Hide_Msg();
+	parentVal = $("#id_institution").val();
+   	$("#id_form-buttonType").val('save and continue');
+	KLP_form_submit(parentVal);
+   });
+   
+   $("#id_save_and_create").click(function(){
+	KLP_Hide_Msg();
+   	parentVal = $("#id_institution").val();
+   	$("#id_form-buttonType").val('save and add another');
+   	KLP_form_submit(parentVal, 'id_form-0-parent');
+   	
+   	
+   });
+    
+    
+   var KLP_form_submit = function(parentVal, parentName, parentId){
+   	$.post(
+        	$('#url').val(),
+        	$("#studentgroupForm").serialize(),
+                function(data){
+                    $("#dyncData").html(data);
+                    NFInit();
+                    $('input:visible:enabled:first').focus();
+		     var successStatus = $("#success_status").val();
+                     if (successStatus == 'True'){
+                    	$("#successMsgHead").show();
+   		    	$("#klp_MsgTxt").html("StudentGroup Created Successfully")
+			//tb_init('#id_StudentDetail a.thickbox, area.thickbox, input.thickbox');
+			if (parentId != null)
+                    		$("#"+parentId).val(parentVal);
+                   	ObjId="#institution_"+parentVal;
+            	    	Obj=$(ObjId)
+                    	KLP_Create_Node(Obj,'studentgroup');
+		    }
+               }
+           );
+   } 
+   
+});  
+</script>
+

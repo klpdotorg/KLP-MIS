@@ -1,7 +1,7 @@
-$("#treeBlk").click(function(){
- var topbranch = $("<li><span class='folder'>New Sublist</span></li>").appendTo("#treeBlk");
+$("#boundary_2").click(function(){
+ var topbranch = $("<li><span class='folder'>New Sublist</span></li>").appendTo("#boundary_2");
 
- $("#treeBlk").treeview({
+ $("#boundary_2").treeview({
   add: topbranch
  });
 });

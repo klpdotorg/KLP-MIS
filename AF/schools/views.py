@@ -529,10 +529,10 @@ def student_delete(request):
 
 from pysqlite2 import dbapi2 as sqlite
 from django.core import serializers
-import simplejson
+from django.utils import simplejson
 
 
-CategoryDic={'cat':School_Category,'school_type':School_Type,'moi':Moi_Type,'mgmt':School_Management}
+CategoryDic={'cat':Institution_Category,'school_type':Institution_Gender,'moi':Moi_Type,'mgmt':Institution_Management}
 def display_info(request):
 	key_value = request.GET.get('query')
 	fieldName = request.GET.get('fieldName')
@@ -542,12 +542,12 @@ def display_info(request):
 	  connection = sqlite.connect('/home/mahiti/Akshara/Akshara/akshara.db')
 	  cursor = connection.cursor()
 
-	  fielfnames = {'boundary':'name','address':'address','school':'name','boundary_type':'boundary_type','child':'name'}	
+	  fielfnames = {'boundary':'name','address':'address','school':'name','boundary_type':'boundary_type','child':'firstName'}
 	  if extraParam:
 	    sectionObj = Sections.objects.get(pk=extraParam)
 	    Query = 'select id,%s from schools_%s where boundary_id=%s and %s like "%s%s"'%(fielfnames[fieldName], fieldName, sectionObj.classname.sid.boundary.id, fielfnames[fieldName],key_value,'%')
 	  else:   
-	    Query = 'select id,%s from schools_%s where %s like "%s%s"'%(fielfnames[fieldName],fieldName,fielfnames[fieldName],key_value,'%')	  	  
+	    Query = 'select id,%s from schools_%s where %s like "%s%s"'%(fielfnames[fieldName],fieldName,fielfnames[fieldName],key_value,'%')	  
 	  cursor.execute(Query)
 	  cuisine = cursor.fetchall()
 	else:

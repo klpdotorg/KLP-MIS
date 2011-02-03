@@ -1,72 +1,131 @@
+{% load template_tags %}
 <div class="detailHead">
-    <span class="hedText">Programme Entry Form</span>
+    <span class="hedText">Programme Form</span>
 </div>
 <form action="." method="POST" enctype="multipart/form-data" class="niceform" id="programmeForm" name="programmeForm" onsubmit="return false;">{% csrf_token %}    
-    
-    <table>
-        <tr>
-      	    <td>
-      		    <table class="tblprofile">
-      			    <tr>
-      				    <td class="rightprofile">Name</td>
-      					<td class="leftprofile">
-                            {{form.name}}
-                            <input type="hidden" name="parent" id="id_parent" size="15" value="" / >
-                        </td>                                                    
-      				</tr>
-      				<tr>
-      				    <td class="rightprofile">Description</td>
-      					<td class="leftprofile">
-                            {{form.description}}
-                        </td>                                                    
-      				</tr>
-      				<tr>
-      				    <td class="rightprofile">Start Date</td>
-      					<td class="leftprofile">
-                            {{form.startDate}}
-                        </td>
-                            
-      				</tr>
-      				<tr>
-      				    <td class="rightprofile">End Date</td>
-      					<td class="leftprofile">
-                            {{form.endDate}}
-                        </td>                        
-	                    <script>
-	                        $("#id_startDate").datepick();
-	                        $( "#id_endDate" ).datepick();
-	                    </script>
-      				</tr>     
-      				 				
-      				<tr>      				    
-      			        <td class="leftprofile">
-      			            {{ form.active }}
-      			        </td>
-      			    </tr>
-      			    <tr>
-      				    <td class="rightprofile">
-                    	    <input type="submit" value="Submit" />
-      				    </td>
-      				</tr>
-      			</table>
-      		</td>
-      	</tr>
-    </table>
+	<input type="hidden" name="form-buttonType" id="id_form-buttonType" value="save" />
+	<input type="hidden" id="programme_id" size="15" value="{{extra_context|displayValue:'prevousId'}}" / >
+	<input type="hidden" id="success_status" size="15" value="{{extra_context|displayValue:'showsuccess'}}" / >
+	{{form.management_form}}
+	{% with form.forms|last as entryForm %}
+		<table>
+        		<tr>
+      	    			<td>
+      					<table class="tblprofile">
+      					       
+      						<tr>
+      					    		<td class="rightprofile"><label class="KLP_required">Name</label></td>
+      							<td class="leftprofile">
+                            					{% render_field entryForm.name 'tabindex=1' %}
+                        				</td> 
+                        				<td>
+                        					
+                                    				{% for error in entryForm.name.errors %}
+	                                				<span class="editErr">{{ error }}</span>
+	                                			{% endfor %}
+                                    			</td>                                                   
+      						</tr>
+      						<tr>
+      					    		<td class="rightprofile"><label>Description</label></td>
+      							<td class="leftprofile">
+                            					<textarea id="id_form-0-description" name="form-0-description" tabindex=2></textarea>
+                        				</td>                                                    
+      						</tr>
+      						<tr>
+      					    		<td class="rightprofile"><label class="KLP_required">Start Date</label></td>
+      							<td class="leftprofile">
+                            					{% render_field entryForm.startDate 'tabindex=3' %}
+                        				</td> 
+                        				<td>
+                                    				{% for error in entryForm.startDate.errors %}
+	                                				<span class="editErr">{{ error }}</span>
+	                                			{% endfor %}
+                                    			</td> 
+      						</tr>
+      						<tr>
+      					    		<td class="rightprofile"><label class="KLP_required">End Date</label></td>
+      							<td class="leftprofile">
+                            					{% render_field entryForm.endDate 'tabindex=4' %}
+                        				</td>   
+                        				<td>
+                                    				{% for error in entryForm.endDate.errors %}
+	                                				<span class="editErr">{{ error }}</span>
+	                                			{% endfor %}
+                                    			</td>                      
+	                    				<script>
+	                        				$("#id_form-0-startDate").datepick({dateFormat: 'dd-mm-yyyy'});
+	                        				$( "#id_form-0-endDate" ).datepick({defaultDate: new Date("{{extra_context|displayValue:'endDate'}} {{extra_context|displayValue:'endMonth'}} {{extra_context|displayValue:'endYear'}}"), dateFormat: 'dd-mm-yyyy'});
+	                    				</script>
+      						</tr>     			
+      						
+      			    			<tr><td> &nbsp;</td></tr>
+                    				<tr><td> &nbsp;</td></tr>
+                    				<tr><td> &nbsp;</td></tr>
+                    				
+      			    			<tr>
+      					    		<td>
+                                    				<input type="submit" name="save" id="id_save" value="Save" tabindex=5 />
+                                    				<input type="hidden" name="form-0-programme_institution_category" id="id_form-0-programme_institution_category" size="15" value="" / >
+                                    				<input type="hidden" name="form-0-active" id="id_form-0-active" value="2" />
+                                    			</td>
+                                    			<td>
+                                    				<input type="submit" name="save_and_continue" id="id_save_and_continue" value="Save And Continue" tabindex=6 />
+                                    			</td>
+                                    			<td>
+                    	    					<input type="submit" name="save_and_create" id="id_save_and_create" value="Save And Create Another" tabindex=7 />
+      				    			</td>
+      						</tr>
+      					</table>
+      				</td>	
+      			</tr>
+    		</table>
+    	{% endwith %}
 </form>
 
 <script>
-  $(document).ready(function(){   
-   $("#programmeForm").submit(function(){     
-    $.post(
-        '/programme/creator/',
-        $("#programmeForm").serialize(),
+  
+$(document).ready(function(){   
+
+	$("#id_form-0-programme_institution_category").val($("#boundary_type").val());
+
+	$("#id_save").click(function(){
+		KLP_Hide_Msg();
+   		$("#id_form-buttonType").val('save');
+   		KLP_form_submit();
+   	
+   	});
+   
+   	$("#id_save_and_continue").click(function(){
+   		KLP_Hide_Msg();
+   		$("#id_form-buttonType").val('save and continue');
+   		KLP_form_submit();
+   	});
+   
+   	$("#id_save_and_create").click(function(){
+   		KLP_Hide_Msg();
+   		$("#id_form-buttonType").val('save and add another');
+   		KLP_form_submit();
+   	});
+   	
+   	
+   	var KLP_form_submit = function(){
+   	$.post(
+        	'/programme/creator/',
+        	$("#programmeForm").serialize(),
                 function(data){
                     $("#dyncData").html(data);
-                    ObjId='#treeBlk'
-                    Obj=$(ObjId)   
-                    call_js(Obj,'programme');                        
+                    NFInit();
+                    $('input:visible:enabled:first').focus();
+                    var successStatus = $("#success_status").val();
+                    if (successStatus == 'True'){
+                    	$("#successMsgHead").show();
+   		    	$("#klp_MsgTxt").html("Programme Created Successfully");
+			ObjId='#treeBlk'
+                    	Obj=$(ObjId)   
+                    	KLP_Create_Node(Obj,'programme');
+                    }
                }
            );
-       });
+   	}   
 });
 </script>

@@ -1,0 +1,131 @@
+{% load template_tags %}
+<div class="detailHead">
+	<span class="hedText">StudentGroup Form</span>
+</div>
+<form action="." method="POST" enctype="multipart/form-data" class="niceform" id="studentgroupForm" onsubmit="return false;">{% csrf_token %}
+	<input type="hidden" id="success_status" size="15" value="{{extra_context|displayValue:'showsuccess'}}" / >
+	<input type="hidden" name="form-buttonType" id="id_form-buttonType" value="save" />
+	<input type="hidden" id="studentgroup_id" value="{{studentgroup.id}}" / >
+	{{form.management_form}}
+        {% with form.forms|last as entryForm %}
+        	<table class="tblprofile">
+			<tr>
+				<td colspan="3"><span class="editErr">{{ entryForm.non_field_errors }}</span></td>
+			</tr>
+        		<tr>
+        			<td><label for="address">Class:</label></td>
+        			<td>
+        				{% render_field entryForm.name 'tabindex=1' %}
+                	        </td>
+                                <td>
+                                	{% for error in entryForm.name.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                </td>
+                	</tr>
+                	<tr>
+                		<td><label for="address">Section:</label></td>
+                		<td>
+                			{% render_field entryForm.section 'tabindex=2' %}
+				</td>
+                                <td>
+                                	{% for error in entryForm.section.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                </td>
+					
+                        </tr>
+			<tr>
+                        	<td><label>Group Type</label></td>
+                                <td>
+                                	{% render_field entryForm.group_type 'tabindex=3' %}
+                                </td>
+                                <td>
+                                	{% for error in entryForm.group_type.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                </td>
+                        </tr>
+			<tr><td> &nbsp;</td></tr>
+                    	<tr><td> &nbsp;</td></tr>
+                    	<tr><td> &nbsp;</td></tr>
+                        <tr>
+			    <td>
+				<span style="display:none">
+					<input type="hidden" name="form-0-institution" id="id_institution" size="15" value="{{studentgroup.institution.id}}" />
+					<input type="hidden" name="old" id="id_old" size="15" value="{{studentgroup.name}} {{studentgroup.section}}" />
+					<input type="hidden" name="parentId" value="{{studentgroup.institution.id}}" id="parentId" />
+					<input type="hidden" id="id_form-0-active" name="form-0-active" value="2">
+
+					
+					{{entryForm.id}}
+				</span>	
+					<input type="submit" name="save" id="id_save" value="Save" tabindex=4 />
+			    </td>
+			    <td>
+				<input type="submit" name="save_and_continue" id="id_save_and_continue" value="Save And Continue" tabindex=5 />
+			    </td>
+			    <td>
+				<input type="submit" name="save_and_create" id="id_save_and_create" value="Save And Create Another" tabindex=6 />
+			    </td>
+			</tr>
+		</table>
+	{%endwith%}
+</form>
+<script>
+$(document).ready(function(){  
+  
+   $("#id_save").click(function(){
+   	KLP_Hide_Msg();
+   	parentVal = $("#parentId").val();
+   	$("#id_form-buttonType").val('save');
+   	KLP_form_submit(parentVal);
+   	
+   });
+   
+   $("#id_save_and_continue").click(function(){
+   	KLP_Hide_Msg();
+   	$("#id_form-buttonType").val('save and continue');
+   	parentVal = $("#parentId").val();
+   	KLP_form_submit(parentVal);
+   	
+   });
+   
+   $("#id_save_and_create").click(function(){
+   	KLP_Hide_Msg();
+   	parentVal = $("#parentId").val();
+   	$("#id_form-buttonType").val('save and add another');
+   	KLP_form_submit(parentVal, 'id_form-0-boundary');
+   	
+   	
+   });
+
+   var KLP_form_submit = function(parentVal, parentId){
+    oldName = $('#id_old').val(); 
+    newName = $('#id_form-0-name').val()+' '+$("#id_form-0-section").val();
+    $.post(  
+        '{{studentgroup.get_update_url}}',  
+        $("#studentgroupForm").serialize(),  
+        function(data){          
+        	$('#dyncData').html(data);
+		tb_init('a.thickbox, area.thickbox, input.thickbox');
+		NFInit();
+		$('input:visible:enabled:first').focus();
+		var successStatus = $("#success_status").val();
+                if (successStatus == 'True'){
+		        treeNode=$("#studentgroup_{{studentgroup.id}}").find("a:first");
+                    	$(treeNode).attr("title", newName);
+                    	$(treeNode).html(newName);
+                    	KLP_BredaCrumb(treeNode);
+		        $("#successMsgHead").show();
+	   		$("#klp_MsgTxt").html("Student Group Updated Successfully");
+			if (parentId != null)
+                    		$("#"+parentId).val(parentVal);
+		}
+        } 
+    ); 
+   } 
+});
+</script>
+
+

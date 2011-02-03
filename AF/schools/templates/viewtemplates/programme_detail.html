@@ -1,11 +1,27 @@
+<div class="KLP_Button_Header">
+	<span class="KLP_Sub">
+		<a class="KLP_Button"  href="/programme/assessment/{{programme.id}}/creator" onclick="return KLP_View(this);">Add Assessment</a>
+	</span>
+	<span class="KLP_Sub">
+		<a class="KLP_Button"  href="/programme/{{programme.id}}/update/" onclick="return KLP_View(this);">Edit</a>
+	</span>
+	<span class="KLP_Sub">
+		<span class="KLP_SpanButton"  onclick="KLP_Del('{{programme.id}}', 'programme', '{{programme.name}}')">Delete</span>
+	</span>
+	
+</div>
+
+
+
 <div class="detailHead">
-<span class="hedText">Programme Details</span>
+	<span class="hedText">Programme Details</span>
 </div>
 
 <div class="boundDetail">
     <label>Programme Name</label>
     <span>{{programme}}</span>	
     <input type="hidden" name="id" id="programme_id" size="15" value="{{programme.id}}" / >
+    <input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / >
 </div>
 <div class="boundDetail">
     <label>Description</label>
@@ -13,11 +29,11 @@
 </div>
 <div class="boundDetail">    
     <label>Start Date</label>
-    <span>{{programme.startDate}}</span>
+    <span>{% if programme.startDate %}{{programme.startDate|date:'d-m-Y'}}{% endif %}</span>
 </div>
 <div class="boundDetail">
     <label>End Date</label>
-    <span>{{programme.endDate}}</span>
+    <span>{% if programme.endDate %}{{programme.endDate|date:'d-m-Y'}}{% endif %}</span>
 </div>
 
 

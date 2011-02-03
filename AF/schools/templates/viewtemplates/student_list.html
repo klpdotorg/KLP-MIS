@@ -1,90 +1,75 @@
-
 <div  id="searchRes">
-<div class="detailHead">
-<span class="hedText">Section Details</span>
+<div style="width:95%;padding:5px 5px 20px 5px;">
+	<span style="font-weight:bold; font-size:15px; padding:5px">
+		<a style="width:auto;padding: 5px 15px;background: url(/static_media/images/price_bg.jpg) center right; color:#fff"  href="/studentgroup/{{studentgroup.id}}/update/" onclick="return KLP_View(this);">Edit</a>
+	</span>
+	<span style="font-weight:bold; font-size:15px; padding:5px">
+		<span style="width:auto;padding: 5px 15px;background: url(/static_media/images/price_bg.jpg) center right; color:#fff;cursor:pointer"  onclick="KLP_Del('{{studentgroup.id}}', 'studentgroup', '{{studentgroup.name}}')">Delete</span>
+	</span>
+	<span style="font-weight:bold; font-size:15px; padding:5px">
+		<a style="width:auto;padding: 5px 15px;background: url(/static_media/images/price_bg.jpg) center right; color:#fff" href="/studentgroup/{{studentgroup.id}}/student/creator/?keepThis=true&TB_iframe=true&height=400&width=800" title="Add Student" class="thickbox">Add Student</a>
+	</span>
 </div>
-<div id="box">
-
-</div>
-<div class="boundDetail">
-    <table width=100%>
-	    <th>Boundary Name</th>  <th>School Name</th>  <th>Class Name</th>  <th>Section Name</th><td>url</th>
-	    <tr style="text-align:center;">
-		{% with student_list|first as first_student %}
-		<td>{{first_student.class_section.classname.sid.boundary}}</td>
-		<td>{{first_student.class_section.classname.sid}}</td>
-		<td>{{first_student.class_section.classname}}</td>
-		<td id='id_section' value='{{first_student.class_section.id}}'>{{first_student.class_section}}</td>
-		<td id = "url" value = "{{first_student.class_section.get_view_url}}" > {{first_student.class_section.get_view_url}}</td>
-		{% endwith %}
-		
-	    </tr>
-	</table>
-</div><br/>
 
 <!--div class="detailHead">
-<span class="hedText">Student Search</span>
+<span class="hedText">Student Group Details</span>
 </div>
-
-<div class="detailHead">
-    <form method='GET' action='/search/child/' id="searchForm" onsubmit="return false">
-	<select name='fieldName' id='id_fieldName'>
-		<option value='name'>First Name</option>
-		<option value='dob'>Date of Birth (Year-month-date  2010-05-09)</option>
-		<option value='gender'>Gender</option>
-		<option value='mt'>Mother Tounge</option>
-		<option value='mother'>mother Name</option>
-		<option value='father'>Father Name</option>
-	</select>
-	{% with student_list|first as first_student %}
-	<input type="hidden" name="section" id='id_section' value='{{first_student.class_section.id}}' />
-	{% endwith %}
-	<input type="text" name="searchtext" id='id_searchtext' value='' />
-	<input type="submit" name='search' value='submit' onclick="SearchData()"/>
-    </form>
-
-</div><br/ -->
+<input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / >
+<table style="width:100%;text-align:center;margin-bottom:30px;">
+<input type="hidden" id="studentgroup_id" value="{{studentgroup.id}}" / >
+    {% ifequal studentgroup.content_type.model "school" %}
+    <tr>
+	<th>Boundary</th> <th>School</th> <th> Student Group</th>
+    </tr>
+    <tr>
+	<td>{{studgrpParent.boundary}}</td> <td>{{studgrpParent.name}}</td> <td>{{studentgroup.name}} {% if studentgroup.section %}{{studentgroup.section}} {% endif %}</td>
+    </tr>
+    {% else %}
+    <tr>
+	<th>Boundary</th> <th> Student Group</th>
+    </tr>
+    <tr>
+	<td>{{studgrpParent.name}}</td> <td>{{studentgroup.name}} {% if studentgroup.section %}{{studentgroup.section}} {% endif %}</td>
+    </tr>
+    {% endifequal %}
+</table-->
 
 
 <div class="detailHead">
 <span class="hedText">Student Details</span>
+<span id = "url" style="display:none;" value = "{{url}}"></span>
 </div>
 
-<div class="boundDetail">
-	<table width=100%>
-	    <th>First Name</th>  <th>Last Name</th>  <th>Date of Birth</th>  <th>Gender</th>  <th>Mother Tounge</th>  <th>Academic Year</th><!--th>Programme</th --><th></th><th>Child Edit/Delete</th>
-	    {% for i in student_list %}
-		<tr style="text-align:center;" id='student_{{i.id}}'>
-			<td>{{i.name.firstName}}</td>
-			<td>{{i.name.lastName}}</td>
-			<td>{{i.name.dob}}</td>
-			<td>{{i.name.gender}}</td>
-			<td>{{i.name.mt}}</td>
-			<td>{{i.academic}}</td>
-			<!--td>{% if i.getAnswers %}<a href="/answer/{{i.id}}/view/" onclick="return studentEdit(this)" style="color:#000;">Edit <img src="/static_media/images/pagebuilder_edit.gif" title="View"/></a>{% endif %}</td -->
-			<td></td>
-			<td><!--a onclick="return studentEdit(this)" href="/boundary/{{i.name.boundary.id}}/schools/{{i.class_section.classname.sid.id}}/classes/{{i.class_section.classname.id}}/sections/{{i.class_section.id}}/students/{{i.id}}/edit/"> <img title="Edit" src="/static_media/images/pagebuilder_edit.gif"></a-->
-<a href="/boundary/{{i.name.boundary.id}}/schools/{{i.class_section.classname.sid.id}}/classes/{{i.class_section.classname.id}}/sections/{{i.class_section.id}}/students/{{i.id}}/edit/?keepThis=True&TB_iframe=True&height=400&width=400" title="Edit Student" class="thickbox"><img title="Edit" src="/static_media/images/pagebuilder_edit.gif"></a><span class="delConf" onclick="deleteSchool({{i.id}}, 'student')"><img width="11" title="Delete" src="/static_media/images/PageRow_delete.gif" title="Delete"></span></td>
-		</tr>
-	    {% endfor %}
-		<tr>
-			<td colspan=8>{% if has_previous %} <span id = 'page_{{previous}}' onclick="Pagination(this)" style="cursor:pointer;color:blue;padding-right:15px;"> previous </span>{% endif %} page {{page}} of {{pages}} {% if has_next %} <span id = 'page_{{next}}' onclick="Pagination(this)" style="cursor:pointer;color:blue;padding-left:15px;"> next </span>{% endif %}</td>
-		</tr>
-	</table>
+{% if students_list %}
+
+<table id="StudentDetail" style="width:100%;overflow:hidden;text-align:center;">
+    <tr>
+	<th>First Name</th> <th>Last Name</th> <th> DOB</th> <th>Gender</th> <th>Mother</th> <th>Father</th> <th>Mother Tongue</th> <th>Academic Year</th> <th>Edit</th>
+    </tr>
+    {% for student in students_list %}
+    <tr id = "student_{{student.id}}">
+	<td>{{student.name.firstName}}</td> <td>{{student.name.lastName}}</td> <td>{{student.name.dob}}</td> <td>{{student.name.gender}}</td> <td>{{student.name.relations.mother}}</td> <td>{{student.name.relations.father}}</td> <td>{{student.name.mt}}</td> <td>{{student.academic}}</td> 
+
+	<td>
+		<a href="/student/{{student.id}}/update/?keepThis=true&TB_iframe=true&height=400&width=800" title="Edit Student" title="Edit Student" class="thickbox"><img title="Edit" src="/static_media/images/pagebuilder_edit.gif"></a>
+
+		<span style="color:blue;cursor:pointer"  onclick="KLP_Del('{{student.id}}', 'student', '{{student.name.firstName}}')"><img width="11" title="Delete" src="/static_media/images/PageRow_delete.gif" title="Delete"></span>
+	</td>
+    </tr>
+    {% endfor %}
+</table>
+<div>
+	{% if has_previous %}<span id = 'page_{{previous}}' onclick="Pagination(this)" style="cursor:pointer;color:blue;padding-right:15px;"> previous </span>{% endif %}
+		page {{page}} of {{pages}}
+	{% if has_next %}<span id='page_{{next}}' onclick="Pagination(this)" style="cursor:pointer;color:blue;padding-left:15px;"> next </span>{% endif %}
 </div>
-</div>
+{% else %}
+
+<div style="color:black;text-align:center;font-weight:bold;"> No Students Found</div>
+{% endif %}
 <script>
 
-function SearchData(){
-        $.ajax({
-            url: '/search/child/',
-            data:'fieldName='+$("#id_fieldName").val()+'&section='+$("#id_section").val()+'&searchtext='+$("#id_searchtext").val(),
-            success: function(data) {
-                $('#searchRes').html(data);
-            }
-        });
-	return false;
-}
+
 
 function Pagination(thisObj){
 	pages = $(thisObj).attr('id')
@@ -100,27 +85,19 @@ function Pagination(thisObj){
 	return false;
 }
 
-
-
-
-function studentEdit(thisObj){
-	    $.ajax({
-            url: thisObj.href,
-            success: function(data) {
-                $("#box").html(data);
-		NFInit();
-		$("#box").show();
-            }
-        });
-	return false;
+function SearchData(){
+	if ($("#id_searchtext").val().length > 2){
+		$.ajax({
+			url: $('#url').attr('value'),
+			data:'fieldName='+$("#id_fieldName").val()+'&searchtext='+$("#id_searchtext").val(),
+			success: function(data) {
+				$('#searchRes').html(data);
+				tb_init('a.thickbox, area.thickbox, input.thickbox');
+			}
+		});
+		return false;
 	}
+}
 </script>
-
-<!--div class="boundDetail"> 
-    <span class=" gallery clearfix">   
-        <a href="/sections/{{section.id}}/student/creator/" onclick="return schoolView(this)">
-            Add Student
-        </a> 
-    </span>
-</div-->    
+</div>
 

@@ -1,0 +1,55 @@
+<div>
+	<span style="color:#75AD0A;font-size:12px;font-weight:bold;padding:5px;">{%if boundary.boundary_type.boundary_type|lower == 'pre-school' %} Anganwadis {% else %} Institutions {% endif %} Under {{boundary.name}}</span>
+	<form name="klp_PermissionForm" id="id_klp_PermissionForm" onsubmit="return false;" class="niceform">
+		<div style="float:left;width:100%; padding:5px;">
+		{% for inst in institution_list %}
+			<span style="float:left;width:100%;color:#000;font-weight:bold;">
+				{{inst.name}} 
+				<input type="hidden" name="instName" value="{{inst.id}}" />
+			</span>
+		{% endfor %}
+		</div>
+		<div style="float:left;width:45%;padding:20px 5px 5px 5px;">
+			<span style="color:#75AD0A;font-size:12px;font-weight:bold;width:100%;text-align:center;padding:5px;">Select User</span><br/>
+			<select name="assignToUser" id="id_assignToUser" class="required">
+				{% for dEUser in users %}
+					<option value="{{dEUser.id}}">{{dEUser.username}}</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div style="float:left;width:45%;padding:20px 5px 5px 5px;">
+			<span style="color:#75AD0A;font-size:12px;font-weight:bold;width:100%;text-align:center;padding:5px;">Select Permission</span><br/>
+			<input type="checkbox" name="userPermission" value="Acess" class="required" minlength=1 checked="true"/> Acess <br/>
+		</div>
+		<div style="float:left;width:100%;padding:20px 5px 5px 5px;">
+			<input type="submit" value="Assign" name="permissions"/>
+		</div>
+	</form>
+	<script>
+		$(document).ready(function(){
+			
+			$("#id_klp_PermissionForm").submit(function(){
+				KLP_Hide_Msg();
+				isValid = $("#id_klp_PermissionForm").valid();
+				if (isValid){
+					$.post(
+						'/assign/permissions/',
+						$("#id_klp_PermissionForm").serialize(),
+						function(data){
+							if(data['isSuccess'] == true){
+								$("#successMsgHead").show();
+   		    						$("#klp_MsgTxt").html(data['respMsg']);
+							}
+							else{
+								$("#failureMsgHead").show();
+								$("#klp_fail_MsgTxt").html(data['respMsg']);
+							}
+							NFDo('stop');
+							NFDo('start');
+						}
+					);
+				}
+			});
+		});
+	</script>
+</div>

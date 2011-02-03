@@ -1,0 +1,61 @@
+<div class="KLP_Button_Header">
+	
+</div>
+
+<div class="detailHead">
+	<span class="hedText">Teacher Details</span>
+</div>
+
+
+<div class="boundDetail">    
+	<label>First Name</label>
+	<span>{{staff.firstName}}<input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / ></span>
+</div>
+<div class="boundDetail">
+	<label>Middle Name</label>
+	<span>
+		{{staff.middleName}}
+	</span>
+</div>
+<div class="boundDetail">
+	<label>Last Name</label>
+	<span>
+		{{staff.lastName}}
+	</span>
+</div>
+<div class="boundDetail">    
+	<label>Date of Joining</label>
+	<span>{{staff.doj|date:'d-m-Y'}}</span>
+</div>
+<div class="boundDetail">
+	<label>Gender</label>
+	<span>
+		{{staff.gender}}
+	</span>
+</div>
+<div class="boundDetail">    
+	<label>MT</label>
+	<span>{{staff.mt}}</span>
+</div>
+<div class="boundDetail">
+	<label>Qualifiaction</label>
+	<span>
+		{{staff.qualification}}
+	</span>
+</div>
+<div class="boundDetail">
+	<label>Staff Type</label>
+	<span>
+		{{staff.staff_type}}
+	</span>
+</div>
+<div class="boundDetail">
+	<label>Classes</label>
+	<span>
+		{% for assignedGrup in staff.getAssigendClasses%}
+			{% if assignedGrup.name == '0' %}Anganwadi Class{% else %}{{assignedGrup.name}}{{assignedGrup.section}}{% endif %}
+			{% if not forloop.last %}, {% endif %}
+		{% endfor %}
+	</span>
+</div>
+

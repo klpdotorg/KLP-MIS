@@ -1,10 +1,16 @@
+{% load template_tags %}
+<tr id="student_{% if not student %}{{child.id}}{% else %}{{child.getStudent.id}}{% endif %}"><td>{{child.firstName}}<input type="hidden" id="success_status" size="15" value="True" / ></td> <td>{{child.lastName}}</td> <td>{{child.dob|date:"d M Y"}}</td> <td>{{child.gender}}</td> <td>{{child.mt}} </td>
+<td>{% if child.getMother.first_name %}Mother:{{child.getMother.first_name}} <br />{% endif %} {% if child.getFather.first_name%}Father:{{child.getFather.first_name}}{% endif %}</td> 
 
-			<td>{{childObj.firstName}}</td>
-			<td>{{childObj.lastName}}</td>
-			<td>{{childObj.dob}}</td>
-			<td>{{childObj.gender}}</td>
-			<td>{{childObj.mt}}</td>
-			<td>{{studentObj.academic}}</td>
-			<td></td>
-			<td><a href="/boundary/{{childObj.boundary.id}}/schools/{{studentObj.id}}/classes/{{class_id}}/sections/{{section_id}}/students/{{studentObj.id}}/edit/?keepThis=True&TB_iframe=True&height=400&width=400" title="Edit Student" class="thickbox"> <img title="Edit" src="/static_media/images/pagebuilder_edit.gif"></a><span class="delConf" onclick="deleteSchool({{studentObj.id}}, 'student')"><img width="11" title="Delete" src="/static_media/images/PageRow_delete.gif" title="Delete"></span></td>
+{% if not student %}
+<td><input type="checkbox" value = "{{child.id}}" name="studentchecked" /></td>
+<td><input type="checkbox" value = "{{child.id}}" name="students" /></td>
+<td><a href="/child/{{child.id}}/update/?keepThis=true&TB_iframe=true&height=400&width=800" title="Edit Student" title="Edit Student" class="thickbox"><img title="Edit" src="/static_media/images/pagebuilder_edit.gif"></a></td>
 
+{% else %}
+<td><input type="checkbox" value = "{{child.getStudent.id}}" name="students" /></td>
+<td>
+<a href="/student/{{child.id}}/update/?keepThis=true&TB_iframe=true&height=400&width=800" title="Edit Student" title="Edit Student" class="thickbox"><img title="Edit" src="/static_media/images/pagebuilder_edit.gif"></a>
+<span style="color:blue;cursor:pointer"  onclick="KLP_Del('{{child.getStudent.id}}', 'student', '{{child.firstName}}')"><img width="11" title="Delete" src="/static_media/images/PageRow_delete.gif" title="Delete"></span></td>
+{% endif %}
+</tr>

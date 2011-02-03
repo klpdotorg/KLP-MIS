@@ -1,0 +1,143 @@
+{% extends "index.html" %}
+{% block leftpart %}{% endblock %}
+{% block midpart %}
+
+{% load template_tags %}
+
+<div class="detailHead">
+	<span class="hedText">Student Edit Form</span>
+</div>
+<form action="." method="POST" enctype="multipart/form-data" class="niceform" id="studentForm" onsubmit="return false;">{% csrf_token %}
+	<table class="tblprofile">
+	 {% with form|first as childForm %}
+				{{childForm.management_form}}
+				{% with childForm.forms|first as entryForm %}
+				<tr>
+				    <td><label class="KLP_required">First Name:</label></td>
+				    <td>
+					{% render_field entryForm.firstName 'tabindex=1' %}
+				    </td>
+				    <td>
+                                    	{% for error in entryForm.firstName.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+				</tr>
+				<tr>
+				    <td><label class="KLP_required">Last Name:</label></td>
+				    <td>
+					{% render_field entryForm.lastName 'tabindex=2' %}
+				    </td>
+				    <td>
+                                    	{% for error in entryForm.lastName.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+				</tr>
+				<tr>
+				    <td><label for="address">Date of Birth:</label></td>
+				    <td>
+					{% render_field entryForm.dob 'tabindex=3' %}
+				    </td>
+				</tr>
+				<tr>
+				    <td><label class="KLP_required">Gender:</label></td>
+				    <td>
+					{% render_field entryForm.gender 'tabindex=4' %}
+				    </td>
+				    <td>
+                                    	{% for error in entryForm.gender.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+				</tr>
+				<tr>
+				    <td><label class="KLP_required">Mother Tongue:</label></td>
+				    <td>
+					{% render_field entryForm.mt 'tabindex=5' %}
+					<input type="hidden" name="form-0-relations" id="id_relations" size="15" value="{{student.name.relations.id}}"/>
+					<input type="hidden" name="form-0-studentchecked" id="id_studentchecked" size="15" value="True"/>
+				    </td>
+				    <td>
+                                    	{% for error in entryForm.mt.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+				</tr>
+				{% endwith %}
+			    {% endwith %}
+				<tr>
+				    <td><label class="KLP_required">Mother Namefvfghfgjh:</label></td>
+				    <td>
+					<input type="text" name="form-0-mother" id="id_mother" size="15" value="{{student.name.relations.mother}}"/>
+				    </td>
+				    <td>
+                                    	{% for error in entryForm.mother.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+				</tr>
+				<tr>
+				    <td><label class="KLP_required">Father Name:</label></td>
+				    <td>
+					<input type="text" name="form-0-father" id="id_father" size="15" value="{{student.name.relations.father}}"/>
+				    </td>
+				    <td>
+                                    	{% for error in entryForm.father.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+				</tr>
+    			    
+    			    {% with form|last as studentForm %}
+				{{studentForm.management_form}}
+				{% with studentForm.forms|first as entryForm %}
+                                <tr>
+                                    <td><label class="KLP_required">Academic Year:</label></td>
+                                    <td>                                        
+                                        {% render_field entryForm.academic 'tabindex=6' %}{{entryForm.id}}
+					<input type="hidden" name="form-0-boundary" id="id_boundary" size="15" value="{{student.name.boundary.id}}"/>
+					<input type="hidden" name="form-0-student_group" id="id_student_group" size="15" value="{{student.student_group.id}}"/>
+					<input type="hidden" name="form-0-name" id="id_name" size="15" value="{{student.name.id}}"/>
+					<input type="hidden" name="form-0-active" id="id_form-0-active" value="True" />
+                                    </td>
+				    <td>
+                                    	{% for error in entryForm.academic.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+                                </tr>
+				<tr>
+					<td></td><td><input type="submit" value="Update" /></td>
+				</tr>
+				{% endwith %}
+			    {% endwith %}
+                </table>
+</form>
+
+<script>
+ $(document).ready(function(){  
+   setTimeout(function(){
+		$('input:visible:enabled:first').focus();
+	},200);
+});
+$("#studentForm").submit(function(){       
+    
+    $.post(  
+        '{{student.get_update_url}}',  
+        $("#studentForm").serialize(),  
+                function(data){
+                    window.parent.tb_remove();
+		    //$('#student_'+{{student.id}}, self.parent.document).html(data);
+		    $('#student_'+{{student.id}}, self.parent.document).replaceWith(data);
+
+		    window.parent.tb_init('#student_'+{{student.id}}+' a.thickbox, area.thickbox, input.thickbox');
+		
+                return false;
+               } 
+               
+           );  
+       });
+</script>
+{% endblock %}
+

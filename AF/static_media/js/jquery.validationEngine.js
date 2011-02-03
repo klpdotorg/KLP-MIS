@@ -270,7 +270,7 @@ $.validationEngine = {
 				   	url: postfile,
 				   	async: true,
 				   	data: "validateValue="+fieldValue+"&validateId="+fieldId+"&validateError="+customAjaxRule+extraData,
-				   	beforeSend: function(){		// BUILD A LOADING PROMPT IF LOAD TEXT EXIST		   			
+				   	beforeSend: function(){		// BUILD A LOADING PROMPT IF LOAD TEXT EXIST	   			
 				   		if($.validationEngine.settings.allrules[customAjaxRule].alertTextLoad){
 				   		
 				   			if(!$("div."+fieldId+"formError")[0]){				   				
@@ -290,7 +290,6 @@ $.validationEngine = {
 						fieldId = ajaxCaller;
 						ajaxErrorLength = $.validationEngine.ajaxValidArray.length;
 						existInarray = false;
-						
 			 			 if(ajaxisError == "false"){			// DATA FALSE UPDATE PROMPT WITH ERROR;
 			 			 	
 			 			 	_checkInArray(false)				// Check if ajax validation alreay used on this field

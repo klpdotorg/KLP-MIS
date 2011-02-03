@@ -42,7 +42,17 @@
 						"extraData":"name=eric",
 						"alertTextOk":"* This user is available",	
 						"alertTextLoad":"* Loading, please wait",
-						"alertText":"* This user is already taken"},	
+						"alertText":"* This user is already taken"},
+					"ajaxQuery":{
+						"file":"/assessment/query/validation/",
+						"extraData":"abc=aaa",
+						"alertTextLoad":"* Loading, please wait",
+						"alertText":"* Invalid Query"},		
+					"matchData":{
+					    "file":"/answer/data/validation/",
+					    "extraData":"abc=aaa",
+					    "alertTextLoad":"* Loading, please wait",
+					    "alertText":"* Data Not Matched"},	
 					"ajaxName":{
 						"file":"validateUser.php",
 						"alertText":"* This name is already taken",

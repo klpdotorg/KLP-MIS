@@ -95,6 +95,33 @@ img{
 	width:95%;
 	text-align:center;
 }
+.shwMsg{
+	padding:5px;
+	width:95%;
+	color:#75AD0A; 
+	background-color:#ccc;
+	font-size:15px;
+	vertical-align:middle;
+	
+}
+#successMsgHead{
+	padding:5px;
+}
+#failureMsgHead{
+	padding:5px;
+}
+.failMsg{
+	padding:5px;
+	width:95%;
+	color:#FF0000; 
+	background-color:#ccc;
+	font-size:15px;
+	vertical-align:middle;
+	
+}
+#dyncData{
+	padding:5px;
+}
 .addBound{
 	float:left;
 	text-decoration:none;
@@ -125,3 +152,200 @@ img{
     font-weight:bold;
     color:#75AD0A;
 }
+.KLP_required{
+	background:url(/static_media/images/icon_star_red-10x10.gif) no-repeat scroll right top transparent;
+	margin-right:15px;
+	padding:5px 5px 5px 0px;
+}
+
+/*load process*/
+
+#KLP_overlay {
+	position: fixed;
+	z-index:100;
+	top: 0px;
+	left: 0px;
+	height:100%;
+	width:100%;
+}
+
+.KLP_overlayBG {
+	display:none;
+	background-color:#000;
+	filter:alpha(opacity=75);
+	-moz-opacity: 0.75;
+	opacity: 0.75;
+}
+
+* html #KLP_overlay { /* ie6 hack */
+     position: absolute;
+     height: expression(document.body.scrollHeight > document.body.offsetHeight ? document.body.scrollHeight : document.body.offsetHeight + 'px');
+}
+
+#KLP_load{
+	position: fixed;
+	display:none;
+	height:13px;
+	width:208px;
+	z-index:103;
+	top: 50%;
+	left: 50%;
+	margin: -6px 0 0 -104px; /* -height/2 0 0 -width/2 */
+}
+
+* html #KLP_load { /* ie6 hack */
+position: absolute;
+margin-top: expression(0 - parseInt(this.offsetHeight / 2) + (TBWindowMargin = document.documentElement && document.documentElement.scrollTop || document.body.scrollTop) + 'px');
+}
+/*load process end */
+/* django error message*/
+.editErr{
+    color:#FF0000;
+}
+/*django error message end*/
+/* tree text*/
+.KLP_treetxt{
+	color:#000 !important;
+}
+.KLP_selNode{
+   color:#00FF00 !important;
+   font-weight: bold;
+}
+/* tree text end */
+.KLP_Button{
+	width:auto;
+	padding: 4px 8px;
+	background: url(/static_media/images/price_bg.jpg) center right;
+	color:#fff !important;
+	font-weight:bold;
+}
+.KLP_SpanButton{
+	width:auto;
+	padding: 4px 15px;
+	background: url(/static_media/images/price_bg.jpg) center right;
+	color:#fff !important;
+	cursor:pointer;	
+	font-weight:bold;
+}
+.KLP_Button_Header{
+	width:98%;
+	padding:5px 5px 20px 5px;
+}
+.KLP_Sub{
+	font-weight:bold;
+	/*font-size:15px;*/
+	padding:5px 5px 5px 0px;
+}
+.KLP_lef_Div{
+	float:left;
+}
+.KLP_txt_cen{
+	text-align:center;
+}
+.KLP_td_height{
+	height:50px;
+	min-width:100px;
+	max-width:100px;
+	text-align:center;
+}
+.KLP_td_width{
+	height:50px;
+	min-width:66px;
+	max-width:66px;
+	text-align:center;
+}
+.KLP_td_check{
+	height:50px;
+	min-width:30px;
+	max-width:30px;
+	text-align:center;
+}
+label.error, label.error {
+	color: red;
+	font-style: italic;
+	float:left;
+	min-width:100px;
+	max-width:100px;
+	text-align:center;
+}
+.KLP_Scroll_Div{
+	width:70%;
+	height:auto;
+	overflow:auto;
+}
+.KLP_DE_Submit{
+	float:left;
+	width:90%;
+	padding:10px;
+}
+/* Bread Crumb */
+.KLP_BreadCrumb{
+	padding:5px 10px;
+	width:90%;
+}
+.KLP_BreadCrumbTxt{
+	color:#75AD0A;
+}
+.KLP_brCrumb{
+	color:#800000;
+}
+/* Bread Crumb Ends */
+/* login */
+.KLP_Log{
+	width:90%;
+	color:#75AD0A;
+	padding:5px 0px;
+}
+.KLP_logOut{
+	padding:0 5px;
+}
+.KLP_logOut a{
+	color:#FF8040;
+}
+.KLP_Log_Head{
+ 	color: #FFFFFF;
+ 	font-weight: bold;
+}   
+.KLP_logUser{
+    width:100%;
+    font-size:14px;
+    text-align:center;
+}
+/* login End */
+.KLP_Form_status {
+	display:none;
+	color:#00FF00;
+	float:left;
+	font-weight:bold;
+}
+.KLP_td_teacher{
+	height:30px;
+	min-width:100px;
+	text-align:center;
+}
+.KLP_DE_AdStudent{
+	padding-left: 20px;
+}
+.KLP_Ans_Fix{
+	height: 55px;
+}
+.KLP_Fix_Div{
+	height:100%;
+	overflow:hidden;
+}
+.editErr .errorlist li{
+	margin:20px 0px;
+	list-style:none outside none;
+	font-weight:bold;
+}
+/* admin console css*/
+.klp_admin{
+	width:90%;
+	padding:5px;
+}
+.klp_admin_note{
+	width:90%;
+	padding:5px;
+	color:#5C5858;	
+}
+/* admin console css ends here */

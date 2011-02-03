@@ -1,24 +1,8 @@
-<div class="detailHead">
-<span class="hedText">Student Details</span>
-</div>
-<div class="boundDetail">
-    <label>Boundary Name</label>
-    <span>{{studentObj.class_section.classname.sid.boundary}}</span><input type="hidden" name="id" id="student_id" size="15" value="{{studentObj.id}}" / >
-</div>
-<div class="boundDetail">    
-    <label>School Name</label>
-    <span>{{studentObj.class_section.classname.sid}}</span>
-</div>
-<div class="boundDetail">    
-    <label>Class Name</label>
-    <span>{{studentObj.class_section.classname}}</span>
-</div>
-<div class="boundDetail">    
-    <label>Section Name</label>
-    <span>{{studentObj.class_section}}</span>
-</div>
-<div class="boundDetail">    
-    <label>Student Name</label>
-    <span>{{studentObj.name}}</span>
-</div>
+
+	<tr id="student_{{child.id}}"><td>{{child.firstName}}<input type="hidden" id="success_status" size="15" value="True" / ></td> <td>{{child.lastName}}</td> <td>{{child.dob|date:"d M Y"}}</td> <td>{{child.gender}}</td> <td>{{child.relations.mother}}</td> <td>{{child.relations.father}}</td> <td>{{child.mt}}</td>
+
+<td><a href="/student/{{child.id}}/update/?keepThis=true&TB_iframe=true&height=400&width=800" title="Edit Student" title="Edit Student" class="thickbox"><img title="Edit" src="/static_media/images/pagebuilder_edit.gif"></a>
+
+		<span style="color:blue;cursor:pointer"  onclick="KLP_Del('{{child.id}}', 'student', '{{child.firstName}}')"><img width="11" title="Delete" src="/static_media/images/PageRow_delete.gif" title="Delete"></span></td>
+</tr>
 

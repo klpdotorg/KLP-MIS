@@ -1,5 +1,4 @@
 function autoCompleteCall(url,FieldNames,multiSelects,databaseSelects,extraParam){
-
 if (extraParam =='1')
     extValue = $("#id_class_section").val();
 else
@@ -12,7 +11,7 @@ FieldNames=FieldNames.split(',')
     FieldName=FieldNames[i]; 
        
     mutiVal = false
-    if (multiSelects[i]=='true')
+    if (multiSelects[i]=='true' || multiSelects[i]=='True')
         mutiVal = true                    
 	$("#"+FieldName).autocomplete(url, {
 		width: 300,
@@ -28,11 +27,12 @@ FieldNames=FieldNames.split(',')
 		hiddenId=$(this).attr('id');		
 		var hidden = $("#id_"+hiddenId);
 		if (mutiVal){		   
-		    $("#id_"+hiddenId).append($('<option selected></option>').val(data[1]).html(data[0]));
+		    $("#id_"+hiddenId).append($('<option selected="True"></option>').val(data[1]).html(data[0]));
 		}
 		else{
-		    //hidden.val( (hidden.val() ? hidden.val() + "," : hidden.val()) +data[1]);
-		    hidden.val(data[1]);
+		    //hidden.val( (hidden.val() ? hidden.val() + "," : hidden.val()) +data[1]);		    
+		    if (data)
+		        hidden.val(data[1]);
 		}		
 	});
 

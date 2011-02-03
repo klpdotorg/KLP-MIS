@@ -1,0 +1,188 @@
+<div  id="searchRes">
+<input type="hidden" id = "url"  value = "{{url}}">
+{% if count != '0' %}
+<div id="insertStudent" style="font-size: 16px; font-weight: bold; background-color: green;">
+	{{count}} Student Records Inserted
+</div>
+{% endif %}
+<div class="detailHead">
+<span class="hedText">Children Details</span>
+</div>
+
+{% if child_list %}
+
+<div class="boundDetail" style="padding:0px;">
+<form action="." method="POST" name="classForm" id="classForm">{% csrf_token %}
+	<table  style="text-align:center;width:100%">
+	    <tr><td>&nbsp;</td>  <td>&nbsp;</td>  <td>&nbsp;</td>  <th>&nbsp;</td>  <td>&nbsp;</td><td>&nbsp;</td> <td><input type="radio" name="map" id="mapchild" /></td><td><input type="radio" name="map" id="mapstdgrp" /></td><td>&nbsp;</td>
+	    </tr>
+	    <th>First Name</th>  <th>Last Name</th>  <th>Date of Birth</th>  <th>Gender</th>  <th>Mother Tonuge</th><th>Relations</th> <th>Map to {% if boundary.boundary_category.boundary_category == 'Circle' %}Anganwadi{% else %}School{% endif %}</th><th>Map to Centre</th><th>Child Edit</th>
+	    {% for i in child_list %}
+		<tr id='student_{{i.id}}'>
+			<td>{{i.firstName}}</td>
+			<td>{{i.lastName}}</td>
+			<td>{{i.dob|date:"d M Y"}}</td>
+			<td>{{i.gender}}</td>
+			<td>{{i.mt}}</td>
+			<td>
+			{% for relation in i.getRelations %}
+			{{relation.relation_type}}:{{relation.name}}<br />
+			{% endfor %}
+			</td>
+			<td><input type="checkbox" value = "{{i.id}}" name="studentchecked"/></td>
+			<td><input type="checkbox" value = "{{i.id}}" name="students"/></td>
+			<td>
+<a href="/child/{{i.id}}/update/?keepThis=True&TB_iframe=True&height=400&width=800" title="Edit Child" class="thickbox"><img title="Edit" src="/static_media/images/pagebuilder_edit.gif"></a><!--span class="delConf" onclick="KLP_Del('{{i.id}}', 'child', '{{i.firstName}}')"><img width="11" title="Delete" src="/static_media/images/PageRow_delete.gif" title="Delete"></span--></td>
+			
+		</tr>
+	    {% endfor %}
+	</table>
+<div id="student_pagenation">
+	<span id = 'page_{{previous}}' onclick="Pagination(this)" style="cursor:pointer;color:blue;padding-right:15px;{% if not has_previous %}display:none;{% endif %}"> previous </span>
+		page <span id="id_currentPage">{{page}}</span> of <span id="id_totPages">{{pages}}</span>
+	<span id='page_{{next}}' onclick="Pagination(this)" style="cursor:pointer;color:blue;padding-left:15px;{% if not has_next %}display:none;{% endif %}"> next </span>
+</div>
+	<input type="hidden" name="prev_sel" id="prev_sel_id" value=""/>
+	<div style="padding:40px 0px;text-align:center;display:none;" id="div_mapchild">
+		<div class="detailHead">
+			<span class="hedText">Select {% if boundary.boundary_category.boundary_category == 'Circle' %}Anganwadi{% else %}School{% endif %} To Map Children</span>
+		</div>
+			<span style="padding-right:5px;">Schools</span>
+			<span style="padding-right:5px;"><select name="school" id="filtSchool"><option value="None">--</option>{% for school in schools %}<option value="{{school.id}}">{{school.name}}</option>{% endfor %}</select></span>
+			
+
+			</span><input type="hidden" name = "boundary" id = "boundary" value = "{{boundary.id}}" />
+			{% if boundary.boundary_category.boundary_category == 'Circle' %}
+			<span style="padding-right:5px;display:none"><select name="studentgroup" id="filtSchgrp"><option value="None">--</option></select></span>
+			{% else %}
+			<span style="padding-right:5px;">Classes</span>
+			<span style="padding-right:5px;"><select name="studentgroup" id="filtSchgrp"><option value="None">--</option></select></span>
+			{% endif %}
+			<span><input type="submit" value="submit"/></span>
+	</div>
+
+	<div style="padding:40px 0px;text-align:center;display:none;" id="div_mapstdgrp">
+		<div class="detailHead">
+			<span class="hedText">Select Centre To Map Children</span>
+		</div>
+			<span style="padding-right:5px;">Centres</span>
+			<span style="padding-right:5px;"><select name="studentgroup"><option value="None">--</option>{% for stdgrp in studentGroups %}<option value="{{stdgrp.id}}">{{stdgrp.name}}</option>{% endfor %}</select></span>
+
+			<span><input type="submit" value="submit"/></span>
+	</div>
+</form>
+</div>
+
+{% else %}
+<div style="color:black;text-align:center;font-weight:bold;"> No Childrens Found</div>
+{% endif %}
+
+<div class="detailHead">
+<span class="hedText">Children Search</span>
+</div>
+
+<div class="detailHead">
+    <form method='GET' action='/search/child/' id="child_searchForm" onsubmit="return false">
+	<select name='fieldName' id='id_fieldName'>
+		<option value='firstname'>First Name</option>
+		<option value='lastname'>Last Name</option>
+		<option value='dob'>Date of Birth (Year-month-date  2010-05-09)</option>
+		<option value='gender'>Gender</option>
+		<option value='mt'>Mother Tongue</option>
+		<option value='mother'>Mother Name</option>
+		<option value='father'>Father Name</option>
+	</select>
+	<input type="text" name="searchtext" id='id_searchtext' value='' />
+	<input type="submit" name='search' value='submit' />
+    </form>
+
+</div>
+
+<script>
+
+function Pagination(thisObj){
+	pages = $(thisObj).attr('id')
+	page = pages.split('_')[1]
+        $.ajax({
+            url: $('#url').attr('value'),
+            data:'&page='+page,
+            success: function(data) {
+                $('#searchRes').html(data);
+		tb_init('a.thickbox, area.thickbox, input.thickbox');
+            }
+        });
+	return false;
+}
+
+/*function SearchData(){
+	//if ($("#id_searchtext").val().length > 2){
+		$.ajax({
+			url: $('#url').attr('value'),
+			data:'fieldName='+$("#id_fieldName").val()+'&searchtext='+$("#id_searchtext").val(),
+			success: function(data) {
+				$('#searchRes').html(data);
+				tb_init('a.thickbox, area.thickbox, input.thickbox');
+			}
+		});
+		return false;
+	//}
+}*/
+
+$('#child_searchForm').submit(function(){
+		$.ajax({
+			url:$('#url').val(),
+			data:$('#child_searchForm').serialize(),
+			 success:function(data) {
+				$('#searchRes').html(data);
+				$('#failureMsgHead').hide()
+				tb_init('a.thickbox, area.thickbox, input.thickbox');
+			}
+		});
+		return false;
+});
+
+
+
+$(document).ready(function(){
+	$("#filtSchool").change(function(){
+		$.ajax({                    
+                	url: '/filter/'+$('#filtSchool option:selected').val()+'/schgrp',
+                	success: function(data) {
+				if (data != 'fail'){
+			        	rows = data.split('&&')
+			                selOption = ''
+			                for (i=0;i<rows.length;i++){
+			                	vals = rows[i].split('$$')
+			                	selOption += "<option value="+vals[0]+">"+vals[1]+"</option>"
+			        	}
+			                $("#filtSchgrp").html(selOption);
+			        }
+                    	}
+            	});
+	});
+
+
+$('#classForm').submit(function (){
+	$.post(
+		'/childsql/'+$('#boundary').val()+'/',
+		$('#classForm').serialize(),
+		function(data) {
+			$('#searchRes').html(data);
+		}
+	);
+	return false;
+});
+
+$('input[name=map]:radio').click(function(){
+	selRadio = $("input[type=radio]:checked").attr("id");
+	prev_sel_Div = $("#prev_sel_id").val();
+	if (prev_sel_Div)
+		$("#div_"+prev_sel_Div).hide();
+	$("#prev_sel_id").val(selRadio);
+	$("#div_"+selRadio).show();
+});
+
+});
+</script>
+</div>
+

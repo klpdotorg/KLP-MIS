@@ -1,0 +1,79 @@
+{% extends "index.html" %}	
+{% load i18n %}
+{% load template_tags %}
+{{% block leftpart%}{% endblock %}
+{% block midpart %}
+	    <div id="successMsgHead" style="display:none;">
+    		<div class="shwMsg"> 
+    			<span >
+    				<img src="/static_media/images/correct_icon.jpg" height="18"/>
+    			</span>
+    			<span style="padding:2px;" id="klp_MsgTxt">
+    				Permissions Flush Successfully
+    			</span>
+    		</div>
+	    </div>
+	    <table align="center" width="500">
+	        <tr>
+    	        	<td colspan="3" bgcolor="#336699" align="Center"><span class="pwdHead">Permissions For User {{userName}}</span> </td>    	        
+    	    	</tr>
+    	    
+    	    	<tr>
+                    	<td align="Center" colspan="3">&nbsp;</td>
+            	</tr>
+            	<tr bgcolor="#408080">
+            		<td> 
+            			<table>
+            				<tr>
+            					<td class="KLP_td_height"><font color="#fff"><b>Institute</b></font> </td> 
+            					<td class="KLP_td_height"> <font color="#fff" weight="bold"><b>Acess</b></font> 
+            					<td class="KLP_td_height"> <font color="#fff" weight="bold"><b>Flush</b></font> </td>
+            				</tr>
+            			</table>
+            		</td>
+            	</tr>
+            	{% if inst_list %}
+                	{% for inst in inst_list %}
+                		<tr id="id_permission_{{inst|displayValue:'instId'}}">
+		        		<td>
+		        			<form name="flushForm" id="id_FlushForm_inst_{{inst|displayValue:'instId'}}" onsubmit="return false;">
+		        				<table>
+		        					<tr>
+		        						<td class="KLP_td_height">
+		        							{{inst|displayValue:'Institute'}}
+		        							<input type="hidden" name="inst_id" id="inst_id" value="{{inst|displayValue:'instId'}}"/>
+		        							<input type="hidden" name="userId" value="{{userId}}" />
+		        						</td>
+		        						<td class="KLP_td_height">{{inst|displayValue:'Acess'}}</td>
+		        						<td class="KLP_td_height"><input type="submit" name="flush_permission" value="Flush" /></td>
+		        					</tr>
+		        				</table>
+		        			</form>
+		        			<script>
+		        				$("#id_FlushForm_inst_{{inst|displayValue:'instId'}}").submit(function(){
+		        					$("#successMsgHead").hide();
+		        					$.post(
+		        						'/flush/user/permissions',
+		        						$("#id_FlushForm_inst_{{inst|displayValue:'instId'}}").serialize(),
+		        						function(data){
+		        							if (data == 'success'){
+		        								$("#id_permission_{{inst|displayValue:'instId'}}").remove();
+		        								$("#successMsgHead").show();
+		        							}
+		        						}
+		        					);
+		        				});
+		        			</script>
+		        		</td>
+		        	</tr>	
+                	{% endfor %}
+            	{% endif %}
+            	<tr>
+            		<td>
+    	        		<a href="{% if user.is_superuser %}/home/ {% else %}/home/?respType=userpermissions {% endif %}"> << Click Here</a> to go Back
+    	        	</td>
+            	</tr>
+	    </table>	    
+	
+{% endblock %}
+

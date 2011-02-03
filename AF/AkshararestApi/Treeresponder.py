@@ -19,6 +19,8 @@ from django.utils import simplejson
 from django.utils.xmlutils import SimplerXMLGenerator
 from django.views.generic.simple import direct_to_template
 import json
+from schools.models import StudentGroup,Answer,Student_StudentGroupRelation
+
 class TreeSerializeResponder(object):
     """
     Class for all data formats that are possible
@@ -48,19 +50,28 @@ class TreeSerializeResponder(object):
         """
         # Hide unexposed fields
         hidden_fields = []
+	#print " am working"
+	#print self.format
         for obj in list(object_list):
             for field in obj._meta.fields:
                 if not field.name in self.expose_fields and field.serialize:
                     field.serialize = False
                     hidden_fields.append(field)
+        #print object_list
+	#print serializers.serialize(self.format, object_list)	
         response = serializers.serialize(self.format, object_list)
         # Show unexposed fields again
-        
+        #print response 
         response1 = serializers.serialize(self.format, object_list,use_natural_keys=True)
        
         response1= simplejson.loads(response)
-        
+        boundary_id = ''
         for k in response1:
+		   if k['model'] == "schools.school":
+			boundary_id = k['fields']['boundary']
+		   imageName=modelName = k['model'].split('.')[-1]
+		   if modelName=='studentgroup':
+                        imageName=imageName+'_'+k['fields']['group_type']
 		   modelName = k['model'].split('.')[-1]
                    childkey= modelName+'_'+str(k['pk'])
                    temval=self.CDict[childkey]
@@ -74,11 +85,47 @@ class TreeSerializeResponder(object):
                    try:
                         titleval=names['name']
 		   except:
-                          titleval=names['section']
-                   if modelName=='student':
-                       titleval=temval[4]
-                   
-		   k['text'] = '<img src="/static_media/tree-images/reicons/'+modelName+'.gif" title='+modelName+' /> &nbsp;'+temval[1]+temval[2]+temval[3]
+			titleval = names['question']
+		   k['text'] = '<img src="/static_media/tree-images/reicons/'+imageName+'.gif" title='+modelName+' /> &nbsp;'+temval[1]
+
+	response3 = []
+	if boundary_id:
+		if self.CDict['filterBy'] != 'None':
+			students_list = Answer.objects.filter(question__assessment__programme__id=self.CDict['filterBy'], question__assessment__id=self.CDict['secFilter']).values_list('student',flat=True).distinct('student')
+			studentgroup_list = Student_StudentGroupRelation.objects.filter(student__id__in=students_list, active=2,).values_list('student_group', flat=True).distinct()
+			object_list1 = StudentGroup.objects.filter(content_type__model="boundary",object_id = boundary_id, active=2,  id__in=studentgroup_list).distinct()
+		else:
+			object_list1 = StudentGroup.objects.filter(content_type__model="boundary",object_id = boundary_id, active=2,group_type="Center")
+		#object_list1 = StudentGroup.objects.filter(content_type__model="boundary",object_id = boundary_id, active=2,group_type="Center")
+		response2 = serializers.serialize(self.format, object_list1)
+		response3= simplejson.loads(response2)
+
+		for k in response3:
+			   imageName=modelName = k['model'].split('.')[-1]
+			   if modelName=='studentgroup':
+				imageName=imageName+'_'+k['fields']['group_type']
+			   childkey= modelName+'_'+str(k['pk'])
+
+			   if self.CDict['filterBy'] != 'None':
+				viewlink = '<a href="/studentgroup/'+str(k['pk'])+'/programme/'+str(self.CDict['filterBy'])+'/assessment/'+str(self.CDict['secFilter'])+'/view" onclick="return KLP_View(this)" class="KLP_treetxt" title="">' +k['fields']['name']+'</a>'
+			   else:
+				viewlink = '<a href="/studentgroup/'+str(k['pk'])+'/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="">' +k['fields']['name']+'</a>'
+
+		           temval=[False,viewlink]
+		           childval=temval[0]
+		           if childval:
+		                  childvals='true'  
+		                  k['hasChildren']=childvals
+		           k['id']=childkey
+			   names =  k['fields']
+		           try:
+		                titleval=names['name']
+			   except:
+				titleval = names['question']
+			   k['text'] = '<img src="/static_media/tree-images/reicons/'+imageName+'.gif" title='+modelName+' /> &nbsp;'+temval[1]
+
+	response1 = response1+response3
+
         response=simplejson.dumps(response1)
         for field in hidden_fields:
             field.serialize = True

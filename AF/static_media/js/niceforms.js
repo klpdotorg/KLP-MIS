@@ -61,7 +61,7 @@ function niceform(nf) {
 	nf.add_inputFile = function(obj) {this._inputFile[this._inputFile.length] = obj; inputFile(obj);}
 	nf.add_textarea = function(obj) {this._textarea[this._textarea.length] = obj; textarea(obj);}
 	nf.add_select = function(obj) {this._select[this._select.length] = obj; selects(obj);}
-	nf.add_multiselect = function(obj) {this._multiselect[this._multiselect.length] = obj; multiSelects(obj);}
+	//nf.add_multiselect = function(obj) {this._multiselect[this._multiselect.length] = obj; multiSelects(obj);}
 	nf.start = function() {
 		//Separate and assign elements
 		var allInputs = this.getElementsByTagName('input');
@@ -82,11 +82,11 @@ function niceform(nf) {
 		for(var w = 0; w < allTextareas.length; w++) {
 			this.add_textarea(allTextareas[w]);
 		}
-		var allSelects = this.getElementsByTagName('select');
-		for(var w = 0; w < allSelects.length; w++) {
-			if(allSelects[w].size == "1") {this.add_select(allSelects[w]);}
-			else {this.add_multiselect(allSelects[w]);}
-		}
+		//var allSelects = this.getElementsByTagName('select');
+		//for(var w = 0; w < allSelects.length; w++) {
+		//	if(allSelects[w].size == "1") {this.add_select(allSelects[w]);}
+		//	else {this.add_multiselect(allSelects[w]);}
+		//}
 		//Start
 		for(w = 0; w < this._inputText.length; w++) {this._inputText[w].init();}
 		for(w = 0; w < this._inputRadio.length; w++) {this._inputRadio[w].init();}
@@ -110,6 +110,7 @@ function niceform(nf) {
 	}
 }
 function inputText(el) { //extent Text inputs
+
 	el.oldClassName = el.className;
 	el.left = document.createElement('img');
 	el.left.src = imagesPath + "0.png";
@@ -134,7 +135,7 @@ function inputText(el) { //extent Text inputs
 		this.parentNode.insertBefore(this.right, this.nextSibling);
 		this.dummy.appendChild(this);
 		this.right.parentNode.insertBefore(this.dummy, this.right);
-		this.className = "NFText";
+		this.className = el.oldClassName+" NFText";
 	}
 	el.unload = function() {
 		this.parentNode.parentNode.appendChild(this);
@@ -160,7 +161,7 @@ function inputRadio(el) { //extent Radio buttons
 				siblings[q].dummy.className = "NFRadio";
 			}
 			this.ref.checked = true;
-			this.className = "NFRadio NFh";
+			this.className = el.oldClassName+" NFRadio NFh";
 		}
 	}
 	el.onclick = function() {
@@ -195,11 +196,11 @@ function inputCheck(el) { //extend Checkboxes
 	el.dummy.onclick = function() {
 		if(!this.ref.checked) {
 			this.ref.checked = true;
-			this.className = "NFCheck NFh";
+			this.className = el.oldClassName+" NFCheck NFh";
 		}
 		else {
 			this.ref.checked = false;
-			this.className = "NFCheck";
+			this.className = el.oldClassName+" NFCheck";
 		}
 	}
 	el.onclick = function() {
@@ -226,19 +227,19 @@ function inputSubmit(el) { //extend Buttons
 	el.right.src = imagesPath + "0.png";
 	el.right.className = "NFButtonRight";
 	el.onmouseover = function() {
-		this.className = "NFButton NFh";
+		this.className = el.oldClassName+" NFButton NFh";
 		this.left.className = "NFButtonLeft NFh";
 		this.right.className = "NFButtonRight NFh";
 	}
 	el.onmouseout = function() {
-		this.className = "NFButton";
+		this.className = el.oldClassName+" NFButton";
 		this.left.className = "NFButtonLeft";
 		this.right.className = "NFButtonRight";
 	}
 	el.init = function() {
 		this.parentNode.insertBefore(this.left, this);
 		this.parentNode.insertBefore(this.right, this.nextSibling);
-		this.className = "NFButton";
+		this.className = el.oldClassName+" NFButton";
 	}
 	el.unload = function() {
 		this.parentNode.removeChild(this.left);
@@ -277,7 +278,7 @@ function inputFile(el) { //extend File inputs
 		this.file.insertBefore(this.left, this.center);
 		this.file.appendChild(this.button);
 		this.dummy.appendChild(this.file);
-		this.className = "NFhidden";
+		this.className = el.oldClassName+" NFhidden";
 		this.relatedElement = this.clone;
 	}
 	el.unload = function() {
@@ -332,7 +333,7 @@ function textarea(el) { //extend Textareas
 		this.bottomRight.appendChild(this.bottomLeft);
 		el.style.width = el.topRight.style.width = el.bottomRight.style.width = el.width + 'px';
 		el.style.height = el.left.style.height = el.right.style.height = el.height + 'px';
-		this.className = "NFTextarea";
+		this.className = el.oldClassName+" NFTextarea";
 	}
 	el.unload = function() {
 		this.parentNode.parentNode.appendChild(this);
@@ -362,7 +363,7 @@ function textarea(el) { //extend Textareas
 function selects(el) { //extend Selects
 	el.oldClassName = el.className;
 	el.dummy = document.createElement('div');
-	el.dummy.className = "NFSelect";
+	el.dummy.className = el.oldClassName+" NFSelect";
 	el.dummy.style.width = el.offsetWidth + 'px';
 	el.dummy.ref = el;
 	el.left = document.createElement('img');
@@ -402,7 +403,7 @@ function selects(el) { //extend Selects
 		}
 		this.dummy.style.zIndex = 999 - pos;
 		this.parentNode.insertBefore(this.dummy, this);
-		this.className = "NFhidden";
+		this.className = el.oldClassName+" NFhidden";
 	}
 	el.unload = function() {
 		this.parentNode.removeChild(this.dummy);
@@ -502,7 +503,7 @@ function multiSelects(el) { //extend Multiple Selects
 		this.bottomRight.appendChild(this.bottomLeft);
 		el.style.width = el.topRight.style.width = el.bottomRight.style.width = el.width + 'px';
 		el.style.height = el.left.style.height = el.right.style.height = el.height + 'px';
-		el.className = "NFMultiSelect";
+		el.className = el.oldClassName+" NFMultiSelect";
 	}
 	el.unload = function() {
 		this.parentNode.parentNode.appendChild(this);

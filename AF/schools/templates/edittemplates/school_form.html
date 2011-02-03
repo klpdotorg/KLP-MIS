@@ -1,0 +1,204 @@
+{% load template_tags %}
+<div class="detailHead">
+	<span class="hedText">{{extra_context|displayValue:'schoolType'}} Form</span>
+</div>
+<form action="." method="POST" enctype="multipart/form-data" class="niceform" id="schoolForm" onsubmit="return false;">{% csrf_token %}
+	{{form.management_form}}
+	<input type="hidden" name="form-buttonType" id="id_form-buttonType" value="save" />
+	<input type="hidden" id="url" value="/school/{{school.id}}/update/" />
+	<input type="hidden" id="school_id" value="{{school.id}}" />
+	<input type="hidden" id="success_status" size="15" value="{{extra_context|displayValue:'showsuccess'}}" / >
+        {% with form.forms|last as entryForm %}
+        	<table class="tblprofile">
+        		<tr>
+        			<td><label class="KLP_required">Name:</label></td>
+        			<td>
+        				{% render_field entryForm.name 'tabindex=1' %}
+                	        </td>
+                	        <td>
+                                	{% for error in entryForm.name.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                </td>
+                	</tr>
+                	<tr>
+                		<td><label class="KLP_required">Category:</label></td>
+                		<td>	
+					<select id="id_form-0-cat" name="form-0-cat" tabindex=2>
+						{% for category in extra_context|displayValue:'categoryList' %}
+							{% if extra_context|displayValue:'selCategoryTyp' == category.id or school.cat.id == category.id %}
+								<option value="{{category.id}}" selected="true">{{category.name}}</option>
+							{% else %}
+								<option value="{{category.id}}">{{category.name}}</option>
+							{% endif %}
+						{% endfor %}
+					</select>
+				</td>
+				<td>
+                                	{% for error in entryForm.cat.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                </td>
+					
+                        </tr>
+                        <tr>
+                        	<td><label class="KLP_required">{{extra_context|displayValue:'schoolType'}} Type:</label></td>
+                                <td>
+                                	{% render_field entryForm.school_type 'tabindex=3' %}
+                                </td>
+                                <td>
+                                	{% for error in entryForm.school_type.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                </td>
+                        </tr>
+                        <tr>
+                        	<td><label>Dise Code:</label></td>
+                                <td>
+                                        {% render_field entryForm.dise_code 'tabindex=4' %}
+                                </td>
+                                <td>
+                                	{% for error in entryForm.dise_code.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                </td>
+                        </tr>
+                        <tr>
+                        	<td><label class="KLP_required">Language:</label></td>
+                        	<td>
+                        		{% render_field entryForm.languages 'tabindex=5' %}
+                        	</td>
+                        	<td>
+                                	{% for error in entryForm.languages.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                </td>
+                        </tr>
+                        <tr>
+                        	<td><label class="KLP_required">Management:</label></td>
+                        	<td>
+                        		{% render_field entryForm.mgmt 'tabindex=6' %}
+                                </td>
+                                <td>
+                                	{% for error in entryForm.mgmt.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                </td>
+                        </tr>
+                        <tr>
+                        	<td><label class="KLP_required">Address:</label></td>
+                        	<td>
+                        		<textarea name="form-0-address" id="id_form-0-address" rows="4" cols="20" tabindex=7>{{school.address}}</textarea>
+                                </td>
+                                <td>
+                                	{% for error in entryForm.address.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                </td>
+                        </tr>
+                        <tr>
+                        	<td><label>Landmark:</label></td>
+                        	<td>
+                                        <textarea name="form-0-landmark" id="id_form-0-landmark" rows="4" cols="20" tabindex=8>{{school.landmark}}</textarea>
+                                </td>
+                                <td>
+                                	{% for error in entryForm.landmark.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                </td>
+                        </tr>
+			<tr>
+				<td><label>Pincode:</label></td>
+                                <td>
+                                	{% render_field entryForm.pincode 'tabindex=9' %}
+                                </td>
+                                <td>
+                                	{% for error in entryForm.pincode.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                </td>
+                        </tr>
+                        <tr><td> &nbsp;</td></tr>
+      			<tr><td> &nbsp;</td></tr>
+      			<tr><td> &nbsp;</td></tr>
+                        <tr>
+                        	<td>
+                        		<span style="display:none">
+                        			<input type="hidden" name="old" id="id_old" size="15" value='{{school.name}}' />
+                        			<input type="hidden" name="form-0-boundary" id="id_form-0-boundary" size="15" value='{{school.boundary.id}}'/>
+                        			<input type="hidden" name="parentId" value="{{school.boundary.id}}" id="parentId" />
+                        			<input type="hidden" id="id_form-0-active" name="form-0-active" value="2">
+                        			{{entryForm.id}}
+                        		</span>	
+                                        <input type="submit" name="save" id="id_save" value="Save" tabindex=10/>
+                                </td>
+                                <td>
+                                    	<input type="submit" name="save_and_continue" id="id_save_and_continue" value="Save And Continue" tabindex=11/>
+                                </td>
+                                <td>
+                    	    		<input type="submit" name="save_and_create" id="id_save_and_create" value="Save And Create Another" tabindex=12/>
+      				</td>
+                        </tr>        
+                </table>
+        {%endwith%}             
+</form>
+<script>
+
+$(document).ready(function(){  
+  
+   $("#id_save").click(function(){
+   	KLP_Hide_Msg();
+   	parentVal = $("#id_form-0-boundary").val();
+   	$("#id_form-buttonType").val('save');
+   	KLP_form_submit(parentVal);
+   	
+   });
+   
+   $("#id_save_and_continue").click(function(){
+   	KLP_Hide_Msg();
+   	$("#id_form-buttonType").val('save and continue');
+   	parentVal = $("#id_form-0-boundary").val();
+   	KLP_form_submit(parentVal);
+   	
+   });
+   
+   $("#id_save_and_create").click(function(){
+   	KLP_Hide_Msg();
+   	parentVal = $("#id_form-0-boundary").val();
+   	$("#id_form-buttonType").val('save and add another');
+   	KLP_form_submit(parentVal, 'id_form-0-boundary');
+   	
+   	
+   });
+    
+    
+   var KLP_form_submit = function(parentVal, parentId){
+   	oldName = $('#id_old').val(); 
+    	newName = $('#id_form-0-name').val();
+   	$.post(
+        	$('#url').val(),
+        	$("#schoolForm").serialize(),
+                function(data){
+                    $("#dyncData").html(data);
+                    NFInit();
+                    $('input:visible:enabled:first').focus();
+                    var successStatus = $("#success_status").val();
+                    if (successStatus == 'True'){
+                    	treeNode=$("#school_{{school.id}}").find("a:first");
+                    	$(treeNode).attr("title", newName);
+                    	$(treeNode).html(newName);
+                    	KLP_BredaCrumb(treeNode);
+                    	$("#successMsgHead").show();
+   		    	$("#klp_MsgTxt").html("{{extra_context|displayValue:'schoolType'}} Updated Successfully")
+                    
+                    	if (parentId != null)
+                    		$("#"+parentId).val(parentVal);
+                    }
+               }
+           );
+   } 
+   
+});
+</script>
+
+

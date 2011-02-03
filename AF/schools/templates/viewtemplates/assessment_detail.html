@@ -1,3 +1,20 @@
+<div class="KLP_Button_Header">
+	<span class="KLP_Sub">
+		<a class="KLP_Button"  href="/assessment/question/{{assessment.id}}/creator" onclick="return KLP_View(this);">Add Question</a>
+	</span>
+	<span class="KLP_Sub">
+		<a class="KLP_Button"  href="/assessment/{{assessment.id}}/update/" onclick="return KLP_View(this);">Edit</a>
+	</span>
+	<span class="KLP_Sub">
+		<span class="KLP_SpanButton"  onclick="KLP_Del('{{assessment.id}}', 'assessment', '{{assessment.name}}')">Delete</span>
+	</span>
+	<!--span style="font-weight:bold; font-size:15px; padding:5px">
+		<span style="width:auto;padding: 5px 15px;background: url(/static_media/images/price_bg.jpg) center right; color:#fff;cursor:pointer;"  onclick="KLP_Del('{{assessment.id}}', 'assessment', '{{assessment.name}}')">Copy</span>
+	</span-->
+	
+</div>
+
+
 <div class="detailHead">
 <span class="hedText">Assessment Details</span>
 </div>
@@ -12,24 +29,17 @@
     <span>
         {{assessment}}
         <input type="hidden" name="id" id="assessment_id" size="15" value="{{assessment.id}}" / >
+        <input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / >
     </span>	
 </div>
 <div class="boundDetail">    
     <label>Start Date</label>
-    <span>{{assessment.startDate}}</span>
+    <span>{% if assessment.startDate %}{{assessment.startDate|date:'d-m-Y'}}{% endif %}</span>
 </div>
 <div class="boundDetail">
     <label>End Date</label>
-    <span>{{assessment.endDate}}</span>
+    <span>{% if assessment.endDate %}{{assessment.endDate|date:'d-m-Y'}}{% endif %}</span>
 </div>
 
-<div class="boundDetail">    
-    <label>Assessment Type</label>
-    <span>{{assessment.assessmentType}}</span>
-</div>
-<div class="boundDetail">    
-    <label>Quesry</label>
-    <span>{{assessment.query}}</span>
-</div>
 
 

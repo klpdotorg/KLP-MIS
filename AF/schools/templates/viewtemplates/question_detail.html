@@ -1,19 +1,44 @@
+<div class="KLP_Button_Header">
+	<span class="KLP_Sub">
+		<a class="KLP_Button"  href="/question/{{question.id}}/update/" onclick="return KLP_View(this);">Edit</a>
+	</span>
+	<span class="KLP_Sub">
+		<span class="KLP_SpanButton"  onclick="KLP_Del('{{question.id}}', 'question', '{{question.name}}')">Delete</span>
+	</span>
+	
+</div>
+
+
 <div class="detailHead">
-<span class="hedText">Question Details</span>
+	<span class="hedText">Question Details</span>
 </div>
 
 <div class="boundDetail">    
     <label>Question</label>
     <span>{{question}}</span>
+    <input type="hidden" name="id" id="question_id" size="15" value="{{question.id}}" / >
+    <input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / >
 </div>
 
 <div class="boundDetail">    
     <label>Question Type</label>
-    <span>{{question.questionType}}</span>
+    <span>{% if question.questionType == 1 %}Marks{%else%}Grade{%endif%}</span>
 </div>
-
-<div class="boundDetail">    
-    <label>Tags</label>
-    <span>{{question.tags}}</span>
-</div>
-
+{% if question.questionType == 1 %}
+	<div class="boundDetail">    
+    		<label>ScoreMin</label>
+   		<span>{{question.scoreMin}}</span>
+	</div>
+{% endif %}	
+{% if question.questionType == 1 %}
+	<div class="boundDetail">    
+    		<label>ScoreMax</label>
+   		<span>{{question.scoreMax}}</span>
+	</div>
+{% endif %}
+{% if question.questionType == 2 %}
+	<div class="boundDetail">    
+    		<label>Grades</label>
+   		<span>{{question.grade}}</span>
+	</div>
+{% endif %}

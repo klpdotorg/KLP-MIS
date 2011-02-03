@@ -7,23 +7,22 @@ from django_restapi.responder import *
 from django_restapi.receiver import *
 from AkshararestApi.BoundaryApi import ChoiceEntry
 
-class LanguageView(Collection):  
+class KLP_Language(Collection):  
     """ To create new language language/creator/""" 
     def get_entry(self,language_id):        
         language = Moi_Type.objects.all(id=language_id)          
         return ChoiceEntry(self, language)   
 
-template_language_view =  LanguageView(
-    queryset = Moi_Type.objects.all(),
-    permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'),    
-    responder = TemplateResponder(
-        template_dir = 'viewtemplates',
-        template_object_name = 'language',        
-    ),
-  receiver = XMLReceiver(),
-)
-
+def KLP_Language_Create(request):
+	""" To Create new language language/creator/"""
+	buttonType = request.POST.get('form-buttonType')
+	KLP_Language_Create = KLP_Language(queryset = Moi_Type.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'Language',extra_context={'buttonType':buttonType}), receiver = XMLReceiver(),)
+	response = KLP_Language_Create.responder.create_form(request,form_class=Moi_Type_Form)
+	
+	return HttpResponse(response)
+	
+	
 
 urlpatterns = patterns('',             
-   url(r'^language/creator/?$', template_language_view.responder.create_form, {'form_class':'language'}),   
+   url(r'^language/creator/?$', KLP_Language_Create),   
 )

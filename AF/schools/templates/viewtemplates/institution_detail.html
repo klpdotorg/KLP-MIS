@@ -1,0 +1,90 @@
+<div class="KLP_Button_Header">
+	{% if institution.boundary.boundary_category.boundary_category|lower == 'cluster' %}
+		<span class="KLP_Sub">
+			<a class="KLP_Button"  href="/boundary/institution/{{institution.id}}/studentgroup/creator/" onclick="return KLP_View(this);">Add Class</a>
+		</span>
+	{% endif %}
+	<span class="KLP_Sub">
+		<a class="KLP_Button"  href="/institution/{{institution.id}}/update/" onclick="return KLP_View(this);">Edit</a>
+	</span>
+	<span class="KLP_Sub">
+		<span class="KLP_SpanButton"  onclick="KLP_Del('{{institution.id}}', 'institution', '{{institution.name}}')">Delete</span>
+	</span>
+	<span class="KLP_Sub">
+		<a class="KLP_Button"  href="/institution/{{institution.id}}/staff/creator/" onclick="return KLP_View(this);">Add Teacher</a>
+	</span>
+	<span class="KLP_Sub">
+		<a class="KLP_Button"  href="/institution/{{institution.id}}/staff/view/" onclick="return KLP_View(this);">View Teachers</a>
+	</span>
+	
+</div>
+
+<div class="detailHead">
+<span class="hedText">{% if institution.boundary.boundary_category.boundary_category|lower == 'cluster' %} Institution {% else %} Anganwadi {% endif %}Details</span>
+</div>
+<div class="boundDetail">
+    <label>Boundary Name</label>
+    <span>{{institution.boundary}}</span><input type="hidden" name="id" id="institution_id" size="15" value="{{institution.id}}" / >
+    <input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / >
+</div>
+
+<div class="boundDetail">    
+    <label>{% if institution.boundary.boundary_category.boundary_category|lower == 'cluster' %} Institution {% else %} Anganwadi {% endif %} Name</label>
+    <span>{{institution.name}}</span>
+</div>
+<div class="boundDetail">    
+    <label>{% if institution.boundary.boundary_category.boundary_category|lower == 'cluster' %} Institution {% else %} Anganwadi {% endif %} Category</label>
+    <span>{{institution.cat}}</span>
+</div>
+<div class="boundDetail">    
+    <label>{% if institution.boundary.boundary_category.boundary_category|lower == 'cluster' %} Institution {% else %} Anganwadi {% endif %} Gender</label>
+    <span>{{institution.institution_gender}}</span>
+</div>
+<div class="boundDetail">    
+    <label>{% if institution.boundary.boundary_category.boundary_category|lower == 'cluster' %} Institution {% else %} Anganwadi {% endif %} Type</label>
+    <span>{{institution.institution_type}}</span>
+</div>
+
+<div class="boundDetail">
+    <label>Dise Code</label>
+    <span>{{institution.dise_code}}</span>
+</div>
+
+<div class="boundDetail">    
+    <label>Languages</label>
+    <span>
+        {% for lang in institution.languages.all %}
+            {{lang.name}}
+        {% endfor %}
+    </span>
+</div>
+<div class="boundDetail">    
+    <label>Management</label>
+    <span>{{institution.mgmt}}</span>
+</div>
+<div class="boundDetail">    
+    <label>Address</label>
+    <span>{{institution.inst_address.address}}</span>
+</div>
+
+<div class="boundDetail">    
+    <label>Landmark</label>
+    <span>{{institution.inst_address.landmark}}</span>
+</div>
+
+<div class="boundDetail">    
+    <label>Pincode</label>
+    <span>{{institution.inst_address.pincode}}</span>
+</div>
+<div class="boundDetail">    
+    <label>Area</label>
+    <span>{{institution.inst_address.area}}</span>
+</div>
+<div class="boundDetail">    
+    <label>Identification</label>
+    <span>{{institution.inst_address.instidentification}}</span>
+</div>
+<div class="boundDetail">    
+    <label>Route Information</label>
+    <span>{{institution.inst_address.routeInformation}}</span>
+</div>
