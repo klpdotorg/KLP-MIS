@@ -76,6 +76,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'fullhistory.fullhistory.FullHistoryMiddleware',
 )
 
 ROOT_URLCONF = 'Akshara.urls'
@@ -106,4 +107,5 @@ INSTALLED_APPS = (
     #'django_extensions',
     'schools',
     'object_permissions',
+    'fullhistory',
 )

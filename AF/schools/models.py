@@ -3,16 +3,16 @@ import datetime
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.contrib.auth.models import User
-    # Table Structure For Klp
 from object_permissions import register
-
+from fullhistory import register_model
+# Table Structure For Klp
 class Institution_Category(models.Model):
 	'''This Class stores the Institution Category Information'''
 	name = models.CharField(max_length = 50)
 	categoryType = models.IntegerField()
 	def __unicode__(self):
 		return "%s"%self.name
-
+register_model(Institution_Category)
 
 Institution_Genders=['boys','girls','co-ed']
 Institution_Gender = []
@@ -61,6 +61,7 @@ class Moi_Type(models.Model):
 	def __unicode__(self):
 		return "%s"%self.name
 
+register_model(Moi_Type)
 
 class Institution_Management(models.Model):
 	'''This Class stores the Institution Management Information'''
@@ -68,6 +69,7 @@ class Institution_Management(models.Model):
 
 	def __unicode__(self):
 		return "%s"%self.name
+register_model(Institution_Management)
 		
 class Institution_Type(models.Model):	
 	'''This Class Stores the Institution Type Information'''
@@ -84,6 +86,7 @@ class Institution_address(models.Model):
 	landmark = models.CharField(max_length = 1000, blank=True, null=True, help_text="Can be comma separated")
 	instidentification = models.CharField(max_length = 1000, blank=True, null=True, help_text="Can be comma separated")
 	routeInformation = models.CharField(max_length = 500, blank=True, null=True, help_text="Can be comma separated")		
+register_model(Institution_address)
 
 
 class Boundary_Category(models.Model):
@@ -92,7 +95,7 @@ class Boundary_Category(models.Model):
 
 	def __unicode__(self):
 		return "%s" %(self.boundary_category)
-
+register_model(Boundary_Category)
 
 class Boundary_Type(models.Model):
 	'''This Class stores the Boundary Type Information'''
@@ -100,6 +103,7 @@ class Boundary_Type(models.Model):
 
 	def __unicode__(self):
 		return "%s" %(self.boundary_type)
+register_model(Boundary_Type)
 
 class Staff_Type(models.Model):
 	'''This Class stores information about Staff Type'''
@@ -108,6 +112,7 @@ class Staff_Type(models.Model):
 	
 	def __unicode__(self):
 		return "%s" %(self.staffType)
+register_model(Staff_Type)
 		
 class Staff_Qualifications(models.Model):
 	''' This Class Stores Information about staff qualification '''
@@ -115,6 +120,7 @@ class Staff_Qualifications(models.Model):
 	
 	def __unicode__(self):
 		return '%s' %(self.qualification)			
+register_model(Staff_Qualifications)
 
 class Boundary(models.Model):
 	'''This class specifies the longitude and latitute of the area'''
@@ -168,6 +174,7 @@ class Boundary(models.Model):
 	def getPermissionViewUrl(self, secFilter):
 		return '<a href="/boundary/%s/assessment/%s/permissions" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s">%s </a>' % (self.id, secFilter, self.name, self.name)	
 
+register_model(Boundary)
 
 class Institution(models.Model):
 	''' It stores the all data regarding Institutions'''
@@ -237,7 +244,7 @@ class Institution(models.Model):
 
 
 register(['Acess'], Institution)
-
+register_model(Institution)
 
 class Child(models.Model):
 	''' This class stores the personnel information of the childrens'''
@@ -269,6 +276,7 @@ class Child(models.Model):
 
 	def get_update_url(self):
 		return '/child/%d/update/' %(self.id)
+register_model(Child)		
 
 class Relations(models.Model):
     ''' This class stores relation information of the childrens'''
@@ -283,6 +291,7 @@ class Relations(models.Model):
 
     def get_view_url(self):
 		return ''
+register_model(Relations)
 
 class StudentGroup(models.Model):
 	''' Here it holds the informaion of the class and section of the Institutions'''
@@ -340,6 +349,7 @@ class StudentGroup(models.Model):
 		if groupName == '0':
 			groupName = 'Anganwadi Class'
 		return '<span><img src="/static_media/tree-images/reicons/studentgroup_%s.gif" title="class" /> &nbsp;<a href="/studentgroup/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s %s"> %s %s </a></span>' %(self.group_type,self.id, groupName, sec, groupName, sec)
+register_model(StudentGroup)
 
 class Academic_Year(models.Model):
 	''' Its stores the academic years information'''
@@ -347,6 +357,7 @@ class Academic_Year(models.Model):
 	
 	def __unicode__(self):
 		return self.name
+register_model(Academic_Year)
 
 def current_academic():
     ''' To select current academic year'''
@@ -382,6 +393,7 @@ class Staff(models.Model):
 		
 	def getAssigendClasses(self):
 		return 	StudentGroup.objects.filter(staff_studentgrouprelation__staff__id = self.id, staff_studentgrouprelation__active=2)
+register_model(Staff)
 
 class Student(models.Model):
 	''' This class gives information regarding the students class , academic year and personnel details'''
@@ -419,12 +431,15 @@ class Student(models.Model):
 	def CreateNewFolder(self):
 		return '<span><img src="/static_media/tree-images/reicons/student.gif" title="student" /> &nbsp;<a href="/boundary/%s/institution/%s/classes/%s/sections/%s/students/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt"> %s </a><a href="/boundary/%s/institution/%s/classes/%s/sections/%s/students/%s/edit/" onclick="return KLP_View(this)"> <img src="/static_media/images/pagebuilder_edit.gif" title="Edit"/></a><span class="delConf" onclick="deleteSchool(\'%s\', \'student\', \'%s\')"><img width="11" title="Delete" src="/static_media/images/PageRow_delete.gif" title="Delete"></span></span>' %(self.class_section.classname.sid.boundary.id, self.class_section.classname.sid.id, self.class_section.classname.id, self.class_section.id,self.id,self.name, self.class_section.classname.sid.boundary.id, self.class_section.classname.sid.id, self.class_section.classname.id,self. class_section.id, self.id, self.id, self.name)
 
+register_model(Student)
+
 class Student_StudentGroupRelation(models.Model):
 	'''This Class stores the Student and Student Group Realation Information'''
 	student = models.ForeignKey(Student)
 	student_group = models.ForeignKey(StudentGroup)	
 	academic = models.ForeignKey(Academic_Year, default=current_academic)
 	active = models.IntegerField(blank = True, null = True,default=2)
+register_model(Student_StudentGroupRelation)	
 	
 class Staff_StudentGroupRelation(models.Model): 
 	'''This Class stores the Staff and Student Group Realation Information'''
@@ -432,7 +447,7 @@ class Staff_StudentGroupRelation(models.Model):
  	student_group = models.ForeignKey(StudentGroup)  
  	academic = models.ForeignKey(Academic_Year, default=current_academic) 
  	active = models.IntegerField(blank = True, null = True,default=2) 		
-	
+register_model(Staff_StudentGroupRelation)		
 
 def default_end_date():
     ''' To select academic year end date'''
@@ -478,7 +493,7 @@ class Programme(models.Model):
 
 	def CreateNewFolder(self):
 		return '<span><img src="/static_media/tree-images/reicons/programme.gif" title="Programme" /> &nbsp;<a href="/programme/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> %s</a></span>' %(self.id,self.name, self.name)	
-
+register_model(Programme)
 
 class Assessment(models.Model):
     """ This class stores information about Assessment """
@@ -512,13 +527,14 @@ class Assessment(models.Model):
 
     def CreateNewFolder(self):
 		return '<span><img src="/static_media/tree-images/reicons/assessment.gif" title="Assessment" /> &nbsp;<a id="assessment_%s_view" href="/assessment/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> %s</a></span>' %(self.id, self.id, self.name, self.name)
+register_model(Assessment)
 
 class Assessment_StudentGroup_Association(models.Model):
 	'''This Class stores the Assessment and Student Group Association Information'''
 	assessment = models.ForeignKey(Assessment)
 	student_group = models.ForeignKey(StudentGroup)	
 	active = models.IntegerField(blank = True, null = True,default=2)
-
+register_model(Assessment_StudentGroup_Association)
 
 class Question(models.Model):
     """ This class stores Assessment detail information """
@@ -561,6 +577,7 @@ class Question(models.Model):
     def CreateNewFolder(self):
 		return '<span><img src="/static_media/tree-images/reicons/question.gif" title="Question" /> &nbsp;<a href="/question/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> %s</a></span>' %(self.id, self.name, self.name)
 
+register_model(Question)
 
 class Answer(models.Model):
     """ This class stores information about student marks and grade """
@@ -575,3 +592,4 @@ class Answer(models.Model):
     creationDate = models.DateField(default=datetime.date.today, blank = True, null = True)
     lastModifiedDate = models.DateField(default=datetime.date.today, blank = True, null = True)
     lastmodifiedBy = models.ForeignKey(User, blank = True, null = True, related_name = 'lastmodifiedBy')
+register_model(Answer)
