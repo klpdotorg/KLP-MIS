@@ -20,25 +20,41 @@
 </div>
 
 <div class="boundDetail">
-    <label>Programme Name</label>
-    <span>{{assessment.programme}}</span>	
+    <div class="cl-txtbx">
+    	<label>Programme Name</label>
+    </div>
+    <div class="bng-cl">
+    	<span>{{assessment.programme}}</span>	
+    </div>
 </div>
 
 <div class="boundDetail">
-    <label>Assessment Name</label>
-    <span>
-        {{assessment}}
-        <input type="hidden" name="id" id="assessment_id" size="15" value="{{assessment.id}}" / >
-        <input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / >
-    </span>	
+    <div class="cl-txtbx">
+    	<label>Assessment Name</label>
+    </div>
+    <div class="bng-cl">
+	    <span>
+		{{assessment}}
+		<input type="hidden" name="id" id="assessment_id" size="15" value="{{assessment.id}}" / >
+		<input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / >
+	    </span>
+    </div>	
 </div>
 <div class="boundDetail">    
-    <label>Start Date</label>
-    <span>{% if assessment.startDate %}{{assessment.startDate|date:'d-m-Y'}}{% endif %}</span>
+    <div class="cl-txtbx">
+    	<label>Start Date</label>
+    </div>
+    <div class="bng-cl">
+    	<span>{% if assessment.startDate %}{{assessment.startDate|date:'d-m-Y'}}{% endif %}</span>
+    </div>
 </div>
 <div class="boundDetail">
-    <label>End Date</label>
-    <span>{% if assessment.endDate %}{{assessment.endDate|date:'d-m-Y'}}{% endif %}</span>
+    <div class="cl-txtbx">
+    	<label>End Date</label>
+    </div>
+    <div class="bng-cl">
+    	<span>{% if assessment.endDate %}{{assessment.endDate|date:'d-m-Y'}}{% endif %}</span>
+    </div>
 </div>
 
 

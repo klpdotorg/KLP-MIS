@@ -17,56 +17,40 @@
 	</span>
 </div>
 
-<!--div class="detailHead">
-<span class="hedText">Student Group Details</span>
-</div>
-<input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / >
-<table style="width:100%;text-align:center;margin-bottom:30px;">
-<input type="hidden" id="studentgroup_id" value="{{studentgroup.id}}" / >
-    {% ifequal studentgroup.content_type.model "school" %}
-    <tr>
-	<th>Boundary</th> <th>School</th> <th> Student Group</th>
-    </tr>
-    <tr>
-	<td>{{studgrpParent.boundary}}</td> <td>{{studgrpParent.name}}</td> <td>{{studentgroup.name}} {% if studentgroup.section %}{{studentgroup.section}} {% endif %}</td>
-    </tr>
-    {% else %}
-    <tr>
-	<th>Boundary</th> <th> Student Group</th>
-    </tr>
-    <tr>
-	<td>{{studgrpParent.name}}</td> <td>{{studentgroup.name}} {% if studentgroup.section %}{{studentgroup.section}} {% endif %}</td>
-    </tr>
-    {% endifequal %}
-</table-->
-
-
 <div class="detailHead">
 <span class="hedText">Student Details</span>
 <span id ="list_url" style="display:none;" value = "{{url}}"></span>
 </div>
 
 <form action="." method="POST" name="mapstudents" id="mapstudents">{% csrf_token %}
-<table id="id_StudentDetail" style="width:100%;overflow:hidden;text-align:center;{% if not students_list %}display:none;{% endif %}">
+<div class="tot-border">
+<table border="0" cellpadding="0" cellspacing="0" id="id_StudentDetail" style="width:100%;overflow:hidden;text-align:center;{% if not students_list %}display:none;{% endif %}">
    <tbody>
     <tr>
-	<th>First Name</th> <th>Last Name</th> <th> DOB</th> <th>Gender</th> <th>Mother Tongue</th><th>Relations</th> <th>Map Students to Groups</th> <th>Edit</th>
+	<th class="tot-border3">First Name</th> <th  class="tot-border3">Last Name</th> <th  class="tot-border3"> DOB</th> <th  class="tot-border3">Mother Tongue</th><th  class="tot-border3">Gender</th> <th  class="tot-border3">Relations</th> {% if studentgroup.group_type|lower == 'class' %}<th  class="tot-border3">Map Students to Groups</th><th  class="tot-border4">Edit</th>{% endif %}
     </tr>
     {% for student in students_list %}
     <tr id = "student_{{student.student.id}}">
-	<td>{{student.student.child.firstName}}</td> <td>{{student.student.child.lastName}}</td> <td>{{student.student.child.dob|date:"d M Y" }}</td> <td>{{student.student.child.mt}}</td><td>{{student.student.child.gender}}</td> 
-<td>{% for relation in student.student.child.getRelations %}{{relation.relation_type}}:{{relation.first_name}}<br />{% endfor %}</td> 
-<td><input type="checkbox" value = "{{student.student.id}}" name="students"/></td>
+	<td class="tot-border1">{{student.student.child.firstName}}</td>
+	<td class="tot-border1">{{student.student.child.lastName}}</td>
+	<td class="tot-border1">{{student.student.child.dob|date:"d M Y" }}</td>
+	<td class="tot-border1">{{student.student.child.mt}}</td>
+	<td class="tot-border1">{{student.student.child.gender}}</td> 
+        <td class="tot-border1">{% for relation in student.student.child.getRelations %}{{relation.relation_type}}:{{relation.first_name}}<br />{% endfor %}</td> 
+	{% if studentgroup.group_type|lower == 'class' %}
+		<td class="tot-border1"><input type="checkbox" value = "{{student.student.id}}" name="students"/></td>
 
-	<td>
-		<a href="/student/{{student.student.child.id}}/update/?keepThis=true&TB_iframe=true&height=400&width=800" title="Edit Student" title="Edit Student" class="thickbox"><img title="Edit" src="/static_media/images/pagebuilder_edit.gif"></a>
+		<td class="tot-border2">
+			<a href="/student/{{student.student.child.id}}/update/?keepThis=true&TB_iframe=true&height=400&width=800" title="Edit Student" title="Edit Student" class="thickbox"><img title="Edit" src="/static_media/images/pagebuilder_edit.gif"></a>
 
-		<span style="color:blue;cursor:pointer"  onclick="KLP_Del('{{student.student.id}}', 'student', '{{student.student.child.firstName}}')"><img width="11" title="Delete" src="/static_media/images/PageRow_delete.gif" title="Delete"></span>
-	</td>
+			<span style="color:blue;cursor:pointer"  onclick="KLP_Del('{{student.student.id}}', 'student', '{{student.student.child.firstName}}')"><img width="11" title="Delete" src="/static_media/images/PageRow_delete.gif" title="Delete"></span>
+		</td>
+	{% endif %}
     </tr>
     {% endfor %}
    </tbody>
 </table>
+</div>
 <div id="student_pagenation" style="{% if not students_list %}display:none;{% endif %}">
 	<span id = 'page_{{previous}}' onclick="Pagination(this)" style="cursor:pointer;color:blue;padding-right:15px;{% if not has_previous %}display:none;{% endif %}"> previous </span>
 		page <span id="id_currentPage">{{page}}</span> of <span id="id_totPages">{{pages}}</span>
@@ -78,7 +62,7 @@
 
 <div id="id_No_students" style="color:black;text-align:center;font-weight:bold;{% if students_list %}display:none;{% endif %}"> No Students Found</div>
 
-<div style="padding:40px 0px;text-align:center;">
+<div style="padding:40px 0px;text-align:center;{% if studentgroup.group_type|lower == 'center' %}display:none;{% endif %}">
 		<div class="detailHead">
 			<span class="hedText">Select Centre To Map Students</span>
 		</div>

@@ -14,31 +14,51 @@
 </div>
 
 <div class="boundDetail">    
-    <label>Question</label>
-    <span>{{question}}</span>
-    <input type="hidden" name="id" id="question_id" size="15" value="{{question.id}}" / >
-    <input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / >
+    <div class="cl-txtbx">
+    	<label>Question</label>
+    </div>
+    <div class="bng-cl">
+	    <span>{{question}}</span>
+	    <input type="hidden" name="id" id="question_id" size="15" value="{{question.id}}" / >
+	    <input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / >
+    </div>
 </div>
 
 <div class="boundDetail">    
-    <label>Question Type</label>
-    <span>{% if question.questionType == 1 %}Marks{%else%}Grade{%endif%}</span>
+    <div class="cl-txtbx">
+    	<label>Question Type</label>
+    </div>
+    <div class="bng-cl">
+    	<span>{% if question.questionType == 1 %}Marks{%else%}Grade{%endif%}</span>
+    </div>
 </div>
 {% if question.questionType == 1 %}
 	<div class="boundDetail">    
-    		<label>ScoreMin</label>
-   		<span>{{question.scoreMin}}</span>
+    		<div class="cl-txtbx">
+    			<label>ScoreMin</label>
+    		</div>
+   		<div class="bng-cl">
+   			<span>{{question.scoreMin}}</span>
+   		</div>
 	</div>
 {% endif %}	
 {% if question.questionType == 1 %}
 	<div class="boundDetail">    
-    		<label>ScoreMax</label>
-   		<span>{{question.scoreMax}}</span>
+    		<div class="cl-txtbx">
+    			<label>ScoreMax</label>
+    		</div>
+   		<div class="bng-cl">
+   			<span>{{question.scoreMax}}</span>
+   		</div>
 	</div>
 {% endif %}
 {% if question.questionType == 2 %}
 	<div class="boundDetail">    
-    		<label>Grades</label>
-   		<span>{{question.grade}}</span>
+    		<div class="cl-txtbx">
+    			<label>Grades</label>
+    		</div>
+    		<div class="bng-cl">
+   			<span>{{question.grade}}</span>
+   		</div>
 	</div>
 {% endif %}

@@ -2,14 +2,10 @@
 	<span class="KLP_Sub">
 		{% if boundary.boundary_type.boundary_type|lower == 'anganwadi' %}
 			{% if boundary.boundary_category.boundary_category|lower == 'district' %}
-				{% if user.is_superuser or user.is_staff %}
-					<a class="KLP_Button" id="{{boundary.id}}_add" onclick="return KLP_Boundary_Add(this);" href="/boundary/creator/" boundaryCategory="14">Add Project</a>
-				{% endif %}
+				<a class="KLP_Button" id="{{boundary.id}}_add" onclick="return KLP_Boundary_Add(this);" href="/boundary/creator/" boundaryCategory="14">Add Project</a>
 			{% else %}
 				{% if boundary.boundary_category.boundary_category|lower == 'project' %}
-					{% if user.is_superuser or user.is_staff %}
-						<a class="KLP_Button" id="{{boundary.id}}_add" onclick="return KLP_Boundary_Add(this);" href="/boundary/creator/" boundaryCategory="15">Add Circle</a>
-					{% endif %}
+					<a class="KLP_Button" id="{{boundary.id}}_add" onclick="return KLP_Boundary_Add(this);" href="/boundary/creator/" boundaryCategory="15">Add Circle</a>
 				{% else %}
 					<a class="KLP_Button" onclick="return KLP_View(this);" href="/boundary/{{boundary.id}}/institution/creator/" >Add Anganwadi</a>
 					
@@ -17,14 +13,10 @@
 			{% endif %}
 		{% else %}
 			{% if boundary.boundary_category.boundary_category|lower == 'district' %}
-				{% if user.is_superuser or user.is_staff %}
-					<a class="KLP_Button" id="{{boundary.id}}_add" onclick="return KLP_Boundary_Add(this);" href="/boundary/creator/" boundaryCategory="10">Add Block</a>
-				{% endif %}	
+				<a class="KLP_Button" id="{{boundary.id}}_add" onclick="return KLP_Boundary_Add(this);" href="/boundary/creator/" boundaryCategory="10">Add Block</a>
 			{% else %}
 				{% if boundary.boundary_category.boundary_category|lower == 'block' %}
-					{% if user.is_superuser or user.is_staff %}
-						<a class="KLP_Button"  id="{{boundary.id}}_add" onclick="return KLP_Boundary_Add(this);" href="/boundary/creator/" boundaryCategory="11">Add Cluster</a>
-					{% endif %}	
+					<a class="KLP_Button"  id="{{boundary.id}}_add" onclick="return KLP_Boundary_Add(this);" href="/boundary/creator/" boundaryCategory="11">Add Cluster</a>
 				{% else %}
 					<a class="KLP_Button"   onclick="return KLP_View(this);" href="/boundary/{{boundary.id}}/institution/creator/" >Add Institution</a>
 					
@@ -32,14 +24,13 @@
 			{% endif %}
 		{% endif %}
 	</span>
-	{% if user.is_superuser or user.is_staff %}
-		<span class="KLP_Sub">
-			<a class="KLP_Button"  href="/boundary/{{boundary.id}}/update" onclick="return KLP_View(this);">Edit</a>
-		</span>
-		<span class="KLP_Sub">
-			<span class="KLP_SpanButton"  onclick="KLP_Del('{{boundary.id}}', 'boundary', '{{boundary.name}}')">Delete</span>
-		</span>
-	{% endif %}
+	<span class="KLP_Sub">
+		<a class="KLP_Button"  href="/boundary/{{boundary.id}}/update" onclick="return KLP_View(this);">Edit</a>
+	</span>
+	<span class="KLP_Sub">
+		<span class="KLP_SpanButton"  onclick="KLP_Del('{{boundary.id}}', 'boundary', '{{boundary.name}}')">Delete</span>
+	</span>
+	
 </div>
 
 <div class="detailHead">
@@ -47,19 +38,29 @@
 </div>
 
 <div class="boundDetail">
-	<label>Parent Boundary</label>
-	<span>{{boundary.parent}}</span>
+	<div class="cl-txtbx">
+		<label>Parent Boundary</label>
+	</div>
+	<div class="bng-cl">
+		<span>{{boundary.parent}}</span>
+	</div>
 	<input type="hidden" name="id" id="boundary_id" size="15" value="{{boundary.id}}" / >
 	<input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / >
 </div>
 <div class="boundDetail">    
-	<label>Boundary Name</label>
-	<span>{{boundary.name}}</span>
+	<div class="cl-txtbx">
+		<label>Boundary Name</label>
+	</div>
+	<div class="bng-cl">
+		<span>{{boundary.name}}</span>
+	</div>
 </div>
 <div class="boundDetail">
-	<label>Boundary Category</label>
-	<span>
-		{{boundary.boundary_category}}
-	</span>
+	<div class="cl-txtbx">
+		<label>Boundary Category</label>
+	</div>
+	<div class="bng-cl">
+		<span>{{boundary.boundary_category}}</span>
+	</div>
 </div>
 

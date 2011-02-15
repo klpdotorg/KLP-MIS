@@ -48,7 +48,18 @@
 					</td>
 				</tr>
 				<tr>
-				    <td><label class="KLP_required">Last Name:</label></td>
+				    <td><label>Middle Name:</label></td>
+				    <td>
+					{% render_field entryForm.middleName 'tabindex=2' %}
+				    </td>
+				    <td>
+                                    	{% for error in entryForm.middleName.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+				</tr>
+				<tr>
+				    <td><label>Last Name:</label></td>
 				    <td>
 					{% render_field entryForm.lastName 'tabindex=2' %}
 				    </td><td>

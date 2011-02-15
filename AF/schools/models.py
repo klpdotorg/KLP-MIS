@@ -71,12 +71,6 @@ class Institution_Management(models.Model):
 		return "%s"%self.name
 register_model(Institution_Management)
 		
-class Institution_Type(models.Model):	
-	'''This Class Stores the Institution Type Information'''
-	name = 	models.CharField(max_length = 100)
-	
-	def __unicode__(self):
-		return "%s" %(self.name)		
 		
 class Institution_address(models.Model):
 	''' This class stores information about institution address '''
@@ -183,7 +177,6 @@ class Institution(models.Model):
 	name = models.CharField(max_length = 300)
 	cat = models.ForeignKey(Institution_Category,blank=True,null=True)
 	institution_gender = models.CharField(max_length=10,choices=Institution_Gender,default="co-ed")
-	institution_type = models.ForeignKey(Institution_Type,blank=True,null=True)
 	languages = models.ManyToManyField(Moi_Type)
 	mgmt = models.ForeignKey(Institution_Management,default="ed")
 	inst_address = models.ForeignKey(Institution_address)
@@ -194,10 +187,6 @@ class Institution(models.Model):
 
 	def get_all_cat(self, categoryType):
 		return Institution_Category.objects.all(categoryType = categoryType)
-
-	def get_institution_types(self):
-		typeList = ['%s' %(schType[0]) for schType in Institution_Type]
-		return typeList
 
 	def getChild(self):
 		if StudentGroup.objects.filter(institution__id = self.id,active=2) :
@@ -297,7 +286,7 @@ class StudentGroup(models.Model):
 	''' Here it holds the informaion of the class and section of the Institutions'''
 	institution = models.ForeignKey(Institution)
 	name = models.CharField(max_length=50)
-	section = models.CharField(max_length=10,choices=Alpha_list,blank=True,)
+	section = models.CharField(max_length=10,choices=Alpha_list,blank=True,null=True)
 	active = models.IntegerField(blank = True, null = True,default=2)
 	group_type = models.CharField(max_length=10,choices=Group_Type,default="Class")
 

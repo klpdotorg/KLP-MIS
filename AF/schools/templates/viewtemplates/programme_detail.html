@@ -18,22 +18,38 @@
 </div>
 
 <div class="boundDetail">
-    <label>Programme Name</label>
-    <span>{{programme}}</span>	
-    <input type="hidden" name="id" id="programme_id" size="15" value="{{programme.id}}" / >
-    <input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / >
+    <div class="cl-txtbx">
+    	<label>Programme Name</label>
+    </div>
+    <div class="bng-cl">
+	    <span>{{programme}}</span>	
+	    <input type="hidden" name="id" id="programme_id" size="15" value="{{programme.id}}" / >
+	    <input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / >
+    </div>
 </div>
 <div class="boundDetail">
-    <label>Description</label>
-    <span>{{programme.description}}</span>	
+    <div class="cl-txtbx">
+    	<label>Description</label>
+    </div>
+    <div class="bng-cl">
+    	<span>{{programme.description}}</span>	
+    </div>
 </div>
 <div class="boundDetail">    
-    <label>Start Date</label>
-    <span>{% if programme.startDate %}{{programme.startDate|date:'d-m-Y'}}{% endif %}</span>
+    <div class="cl-txtbx">
+    	<label>Start Date</label>
+    </div>
+    <div class="bng-cl">
+    	<span>{% if programme.startDate %}{{programme.startDate|date:'d-m-Y'}}{% endif %}</span>
+    </div>
 </div>
 <div class="boundDetail">
-    <label>End Date</label>
-    <span>{% if programme.endDate %}{{programme.endDate|date:'d-m-Y'}}{% endif %}</span>
+    <div class="cl-txtbx">
+    	<label>End Date</label>
+    </div>
+    <div class="bng-cl">
+    	<span>{% if programme.endDate %}{{programme.endDate|date:'d-m-Y'}}{% endif %}</span>
+    </div>	
 </div>
 
 

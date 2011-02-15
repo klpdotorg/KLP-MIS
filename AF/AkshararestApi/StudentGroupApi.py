@@ -45,7 +45,7 @@ def KLP_StudentGroup_View(request, studentgroup_id):
 	url = '/studentgroup/'+studentgroup_id+'/view/'
 	school = Institution.objects.get(id = studentgroup.institution.id)
 	studgrpParent = school
-	studentGroups = StudentGroup.objects.filter(institution__id=studgrpParent.id,group_type="Center")
+	studentGroups = StudentGroup.objects.filter(institution__id=studgrpParent.id,group_type="Center", active=2)
 	'''if studentgroup.content_type.model == "school":
 		school = School.objects.get(id = studentgroup.object_id)
 		studgrpParent = school
@@ -93,7 +93,7 @@ def MapStudents(request,id):
 		studentgroup_id = request.POST['StdgrpCtr']
 	if student_id and studentgroup_id:
 		studentgroup =  StudentGroup.objects.get(pk = studentgroup_id)
-		school =  School.objects.get(pk = request.POST['school'])
+		school =  Institution.objects.get(pk = request.POST['school'])
 		academic =  Academic_Year.objects.get(pk = current_academic().id)
 		for student in student_id:
 			student = Student.objects.get(pk = student)

@@ -52,18 +52,7 @@
 	                                {% endfor %}
                                 </td>
                         </tr>
-                        <tr>
-                                    <td><label>{{extra_context|displayValue:'institutionType'}} Type:</label></td>
-                                    <td>                                        
-                                        {% render_field entryForm.institution_type 'tabindex=3' %}
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                    	{% for error in entryForm.institution_type.errors %}
-	                                	<span class="editErr">{{ error }}</span>
-	                                {% endfor %}
-                                    </td>
-                                </tr>
+                        
                         <tr>
                         	<td><label>Dise Code:</label></td>
                                 <td>
@@ -156,7 +145,7 @@
                         <tr>
 				<td><label>Route Information:</label></td>
                                 <td>
-                                	<input type="text" name="form-0-busNum" id="id_busNum" size="15" value='{{institution.inst_address.routeInformation}}' tabindex=12 />
+                                	<input type="text" name="form-0-routeInformation" id="id_routeInformation" size="15" value='{{institution.inst_address.routeInformation}}' tabindex=12 />
                                 </td>
                                 <td>
                                 	{% for error in entryForm.routeInformation.errors %}
