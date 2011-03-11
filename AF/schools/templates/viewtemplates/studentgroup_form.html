@@ -8,6 +8,8 @@
                             <input type="hidden" name="form-buttonType" id="id_form-buttonType" value="save" />
                             <input type="hidden" id="success_status" size="15" value="{{extra_context|displayValue:'showsuccess'}}" / >
 			    <input type="hidden" id="studentgroup_id" value="{{extra_context|displayValue:'prevousId'}}" / >
+			    <input type="hidden" id="id_group_typ" name="group_typ" value="{{extra_context|displayValue:'group_typ'}}" />
+			    <input type="hidden" id="id_sch_typ" name="sch_typ" value="{{extra_context|displayValue:'sch_typ'}}" />
     			    {{form.management_form}}
     			    {% with form.forms|last as entryForm %}
                             <table class="tblprofile">
@@ -25,7 +27,7 @@
 	                                {% endfor %}
                                     </td>
                                 </tr>                                
-                                <tr>
+                                <tr style="{% if extra_context|displayValue:'group_typ'|lower == 'center' %} display:none; {% endif %} ">
                                     <td><label for="address">Section:</label></td>
                                     <td>
                                         {% render_field entryForm.section 'tabindex=2' %}
@@ -40,17 +42,21 @@
 	                                {% endfor %}
                                     </td>
                                 </tr>
-				<tr>
-                                	<td><label>Group Type</label></td>
-                                	<td>
-                                		{% render_field entryForm.group_type 'tabindex=3' %}
-                                	</td>
-                                	<td>
-                                    		{% for error in entryForm.group_type.errors %}
-	                                		<span class="editErr">{{ error }}</span>
-	                                	{% endfor %}
-                                    	</td>
-                                </tr>
+                                {% if extra_context|displayValue:'group_typ'|lower == "center" %}
+                                	<input type="hidden" id="id_form-0-group_type" name="form-0-group_type" value="Center" />
+                                {% else %}	
+					<tr>
+		                        	<td><label>Group Type</label></td>
+		                        	<td>
+		                        		{% render_field entryForm.group_type 'tabindex=3' %}
+		                        	</td>
+		                        	<td>
+		                            		{% for error in entryForm.group_type.errors %}
+			                        		<span class="editErr">{{ error }}</span>
+			                        	{% endfor %}
+		                            	</td>
+		                        </tr>
+		                {% endif %}
                                 <tr><td> &nbsp;</td></tr>
                     		<tr><td> &nbsp;</td></tr>
                     		<tr><td> &nbsp;</td></tr>
@@ -77,28 +83,31 @@
    $("#id_save").click(function(){
 	KLP_Hide_Msg();
 	parentVal = $("#id_institution").val();
+	typeName = $("#id_form-0-group_type").val();
    	$("#id_form-buttonType").val('save');
-   	KLP_form_submit(parentVal);
+   	KLP_form_submit(parentVal, typeName);
    });
    
    $("#id_save_and_continue").click(function(){
 	KLP_Hide_Msg();
 	parentVal = $("#id_institution").val();
+	typeName = $("#id_form-0-group_type").val();
    	$("#id_form-buttonType").val('save and continue');
-	KLP_form_submit(parentVal);
+	KLP_form_submit(parentVal, typeName);
    });
    
    $("#id_save_and_create").click(function(){
 	KLP_Hide_Msg();
    	parentVal = $("#id_institution").val();
+   	typeName = $("#id_form-0-group_type").val();
    	$("#id_form-buttonType").val('save and add another');
-   	KLP_form_submit(parentVal, 'id_form-0-parent');
+   	KLP_form_submit(parentVal, typeName, 'id_form-0-parent');
    	
    	
    });
     
     
-   var KLP_form_submit = function(parentVal, parentName, parentId){
+   var KLP_form_submit = function(parentVal, typeName, parentName, parentId){
    	$.post(
         	$('#url').val(),
         	$("#studentgroupForm").serialize(),
@@ -109,7 +118,7 @@
 		     var successStatus = $("#success_status").val();
                      if (successStatus == 'True'){
                     	$("#successMsgHead").show();
-   		    	$("#klp_MsgTxt").html("StudentGroup Created Successfully")
+   		    	$("#klp_MsgTxt").html(typeName+" Created Successfully")
 			//tb_init('#id_StudentDetail a.thickbox, area.thickbox, input.thickbox');
 			if (parentId != null)
                     		$("#"+parentId).val(parentVal);

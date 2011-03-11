@@ -4,6 +4,11 @@
 			<a class="KLP_Button"  href="/boundary/institution/{{institution.id}}/studentgroup/creator/" onclick="return KLP_View(this);">Add Class</a>
 		</span>
 	{% endif %}
+	{% if institution.boundary.boundary_category.boundary_category|lower == 'circle' %}
+		<span class="KLP_Sub">
+			<a class="KLP_Button"  href="/boundary/institution/{{institution.id}}/studentgroup/creator/?group_typ=center" onclick="return KLP_View(this);">Add Center</a>
+		</span>
+	{% endif %}
 	<span class="KLP_Sub">
 		<a class="KLP_Button"  href="/institution/{{institution.id}}/update/" onclick="return KLP_View(this);">Edit</a>
 	</span>

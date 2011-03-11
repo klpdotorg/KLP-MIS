@@ -1,6 +1,6 @@
 <div class="KLP_Button_Header">
 	<span class="KLP_Sub">
-		<a class="KLP_Button"  href="/studentgroup/{{studentgroup.id}}/update/" onclick="return KLP_View(this);">Edit</a>
+		<a class="KLP_Button"  href="/studentgroup/{{studentgroup.id}}/update/?group_typ={{studentgroup.group_type}}&sch_typ={{studentgroup.institution.boundary.boundary_category}}" onclick="return KLP_View(this);">Edit</a>
 	</span>
 	<span class="KLP_Sub">
 		<span class="KLP_SpanButton"  onclick="KLP_Del('{{studentgroup.id}}', 'studentgroup', '{{studentgroup.name}}')">Delete</span>

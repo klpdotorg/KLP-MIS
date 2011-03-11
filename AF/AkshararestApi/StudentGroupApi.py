@@ -26,8 +26,10 @@ def KLP_StudentGroup_Create(request, referKey):
 	""" To Create New StudentGroup boundary/(?P<bounday>\d+)/schools/(?P<school>\d+)/class/creator/"""
 	check_user_perm.send(sender=None, user=request.user, model='StudentGroup', operation='Add')
         check_user_perm.connect(KLP_user_Perm)
-	buttonType = request.POST.get('form-buttonType')	
-        KLP_Create_StudentGroup = KLP_StudentGroup(queryset = StudentGroup.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'studentgroup', extra_context={'buttonType':buttonType, 'ParentKey':referKey}), receiver = XMLReceiver(),)
+	buttonType = request.POST.get('form-buttonType')
+	instObj = Institution.objects.get(id = referKey)
+	group_typ = request.GET.get("group_typ") or request.POST.get("group_typ")
+        KLP_Create_StudentGroup = KLP_StudentGroup(queryset = StudentGroup.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'studentgroup', extra_context={'buttonType':buttonType, 'ParentKey':referKey, 'group_typ':group_typ, 'sch_typ':instObj.boundary.boundary_category.boundary_category}), receiver = XMLReceiver(),)
         response = KLP_Create_StudentGroup.responder.create_form(request,form_class=StudentGroup_Form)
         return HttpResponse(response)
 	
@@ -46,17 +48,9 @@ def KLP_StudentGroup_View(request, studentgroup_id):
 	school = Institution.objects.get(id = studentgroup.institution.id)
 	studgrpParent = school
 	studentGroups = StudentGroup.objects.filter(institution__id=studgrpParent.id,group_type="Center", active=2)
-	'''if studentgroup.content_type.model == "school":
-		school = School.objects.get(id = studentgroup.object_id)
-		studgrpParent = school
-		studentGroups = StudentGroup.objects.filter(content_type__model="school",object_id=studgrpParent.id,group_type="Center")
-	else:
-		boundary = Boundary.objects.get(id = studentgroup.object_id)
-		studgrpParent = boundary
-		studentGroups = StudentGroup.objects.filter(content_type__model="boundary",object_id=studgrpParent.id,group_type="Center")'''
-
-	Norecords = len(Student_StudentGroupRelation.objects.filter(student_group__id = studentgroup_id,active=2))
-	students = Student_StudentGroupRelation.objects.filter(student_group__id = studentgroup_id,active=2).order_by('student__child__firstName')
+	
+	Norecords = len(Student_StudentGroupRelation.objects.filter(student_group__id = studentgroup_id,academic=current_academic, active=2))
+	students = Student_StudentGroupRelation.objects.filter(student_group__id = studentgroup_id, academic=current_academic, active=2, student__active=2).order_by('student__child__firstName')
 	resp=Collection(students, permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'students',paginate_by = 10,extra_context={'studgrpParent':studgrpParent,'studentgroup':studentgroup,'url':url, 'students':students,'Norecords':Norecords, 'studentGroups':studentGroups,'count':count}),)
         return HttpResponse(resp(request))
 
@@ -66,7 +60,10 @@ def KLP_StudentGroup_Update(request, studentgroup_id):
         check_user_perm.connect(KLP_user_Perm)
 	buttonType = request.POST.get('form-buttonType')
 	ParentKey = request.POST.get('form-0-institution')
-	KLP_Edit_StudentGroup =KLP_StudentGroup(queryset = StudentGroup.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'studentgroup', extra_context={'buttonType':buttonType,'ParentKey':ParentKey}), receiver = XMLReceiver(),)
+	group_typ = request.GET.get("group_typ") or request.POST.get("group_typ")
+	sgObj = StudentGroup.objects.get(pk=studentgroup_id)
+	sch_typ = request.GET.get("sch_typ") or sgObj.institution.boundary.boundary_category
+	KLP_Edit_StudentGroup =KLP_StudentGroup(queryset = StudentGroup.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'studentgroup', extra_context={'buttonType':buttonType,'ParentKey':ParentKey, 'group_typ':group_typ, 'sch_typ':sch_typ}), receiver = XMLReceiver(),)
 	response = KLP_Edit_StudentGroup.responder.update_form(request, pk=studentgroup_id, form_class=StudentGroup_Form)
 	return HttpResponse(response)	
 
@@ -75,11 +72,13 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 	user = request.user
 	#canEnter = user.has_perm('schools.change_answer')
 	canEnter = True
+	url = "/studentgroup/%s/programme/%s/assessment/%s/view/" %(studentgroup_id, programme_id, assessment_id)
 	if canEnter:
 		students = Student_StudentGroupRelation.objects.filter(student_group__id = studentgroup_id, academic=current_academic, active=2).values_list('student', flat=True).distinct()
-		students_list = Student.objects.filter(id__in = students).order_by("child__firstName").distinct()
+		grupObj = StudentGroup.objects.get(pk = studentgroup_id)
+		students_list = Student.objects.filter(id__in = students, active=2,).order_by("child__firstName").distinct()
 		assessmentObj = Assessment.objects.get(pk=assessment_id)
-		val=Collection(students_list, permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(paginate_by = 10, template_dir = 'prgtemplates', template_object_name = 'students', extra_context={'filter_id':programme_id, 'assessmentObj':assessmentObj, 'user':user, 'studentgroup_id':studentgroup_id}), entry_class = ChoiceEntry, )
+		val=Collection(students_list, permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'prgtemplates', template_object_name = 'students', paginate_by=20, extra_context={'filter_id':programme_id, 'assessmentObj':assessmentObj, 'user':user, 'studentgroup_id':studentgroup_id, 'group_typ':grupObj.group_type, 'url':url}), entry_class = ChoiceEntry, )
 		return HttpResponse(val(request))
 	else:
 		return HttpResponse("<b><font color='red'>Insufficient Priviliges to Access This Data</font></b>")	

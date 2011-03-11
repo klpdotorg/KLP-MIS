@@ -125,7 +125,7 @@ $(document).ready(function(){
                     if (successStatus == 'True'){
                     	treeNode=$("#programme_{{programme.id}}").find("a:first");
                     	$(treeNode).attr("title", newName);
-                    	$(treeNode).html(newName);
+                    	$("#programme_{{programme.id}}_text").html(newName);
                     	KLP_BredaCrumb(treeNode);
                     	$("#successMsgHead").show();
    		    	$("#klp_MsgTxt").html("Programme Updated Successfully");

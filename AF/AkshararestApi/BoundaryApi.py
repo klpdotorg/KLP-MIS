@@ -73,10 +73,10 @@ class KLP_Create_Node(Resource):
 class KLP_Delete(Resource):    
     """ To delete boundary boundary/(?P<boundary_id>\d+)/delete/"""
     def read(self,request,model_name, referKey):
-        modelDict = {'boundary':Boundary, 'institution':Institution, 'programme':Programme, 'assessment':Assessment, 'question':Question, 'studentgroup':StudentGroup, 'student':Student, 'staff':Staff}
-        check_user_perm.send(sender=None, user=request.user, model=modelDict[model_name], operation='Delete')
+        modelDict = {'boundary':Boundary, 'institution':Institution, 'programme':Programme, 'assessment':Assessment, 'question':Question, 'studentgroup':StudentGroup, 'student':Student, 'staff':Staff, 'class':StudentGroup, 'center':StudentGroup}
+        check_user_perm.send(sender=None, user=request.user, model=modelDict[model_name.lower()], operation='Delete')
         check_user_perm.connect(KLP_user_Perm)
-        obj = modelDict[model_name].objects.get(pk=referKey)
+        obj = modelDict[model_name.lower()].objects.get(pk=referKey)
 	if model_name == 'student':
 		Student_StudentGroupRelation.objects.filter(student__id = referKey).update(active=0)
         obj.active=0 

@@ -8,54 +8,90 @@
 
 
 <div class="boundDetail">    
-	<label>First Name</label>
-	<span>{{staff.firstName}}<input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / ></span>
+	<div class="cl-txtbx"> 
+ 		<label>First Name</label>
+ 	</div>
+	<div class="bng-cl">	
+		<span>{{staff.firstName}}<input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / ></span>
+	</div>
 </div>
 <div class="boundDetail">
-	<label>Middle Name</label>
-	<span>
-		{{staff.middleName}}
-	</span>
+	<div class="cl-txtbx"> 
+ 		<label>Middle Name</label>
+ 	</div>
+	<div class="bng-cl">
+		<span>
+			{{staff.middleName}}
+		</span>
+	</div>
 </div>
 <div class="boundDetail">
-	<label>Last Name</label>
-	<span>
-		{{staff.lastName}}
-	</span>
+	<div class="cl-txtbx"> 
+ 		<label>Last Name</label>
+ 	</div>
+	<div class="bng-cl">
+		<span>
+			{{staff.lastName}}
+		</span>
+	</div>
 </div>
 <div class="boundDetail">    
-	<label>Date of Joining</label>
-	<span>{{staff.doj|date:'d-m-Y'}}</span>
+	<div class="cl-txtbx"> 
+ 		<label>Date of Joining</label>
+ 	</div>
+	<div class="bng-cl">
+		<span>{{staff.doj|date:'d-m-Y'}}</span>
+	</div>
 </div>
 <div class="boundDetail">
-	<label>Gender</label>
-	<span>
-		{{staff.gender}}
-	</span>
+	<div class="cl-txtbx"> 
+ 		<label>Gender</label>
+ 	</div>
+	<div class="bng-cl">
+		<span>
+			{{staff.gender}}
+		</span>
+	</div>
 </div>
 <div class="boundDetail">    
-	<label>MT</label>
-	<span>{{staff.mt}}</span>
+	<div class="cl-txtbx"> 
+ 		<label>MT</label>
+ 	</div>
+	<div class="bng-cl">
+		<span>{{staff.mt}}</span>
+	</div>
 </div>
 <div class="boundDetail">
-	<label>Qualifiaction</label>
-	<span>
-		{{staff.qualification}}
-	</span>
+	<div class="cl-txtbx"> 
+ 		<label>Qualifiaction</label>
+ 	</div>
+	<div class="bng-cl">
+		<span>
+			{{staff.qualification}}
+		</span>
+	</div>
 </div>
 <div class="boundDetail">
-	<label>Staff Type</label>
-	<span>
-		{{staff.staff_type}}
-	</span>
+	<div class="cl-txtbx"> 
+ 		<label>Staff Type</label>
+ 	</div>
+	<div class="bng-cl">
+		<span>
+			{{staff.staff_type}}
+		</span>
+	</div>
 </div>
 <div class="boundDetail">
-	<label>Classes</label>
-	<span>
-		{% for assignedGrup in staff.getAssigendClasses%}
-			{% if assignedGrup.name == '0' %}Anganwadi Class{% else %}{{assignedGrup.name}}{{assignedGrup.section}}{% endif %}
-			{% if not forloop.last %}, {% endif %}
-		{% endfor %}
-	</span>
+	<div class="cl-txtbx"> 
+ 		<label>Classes</label>
+ 	</div>
+	<div class="bng-cl">
+		<span>
+			{% for assignedGrup in staff.getAssigendClasses%}
+				{% if assignedGrup.name == '0' %}Anganwadi Class{% else %}{{assignedGrup.name}}{{assignedGrup.section}}{% endif %}
+				{% if not forloop.last %}, {% endif %}
+			{% endfor %}
+		</span>
+	</div>
 </div>
 

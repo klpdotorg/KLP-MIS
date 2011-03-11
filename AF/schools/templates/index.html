@@ -33,6 +33,7 @@
 	$("body").append("<div id='KLP_load'><img src='/static_media/images/loadingAnimation.gif' alt='Process'></div>");
 
 	$("#KLP_load").ajaxStart(function(){
+	  KLP_isLog();
 	  $("#KLP_overlay").show();	
 	  $(this).show();
 	});
@@ -47,7 +48,7 @@
 		var sch_typ_val = $("#boundary_type").val();
 		var asEntryVal = $("#id_entry_view").val();
 		if (sch_typ_val && asEntryVal != 'True'){
-			treeUrl = '/tree/?home={{home}}&filter='+$("#filtProg").val()+'&secFilter='+$("#filtAsmnt").val()+'&boundTyp='+sch_typ_val;
+			treeUrl = '/tree/?home={{home}}&filter='+$("#filtProg").val()+'&secFilter='+$("#filtAsmnt").val()+'&boundTyp='+sch_typ_val+'&permission='+$("#id_perm_assign").val()+'&assesspermission='+$("#id_assess_perm_assign").val();
 			$("#treeStruc").html('<ul id="treeBlk" class="filetree treeview-famfamfam"></ul>');
 			KLP_TreeBLK(treeUrl);
 			var homeView = $("#id_home_view").val();
@@ -68,7 +69,7 @@
 					KLP_Programme_List(typVal)
 				}
 				else{
-					treeUrl = '/tree/?home={{home}}&filter=None&secFilter='+$("#filtAsmnt").val()+'&boundTyp='+typVal;
+					treeUrl = '/tree/?home={{home}}&filter=None&secFilter='+$("#filtAsmnt").val()+'&boundTyp='+typVal+'&permission='+$("#id_perm_assign").val()+'&assesspermission='+$("#id_assess_perm_assign").val();
 					$("#treeStruc").html('<ul id="treeBlk" class="filetree treeview-famfamfam"></ul>');
 					KLP_TreeBLK(treeUrl);
 					$("#rootBoundary").show()
@@ -100,7 +101,7 @@
 		$("#filtAsmnt").change(function(){
 			var asmVal = $("#filtAsmnt").val();
 			if (asmVal){
-				treeUrl = '/tree/?home={{home}}&filter='+$("#filtProg").val()+'&secFilter='+asmVal+'&boundTyp='+$("#boundary_type").val()+'&permission='+$("#id_perm_assign").val();
+				treeUrl = '/tree/?home={{home}}&filter='+$("#filtProg").val()+'&secFilter='+asmVal+'&boundTyp='+$("#boundary_type").val()+'&permission='+$("#id_perm_assign").val()+'&assesspermission='+$("#id_assess_perm_assign").val();
 				$("#treeStruc").html('<ul id="treeBlk" class="filetree treeview-famfamfam"></ul>');
 				KLP_TreeBLK(treeUrl);
 			}
@@ -149,6 +150,7 @@
 	            	<input type="hidden" name="homeView" id="id_home_view" value="{{home}}"/>
 	            	<input type="hidden" name="prvSelNode" id="id_prvSelNode" value=""/>
 	            	<input type="hidden" name="perm" id="id_perm_assign" value="{{permission}}"/>
+	            	<input type="hidden" name="assessPerm" id="id_assess_perm_assign" value="{{assessmentpermission}}"/>
             		<span style="{% if not filter %}display:none;{% endif %}">
 	        		<select id="filtProg" name="filtProg">
 	                		<option value="None">--</option>
@@ -191,7 +193,7 @@
 		    <div class="addBound" style="margin:5px 0px;font-size:13px;">
 		        <div class="boundLink">
 		            {% if 'Data Entry Executive' in usergroups or user.is_superuser or user.is_staff %}
-		            	<a href='/home/' style="{% if home and not filter%}color:#75ad0a;{%endif%}">Home</a> |
+		            	<a href='/home/' style="{% if home and not permission and not filter%}color:#75ad0a;{%endif%}">Home</a> |
 		            {% endif %}
 		            
 		            {% if user.is_staff or user.is_superuser%} 
@@ -199,7 +201,7 @@
 		            {% endif %} 
 		               
 		            {% if 'Data Entry Operator' in usergroups or 'Data Entry Executive' in usergroups or user.is_superuser  or user.is_staff%}
-		            	<a href='/home/?respType=filter' style="{% if filter%}color:#75ad0a;{%endif%}">Filter By Programme</a>
+		            	<a href='/home/?respType=filter' style="{% if filter and not permission and not assessmentpermission %}color:#75ad0a;{%endif%}">Filter By Programme</a>
 		            {% endif %}  
 		            
 		        </div>
@@ -211,9 +213,11 @@
 		        	{% if user.is_superuser  %} <a href='/console/'>Admin Console </a> |{% endif %}
 		        	{% if 'AdminGroup' in usergroups or user.is_superuser %} 
 		        		<a href="/accounts/auth/user/add/"> Create User</a> |
-		        		<a href="/home/?respType=userpermissions" style="{% if filter and permission%}color:#75ad0a;{%endif%}"> Assign Permissions</a> |
+		        		<a href="/home/?respType=userpermissions" style="{% if permission%}color:#75ad0a;{%endif%}"> Assign Permissions</a> |
+		        		<a href="/home/?respType=assessmentpermissions" style="{% if assessmentpermission%}color:#75ad0a;{%endif%}"> Assessment Permissions</a> |
 		        		<a href="/list/users/"> List Users</a> 
 		        	{% endif %} 
+		        	{% if user.is_superuser or 'AdminGroup' in usergroups %} | <a href='/audit/trial'>Audit Trial </a>{% endif %}
 		        </div>
 		</div>
             {% endif %}

@@ -39,9 +39,13 @@ def KLP_Logout_user(request):
     # Method For Logout          
     logout(request)
     return render_to_response('login.html',context_instance=RequestContext(request))
+    
+def KLP_User_Auth(request):
+	return HttpResponse(request.user.is_authenticated())    
 
 
 urlpatterns = patterns('',             
    url(r'^login/?$', KLP_Login), 
-   url(r'^logout/?$', KLP_Logout_user),   
+   url(r'^logout/?$', KLP_Logout_user),  
+   url(r'^user/authentication/?$', KLP_User_Auth),    
 )

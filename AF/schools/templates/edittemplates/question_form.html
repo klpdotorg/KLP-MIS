@@ -177,7 +177,7 @@
                     if (successStatus == 'True'){
                     	treeNode=$("#question_{{question.id}}").find("a:first");
                     	$(treeNode).attr("title", newName);
-                    	$(treeNode).html(newName);
+                    	$("#question_{{question.id}}_text").html(newName);
                     	KLP_BredaCrumb(treeNode);
                     	$("#successMsgHead").show();
    		    	$("#klp_MsgTxt").html("Question Updated Successfully")

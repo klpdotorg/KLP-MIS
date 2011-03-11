@@ -18,10 +18,10 @@ def KLP_Assign_Permissions(request):
 	check_user_perm.send(sender=None, user=request.user, model='Users', operation=None)
         check_user_perm.connect(KLP_user_Perm)
 	respDict = {}
-	print request.POST
 	deUser = request.POST.get('assignToUser')
 	permissions = request.POST.getlist('userPermission')
-	print permissions
+	permissionType = request.POST.get('permissionType')
+	assessmentId = request.POST.get('assessmentId')
 	if not deUser:
 		respDict['respMsg'] = 'Select Atleast One User'
 		respDict['isSuccess'] = False
@@ -31,9 +31,20 @@ def KLP_Assign_Permissions(request):
 	else:
 		inst_list = request.POST.getlist('instName')
 		userObj = User.objects.get(id=deUser)
+		
 		for inst_id in inst_list:
 			instObj = Institution.objects.get(pk=inst_id)
-			userObj.set_perms(permissions, instObj)
+			if permissionType == 'permissions':
+				userObj.set_perms(permissions, instObj)
+			else:
+				assessmentObj = Assessment.objects.get(pk=assessmentId)
+				try:
+					permObj = UserAssessmentPermissions(user = userObj, instituion = instObj, assessment = assessmentObj, access=True)
+					permObj.save()
+				except:
+					permObj = UserAssessmentPermissions.objects.get(user = userObj, instituion = instObj, assessment = assessmentObj)
+					permObj.access = True
+					permObj.save()
 		respDict['respMsg'] = 'Assigned Permissions successfully'
 		respDict['isSuccess'] = True
 	
@@ -69,16 +80,22 @@ def KLP_Show_Permissions(request, user_id):
 		instObj = Institution.objects.get(pk=permObj.obj_id)
 		ins_dict = {'Institute':instObj.name, 'instId':instObj.id, 'Acess':permObj.Acess}
 		inst_list.append(ins_dict)
-	return render_to_response('viewtemplates/show_permissions.html',{'inst_list':inst_list, 'userName':userObj.username, 'userId':user_id})
+	permObjects = UserAssessmentPermissions.objects.filter(user=userObj, access=True)	
+	return render_to_response('viewtemplates/show_permissions.html',{'inst_list':inst_list, 'userName':userObj.username, 'userId':user_id, 'entry':"Add", 'permObjects':permObjects})
 	
-def KLP_Flush_Permissions(request):
+def KLP_Flush_Permissions(request, permissionType):
 	check_user_perm.send(sender=None, user=request.user, model='Users', operation=None)
 	check_user_perm.connect(KLP_user_Perm)
 	user_id = request.POST.get('userId')
 	inst_id = request.POST.get('inst_id')
 	userObj = User.objects.get(pk=user_id)
 	instObj = Institution.objects.get(pk=inst_id)
-	userObj.revoke_all(instObj)
+	if permissionType == 'permissions':
+		userObj.revoke('Acess', instObj)
+	else:
+		permObj = UserAssessmentPermissions.objects.get(user = userObj, instituion = instObj, assessment__id = request.POST.get('assessmentId'))
+		permObj.access = False
+		permObj.save()
 	return HttpResponse("success")
 
 
@@ -87,5 +104,5 @@ urlpatterns = patterns('',
    url(r'^list/users/?$', KLP_Users_list),
    url(r'^user/(?P<user_id>\d+)/delete?$', KLP_User_Delete),
    url(r'^user/(?P<user_id>\d+)/show/permissions/?$', KLP_Show_Permissions),
-   url(r'^flush/user/permissions/?$', KLP_Flush_Permissions),
+   url(r'^flush/user/(?P<permissionType>\w+)/?$', KLP_Flush_Permissions),
 )

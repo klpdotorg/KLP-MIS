@@ -11,43 +11,45 @@
 <div class="boundDetail">
 <form action="." method="POST" name="staffForm" id="staffForm" onsubmit="return false;">{% csrf_token %}
 	<input type="hidden" name="studentGroup" id="student_group_id" value="{{studentgroup_id}}" />
-	<table  style="text-align:center;width:100%" id="id_staffDetail">
-	    <th>Name</th>  <th>Date of Joining</th>  <th>Gender</th>  <th>Mother Tongue</th> <th>Qualifiaction</th> <th>Staff Type</th> <th>Classes</th>
-	    {%if map%}<th>Map</th>{% else %}<th>Edit</th><th>Delete</th>{% endif %}
-	    {% for staff in staff_list %}
-		<tr id='staff_{{staff.id}}'>
-			<td>{{staff.firstName}} {{staff.middleName}} {{staff.lastName}}</td>
-			<td>{{staff.doj|date:"d-m-Y"}}</td>
-			<td>{{staff.gender}}</td>
-			<td>{{staff.mt}}</td>
-			<td>{{staff.qualification}}</td>
-			<td>{{staff.staff_type}}</td>
-			<td>
-				{% for assignedGrup in staff.getAssigendClasses%}
-					{% if assignedGrup.name == '0' %}Anganwadi Class{% else %}{{assignedGrup.name}}{{assignedGrup.section}}{% endif %}
-					{% if not forloop.last %}, {% endif %}
-				{% endfor %}
-			</td>
-			{%if map%}
-				<td>
-					<input type="checkbox" id="staff_{{staff.id}}" name="mapstaff" value="{{staff.id}}" {% if staff.id in existedTeachres%}checked{% endif %}/>
+	<div class="tot-border">
+		<table border="0" cellpadding="0" cellspacing="0" style="text-align:center;width:100%" id="id_staffDetail">
+		    <th class="tot-border3">Name</th>  <th class="tot-border3">Date of Joining</th>  <th class="tot-border3">Gender</th>  <th class="tot-border3">Mother Tongue</th> <th class="tot-border3">Qualifiaction</th> <th class="tot-border3">Staff Type</th> <th class="tot-border3">Classes</th>
+		    {%if map%}<th class="tot-border3">Map</th>{% else %}<th class="tot-border3">Edit</th><th class="tot-border4">Delete</th>{% endif %}
+		    {% for staff in staff_list %}
+			<tr id='staff_{{staff.id}}'>
+				<td  class="tot-border1">{{staff.firstName}} {{staff.middleName}} {{staff.lastName}}</td>
+				<td  class="tot-border1">{{staff.doj|date:"d-m-Y"}}</td>
+				<td  class="tot-border1">{{staff.gender}}</td>
+				<td  class="tot-border1">{{staff.mt}}</td>
+				<td  class="tot-border1">{{staff.qualification}}</td>
+				<td  class="tot-border1">{{staff.staff_type}}</td>
+				<td  class="tot-border1">
+					{% for assignedGrup in staff.getAssigendClasses%}
+						{% if assignedGrup.name == '0' %}Anganwadi Class{% else %}{{assignedGrup.name}}{{assignedGrup.section}}{% endif %}
+						{% if not forloop.last %}, {% endif %}
+					{% endfor %}
 				</td>
-			{% else %}
-				<td>
-					<a href="/staff/{{staff.id}}/update/?keepThis=True&TB_iframe=True&height=400&width=800" title="Edit Staff" class="thickbox">
-						<img title="Edit" src="/static_media/images/pagebuilder_edit.gif">
-					</a>
-				</td>
-				<td>
-					<span onclick="KLP_Del('{{staff.id}}', 'staff', '{{staff.firstName}} {{staff.lastName}}')" style="color: blue; cursor: pointer;">
-						<img width="11" title="Delete" src="/static_media/images/PageRow_delete.gif">
-					</span>
-				</td>
-			{% endif %}
+				{%if map%}
+					<td  class="tot-border1">
+						<input type="checkbox" id="staff_{{staff.id}}" name="mapstaff" value="{{staff.id}}" {% if staff.id in existedTeachres%}checked{% endif %}/>
+					</td>
+				{% else %}
+					<td  class="tot-border1">
+						<a href="/staff/{{staff.id}}/update/?keepThis=True&TB_iframe=True&height=400&width=800" title="Edit Staff" class="thickbox">
+							<img title="Edit" src="/static_media/images/pagebuilder_edit.gif">
+						</a>
+					</td>
+					<td  class="tot-border2">
+						<span onclick="KLP_Del('{{staff.id}}', 'staff', '{{staff.firstName}} {{staff.lastName}}')" style="color: blue; cursor: pointer;">
+							<img width="11" title="Delete" src="/static_media/images/PageRow_delete.gif">
+						</span>
+					</td>
+				{% endif %}
 			
-		</tr>
-	    {% endfor %}
-	</table>
+			</tr>
+		    {% endfor %}
+		</table>
+	</div>
 <div id="student_pagenation">
 	<span id = 'page_{{previous}}' onclick="Pagination(this)" style="cursor:pointer;color:blue;padding-right:15px;{% if not has_previous %}display:none;{% endif %}"> previous </span>
 		page <span id="id_currentPage">{{page}}</span> of <span id="id_totPages">{{pages}}</span>

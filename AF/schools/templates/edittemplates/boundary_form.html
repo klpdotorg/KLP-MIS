@@ -110,7 +110,7 @@
                     if 	(successStatus == 'True'){	
                     	treeNode=$("#boundary_{{boundary.id}}").find("a:first");
                     	$(treeNode).attr("title", newName);
-                    	$(treeNode).html(newName);
+                    	$("#boundary_{{boundary.id}}_text").html(newName);
                     	KLP_BredaCrumb(treeNode);
                     	$("#successMsgHead").show();
    		    	$("#klp_MsgTxt").html("Boundary Updated Successfully"); 	

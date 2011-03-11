@@ -122,7 +122,7 @@ class Question_Form(ModelForm):
         questionType = self.cleaned_data['questionType']
         scoreMin = self.cleaned_data.get('scoreMin', '')
         if questionType  == '1':
-        	if not scoreMin:
+        	if not scoreMin and scoreMin !=0:
             		raise forms.ValidationError("This field is required.")
             	else:
             		scoreMax = self.cleaned_data.get('scoreMax', '')
@@ -134,7 +134,7 @@ class Question_Form(ModelForm):
         questionType = self.cleaned_data['questionType']
         scoreMax = self.cleaned_data.get('scoreMax', '')
         if questionType  == '1':
-        	if not scoreMax:
+        	if not scoreMax and scoreMax !=0:
             		raise forms.ValidationError("This field is required.")
             	else:
             		scoreMin = self.cleaned_data.get('scoreMin', '')

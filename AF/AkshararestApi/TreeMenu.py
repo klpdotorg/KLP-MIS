@@ -6,14 +6,16 @@ from django.http import *
 from Akshara.AkshararestApi.Treeresponder import *
 from django.db.models.query import QuerySet
 #from django_restapi.authentication import *
-def hasChild(query, typ, boundaryType, filterBy, secFilter, permFilter):
+def hasChild(query, typ, boundaryType, filterBy, secFilter, permFilter, assessmentPerm):
     	subboundary = 0
 	childtree = 0
 	childDic={}
 	for i in query:
 		if typ == 'source' or typ == 'boundary': 
 		    if permFilter:
-		    	templist = [i.getPermissionChild(boundaryType), i.getPermissionViewUrl(secFilter)]
+		    	templist = [i.getPermissionChild(boundaryType), i.getPermissionViewUrl()]
+		    elif assessmentPerm:
+		    	templist = [i.getPermissionChild(boundaryType), i.getAssessmentPermissionViewUrl(secFilter)]	
 		    else:
 		    	templist = [i.getChild(boundaryType), i.getViewUrl(boundaryType)]
 		elif  typ == 'institution' and filterBy != 'None' and permFilter in ['', ' ', None]:
@@ -33,6 +35,10 @@ def KLP_assignedInstitutions(userId):
 	for permObj in rawQuerySet:
 		inst_list.append(permObj.obj_id)
 	return inst_list
+	
+def KLP_assignedAssessmentInst(userId, assessmentId):
+	inst_list = UserAssessmentPermissions.objects.filter(user__id=userId, assessment__id=assessmentId, access=True).values_list("instituion__id", flat=True).distinct()
+	return inst_list	
 
 def SampleClass(request):
      model = request.GET['root']
@@ -41,6 +47,7 @@ def SampleClass(request):
      secFilter = request.GET['secFilter']
      boundaryType = request.GET['boundTyp']
      permFilter = request.GET.get('permission')
+     assessmentPerm = request.GET.get('assesspermission')
      model = model.split('_')
      modelObjects = {'source':Boundary,'boundary':Institution,} 
      fields  = {'boundary':Institution,} 
@@ -64,7 +71,7 @@ def SampleClass(request):
 	    		studentgroup_list = Assessment_StudentGroup_Association.objects.filter(assessment__id=secFilter, active=2).values_list('student_group', flat=True).distinct()
 	    		map_institutions_list = StudentGroup.objects.filter(id__in=studentgroup_list, active=2).values_list('institution__id', flat=True).distinct()
 	    		
-	    		institutions_list = list(set(map_institutions_list)&set(KLP_assignedInstitutions(logUser.id)))
+	    		institutions_list = list(set(map_institutions_list)&set(KLP_assignedAssessmentInst(logUser.id, secFilter)))
 	        try:
 	        	boundary_list = Boundary.objects.filter(institution__pk__in=institutions_list, active=2, boundary_type=boundaryType).values_list('parent__parent__id', flat=True).distinct()
 	        except:
@@ -88,7 +95,7 @@ def SampleClass(request):
 			else:
 				studentgroup_list = Assessment_StudentGroup_Association.objects.filter(assessment__id=secFilter, active=2).values_list('student_group', flat=True).distinct()
 				map_institutions_list = StudentGroup.objects.filter(id__in=studentgroup_list, active=2).values_list('institution_id', flat=True).distinct()
-				institutions_list = list(set(map_institutions_list)&set(KLP_assignedInstitutions(logUser.id)))
+				institutions_list = list(set(map_institutions_list)&set(KLP_assignedAssessmentInst(logUser.id, secFilter)))
 				
 			parentBoundary = Boundary.objects.get(id=model[1])
 			if parentBoundary.boundary_category.boundary_category in ['district',]:
@@ -112,7 +119,7 @@ def SampleClass(request):
 				else:
 					studentgroup_list = Assessment_StudentGroup_Association.objects.filter(assessment__id=secFilter, active=2).values_list('student_group', flat=True).distinct()
 					map_institutions_list = StudentGroup.objects.filter(id__in=studentgroup_list, active=2).values_list('institution_id', flat=True).distinct()
-					institutions_list = list(set(map_institutions_list)&set(KLP_assignedInstitutions(logUser.id)))
+					institutions_list = list(set(map_institutions_list)&set(KLP_assignedAssessmentInst(logUser.id, secFilter)))
 				
 				query = Institution.objects.filter(pk__in=institutions_list, boundary__id=model[1], active=2).distinct().order_by("name")
 				typ = 'sch'
@@ -134,7 +141,7 @@ def SampleClass(request):
 		  query = Student.objects.filter(student_group__id=model[1],active=2)
 		  
 
-     CDict=hasChild(query, typ, boundaryType, filterBy, secFilter, permFilter)
+     CDict=hasChild(query, typ, boundaryType, filterBy, secFilter, permFilter, assessmentPerm)
      val= Collection(
      queryset = query,
      responder = TreeResponder(CDict=CDict),

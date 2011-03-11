@@ -1,3 +1,4 @@
+{% load template_tags %}
 <div  id="searchRes">
 {% if count != '0' %}
 <div id="insertStudent" style="font-size: 16px; font-weight: bold; background-color: green;">
@@ -7,10 +8,10 @@
 
 <div class="KLP_Button_Header">
 	<span class="KLP_Sub">
-		<a class="KLP_Button" href="/studentgroup/{{studentgroup.id}}/update/" onclick="return KLP_View(this);">Edit</a>
+		<a class="KLP_Button" href="/studentgroup/{{studentgroup.id}}/update/?group_typ={{studentgroup.group_type}}&sch_typ={{studentgroup.institution.boundary.boundary_category}}" onclick="return KLP_View(this);">Edit</a>
 	</span>
 	<span class="KLP_Sub">
-		<span class="KLP_SpanButton" onclick="KLP_Del('{{studentgroup.id}}', 'studentgroup', '{{studentgroup.name}}')">Delete</span>
+		<span class="KLP_SpanButton" onclick="KLP_Del('{{studentgroup.id}}', '{{studentgroup.group_type}}', '{{studentgroup.name}}')">Delete</span>
 	</span>
 	<span class="KLP_Sub">
 		<a class="KLP_Button thickbox" href="/studentgroup/{{studentgroup.id}}/student/creator/?keepThis=true&TB_iframe=true&height=400&width=800" title="Add Student">Add Student</a>
@@ -36,7 +37,7 @@
 	<td class="tot-border1">{{student.student.child.dob|date:"d M Y" }}</td>
 	<td class="tot-border1">{{student.student.child.mt}}</td>
 	<td class="tot-border1">{{student.student.child.gender}}</td> 
-        <td class="tot-border1">{% for relation in student.student.child.getRelations %}{{relation.relation_type}}:{{relation.first_name}}<br />{% endfor %}</td> 
+        <td class="tot-border1">{% for relation in student.student.child.getRelations %}{{relation.relation_type}}: {{relation.first_name}}<br />{% endfor %}</td> 
 	{% if studentgroup.group_type|lower == 'class' %}
 		<td class="tot-border1"><input type="checkbox" value = "{{student.student.id}}" name="students"/></td>
 
@@ -52,12 +53,16 @@
 </table>
 </div>
 <div id="student_pagenation" style="{% if not students_list %}display:none;{% endif %}">
-	<span id = 'page_{{previous}}' onclick="Pagination(this)" style="cursor:pointer;color:blue;padding-right:15px;{% if not has_previous %}display:none;{% endif %}"> previous </span>
-		page <span id="id_currentPage">{{page}}</span> of <span id="id_totPages">{{pages}}</span>
-		<input type="hidden" name="resultPerPage" id="id_resultPerPage" value="{{results_per_page}}" />
-		<input type="hidden" value = "{{Norecords}}" id="Norecords" name="Norecords"/>
-		<input type="hidden" name="lastPage" id="id_lastPage" value="{{pages}}" />
-	<span id='page_{{next}}' onclick="Pagination(this)" style="cursor:pointer;color:blue;padding-left:15px;{% if not has_next %}display:none;{% endif %}"> next </span>
+	page <span id="id_currentPage">{{page}}</span> of <span id="id_totPages">{{pages}}</span>
+	<input type="hidden" name="resultPerPage" id="id_resultPerPage" value="{{results_per_page}}" />
+	<input type="hidden" value = "{{Norecords}}" id="Norecords" name="Norecords"/>
+	<input type="hidden" name="lastPage" id="id_lastPage" value="{{pages}}" />
+	{% if pages > 1 %}
+		{% for i in pages|KLPrange %}  
+			<span page='page_{{forloop.counter}}' onclick="Pagination(this)" style="cursor:pointer;color:blue;padding-left:10px;">{{ forloop.counter }}</span>
+		{% endfor %}  
+	{% endif %}
+	
 </div>
 
 <div id="id_No_students" style="color:black;text-align:center;font-weight:bold;{% if students_list %}display:none;{% endif %}"> No Students Found</div>
@@ -73,7 +78,7 @@
 </div>
 
 
-
+</form>
 
 
 <script>
@@ -91,7 +96,7 @@ $(document).ready(function(){
 });
 
 function Pagination(thisObj){
-	pages = $(thisObj).attr('id')
+	pages = $(thisObj).attr('page')
 	page = pages.split('_')[1]
         $.ajax({
             url: $('#list_url').attr('value'),

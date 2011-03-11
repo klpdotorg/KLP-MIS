@@ -72,29 +72,46 @@ def KLP_Institution_Update(request, institution_id):
 	
 	return HttpResponse(response)	
 
-def KLP_Institution_Boundary(request, boundary_id, assessment_id):
+
+def KLP_Institution_Boundary(request, boundary_id, permissionType, assessment_id=None):
 	""" To List Institutions Under Boundary to Assign Permissions to the User """
 	user = request.user
 	check_user_perm.send(sender=None, user=request.user, model='Users', operation=None)
         check_user_perm.connect(KLP_user_Perm)
-	users = User.objects.filter(groups__name__in=['Data Entry Executive', 'Data Entry Operator'])
-	#respDict['users'] = users
-	boundaryObj = Boundary.objects.get(id=boundary_id)
-	boundaryCat = boundaryObj.boundary_category
-	studentgroup_list = Assessment_StudentGroup_Association.objects.filter(assessment__id=assessment_id, active=2).values_list('student_group', flat=True).distinct()
-	map_institutions_list = StudentGroup.objects.filter(id__in=studentgroup_list, active=2).values_list('institution__id', flat=True).distinct()
-	if boundaryCat.boundary_category.lower() == 'district':
-		inst_list = Institution.objects.filter(boundary__parent__parent = boundaryObj, id__in=map_institutions_list, active=2).distinct()
-	elif boundaryCat.boundary_category.lower() in [ 'block', 'project']:
-		inst_list = Institution.objects.filter(boundary__parent = boundaryObj, id__in=map_institutions_list, active=2).distinct()
+	klp_UserGroups = user.groups.all()
+	klp_GroupsList = ['%s' %(usergroup.name) for usergroup in klp_UserGroups]
+	if user.is_superuser or 'AdminGroup' in klp_GroupsList:
+		users = User.objects.filter(groups__name__in=['Data Entry Executive', 'Data Entry Operator'], is_active=1)
+		boundaryObj = Boundary.objects.get(id=boundary_id)
+		respDict = {'users':users, 'boundary':boundaryObj, 'permissionType':permissionType}
+		boundaryCat = boundaryObj.boundary_category
+		if permissionType == 'permissions':
+			if boundaryCat.boundary_category.lower() == 'district':
+				inst_list = Institution.objects.filter(boundary__parent__parent = boundaryObj, active=2).distinct()
+			elif boundaryCat.boundary_category.lower() in [ 'block', 'project']:
+				inst_list = Institution.objects.filter(boundary__parent = boundaryObj, active=2).distinct() 
+			else:
+				inst_list = Institution.objects.filter(boundary = boundaryObj, active=2).distinct()
+		else:
+			studentgroup_list = Assessment_StudentGroup_Association.objects.filter(assessment__id=assessment_id, active=2).values_list('student_group', flat=True).distinct()
+			map_institutions_list = StudentGroup.objects.filter(id__in=studentgroup_list, active=2).values_list('institution__id', flat=True).distinct()
+			if boundaryCat.boundary_category.lower() == 'district':
+				inst_list = Institution.objects.filter(id__in=map_institutions_list, boundary__parent__parent=boundaryObj, active=2).distinct() 
+			elif boundaryCat.boundary_category.lower() in [ 'block', 'project']:
+				inst_list = Institution.objects.filter(id__in=map_institutions_list, boundary__parent = boundaryObj, active=2).distinct()
+			else:
+				inst_list = Institution.objects.filter(id__in=map_institutions_list, boundary = boundaryObj, active=2).distinct()
+			respDict['assessmentId'] = assessment_id
+			
+		val=Collection(inst_list, permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'institution', extra_context=respDict), entry_class = ChoiceEntry, )
+		return HttpResponse(val(request))	
 	else:
-		inst_list = Institution.objects.filter(boundary = boundaryObj, id__in=map_institutions_list, active=2).distinct()
-	val=Collection(inst_list, permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'institution', extra_context={'users':users, 'boundary':boundaryObj}), entry_class = ChoiceEntry, )
-	return HttpResponse(val(request))	
+		return HttpResponse('Insufficient Priviliges!')	    
 
 urlpatterns = patterns('',    
    url(r'^boundary/(?P<referKey>\d+)/institution/creator/$', KLP_Institution_Create),
    url(r'^institution/(?P<institution_id>\d+)/view/?$', KLP_Institution_View),   
    url(r'^institution/(?P<institution_id>\d+)/update/?$', KLP_Institution_Update),
-   url(r'^boundary/(?P<boundary_id>\d+)/assessment/(?P<assessment_id>\d+)/permissions/?$', KLP_Institution_Boundary),
+   url(r'^boundary/(?P<boundary_id>\d+)/(?P<permissionType>\w+)/?$', KLP_Institution_Boundary),
+   url(r'^boundary/(?P<boundary_id>\d+)/(?P<permissionType>\w+)/(?P<assessment_id>\d+)/?$', KLP_Institution_Boundary),
 )

@@ -3,6 +3,7 @@
 {% load template_tags %}
 {{% block leftpart%}{% endblock %}
 {% block midpart %}
+
 	    <div id="successMsgHead" style="display:none;">
     		<div class="shwMsg"> 
     			<span >
@@ -13,6 +14,7 @@
     			</span>
     		</div>
 	    </div>
+	    <div style="width:45%;float:left;">
 	    <table align="center" width="500">
 	        <tr>
     	        	<td colspan="3" bgcolor="#336699" align="Center"><span class="pwdHead">Permissions For User {{userName}}</span> </td>    	        
@@ -44,7 +46,7 @@
 		        							<input type="hidden" name="inst_id" id="inst_id" value="{{inst|displayValue:'instId'}}"/>
 		        							<input type="hidden" name="userId" value="{{userId}}" />
 		        						</td>
-		        						<td class="KLP_td_height">{{inst|displayValue:'Acess'}}</td>
+		        						<td class="KLP_td_height" id="id_permission_Access_{{inst|displayValue:'instId'}}">{{inst|displayValue:'Acess'}}</td>
 		        						<td class="KLP_td_height"><input type="submit" name="flush_permission" value="Flush" /></td>
 		        					</tr>
 		        				</table>
@@ -57,7 +59,8 @@
 		        						$("#id_FlushForm_inst_{{inst|displayValue:'instId'}}").serialize(),
 		        						function(data){
 		        							if (data == 'success'){
-		        								$("#id_permission_{{inst|displayValue:'instId'}}").remove();
+		        								//$("#id_permission_Access_{{inst|displayValue:'instId'}}").html('False');
+		        								$("#id_permission_{{inst|displayValue:'instId'}}").remove()
 		        								$("#successMsgHead").show();
 		        							}
 		        						}
@@ -70,10 +73,71 @@
             	{% endif %}
             	<tr>
             		<td>
-    	        		<a href="{% if user.is_superuser %}/home/ {% else %}/home/?respType=userpermissions {% endif %}"> << Click Here</a> to go Back
+    	        	 	<!-- <a href="{% if user.is_superuser %}/home/ {% else %}/home/?respType=userpermissions {% endif %}"> << Click Here</a> to go Back -->
+    	        	 	<a href="/list/users/"> << Click Here</a>
     	        	</td>
             	</tr>
+	    </table>
+	    </div>
+	    <div style="width:45%">
+	    <table>
+	    	<tr>
+    	        	<td colspan="3" bgcolor="#336699" align="Center"><span class="pwdHead">Assessment Permissions For User {{userName}}</span> </td>    	        
+    	    	</tr>
+    	    	<tr>
+                    	<td align="Center" colspan="3">&nbsp;</td>
+            	</tr>
+            	<tr bgcolor="#408080">
+            		<td> 
+            			<table>
+            				<tr>
+            					<td class="KLP_td_height"><font color="#fff"><b>Institute</b></font> </td> 
+            					<td class="KLP_td_height"> <font color="#fff" weight="bold"><b>Assessment</b></font> 
+            					<td class="KLP_td_height"> <font color="#fff" weight="bold"><b>Acess</b></font> 
+            					<td class="KLP_td_height"> <font color="#fff" weight="bold"><b>Flush</b></font> </td>
+            				</tr>
+            			</table>
+            		</td>
+            	</tr>
+            	{% for permObj in permObjects %}
+            		<tr id="id_assessment_pems_{{permObj.id}}">
+            			<td>
+            				<form name="assessmentFlush" id="id_assessmentFlush_{{permObj.id}}" onsubmit="return false;">
+            					<table>
+            						<tr>
+            							<td class="KLP_td_height">
+		        							{{permObj.instituion}}
+		        							<input type="hidden" name="inst_id" id="inst_id" value="{{permObj.instituion.id}}"/>
+		        							<input type="hidden" name="userId" value="{{permObj.user.id}}" />
+		        							<input type="hidden" name="assessmentId" value="{{permObj.assessment.id}}" />
+		        					</td>
+		        					<td class="KLP_td_height">{{permObj.assessment}}</td>
+		        					<td class="KLP_td_height" id="id_assesspermission_Access_{{permObj.id}}">{{permObj.access}}</td>
+		        					<td class="KLP_td_height"><input type="submit" name="flush_permission" value="Flush" /></td>	
+            						</tr>
+            					</table>
+            				</form>
+            				<script>
+		        				$("#id_assessmentFlush_{{permObj.id}}").submit(function(){
+		        					$("#successMsgHead").hide();
+		        					$.post(
+		        						'/flush/user/assessmentpermissions',
+		        						$("#id_assessmentFlush_{{permObj.id}}").serialize(),
+		        						function(data){
+		        							if (data == 'success'){
+		        								//$("#id_permission_Access_{{inst|displayValue:'instId'}}").html('False');
+		        								$("#id_assessment_pems_{{permObj.id}}").remove()
+		        								$("#successMsgHead").show();
+		        							}
+		        						}
+		        					);
+		        				});
+		        		</script>
+            			</td>
+            		</tr>
+            	{% endfor %}
 	    </table>	    
-	
+	    </div>
+	    
 {% endblock %}
 

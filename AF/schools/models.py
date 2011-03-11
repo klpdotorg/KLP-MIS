@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from object_permissions import register
 from fullhistory import register_model
 # Table Structure For Klp
+register_model(User)
 class Institution_Category(models.Model):
 	'''This Class stores the Institution Category Information'''
 	name = models.CharField(max_length = 50)
@@ -145,10 +146,10 @@ class Boundary(models.Model):
 		return 'boundary'
 
 	def getViewUrl(self, boundaryType):
-		return '<a href="/boundary/%s/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s">%s </a>' % (self.id, boundaryType, self.name, self.name)
+		return '<a href="/boundary/%s/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/boundary.gif" title="Boundary" /> &nbsp; <span id="boundary_%s_text">%s</span> </a>' % (self.id, boundaryType, self.name, self.id, self.name)
 
 	def CreateNewFolder(self, boundaryType):
-		return '<span><img src="/static_media/tree-images/reicons/boundary.gif" title="boundary" /> &nbsp;<a href="/boundary/%s/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> %s </a></span>' % (self.id, boundaryType, self.name, self.name)
+		return '<span><a href="/boundary/%s/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/boundary.gif" title="Boundary" /> &nbsp; <span id="boundary_%s_text">%s</span> </a></span>' % (self.id, boundaryType, self.name, self.id, self.name)
 
 	def get_view_url(self, boundaryType):
 		return '/boundary/%s/%s/view/' % (self.id, boundaryType)
@@ -165,8 +166,12 @@ class Boundary(models.Model):
 		else:
 			return False
 	
-	def getPermissionViewUrl(self, secFilter):
-		return '<a href="/boundary/%s/assessment/%s/permissions" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s">%s </a>' % (self.id, secFilter, self.name, self.name)	
+	def getPermissionViewUrl(self):
+		return '<a href="/boundary/%s/permissions/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/boundary.gif" title="boundary" />  %s </a>' % (self.id, self.name, self.name)
+		
+	def getAssessmentPermissionViewUrl(self, assessment_id):
+		return '<a href="/boundary/%s/assessmentpermissions/%s/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/boundary.gif" title="boundary" />  %s </a>' % (self.id, assessment_id , self.name, self.name)
+		
 
 register_model(Boundary)
 
@@ -210,7 +215,7 @@ class Institution(models.Model):
 		return '/institution/%d/update/' %(self.id)
 
 	def getViewUrl(self):
-		return '<a href="/institution/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> %s </a>' %(self.id, self.name, self.name)
+		return '<a href="/institution/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/institution.gif" title="institution" /> &nbsp; <span id="institution_%s_text">%s</span> </a>' %(self.id, self.name, self.id, self.name)
 
 	def get_view_url(self):
 		return '/institution/%s/view/' %(self.id)
@@ -219,7 +224,7 @@ class Institution(models.Model):
 		return '/institution/%s/update/' %(self.id)
 
 	def CreateNewFolder(self):
-		retStr = '<span><img src="/static_media/tree-images/reicons/institution.gif" title="institution" /> &nbsp;<a href="/institution/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> %s</a> </span>' %(self.id, self.name, self.name)
+		retStr = '<span><a href="/institution/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/institution.gif" title="institution" /> &nbsp; <span id="institution_%s_text">%s</span></a> </span>' %(self.id, self.name, self.id, self.name)
 		groupObjects = StudentGroup.objects.filter(institution__id = self.id,active=2)
 		if groupObjects:
 			retStr = "<div class='hitarea hasChildren-hitarea collapsable-hitarea'></div>"+retStr+"<ul>"
@@ -227,7 +232,7 @@ class Institution(models.Model):
 				groupName = groupObj.name
 				if groupName == '0':
 					groupName = 'Anganwadi Class'
-				retStr = retStr + """<li id="%s"><span><img title="studentgroup" src="/static_media/tree-images/reicons/studentgroup.gif"><a class="KLP_treetxt" onclick="return KLP_View(this)" href="/studentgroup/%s/view/" title="%s"> %s  </a></span></li>""" %(groupObj.id, groupObj.id, groupName, groupName)
+				retStr = retStr + """<li id="%s"><span><a class="KLP_treetxt" onclick="return KLP_View(this)" href="/studentgroup/%s/view/" title="%s"> <img title="Class" src="/static_media/tree-images/reicons/studentgroup_Class.gif"> <span id="studentgroup_%s_text">%s</span>  </a></span></li>""" %(groupObj.id, groupObj.id, groupName, groupObj.id, groupName)
 			retStr = retStr + "</ul>"
 		return retStr
 
@@ -316,7 +321,7 @@ class StudentGroup(models.Model):
 		groupName = self.name
 		if groupName == '0':
 			groupName = 'Anganwadi Class'
-		return '<a href="/studentgroup/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s %s"> %s %s </a>' %(self.id, groupName, sec, groupName, sec)
+		return '<a href="/studentgroup/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s %s"> <img src="/static_media/tree-images/reicons/studentgroup_%s.gif" title="%s" /> <span id="studentgroup_%s_text">%s %s</span> </a>' %(self.id, groupName, sec, self.group_type, self.group_type, self.id, groupName, sec)
 		
 	def getStudentProgrammeUrl(self, filter_id, secfilter_id):
 	    groupName = self.name
@@ -325,7 +330,7 @@ class StudentGroup(models.Model):
 	    sec = self.section
 	    if sec == None:
 	    	sec = ''	
-	    return '<a href="/studentgroup/%s/programme/%s/assessment/%s/view" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s %s"> %s %s </a>' %(self.id, filter_id, secfilter_id, groupName, sec, groupName, sec)
+	    return '<a href="/studentgroup/%s/programme/%s/assessment/%s/view" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s %s"> <img src="/static_media/tree-images/reicons/studentgroup_%s.gif" title="%s" /> &nbsp; <span id="studentgroup_%s_text">%s %s</span> </a>' %(self.id, filter_id, secfilter_id, groupName, sec, self.group_type, self.group_type, self.id,  groupName, sec)
 
 	def get_view_url(self):
 		return '/studentgroup/%s/view/' %(self.id)
@@ -337,7 +342,7 @@ class StudentGroup(models.Model):
 		groupName = self.name
 		if groupName == '0':
 			groupName = 'Anganwadi Class'
-		return '<span><img src="/static_media/tree-images/reicons/studentgroup_%s.gif" title="class" /> &nbsp;<a href="/studentgroup/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s %s"> %s %s </a></span>' %(self.group_type,self.id, groupName, sec, groupName, sec)
+		return '<span><a href="/studentgroup/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s %s"> <img src="/static_media/tree-images/reicons/studentgroup_%s.gif" title="%s" /> &nbsp; <span id="studentgroup_%s_text">%s %s</span> </a></span>' %(self.id, groupName, sec, self.group_type, self.group_type, self.id,  groupName, sec)
 register_model(StudentGroup)
 
 class Academic_Year(models.Model):
@@ -428,6 +433,9 @@ class Student_StudentGroupRelation(models.Model):
 	student_group = models.ForeignKey(StudentGroup)	
 	academic = models.ForeignKey(Academic_Year, default=current_academic)
 	active = models.IntegerField(blank = True, null = True,default=2)
+	
+	class Meta: 
+		unique_together = (('student', 'student_group', 'academic'),) 
 register_model(Student_StudentGroupRelation)	
 	
 class Staff_StudentGroupRelation(models.Model): 
@@ -435,7 +443,10 @@ class Staff_StudentGroupRelation(models.Model):
  	staff = models.ForeignKey(Staff) 
  	student_group = models.ForeignKey(StudentGroup)  
  	academic = models.ForeignKey(Academic_Year, default=current_academic) 
- 	active = models.IntegerField(blank = True, null = True,default=2) 		
+ 	active = models.IntegerField(blank = True, null = True,default=2) 	
+ 	
+ 	class Meta: 
+		unique_together = (('staff', 'student_group', 'academic'),) 	
 register_model(Staff_StudentGroupRelation)		
 
 def default_end_date():
@@ -478,10 +489,10 @@ class Programme(models.Model):
 		return 'programme'
 
 	def getViewUrl(self):
-		return '<a href="/programme/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s">%s </a>' %(self.id, self.name, self.name)
+		return '<a href="/programme/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/programme.gif" title="Programme" /> &nbsp; <span id="programme_%s_text">%s</span> </a>' %(self.id, self.name, self.id, self.name)
 
 	def CreateNewFolder(self):
-		return '<span><img src="/static_media/tree-images/reicons/programme.gif" title="Programme" /> &nbsp;<a href="/programme/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> %s</a></span>' %(self.id,self.name, self.name)	
+		return '<span><a href="/programme/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/programme.gif" title="Programme" /> &nbsp; <span id="programme_%s_text">%s</span></a></span>' %(self.id,self.name, self.id, self.name)	
 register_model(Programme)
 
 class Assessment(models.Model):
@@ -492,6 +503,9 @@ class Assessment(models.Model):
     endDate = models.DateField(max_length = 20, default=default_end_date)
     query = models.CharField(max_length = 500,blank = True, null = True)
     active = models.IntegerField(blank = True, null = True,default=2)
+    
+    class Meta: 
+		unique_together = (('programme', 'name'),)
 
     def __unicode__(self):
         return "%s"%(self.name)
@@ -509,13 +523,13 @@ class Assessment(models.Model):
 		return False
 
     def getViewUrl(self):
-	return '<a id="assessment_%s_view" href="/assessment/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s">%s </a>' %(self.id, self.id, self.name, self.name)
+	return '<a id="assessment_%s_view" href="/assessment/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/assessment.gif" title="Assessment" /> &nbsp; <span id="assessment_%s_text">%s</span> </a>' %(self.id, self.id, self.name, self.id, self.name)
 
     def getModuleName(self):
 		return 'assessment'
 
     def CreateNewFolder(self):
-		return '<span><img src="/static_media/tree-images/reicons/assessment.gif" title="Assessment" /> &nbsp;<a id="assessment_%s_view" href="/assessment/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> %s</a></span>' %(self.id, self.id, self.name, self.name)
+		return '<span><a id="assessment_%s_view" href="/assessment/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/assessment.gif" title="Assessment" /> &nbsp; <span id="assessment_%s_text">%s</span></a></span>' %(self.id, self.id, self.name, self.id, self.name)
 register_model(Assessment)
 
 class Assessment_StudentGroup_Association(models.Model):
@@ -523,6 +537,9 @@ class Assessment_StudentGroup_Association(models.Model):
 	assessment = models.ForeignKey(Assessment)
 	student_group = models.ForeignKey(StudentGroup)	
 	active = models.IntegerField(blank = True, null = True,default=2)
+	
+	class Meta: 
+		unique_together = (('assessment', 'student_group'),) 
 register_model(Assessment_StudentGroup_Association)
 
 class Question(models.Model):
@@ -535,6 +552,9 @@ class Question(models.Model):
     grade = models.CharField(max_length = 100,blank = True, null = True)
     doubleEntry = models.BooleanField(default=True)
     active = models.IntegerField(blank = True, null = True,default=2)
+    
+    class Meta: 
+		unique_together = (('assessment', 'name'),)
 
     def __unicode__(self):
         return self.name
@@ -552,7 +572,7 @@ class Question(models.Model):
         return False
 
     def getViewUrl(self):
-        return '<a href="/question/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s">%s </a>' %(self.id, self.name, self.name)
+        return '<a href="/question/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/question.gif" title="Question" /> &nbsp; <span id="question_%s_text">%s</span> </a>' %(self.id, self.name, self.id, self.name)
 
     def getModuleName(self):
         return 'question'
@@ -564,7 +584,7 @@ class Question(models.Model):
     	return '/question/%s/update/' %(self.id)
 
     def CreateNewFolder(self):
-		return '<span><img src="/static_media/tree-images/reicons/question.gif" title="Question" /> &nbsp;<a href="/question/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> %s</a></span>' %(self.id, self.name, self.name)
+		return '<span><a href="/question/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/question.gif" title="Question" /> &nbsp; <span id="question_%s_text">%s</span></a></span>' %(self.id, self.name, self.id, self.name)
 
 register_model(Question)
 
@@ -581,4 +601,17 @@ class Answer(models.Model):
     creationDate = models.DateField(default=datetime.date.today, blank = True, null = True)
     lastModifiedDate = models.DateField(default=datetime.date.today, blank = True, null = True)
     lastmodifiedBy = models.ForeignKey(User, blank = True, null = True, related_name = 'lastmodifiedBy')
+    
+    class Meta: 
+		unique_together = (('question', 'student'),)
 register_model(Answer)
+
+class UserAssessmentPermissions(models.Model):
+	""" This class stores information about user, instituion and assessment permissions"""
+	user = models.ForeignKey(User)
+	instituion = models.ForeignKey(Institution)
+	assessment = models.ForeignKey(Assessment)
+	access = models.BooleanField(default=True)
+	
+	class Meta: 
+		unique_together = (('user', 'instituion', 'assessment'),)

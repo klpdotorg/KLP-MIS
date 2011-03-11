@@ -35,7 +35,7 @@ def KLP_Staff_Create(request, referKey):
 	extra_dict['institution_id'] =  referKey
 	extra_dict['stgrps'] = StudentGroup.objects.filter(institution__id = referKey, active=2).order_by("name","section")
 	institutionObj = Institution.objects.get(pk = referKey)
-	if institutionObj.boundary.boundary_category.boundary_category == 'Circle':
+	if institutionObj.boundary.boundary_category.boundary_category.lower() == 'circle':
 		extra_dict['institutionType'] = 'Anganwadi'
 		Staff_Types = Staff_Type.objects.filter(categoryType=2)
 	else:
@@ -68,22 +68,26 @@ def KLP_staff_view(request, institution_id):
 	
 def KLP_Staff_Update(request, staff_id):
 	""" To update Selected staff staff/(?P<staff_id>\d+)/update/"""
+	#print '*****************************'
 	check_user_perm.send(sender=None, user=request.user, model='Staff', operation='Update')
         check_user_perm.connect(KLP_user_Perm)
+        #print 1111111111111111111111
 	buttonType = request.POST.get('form-buttonType')
 	referKey = request.POST.get('form-0-boundary')
 	staff = Staff.objects.get(pk=staff_id)
 	stgrps = StudentGroup.objects.filter(institution = staff.institution, active=2)
 	institutionObj = staff.institution
-	if institutionObj.boundary.boundary_category.boundary_category == 'Circle':
+	if institutionObj.boundary.boundary_category.boundary_category.lower() == 'circle':
 		institutionType = 'Anganwadi'
 		Staff_Types = Staff_Type.objects.filter(categoryType=2)
 	else:
 		institutionType = 'Institution'
 		Staff_Types = Staff_Type.objects.filter(categoryType=1)
+	#print 'aaaaaaaaaaaaaaaaaa'
 	KLP_Edit_Staff =KLP_Staff(queryset = Staff.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'staff', extra_context={'buttonType':buttonType, 'referKey':referKey, 'stgrps':stgrps, 'institutionType':institutionType, 'Staff_Types':Staff_Types}), receiver = XMLReceiver(),)
+	#print 'bbbbbbbbbbbbbbbbbb'
 	response = KLP_Edit_Staff.responder.update_form(request, pk=staff_id, form_class=Staff_Form)
-	
+	#print 'sssssssssssssssssssssssss'
 	return HttpResponse(response)		
 			      
 

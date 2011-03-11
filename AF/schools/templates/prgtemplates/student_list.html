@@ -1,6 +1,6 @@
 {% load template_tags %}
 
-<div  id="searchRes">
+<div  id="searchRes" style="width:700px;">
 	<div class="detailHead">
 		<span class="hedText">Student Details</span>
 	</div>
@@ -90,7 +90,7 @@
 									   					       tabindex="1"
 									   					       value="{% if ques|getAnswer:i %}{%if user.id == ques|firstUser:i and ques|dEStatus:i == 1  %}{{ques|getAnswerValue:i}}{% endif %}{% endif %}" 
 									   					       size="3"
-									   					       class="required {% if ques.questionType == 2 %}letters{%else%}digits{%endif%}"
+									   					       class="required {% if ques.questionType == 2 %}letters{%else%}number{%endif%}"
 									   					       {% if user.id != ques|firstUser:i and ques|dEStatus:i == 1%}dE="true" sE="true"{% endif %}
 									   					       />
 									   					       
@@ -126,13 +126,31 @@
 			</table>
 			
 </div><br/>
+<div id="student_pagenation" style="{% if not students_list %}display:none;{% endif %}">
+	<!--span page = 'page_{{previous}}' onclick="Pagination(this)" style="cursor:pointer;color:blue;padding-right:15px;{% if not has_previous %}display:none;{% endif %}"> previous </span-->
+		page <span id="id_currentPage">{{page}}</span> of <span id="id_totPages">{{pages}}</span>
+		<input type="hidden" name="resultPerPage" id="id_resultPerPage" value="{{results_per_page}}" />
+		<input type="hidden" value = "{{Norecords}}" id="Norecords" name="Norecords"/>
+		<input type="hidden" name="lastPage" id="id_lastPage" value="{{pages}}" />
+		{% if pages > 1 %}
+			{% for i in pages|KLPrange %}  
+	   			<span page='page_{{forloop.counter}}' onclick="Pagination(this)" style="cursor:pointer;color:blue;padding-left:10px;">{{ forloop.counter }}</span>
+			{% endfor %}  
+		{% endif %}
+	<!--span page='page_{{next}}' onclick="Pagination(this)" style="cursor:pointer;color:blue;padding-left:15px;{% if not has_next %}display:none;{% endif %}"> next </span-->
+</div>
+<span id ="list_url" style="display:none;" value = "{{url}}"></span>
 <div class="KLP_DE_Submit">
 	<!--input type="submit" class="KLP_Button" name="ans" value="Submit" id="id_ans_global_submit" tabindex="2"/-->
 	<span class="KLP_SpanButton"  id="id_ans_global_submit">Submit</span>
+	{% if group_typ|lower == 'class' %}
 	<span class="KLP_DE_AdStudent">
 		<a href="/studentgroup/{{studentgroup_id}}/student/creator/?keepThis=True&map_Student=1&assessment_id={{assessmentObj.id}}&TB_iframe=True&height=400&width=800" title="Create New Student to Map" class="thickbox KLP_Button"> Add Student </a>
 	</span>
+	{% endif %}
 </div>
+
+
 <script>
 $(document).ready(function(){
       $('.blue').bt();
@@ -153,6 +171,19 @@ $(document).ready(function(){
        
       
 });
+function Pagination(thisObj){
+	pages = $(thisObj).attr('page')
+	page = pages.split('_')[1]
+        $.ajax({
+            url: $('#list_url').attr('value'),
+            data:'&page='+page,
+            success: function(data) {
+                $('#searchRes').html(data);
+		tb_init('a.thickbox, area.thickbox, input.thickbox');
+            }
+        });
+	return false;
+}
 </script>
 
 

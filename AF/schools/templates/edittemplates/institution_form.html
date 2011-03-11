@@ -219,7 +219,7 @@ $(document).ready(function(){
                     if (successStatus == 'True'){
                     	treeNode=$("#institution_{{institution.id}}").find("a:first");
                     	$(treeNode).attr("title", newName);
-                    	$(treeNode).html(newName);
+                    	$("#institution_{{institution.id}}_text").html(newName);
                     	KLP_BredaCrumb(treeNode);
                     	$("#successMsgHead").show();
    		    	$("#klp_MsgTxt").html("{{extra_context|displayValue:'institutionType'}} Updated Successfully")

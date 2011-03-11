@@ -86,7 +86,7 @@ class TreeSerializeResponder(object):
                         titleval=names['name']
 		   except:
 			titleval = names['question']
-		   k['text'] = '<img src="/static_media/tree-images/reicons/'+imageName+'.gif" title='+modelName+' /> &nbsp;'+temval[1]
+		   k['text'] = temval[1]
 
 	response3 = []
 	if boundary_id:

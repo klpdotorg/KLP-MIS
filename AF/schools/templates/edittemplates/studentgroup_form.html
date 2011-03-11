@@ -13,7 +13,7 @@
 				<td colspan="3"><span class="editErr">{{ entryForm.non_field_errors }}</span></td>
 			</tr>
         		<tr>
-        			<td><label for="address">Class:</label></td>
+        			<td><label class="KLP_required">Name:</label></td>
         			<td>
         				{% render_field entryForm.name 'tabindex=1' %}
                 	        </td>
@@ -23,7 +23,7 @@
 	                                {% endfor %}
                                 </td>
                 	</tr>
-                	<tr>
+                	<tr style="{% if extra_context|displayValue:'group_typ'|lower == 'center' and extra_context|displayValue:'sch_typ'|lower == 'circle'%} display:none; {% endif %} ">
                 		<td><label for="address">Section:</label></td>
                 		<td>
                 			{% render_field entryForm.section 'tabindex=2' %}
@@ -35,17 +35,21 @@
                                 </td>
 					
                         </tr>
-			<tr>
-                        	<td><label>Group Type</label></td>
-                                <td>
-                                	{% render_field entryForm.group_type 'tabindex=3' %}
-                                </td>
-                                <td>
-                                	{% for error in entryForm.group_type.errors %}
-	                                	<span class="editErr">{{ error }}</span>
-	                                {% endfor %}
-                                </td>
-                        </tr>
+                        {% if extra_context|displayValue:'group_typ'|lower == "center" and extra_context|displayValue:'sch_typ'|lower == 'circle'%}
+                        	<input type="hidden" id="id_form-0-group_type" name="form-0-group_type" value="Center" />
+                        {% else %}
+				<tr>
+		                	<td><label>Group Type</label></td>
+		                        <td>
+		                        	{% render_field entryForm.group_type 'tabindex=3' %}
+		                        </td>
+		                        <td>
+		                        	{% for error in entryForm.group_type.errors %}
+			                        	<span class="editErr">{{ error }}</span>
+			                        {% endfor %}
+		                        </td>
+		                </tr>
+		        {% endif %}
 			<tr><td> &nbsp;</td></tr>
                     	<tr><td> &nbsp;</td></tr>
                     	<tr><td> &nbsp;</td></tr>
@@ -78,8 +82,9 @@ $(document).ready(function(){
    $("#id_save").click(function(){
    	KLP_Hide_Msg();
    	parentVal = $("#parentId").val();
+   	typeName = $("#id_form-0-group_type").val();
    	$("#id_form-buttonType").val('save');
-   	KLP_form_submit(parentVal);
+   	KLP_form_submit(parentVal, typeName);
    	
    });
    
@@ -87,20 +92,22 @@ $(document).ready(function(){
    	KLP_Hide_Msg();
    	$("#id_form-buttonType").val('save and continue');
    	parentVal = $("#parentId").val();
-   	KLP_form_submit(parentVal);
+   	typeName = $("#id_form-0-group_type").val();
+   	KLP_form_submit(parentVal, typeName);
    	
    });
    
    $("#id_save_and_create").click(function(){
    	KLP_Hide_Msg();
    	parentVal = $("#parentId").val();
+   	typeName = $("#id_form-0-group_type").val();
    	$("#id_form-buttonType").val('save and add another');
-   	KLP_form_submit(parentVal, 'id_form-0-boundary');
+   	KLP_form_submit(parentVal, typeName, 'id_form-0-boundary');
    	
    	
    });
 
-   var KLP_form_submit = function(parentVal, parentId){
+   var KLP_form_submit = function(parentVal, typeName, parentId){
     oldName = $('#id_old').val(); 
     newName = $('#id_form-0-name').val()+' '+$("#id_form-0-section").val();
     $.post(  
@@ -115,10 +122,10 @@ $(document).ready(function(){
                 if (successStatus == 'True'){
 		        treeNode=$("#studentgroup_{{studentgroup.id}}").find("a:first");
                     	$(treeNode).attr("title", newName);
-                    	$(treeNode).html(newName);
+                    	$("#studentgroup_{{studentgroup.id}}_text").html(newName);
                     	KLP_BredaCrumb(treeNode);
 		        $("#successMsgHead").show();
-	   		$("#klp_MsgTxt").html("Student Group Updated Successfully");
+	   		$("#klp_MsgTxt").html(typeName+ " Updated Successfully");
 			if (parentId != null)
                     		$("#"+parentId).val(parentVal);
 		}

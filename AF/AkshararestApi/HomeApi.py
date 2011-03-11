@@ -38,11 +38,15 @@ class KLP_Home(Resource):
 		    respDict['urHere'] = 'Data Entry'
 		    respDict['prgsList'] =  Programme.objects.filter(active=2, programme_institution_category=sessionVal)
 		elif respType == 'userpermissions' and (user.is_superuser or 'AdminGroup' in user_GroupsList):  
-			respDict['home'] = True    
-		    	respDict['filter'] = True  
+			respDict['home'] = True      
 		    	respDict['permission'] = True  
 		    	respDict['urHere'] = 'Permissions'
-		    	respDict['prgsList'] =  Programme.objects.filter(active=2, programme_institution_category=sessionVal)
+		elif respType == 'assessmentpermissions' and (user.is_superuser or 'AdminGroup' in user_GroupsList):  
+			respDict['home'] = True    
+			respDict['filter'] = True  
+		    	respDict['assessmentpermission'] = True  
+		    	respDict['urHere'] = 'Assessment Permissions'
+		    	respDict['prgsList'] =  Programme.objects.filter(active=2, programme_institution_category=sessionVal)        	
 		elif respType == 'createUser' and (user.is_superuser or 'AdminGroup' in user_GroupsList):  
 			return HttpResponseRedirect('accounts/auth/user/add/')
 		elif respType == 'changepermissions' and (user.is_superuser or 'AdminGroup' in user_GroupsList):  
@@ -63,5 +67,6 @@ def KLP_Set_Session(request):
         
 urlpatterns = patterns('',             
    url(r'^home/$', KLP_Home(permitted_methods=('POST','PUT','GET','DELETE'))),
+   url(r'^$', KLP_Home(permitted_methods=('POST','PUT','GET','DELETE'))),
    url(r'^set/session/$', KLP_Set_Session),
 )        

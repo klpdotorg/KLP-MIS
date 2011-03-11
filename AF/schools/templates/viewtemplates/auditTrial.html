@@ -1,0 +1,71 @@
+{% extends "index.html" %}
+{% load i18n %}
+{% block leftpart%}{% endblock %}
+{% block midpart %} 
+  <div style="padding:10px 0px 10px 0px;">
+  	<a href="{% if user.is_superuser %}/home/ {% endif %}"> << Click Here</a> to go Back
+  </div>
+  <div style="width:90%;text-align:center;min-height:200px;">
+    <form action="." method="post">{% csrf_token %}     
+    	<div style="padding:10px 0px 20px 0px;">   	    	        	
+		<table>
+			<th> Select Start Date </th> 
+			<th> Select End Date </th>
+			<th> Select User </th>
+			<th> Submit </th>
+			<tr>
+				<td><input type="text" name="startDate" id="id_startDate" value="{{startDate}}"/></td>
+				<td><input type="text" name="endDate" id="id_endDate" value="{{endDate}}"/></td>
+				<td>
+					<select name="selUser" id="selUser">
+						{%for userl in userList %}
+							<option {%ifequal selUser userl.id %}selected="true"{% endifequal %} value="{{userl.id}}">{{userl.username}}</option>
+						{% endfor %}
+					</select>
+				</td>
+				<td>
+					<input type="submit" value="GO" />
+				</td>
+				
+			</tr>
+		</table>
+        </div>
+        {% if fullHistoryList %}
+        	<div class="tot-border">
+        		<table border="0" cellpadding="0" cellspacing="0" style="text-align:center;width:100%">
+        			<th class="tot-border3">Sl.No</th>
+        			<th class="tot-border3">Content Type Id</th>
+        			<th class="tot-border3">Object Id</th>
+        			<th class="tot-border3">Revision</th>
+        			<th class="tot-border3">Action Time</th>
+        			<th class="tot-border3">Data</th>
+        			<th class="tot-border3">Request Id</th>
+        			<th class="tot-border3">Action</th>
+        			<th class="tot-border4">Info</th>
+        			{% for history in fullHistoryList %}
+        				<tr>
+						<td class="tot-border1">{{history.id}}</td>
+						<td class="tot-border1">{{history.content_type}}</td>
+						<td class="tot-border1">{{history.object_id}}</td>
+						<td class="tot-border1">{{history.revision}}</td>
+						<td class="tot-border1">{{history.action_time}}</td>
+						<td class="tot-border1">{{history.data}}</td>
+						<td class="tot-border1">{{history.request.id}}</td>
+						<td class="tot-border1">{{history.action}}</td>
+						<td class="tot-border2">{{history.info}}</td>
+					</tr>
+        			{% endfor %}
+        		</table>
+        	</div>
+        {% endif %}
+    	<script>
+    		$("#id_startDate").datepick({dateFormat: 'dd-mm-yyyy'});
+	        $("#id_endDate" ).datepick({dateFormat: 'dd-mm-yyyy'});
+	                    				</script>    	
+    </form>
+  </div>
+  <div style="padding:20px 0px 10px 0px;">
+  	<a href="{% if user.is_superuser %}/home/{% else %}/home/?respType=userpermissions {% endif %}"> << Click Here</a> to go Back
+  </div>
+{% endblock %}
+	

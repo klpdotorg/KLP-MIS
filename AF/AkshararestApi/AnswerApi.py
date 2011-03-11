@@ -50,7 +50,7 @@ class KLP_ChangeAns(Resource):
         				ansObj.answerGrade = textFieldVal
         			else:
         				ansObj.status = None	
-        				ansObj.answerScore = int(textFieldVal)
+        				ansObj.answerScore = textFieldVal
         			if ansObj.doubleEntry == 1 and ansObj.user1 == user:
 					ansObj.lastmodifiedBy = user
 				else:
@@ -69,7 +69,7 @@ class KLP_ChangeAns(Resource):
 				elif question.questionType == 2:
         				ansObj.answerGrade = textFieldVal
         			else:
-        				ansObj.answerScore = int(textFieldVal)
+        				ansObj.answerScore = textFieldVal
         			ansObj.user1 = user
         			ansObj.save()
 	        
@@ -102,7 +102,7 @@ def KLP_DataValidation(request):
 		    	pass
 	    	else:
 	    	    try:
-		    	    if int(ansObj.answerScore) == int(validateValue):
+		    	    if float(ansObj.answerScore) == float(validateValue):
 		    	        respStr = 'true'
 	    	    except:
 	    	    	pass

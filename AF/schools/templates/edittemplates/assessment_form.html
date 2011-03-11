@@ -123,7 +123,7 @@
                     if (successStatus == 'True'){
                     	treeNode=$("#assessment_{{assessment.id}}").find("a:first");
                     	$(treeNode).attr("title", newName);
-                    	$(treeNode).html(newName);
+                    	$("#assessment_{{assessment.id}}_text").html(newName);
                     	KLP_BredaCrumb(treeNode);
                     	$("#successMsgHead").show();
    		    	$("#klp_MsgTxt").html("Assessment Updated Successfully");

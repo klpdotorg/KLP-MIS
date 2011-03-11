@@ -6,14 +6,17 @@ from django.shortcuts import render_to_response
 register = template.Library()
 
 
+@register.filter  
+def KLPrange(value):  
+    return range(value)
+
 @register.filter(name='getAssessmentQuestions')
 def getAssessmentQuestions(obj, resp): 
     try:
-        question_list = Question.objects.filter(assessment=obj, active=2)
         if resp == 'length':
-            return len(question_list)
+            return len(Question.objects.filter(assessment=obj, active=2))
         else: 
-            return question_list
+            return Question.objects.filter(assessment=obj, active=2).extra(select={'lower_class': 'lower(name)'}).order_by("lower_class")
     except:        
         pass      
         

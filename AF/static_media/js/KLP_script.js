@@ -50,9 +50,9 @@ $.ajaxSetup({
    		    	$("#klp_fail_MsgTxt").html("Requested URL not found.");
 		}else if(x.status==500){
 			$("#failureMsgHead").show();
-			respTxt = x.responseText;
-			var exceptionVal = $(".exception_value", respTxt).html(); 
-			$("#klp_fail_MsgTxt").html(exceptionVal);
+			//respTxt = x.responseText;
+			//var exceptionVal = $(".exception_value", respTxt).html(); 
+			$("#klp_fail_MsgTxt").html("Invalid data or insufficient priviliges");
 		}else if(e=='parsererror'){
 			$("#failureMsgHead").show();
    		    	$("#klp_fail_MsgTxt").html("Error.\nParsing JSON Request failed.");
@@ -61,7 +61,8 @@ $.ajaxSetup({
    		    	$("#klp_fail_MsgTxt").html("Request Time out.");
 		}else {
 			$("#failureMsgHead").show();
-   		    	$("#klp_fail_MsgTxt").html("Unknow Error.\n"+x.responseText);
+   		    	//$("#klp_fail_MsgTxt").html("Unknow Error.\n"+x.responseText);
+   		    	$("#klp_fail_MsgTxt").html("Invalid data or insufficient priviliges");
 		}
 	}
 });
@@ -69,8 +70,8 @@ $.ajaxSetup({
 
 var KLP_Del = function(referKey,type, msgText){
 	KLP_Hide_Msg();
-	if (type=='section')
-        	nodeId = $("#sections_"+referKey) 
+	if (type.toLowerCase()=='class' || type.toLowerCase()=='center')
+        	nodeId = $("#studentgroup_"+referKey) 
         else
                 nodeId = $("#"+type+'_'+referKey)  
         if (type=='assessmentdetail')
@@ -83,6 +84,9 @@ var KLP_Del = function(referKey,type, msgText){
                 	url: '/delete/'+type+'/'+referKey+'/',
                 	success: function(data) {
 				nodeId.remove();
+				$("#dyncData").html("");
+				$("#klp_MsgTxt").html(" Sucessfully deleted "+msgType+'  '+msgText);
+				$("#successMsgHead").show();
                     }
                 });
         }
@@ -294,3 +298,18 @@ var KLP_post_script=function(form,formName){
 	);    
 
 }
+
+
+var KLP_isLog = function(){
+	$.ajax({
+		url: '/user/authentication',
+		success: function(data){
+			if (data == 'False'){
+				window.location.href="/"
+				return false;
+			}
+			return true;
+		}
+	});
+}
+
