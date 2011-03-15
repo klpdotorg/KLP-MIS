@@ -219,6 +219,7 @@
    });
 
 var KLP_form_submit = function(parentVal, parentId){
+    $("#id_save").attr("disabled", "true");
     modelName=$('#model').val();
     replaceId =  'student_'+$('#replace_id').val()
     $.post(  
@@ -227,6 +228,7 @@ var KLP_form_submit = function(parentVal, parentId){
         function(data){
         	$('#popData').html(data);
 		NFInit();
+		$("#id_save").removeAttr("disabled");
 		var successStatus = $("#success_status").val();
 		if (successStatus == 'True'){
 			$('#'+replaceId, self.parent.document).replaceWith(data);

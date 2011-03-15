@@ -31,7 +31,8 @@ def KLP_Question_Create(request, referKey):
 	check_user_perm.send(sender=None, user=request.user, model='Question', operation='Add')
         check_user_perm.connect(KLP_user_Perm)
 	buttonType = request.POST.get('form-buttonType')
-        KLP_Create_Question = KLP_Question(queryset = Question.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'question', extra_context={'buttonType':buttonType, 'referKey':referKey}), receiver = XMLReceiver(),)
+	order = len(Question.objects.filter(assessment__id=referKey))+1
+        KLP_Create_Question = KLP_Question(queryset = Question.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'question', extra_context={'buttonType':buttonType, 'referKey':referKey, 'order':order}), receiver = XMLReceiver(),)
         response = KLP_Create_Question.responder.create_form(request,form_class=Question_Form)
         			
         return HttpResponse(response)               

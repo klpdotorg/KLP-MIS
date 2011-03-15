@@ -60,7 +60,7 @@ def SampleClass(request):
 	if data:
 	    
 	    if (logUser.is_superuser or logUser.is_staff or 'AdminGroup' in user_GroupsList) and filterBy == 'None':
-	    	query = Boundary.objects.filter(parent__id=1,active=2, boundary_type=boundaryType).order_by("name").order_by("name")
+	    	query = Boundary.objects.filter(parent__id=1,active=2, boundary_type=boundaryType).order_by("name").extra(select={'lower_name':'lower(name)'}).order_by("lower_name")
 	    else:
 	    	if (logUser.is_superuser or logUser.is_staff or 'AdminGroup' in user_GroupsList) :
 	    		studentgroup_list = Assessment_StudentGroup_Association.objects.filter(assessment__id=secFilter, active=2).values_list('student_group', flat=True).distinct()
@@ -77,15 +77,15 @@ def SampleClass(request):
 	        except:
 	        	boundary_list = Boundary.objects.filter(institution__pk__in=institutions_list, active=2, boundary_type=boundaryType).values_list('parent__id', flat=True).distinct()
 	        	
-	        query = Boundary.objects.filter(pk__in=boundary_list, active=2, parent__id=1).distinct().order_by("name")
+	        query = Boundary.objects.filter(pk__in=boundary_list, active=2, parent__id=1).distinct().extra(select={'lower_name':'lower(name)'}).order_by("lower_name")
 		
 	else:
-		query = Programme.objects.filter(active=2, programme_institution_category=boundaryType).order_by("name")
+		query = Programme.objects.filter(active=2, programme_institution_category=boundaryType).extra(select={'lower_name':'lower(name)'}).order_by("lower_name")
 		typ = 'programme'
      else:
 	if model[0] == 'boundary':
 		if (logUser.is_superuser or logUser.is_staff or 'AdminGroup' in user_GroupsList) and filterBy == 'None':
-			query = Boundary.objects.filter(parent__id=model[1], active=2, boundary_type=boundaryType).order_by("name")
+			query = Boundary.objects.filter(parent__id=model[1], active=2, boundary_type=boundaryType).extra(select={'lower_name':'lower(name)'}).order_by("lower_name")
 		else:
 			if (logUser.is_superuser or logUser.is_staff or 'AdminGroup' in user_GroupsList):
 				studentgroup_list = Assessment_StudentGroup_Association.objects.filter(assessment__id=secFilter, active=2).values_list('student_group', flat=True).distinct()
@@ -100,14 +100,15 @@ def SampleClass(request):
 			parentBoundary = Boundary.objects.get(id=model[1])
 			if parentBoundary.boundary_category.boundary_category in ['district',]:
 				boundary_list = Boundary.objects.filter(institution__pk__in=institutions_list, active=2, boundary_type=boundaryType).values_list('parent', flat=True).distinct()
-				query = Boundary.objects.filter(parent__id=model[1], pk__in = boundary_list, active=2, boundary_type=boundaryType).distinct().order_by("name")
+				query = Boundary.objects.filter(parent__id=model[1], pk__in = boundary_list, active=2, boundary_type=boundaryType).distinct().extra(select={'lower_name':'lower(name)'}).order_by("lower_name")
 			else:
-				query = Boundary.objects.filter(parent__id=model[1], institution__pk__in=institutions_list, active=2, boundary_type=boundaryType).distinct().order_by("name")	
+				boundaries = Boundary.objects.filter(parent__id=model[1], institution__pk__in=institutions_list, active=2, boundary_type=boundaryType).values_list('id', flat=True).distinct()
+				query = Boundary.objects.filter(id__in=boundaries).extra(select={'lower_name':'lower(name)'}).order_by("lower_name")	
 			
 		
 		if not query:
 			if (logUser.is_superuser or logUser.is_staff or 'AdminGroup' in user_GroupsList) and filterBy == 'None':
-				query = Institution.objects.filter(boundary__id=model[1],active=2).order_by("name")
+				query = Institution.objects.filter(boundary__id=model[1],active=2).extra(select={'lower_name':'lower(name)'}).order_by("lower_name")	
 				typ = 'sch'
 			else:
 				if (logUser.is_superuser or logUser.is_staff or 'AdminGroup' in user_GroupsList):
@@ -121,22 +122,22 @@ def SampleClass(request):
 					map_institutions_list = StudentGroup.objects.filter(id__in=studentgroup_list, active=2).values_list('institution_id', flat=True).distinct()
 					institutions_list = list(set(map_institutions_list)&set(KLP_assignedAssessmentInst(logUser.id, secFilter)))
 				
-				query = Institution.objects.filter(pk__in=institutions_list, boundary__id=model[1], active=2).distinct().order_by("name")
+				query = Institution.objects.filter(pk__in=institutions_list, boundary__id=model[1], active=2).distinct().extra(select={'lower_name':'lower(name)'}).order_by("lower_name")
 				typ = 'sch'
 			
 				
 	elif model[0] == 'programme':
-		query = Assessment.objects.filter(programme__id=model[1],active=2).order_by("name")
+		query = Assessment.objects.filter(programme__id=model[1],active=2).extra(select={'lower_name':'lower(name)'}).order_by("lower_name")
 	elif model[0] == 'assessment':
-		query = Question.objects.filter(assessment__id=model[1],active=2).order_by("name")			
+		query = Question.objects.filter(assessment__id=model[1],active=2)	
 	else:
 		if model[0] == 'institution':
 			if filterBy != 'None':
 				
 				studentgroup_list = Assessment_StudentGroup_Association.objects.filter(assessment__id=secFilter, active=2).values_list('student_group', flat=True).distinct()
-				query = StudentGroup.objects.filter(institution__id = model[1], active=2, id__in=studentgroup_list).distinct().order_by("name","section")
+				query = StudentGroup.objects.filter(institution__id = model[1], active=2, id__in=studentgroup_list).distinct().extra(select={'lower_class': 'lower(name)'}).order_by("lower_class","section")
 			else:
-		  		query = StudentGroup.objects.filter(institution__id = model[1], active=2).order_by("name","section")
+		  		query = StudentGroup.objects.filter(institution__id = model[1], active=2).extra(select={'lower_class': 'lower(name)'}).order_by("lower_class","section")
 		if model[0] == 'studentgroup':
 		  query = Student.objects.filter(student_group__id=model[1],active=2)
 		  

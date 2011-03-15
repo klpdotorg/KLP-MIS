@@ -66,9 +66,21 @@
       				    			<td class="rightprofile"><label class="KLP_required">Grade</label></td>
       							<td class="leftprofile">
                             					{% render_field entryForm.grade 'tabindex=3' %}
+                            					<input type="hidden" name="form-0-order" value="{{extra_context|displayValue:'order'}}"/>
                         				</td>
                         				<td>
                                     				{% for error in entryForm.grade.errors %}
+	                                				<span class="editErr">{{ error }}</span>
+	                                			{% endfor %}
+                                    			</td>
+      						</tr> 
+      						<tr id="gradeTyp">
+      				    			<td class="rightprofile"><label class="KLP_required">Order</label></td>
+      							<td class="leftprofile">
+                            					<input type="text" name="form-0-order" value="{{extra_context|displayValue:'order'}}" tabindex=4/>
+                        				</td>
+                        				<td>
+                                    				{% for error in entryForm.order.errors %}
 	                                				<span class="editErr">{{ error }}</span>
 	                                			{% endfor %}
                                     			</td>

@@ -16,7 +16,7 @@ def getAssessmentQuestions(obj, resp):
         if resp == 'length':
             return len(Question.objects.filter(assessment=obj, active=2))
         else: 
-            return Question.objects.filter(assessment=obj, active=2).extra(select={'lower_class': 'lower(name)'}).order_by("lower_class")
+            return Question.objects.filter(assessment=obj, active=2)
     except:        
         pass      
         

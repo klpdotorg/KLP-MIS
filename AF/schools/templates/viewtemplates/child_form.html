@@ -244,6 +244,7 @@
     
    var KLP_form_submit = function(parentVal,parentId ){
         modelName=$('#model').val();
+        $("#id_save").attr("disabled", "true");
         var studentgroup_id = $('#id_studentgroup').val()
    	$.post(
         	$('#url').val(),
@@ -260,6 +261,7 @@
 		            $("#popData").html(data);
 			    //window.parent.tb_init('a.thickbox, area.thickbox, input.thickbox');
 			    var successStatus = $("#success_status").val();
+			    $("#id_save").removeAttr("disabled");
 		            if (successStatus == 'True'){
 				if (modelName != 'student') {
 					$("#successMsgHead").show();

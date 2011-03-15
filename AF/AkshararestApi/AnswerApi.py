@@ -20,10 +20,10 @@ class KLP_ChangeAns(Resource):
     """ To Create and Edit Answers answer/data/entry/"""
     def read(self,request):
     	user = request.user
-        student =  request.POST['student']
-        programId = request.POST['programId']
-        assessmentId = request.POST['assessmentId']
-        student_groupId = request.POST['student_groupId']
+        student =  request.POST.get('student')
+        programId = request.POST.get('programId')
+        assessmentId = request.POST.get('assessmentId')
+        student_groupId = request.POST.get('student_groupId')
         studentObj = Student.objects.get(pk=student)
         Questions_list = Question.objects.filter(assessment__id=assessmentId)
         student_groupObj = StudentGroup.objects.get(pk = student_groupId)
@@ -33,7 +33,7 @@ class KLP_ChangeAns(Resource):
         check_perm.connect(KLP_obj_Perm)
         for question in Questions_list:
         	textField = 'student_%s_%s' %(student, question.id)
-        	textFieldVal = request.POST[textField]
+        	textFieldVal = request.POST.get(textField)
         	try:
         		ansObj = Answer.objects.get(question = question, student = studentObj)
         		if textFieldVal:

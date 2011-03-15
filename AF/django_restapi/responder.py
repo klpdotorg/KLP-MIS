@@ -404,7 +404,7 @@ class TemplateResponder(object):
 					std_stdgrp_relation.save()
 					if self.extra_context['mapStudent'] in [1 , '1']:
 						assessmentObj = Assessment.objects.get(pk=self.extra_context['assessment_id'])
-						questions_list = Question.objects.filter(assessment = assessmentObj, active=2).order_by('id')
+						questions_list = Question.objects.filter(assessment = assessmentObj, active=2)
 						entryStr = '''<tr class='KLP_txt_cen'><td><form onsubmit='return false;' id='id_Student_%s' name='student_%s' class="validForm"><input type='hidden' value='%s' name='programId'><input type='hidden' value='%s' name='assessmentId'><input type='hidden' value='%s' name='student'><input type='hidden' value='%s' name='student_groupId'><table><tbody><tr>''' %(student.id, student.id, assessmentObj.programme.id, self.extra_context['assessment_id'], student.id, self.extra_context['studentgroup_id'])
 						for question in questions_list:
 							qType = 'digits'
@@ -617,5 +617,7 @@ class TemplateResponder(object):
 		form = ResourceForm(queryset=queryset.model.objects.filter(pk=pk))
 	
         template_name = '%s/%s_form.html' % (self.template_dir, elem._meta.module_name)
+        #print template_name
+        #print 'cccccccccccccc'
         return render_to_response(template_name, 
                 {'form':form, 'update':True, self.template_object_name:elem, 'extra_context':self.extra_context})

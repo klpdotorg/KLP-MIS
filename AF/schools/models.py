@@ -550,11 +550,13 @@ class Question(models.Model):
     scoreMin = models.DecimalField(max_digits=5, decimal_places=2, blank = True, null = True)
     scoreMax = models.DecimalField(max_digits=5, decimal_places=2, blank = True, null = True)
     grade = models.CharField(max_length = 100,blank = True, null = True)
+    order = models.IntegerField()
     doubleEntry = models.BooleanField(default=True)
     active = models.IntegerField(blank = True, null = True,default=2)
     
     class Meta: 
 		unique_together = (('assessment', 'name'),)
+		ordering = ["order"]
 
     def __unicode__(self):
         return self.name

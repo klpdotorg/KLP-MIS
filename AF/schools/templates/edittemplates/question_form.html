@@ -70,6 +70,17 @@
 	                                			{% endfor %}
                                     			</td>
       						</tr>
+      						<tr>
+      				    			<td class="rightprofile"><label class="KLP_required">Question Order:</label></td>
+      							<td class="leftprofile">
+                            					{% render_field entryForm.order 'tabindex=5' %}
+                        				</td>
+                        				<td>
+                                    				{% for error in entryForm.order.errors %}
+	                                				<span class="editErr">{{ error }}</span>
+	                                			{% endfor %}
+                                    			</td>
+      						</tr> 
       						<tr><td> &nbsp;</td></tr>
       						<tr><td> &nbsp;</td></tr>
       						<tr><td> &nbsp;</td></tr>

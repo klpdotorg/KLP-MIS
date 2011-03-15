@@ -185,6 +185,7 @@ $(document).ready(function(){
    	window.parent.$("#successMsgHead").hide();
         window.parent.$("#failureMsgHead").hide();
    	$("#id_form-buttonType").val('save');
+   	$("#id_save").attr("disabled", "true");
    	KLP_form_submit();
    	
    });
@@ -198,6 +199,7 @@ $(document).ready(function(){
         	$("#staffForm").serialize(),
                 function(data){	
                     $("#popData").html(data);
+                    $("#id_save").removeAttr("disabled");
                     NFInit();
                     $('input:visible:enabled:first').focus();
                     var successStatus = $("#success_status").val();

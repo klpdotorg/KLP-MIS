@@ -53,9 +53,13 @@
 			KLP_TreeBLK(treeUrl);
 			var homeView = $("#id_home_view").val();
 			var entryView = $("#id_entry_view").val();
+			var urHere = $("#id_urHere").val();
 			if (homeView == 'True' && entryView != 'True' ){
 				$("#rootBoundary").show()
 			}
+			if (urHere == 'Programme'){
+				$("#rootProgramme").show()
+		       }
 		}
 	
 		    
@@ -77,7 +81,11 @@
 			} 
 			else{
 				$("#treeStruc").html('<ul id="treeBlk" class="filetree treeview-famfamfam"></ul>');
-			}	
+			}
+			var urHere = $("#id_urHere").val();
+			if (urHere == 'Programme'){
+				$("#rootProgramme").show()
+			}		
 		});
 		   
 		$("#filtProg").change(function(){
@@ -151,6 +159,7 @@
 	            	<input type="hidden" name="prvSelNode" id="id_prvSelNode" value=""/>
 	            	<input type="hidden" name="perm" id="id_perm_assign" value="{{permission}}"/>
 	            	<input type="hidden" name="assessPerm" id="id_assess_perm_assign" value="{{assessmentpermission}}"/>
+	            	<input type="hidden" name="urHere" id="id_urHere" value="{{urHere}}"/>
             		<span style="{% if not filter %}display:none;{% endif %}">
 	        		<select id="filtProg" name="filtProg">
 	                		<option value="None">--</option>
@@ -182,7 +191,7 @@
             {% endif %}
             {% if programme %}
             	{% if user.is_superuser or user.is_staff %}
-		    <div class="addBound">
+		    <div class="addBound" id="rootProgramme" style="display:none;">
 		        <div class="boundLink">
 		            <a href='/programme/creator/' onclick="return KLP_View(this);">Add Programme <img src="/static_media/images/programme_add.gif" title="Add Programme" /></a>
 		        </div>
