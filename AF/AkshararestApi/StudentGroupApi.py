@@ -50,7 +50,9 @@ def KLP_StudentGroup_View(request, studentgroup_id):
 	studentGroups = StudentGroup.objects.filter(institution__id=studgrpParent.id,group_type="Center", active=2)
 	
 	Norecords = len(Student_StudentGroupRelation.objects.filter(student_group__id = studentgroup_id,academic=current_academic, active=2))
-	students = Student_StudentGroupRelation.objects.filter(student_group__id = studentgroup_id, academic=current_academic, active=2, student__active=2).order_by('student__child__firstName')
+	child_list = Student_StudentGroupRelation.objects.filter(student_group__id = studentgroup_id, academic=current_academic, active=2, student__active=2).values_list('student__child', flat=True)
+	
+	students = Child.objects.filter(id__in=child_list).extra(select={'lower_name':'lower(trim("firstName"))'}).order_by('lower_name')
 	resp=Collection(students, permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'students',paginate_by = 20,extra_context={'studgrpParent':studgrpParent,'studentgroup':studentgroup,'url':url, 'students':students,'Norecords':Norecords, 'studentGroups':studentGroups,'count':count}),)
         return HttpResponse(resp(request))
 
@@ -76,8 +78,7 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 	if canEnter:
 		students = Student_StudentGroupRelation.objects.filter(student_group__id = studentgroup_id, academic=current_academic, active=2).values_list('student__child', flat=True).distinct()
 		grupObj = StudentGroup.objects.get(pk = studentgroup_id)
-		students_list = Student.objects.filter(id__in = students, active=2,).order_by("child__firstName").distinct()
-		students_list = Child.objects.filter(id__in=students)
+		students_list = Child.objects.filter(id__in=students).extra(select={'lower_name':'lower(trim("firstName"))'}).order_by('lower_name')
 		assessmentObj = Assessment.objects.get(pk=assessment_id)
 		val=Collection(students_list, permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'prgtemplates', template_object_name = 'students', paginate_by=20, extra_context={'filter_id':programme_id, 'assessmentObj':assessmentObj, 'user':user, 'studentgroup_id':studentgroup_id, 'group_typ':grupObj.group_type, 'url':url}), entry_class = ChoiceEntry, )
 		return HttpResponse(val(request))

@@ -240,6 +240,10 @@ class Institution(models.Model):
 register(['Acess'], Institution)
 register_model(Institution)
 
+from django.db.models.signals import post_save, pre_save
+from schools.receivers import KLP_NewInst_Permission
+post_save.connect(KLP_NewInst_Permission, sender=Institution)
+
 class Child(models.Model):
 	''' This class stores the personnel information of the childrens'''
 	firstName = models.CharField(max_length = 50)

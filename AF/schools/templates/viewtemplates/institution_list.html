@@ -4,16 +4,18 @@
 		<input type="hidden" name="permissionType" value="{{permissionType}}" />
 		<input type="hidden" name="assessmentId" value="{{assessmentId}}" />
 		<div style="float:left;width:100%; padding:5px;">
+		<span style="float:left;width:100%;color:#000;font-weight:bold;">
+			Select <span style="cursor:pointer;color:#1569C7;" onclick="checkAll()">All</span> / <span style="cursor:pointer;color:#1569C7;" onclick="unCheckAll()">None</span>
+		</span>
 		{% for inst in institution_list %}
 			<span style="float:left;width:100%;color:#000;font-weight:bold;">
-				{{inst.name}} 
-				<input type="hidden" name="instName" value="{{inst.id}}" />
+				<input type="checkbox" name="instName" value="{{inst.id}}" />  {{inst.name}}
 			</span>
 		{% endfor %}
 		</div>
 		<div style="float:left;width:45%;padding:20px 5px 5px 5px;">
 			<span style="color:#75AD0A;font-size:12px;font-weight:bold;width:100%;text-align:center;padding:5px;">Select User</span><br/>
-			<select name="assignToUser" id="id_assignToUser" class="required">
+			<select name="assignToUser" id="id_assignToUser" multiple="true"  >
 				{% for dEUser in users %}
 					<option value="{{dEUser.id}}">{{dEUser.username}}</option>
 				{% endfor %}
@@ -21,7 +23,7 @@
 		</div>
 		<div style="float:left;width:45%;padding:20px 5px 5px 5px;">
 			<span style="color:#75AD0A;font-size:12px;font-weight:bold;width:100%;text-align:center;padding:5px;">Select Permission</span><br/>
-			<input type="checkbox" name="userPermission" value="Acess" class="required" minlength=1 checked="true"/> Acess <br/>
+			<input type="checkbox" name="userPermission" value="Acess" minlength=1 checked="true"/> Acess <br/>
 		</div>
 		<div style="float:left;width:100%;padding:20px 5px 5px 5px;">
 			<input type="submit" value="Assign" name="permissions"/>
@@ -32,7 +34,9 @@
 			
 			$("#id_klp_PermissionForm").submit(function(){
 				KLP_Hide_Msg();
+				NFDo('stop');
 				isValid = $("#id_klp_PermissionForm").valid();
+				NFDo('start');
 				if (isValid){
 					$.post(
 						'/assign/permissions/',
@@ -53,5 +57,23 @@
 				}
 			});
 		});
+		var checkAll = function(){
+			allCheckboxes = $('input[name=instName]:unchecked');
+			NFDo('stop');
+			allCheckboxes.each(function(index){
+				$(this).attr("checked", "true")
+			});
+			NFDo('start');
+		}
+
+		var unCheckAll = function(){
+			allCheckboxes = $('input[name=instName]:checked')
+			NFDo('stop');
+			allCheckboxes.each(function(index){
+				$(this).removeAttr("checked");
+			});
+			NFDo('start');
+	
+		}
 	</script>
 </div>

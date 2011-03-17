@@ -428,6 +428,8 @@ class TemplateResponder(object):
         			return render_to_response(template_name, {'form':form, 'update':True, self.template_object_name:elem, 'extra_context':self.extra_context})
 			elif buttonType == 'save and add another':
 				self.extra_context['prevousId'] = obj.id
+				if form_class == Question_Form:
+					self.extra_context['order'] = len(Question.objects.filter(assessment__id=self.extra_context['referKey']))+1
 				form = ResourceForm(queryset=queryset.model.objects.none())
 			else:
 				if form_class in [Institution_Category_Form, Moi_Type_Form, Institution_Management_Form]:	
@@ -598,6 +600,8 @@ class TemplateResponder(object):
                 		retFormlist = ResourceForm(queryset=queryset.model.objects.filter(pk=obj.id))
                 	elif buttonType == 'save and add another':
                 		self.extra_context['prevousId'] = obj.id
+                		if form_class == Question_Form:
+					self.extra_context['order'] = len(Question.objects.filter(assessment__id=self.extra_context['referKey']))+1
                 		ResourceForm = modelformset_factory(queryset.model, form=form_class,)
                 		form = ResourceForm(queryset=queryset.model.objects.none())
                 		template_name = '%s/%s_form.html' % ('viewtemplates', elem._meta.module_name)

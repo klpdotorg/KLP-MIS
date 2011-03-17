@@ -1,3 +1,4 @@
+from schools.models import *
 def KLP_obj_Perm(sender, **kwargs):
 	userObj = kwargs['user']
 	instObj =  kwargs['instance']
@@ -36,3 +37,17 @@ def KLP_user_Perm(sender, **kwargs):
 			raise Exception("Insufficient Previliges")
 	else:
 		raise Exception("Insufficient Previliges")	
+
+def KLP_NewInst_Permission(sender, instance, created, **kwargs):
+	if created:
+		parentBoundary = instance.boundary
+		inst_list = Institution.objects.filter(boundary=parentBoundary, active=2)
+		users_List =  User.objects.filter(groups__name__in=['Data Entry Executive', 'Data Entry Operator'], is_active=1)
+		lenInst = len(inst_list)
+		for user in users_List:
+			userPerm = []
+			for inst in inst_list:
+				userPerm.append(user.has_any_perms(inst, perms=['Acess']))
+			lenTrue = userPerm.count(True)
+			if lenTrue == lenInst - 1:
+				user.set_perms(['Acess'], instance)		

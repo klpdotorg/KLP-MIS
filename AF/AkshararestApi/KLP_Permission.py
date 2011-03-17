@@ -18,33 +18,37 @@ def KLP_Assign_Permissions(request):
 	check_user_perm.send(sender=None, user=request.user, model='Users', operation=None)
         check_user_perm.connect(KLP_user_Perm)
 	respDict = {}
-	deUser = request.POST.get('assignToUser')
+	deUserList = request.POST.getlist('assignToUser')
 	permissions = request.POST.getlist('userPermission')
 	permissionType = request.POST.get('permissionType')
 	assessmentId = request.POST.get('assessmentId')
-	if not deUser:
+	inst_list = request.POST.getlist('instName')
+	if not deUserList:
 		respDict['respMsg'] = 'Select Atleast One User'
 		respDict['isSuccess'] = False
 	elif not permissions:
 		respDict['respMsg'] = 'Select Atleast One Permission'
 		respDict['isSuccess'] = False
+	elif not inst_list:
+		respDict['respMsg'] = 'Select Atleast One Institution'
+		respDict['isSuccess'] = False	
 	else:
-		inst_list = request.POST.getlist('instName')
-		userObj = User.objects.get(id=deUser)
 		
 		for inst_id in inst_list:
 			instObj = Institution.objects.get(pk=inst_id)
-			if permissionType == 'permissions':
-				userObj.set_perms(permissions, instObj)
-			else:
-				assessmentObj = Assessment.objects.get(pk=assessmentId)
-				try:
-					permObj = UserAssessmentPermissions(user = userObj, instituion = instObj, assessment = assessmentObj, access=True)
-					permObj.save()
-				except:
-					permObj = UserAssessmentPermissions.objects.get(user = userObj, instituion = instObj, assessment = assessmentObj)
-					permObj.access = True
-					permObj.save()
+			for deUser in deUserList:
+				userObj = User.objects.get(id=deUser)
+				if permissionType == 'permissions':
+					userObj.set_perms(permissions, instObj)
+				else:
+					assessmentObj = Assessment.objects.get(pk=assessmentId)
+					try:
+						permObj = UserAssessmentPermissions(user = userObj, instituion = instObj, assessment = assessmentObj, access=True)
+						permObj.save()
+					except:
+						permObj = UserAssessmentPermissions.objects.get(user = userObj, instituion = instObj, assessment = assessmentObj)
+						permObj.access = True
+						permObj.save()
 		respDict['respMsg'] = 'Assigned Permissions successfully'
 		respDict['isSuccess'] = True
 	
