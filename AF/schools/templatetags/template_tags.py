@@ -10,31 +10,6 @@ register = template.Library()
 def KLPrange(value):  
     return range(value)
 
-@register.filter(name='getAssessmentQuestions')
-def getAssessmentQuestions(obj, resp): 
-    try:
-        if resp == 'length':
-            return len(Question.objects.filter(assessment=obj, active=2))
-        else: 
-            return Question.objects.filter(assessment=obj, active=2)
-    except:        
-        pass      
-        
-@register.filter(name='getAnswers')        
-def getAnswers(obj, student):
-    try:
-        ans_list = Answer.objects.filter(question__assessment=obj, student=student)
-        return ans_list
-    except:
-        pass          
-        
-@register.filter(name='getAssessments')        
-def getAssessments(filter_id):
-    try:
-        Assessment_list = Assessment.objects.filter(programme__id=filter_id) 
-        return Assessment_list    
-    except:
-        pass
         
 @register.filter(name='displayValue')        
 def displayValue(dictionary, key):
@@ -68,16 +43,14 @@ def getAnswerValue(question, student):
 @register.filter(name='dEStatus')        
 def dEStatus(question, student): 
 	try:
-		ansObj = Answer.objects.get(question=question, student=student)
-		return ansObj.doubleEntry
+		return Answer.objects.filter(question=question, student=student).values_list("doubleEntry", flat=True)[0]
 	except:
-		return ''
+		return 0
 		
 @register.filter(name='firstUser')        
 def firstUser(question, student): 
 	try:
-		ansObj = Answer.objects.get(question=question, student=student)
-		return ansObj.user1.id
+		return Answer.objects.filter(question=question, student=student).values_list("user1__id", flat=True)[0]
 	except:
 		return ''        
         

@@ -84,27 +84,26 @@ def KLP_Institution_Boundary(request, boundary_id, permissionType, assessment_id
 		users = User.objects.filter(groups__name__in=['Data Entry Executive', 'Data Entry Operator'], is_active=1)
 		boundaryObj = Boundary.objects.get(id=boundary_id)
 		respDict = {'users':users, 'boundary':boundaryObj, 'permissionType':permissionType}
-		boundaryCat = boundaryObj.boundary_category
+		bound_cat = boundaryObj.boundary_category.boundary_category.lower()
+		respDict['bound_cat'] = bound_cat
 		if permissionType == 'permissions':
-			if boundaryCat.boundary_category.lower() == 'district':
-				inst_list = Institution.objects.filter(boundary__parent__parent = boundaryObj, active=2).distinct()
-			elif boundaryCat.boundary_category.lower() in [ 'block', 'project']:
-				inst_list = Institution.objects.filter(boundary__parent = boundaryObj, active=2).distinct() 
+			if bound_cat in ['district', 'block', 'project']:
+				respDict['boundary_list'] = Boundary.objects.filter(parent = boundaryObj, active=2).distinct()
 			else:
-				inst_list = Institution.objects.filter(boundary = boundaryObj, active=2).distinct()
+				respDict['institution_list'] = Institution.objects.filter(boundary = boundaryObj, active=2).distinct()
 		else:
 			studentgroup_list = Assessment_StudentGroup_Association.objects.filter(assessment__id=assessment_id, active=2).values_list('student_group', flat=True).distinct()
 			map_institutions_list = StudentGroup.objects.filter(id__in=studentgroup_list, active=2).values_list('institution__id', flat=True).distinct()
-			if boundaryCat.boundary_category.lower() == 'district':
-				inst_list = Institution.objects.filter(id__in=map_institutions_list, boundary__parent__parent=boundaryObj, active=2).distinct() 
-			elif boundaryCat.boundary_category.lower() in [ 'block', 'project']:
-				inst_list = Institution.objects.filter(id__in=map_institutions_list, boundary__parent = boundaryObj, active=2).distinct()
+			if bound_cat == 'district':
+				boundary_list = Boundary.objects.filter(institution__pk__in=map_institutions_list, active=2, parent__parent=boundaryObj).values_list('parent__id', flat=True).distinct()
+				respDict['boundary_list'] = Boundary.objects.filter(id__in=boundary_list, active=2).distinct()
+			elif bound_cat in [ 'block', 'project']:
+				respDict['boundary_list'] = Boundary.objects.filter(institution__pk__in=map_institutions_list, active=2, parent=boundaryObj).distinct()
 			else:
-				inst_list = Institution.objects.filter(id__in=map_institutions_list, boundary = boundaryObj, active=2).distinct()
+				respDict['institution_list'] = Institution.objects.filter(id__in=map_institutions_list, boundary = boundaryObj, active=2).distinct()
 			respDict['assessmentId'] = assessment_id
 			
-		val=Collection(inst_list, permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'institution', extra_context=respDict), entry_class = ChoiceEntry, )
-		return HttpResponse(val(request))	
+		return render_to_response('viewtemplates/institution_list.html', respDict)
 	else:
 		return HttpResponse('Insufficient Priviliges!')	    
 

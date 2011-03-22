@@ -1,8 +1,20 @@
 <div>
-	<span style="color:#75AD0A;font-size:12px;font-weight:bold;padding:5px;">{%if boundary.boundary_type.boundary_type|lower == 'pre-school' %} Anganwadis {% else %} Institutions {% endif %} Under {{boundary.name}}</span>
+	<span style="color:#75AD0A;font-size:12px;font-weight:bold;padding:5px;">
+		{%if boundary.boundary_type.boundary_type|lower == 'pre-school' %}
+			{%if boundary.boundary_category.boundary_category|lower == 'district' %} Projects {% endif %}
+			{%if boundary.boundary_category.boundary_category|lower == 'project' %} Circles {% endif %}
+			{%if boundary.boundary_category.boundary_category|lower == 'circle'%} Anganwadis {% endif %}
+		{% else %}
+			{%if boundary.boundary_category.boundary_category|lower == 'district' %} Blocks {% endif %}
+			{%if boundary.boundary_category.boundary_category|lower == 'block' %} Clusters {% endif %}
+			{%if boundary.boundary_category.boundary_category|lower == 'cluster'%} Institutions {% endif %}
+			  
+		{% endif %} Under {{boundary.name}}
+	</span>
 	<form name="klp_PermissionForm" id="id_klp_PermissionForm" onsubmit="return false;" class="niceform">
 		<input type="hidden" name="permissionType" value="{{permissionType}}" />
 		<input type="hidden" name="assessmentId" value="{{assessmentId}}" />
+		<input type="hidden" name="bound_cat" id="id_BoundCat" value="{{bound_cat}}" />
 		<div style="float:left;width:100%; padding:5px;">
 		<span style="float:left;width:100%;color:#000;font-weight:bold;">
 			Select <span style="cursor:pointer;color:#1569C7;" onclick="checkAll()">All</span> / <span style="cursor:pointer;color:#1569C7;" onclick="unCheckAll()">None</span>
@@ -10,6 +22,12 @@
 		{% for inst in institution_list %}
 			<span style="float:left;width:100%;color:#000;font-weight:bold;">
 				<input type="checkbox" name="instName" value="{{inst.id}}" />  {{inst.name}}
+			</span>
+		{% endfor %}
+		{% for boundary in boundary_list %}
+			<span style="float:left;width:100%;color:#000;font-weight:bold;">
+				<input type="checkbox" name="boundaryName" value="{{boundary.id}}" />  {{boundary.name}} 
+				
 			</span>
 		{% endfor %}
 		</div>
@@ -58,8 +76,12 @@
 			});
 		});
 		var checkAll = function(){
-			allCheckboxes = $('input[name=instName]:unchecked');
+			bound_cat = $("#id_BoundCat").val();
 			NFDo('stop');
+			if (bound_cat == 'cicrle' || bound_cat == 'cluster')
+				allCheckboxes = $('input[name=instName]:unchecked');				
+			else
+				allCheckboxes = $('input[name=boundaryName]:unchecked');
 			allCheckboxes.each(function(index){
 				$(this).attr("checked", "true")
 			});
@@ -67,8 +89,12 @@
 		}
 
 		var unCheckAll = function(){
-			allCheckboxes = $('input[name=instName]:checked')
+			bound_cat = $("#id_BoundCat").val();
 			NFDo('stop');
+			if (bound_cat == 'cicrle' || bound_cat == 'cluster')
+				allCheckboxes = $('input[name=instName]:checked')
+			else
+				allCheckboxes = $('input[name=boundaryName]:checked');
 			allCheckboxes.each(function(index){
 				$(this).removeAttr("checked");
 			});
