@@ -82,32 +82,33 @@ def KLP_DataValidation(request):
     validateValue = request.POST.get('validateValue')
     listIds = validateId.split('_')
     ansObj = Answer.objects.get(student__id=listIds[1], question__id=listIds[2])
-    respStr = 'Data mismatch'
+    #respStr = 'Data mismatch'
+    respStr = False
     dEntry = int(ansObj.doubleEntry)
     if dEntry in [0,2]:
-    	respStr = 'true'
+    	respStr = True
     else:
     	if validateValue:
 	    	if validateValue.lower() == 'ab':
 	    		if ansObj.status == -99999:
-	    			respStr = 'true'
+	    			respStr = True
 	    	elif validateValue.lower() == 'uk':
 	    		if ansObj.status == -1:
-	    			respStr = 'true'
+	    			respStr = True
 	    	elif ansObj.question.questionType == 2:
 	    	    try:
 		    	    if ansObj.answerGrade.lower() == validateValue.lower():
-		    	        respStr = 'true'
+		    	        respStr = True
 		    except:
 		    	pass
 	    	else:
 	    	    try:
 		    	    if float(ansObj.answerScore) == float(validateValue):
-		    	        respStr = 'true'
+		    	        respStr = True
 	    	    except:
 	    	    	pass
 	else:
-		respStr = 'false'	
+		respStr = False
     return HttpResponse(simplejson.dumps(respStr))
 
         

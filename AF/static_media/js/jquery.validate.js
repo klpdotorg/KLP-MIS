@@ -255,12 +255,12 @@ $.extend($.validator, {
 
 	messages: {
 		required: "This field is required.",
-		remote: "Please fix this field.",
+		remote: "Data mismatch",
 		email: "Please enter a valid email address.",
 		url: "Please enter a valid URL.",
 		date: "Please enter a valid date.",
 		dateISO: "Please enter a valid date (ISO).",
-		number: "Please enter a valid number.",
+		number: "Digits or AB or UK.",
 		digits: "Digits or AB or UK",
 		letters: "Alphabets or AB or UK",
 		creditcard: "Please enter a valid credit card number.",
@@ -622,8 +622,7 @@ $.extend($.validator, {
 		
 		showLabel: function(element, message) {
 			var label = this.errorsFor( element );
-			if (message == 'true')
-			       message=''
+			
 			if ( label.length ) {
 				// refresh error/success class
 				label.removeClass().addClass( this.settings.errorClass );
@@ -1029,7 +1028,12 @@ $.extend($.validator, {
 	
 		// http://docs.jquery.com/Plugins/Validation/Methods/number
 		number: function(value, element) {
-			return this.optional(element) || /^-?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$/.test(value);
+			if (value.toLowerCase() == 'ab' || value.toLowerCase() == 'uk'){
+				return true
+			}
+			else{
+				return this.optional(element) || /^-?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$/.test(value);
+			}
 		},
 	
 		// http://docs.jquery.com/Plugins/Validation/Methods/digits
