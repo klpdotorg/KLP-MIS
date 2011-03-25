@@ -104,7 +104,7 @@
 			                					
 			            							</td>
 			            							{% if forloop.last %}
-			            								<td class="KLP_td_height"> <input type="submit" tabindex="1"   value="submit"  {%if ques|firstUser:firstStud == user.id and ques|dEStatus:firstStud > 1 or ques|dEStatus:firstStud == 2%}disabled{%endif%}/>       
+			            								<td class="KLP_td_height"> <input id="id_Student_{{firstStud.id}}_submit" type="submit" tabindex="1"   value="submit"  {%if ques|firstUser:firstStud == user.id and ques|dEStatus:firstStud > 1 or ques|dEStatus:firstStud == 2%}disabled{%endif%}/>       
 			            								
 			            								<script>
 													$().ready(function() {

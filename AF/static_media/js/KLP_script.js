@@ -249,11 +249,14 @@ var KLP_BredaCrumb = function(currentObj){
 
 
 var KLP_validateScript=function(formId){
+        
  	$('#'+formId).validate({
       		submitHandler: function(){
+      			$("#"+formId+"_submit").hide();
       			formName = formId;
 	             	form=$('#'+formName)
 	             	count = 0
+	             	
         		var txtFields = $(form).find("input[type=text]:visible");
         	        DeFlag=false		
        			txtFields.each(function(index){
@@ -269,11 +272,17 @@ var KLP_validateScript=function(formId){
        			});
        			if (DeFlag == true && count == txtFields.length){ 
        			    errLength = $('label.error:visible').length
-       			    if (errLength == 0)
+       			    if (errLength == 0){
 			   		KLP_post_script(form,formName)
+			    }
+			    else{
+			    	$("#"+formId+"_submit").show();
+			    }		
 	       		   }
-	       		else
+	       		else{
 	       		       KLP_post_script(form,formName)
+	       		       $("#"+formId+"_submit").show();
+	       		}
 	       		
     		}	
       });
