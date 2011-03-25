@@ -16,7 +16,14 @@ def displayValue(dictionary, key):
     try:
         return dictionary[key]
     except:
-        pass        
+        pass     
+        
+@register.filter(name='assesmentUpdation')        
+def assesmentUpdation(dictionary, key):
+    try:
+        return dictionary[key+'_u']
+    except:
+        pass                
 
 @register.filter(name='getAnswer')        
 def getAnswer(question, student):

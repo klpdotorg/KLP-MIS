@@ -61,12 +61,27 @@ def  KLP_dEHistory(request):
     	strDate = startDate.split('-')
     	enDate = endDate.split('-')
     	deDict = {}
+    	activePrgs = Programme.objects.filter(active=2).values_list("id", flat=True)
+    	assessments = Assessment.objects.filter(programme__id__in=activePrgs, active=2).distinct()
+    	respDict['assessments'] = assessments
     	for user in userList:
     		actDict = {}
     		for content in contentList:
     			contObj = ContentType.objects.get(app_label='schools', name=content)
     			actDict[content+'_c'] = len(FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, content_type__id=contObj.id, action='C'))
     			actDict[content+'_u'] = len(FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, content_type__id=contObj.id, action='U'))
+    		for assessment in assessments:
+    			questions = Question.objects.filter(assessment = assessment,active=2).values_list("id", flat=True).distinct()
+    			answers = Answer.objects.filter(question__id__in=questions).values_list("id", flat=True).distinct()
+    			if len(answers) == 0:
+    				actDict[assessment.name] = 0
+    				actDict[assessment.name+'_u'] = 0
+    			else:	
+    				nList = [i for i in answers]
+    				actDict[assessment.name] = len(FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, object_id__in=nList, action='C'))
+    			 	actDict[assessment.name+'_u'] = len(FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, object_id__in=nList, action='U', _data__icontains='answer'))
+    			
+    		
     		deDict[user.username]=actDict
     	respDict['deDict'] = deDict
     	return render_to_response('viewtemplates/dEHistory.html',respDict,context_instance=RequestContext(request)) 

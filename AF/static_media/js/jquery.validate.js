@@ -940,6 +940,7 @@ $.extend($.validator, {
 					type: "POST",
 					url: param,
 					mode: "abort",
+					async: false,
 					port: "validate" + element.name,
 					dataType: "json",
 					data: data,

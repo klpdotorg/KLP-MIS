@@ -6,7 +6,7 @@
   <div style="padding:10px 0px 10px 0px;">
   	<a href="{% if user.is_superuser %}/home/ {% endif %}"> << Click Here</a> to go Back
   </div>
-  <div style="width:90%;text-align:center;min-height:200px;">
+  <div style="width:90%;text-align:center;min-height:200px;overflow:auto;">
     <form action="." method="post">{% csrf_token %}     
     	<div style="padding:10px 0px 20px 0px;">   	    	        	
 		<table>
@@ -28,12 +28,16 @@
         		<table border="0" cellpadding="0" cellspacing="0" style="text-align:center;width:100%">
         			<th class="tot-border3">Sl.No</th>
         			<th class="tot-border3">User</th>
-        			<th class="tot-border3">sch_created</th>
-        			<th class="tot-border3">sch_mod</th>
-        			<th class="tot-border3">stud_created</th>
-        			<th class="tot-border3">stud_mod</th>
-        			<th class="tot-border3">teacher_created</th>
-        			<th class="tot-border3">teacher_mod</th>
+        			<th class="tot-border3">sch created</th>
+        			<th class="tot-border3">sch mod</th>
+        			<th class="tot-border3">stud created</th>
+        			<th class="tot-border3">stud mod</th>
+        			<th class="tot-border3">teacher created</th>
+        			<th class="tot-border3">teacher mod</th>
+        			{% for assessment in assessments %}
+        				<th class="tot-border3">{{assessment}}</th>
+        				<th class="tot-border3">{{assessment}} DE</th>
+        			{% endfor %}
         			{% for username,data in deDict.iteritems %}
         				<tr>
 						<td class="tot-border1">{{forloop.counter}}</td>
@@ -44,6 +48,10 @@
 						<td class="tot-border1">{{data|displayValue:'student_u'}}</td>
 						<td class="tot-border1">{{data|displayValue:'staff_c'}}</td>
 						<td class="tot-border1">{{data|displayValue:'staff_u'}}</td>
+						{% for assessment in assessments %}
+        						<td class="tot-border1">{{data|displayValue:assessment.name}}</td>
+        						<td class="tot-border1">{{data|assesmentUpdation:assessment.name}}</td>
+        					{% endfor %}
 					</tr>
         			{% endfor %}
         		</table>

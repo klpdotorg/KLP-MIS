@@ -227,6 +227,7 @@
 		        		<a href="/list/users/"> List Users</a> 
 		        	{% endif %} 
 		        	{% if user.is_superuser or 'AdminGroup' in usergroups %} | <a href='/audit/trial'>Audit Trial </a>{% endif %}
+		        	{% if user.is_superuser or 'AdminGroup' in usergroups %} | <a href='/dEHistory/'>DEO History </a>{% endif %}
 		        </div>
 		</div>
             {% endif %}

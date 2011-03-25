@@ -253,23 +253,24 @@ var KLP_validateScript=function(formId){
       		submitHandler: function(){
       			formName = formId;
 	             	form=$('#'+formName)
+	             	count = 0
         		var txtFields = $(form).find("input[type=text]:visible");
         	        DeFlag=false		
        			txtFields.each(function(index){
        				isDE = $(this).attr("dE");
-       				
+       				tempAt = "#"+$(this).attr("id");
        				if (isDE == "true"){
        				        DeFlag=true;
        					$(this).attr("remote", "/answer/data/validation/");
+       					count = count + 1
+       					form.validate().element(tempAt);
        				}
+       				
        			});
-       			if (DeFlag){ 
-       			    $(form).valid();
-       			
-       			    $(form).submit(function(){
-       				KLP_post_script(form,formName)
-	       			
-	       		       });
+       			if (DeFlag == true && count == txtFields.length){ 
+       			    errLength = $('label.error:visible').length
+       			    if (errLength == 0)
+			   		KLP_post_script(form,formName)
 	       		   }
 	       		else
 	       		       KLP_post_script(form,formName)
