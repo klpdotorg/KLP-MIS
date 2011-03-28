@@ -70,6 +70,7 @@ class KLP_ChangeAns(Resource):
         				ansObj.answerGrade = textFieldVal
         			else:
         				ansObj.answerScore = textFieldVal
+        			ansObj.lastmodifiedBy = user	
         			ansObj.user1 = user
         			ansObj.save()
 	        

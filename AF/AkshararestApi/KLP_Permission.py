@@ -25,7 +25,8 @@ def KLP_Assign_Permissions(request):
 	bound_cat = request.POST.get('bound_cat')
 	inst_list = request.POST.getlist('instName')
 	bound_list = request.POST.getlist('boundaryName')
-	count = 0
+	assessmentPerm = request.POST.get('assessmentPerm')
+	count, asmCount = 0, 0
 	if not deUserList:
 		respDict['respMsg'] = 'Select Atleast One User'
 		respDict['isSuccess'] = False
@@ -41,13 +42,18 @@ def KLP_Assign_Permissions(request):
 				for bound in bound_list:
 					inst_list = Institution.objects.filter(boundary__parent__id = bound, active=2).values_list('id', flat=True).distinct()
 					count = count + len(inst_list)
-					assignPermission(inst_list, deUserList, permissions, permissionType, assessmentId)
+					aCount = assignPermission(inst_list, deUserList, permissions, permissionType, assessmentId, assessmentPerm)
+					asmCount = asmCount + aCount
 			elif bound_cat in [ 'block', 'project']:
 				for bound in bound_list:
 					inst_list = Institution.objects.filter(boundary__id = bound, active=2).values_list('id', flat=True).distinct() 
 					count = count + len(inst_list)
-					assignPermission(inst_list, deUserList, permissions, permissionType, assessmentId)
-			respDict['respMsg'] = 'Assigned Permissions successfully for %s Institutions' %(count)
+					aCount = assignPermission(inst_list, deUserList, permissions, permissionType, assessmentId, assessmentPerm)
+					asmCount = asmCount + aCount
+			if assessmentPerm:
+				respDict['respMsg'] = 'Assigned Permissions successfully for %s Institutions  and %s Assessments Assigned successfully' %(count, asmCount)
+			else:
+				respDict['respMsg'] = 'Assigned Permissions successfully for %s Institutions' %(count)
 			respDict['isSuccess'] = True
 		
 	else:
@@ -55,8 +61,12 @@ def KLP_Assign_Permissions(request):
 			respDict['respMsg'] = 'Select Atleast One Institution'
 			respDict['isSuccess'] = False				
 		else:
-			status = assignPermission(inst_list, deUserList, permissions, permissionType, assessmentId)
-			respDict['respMsg'] = 'Assigned Permissions successfully for  %s Institutions' %(count)
+			aCount = assignPermission(inst_list, deUserList, permissions, permissionType, assessmentId, assessmentPerm)
+			asmCount = asmCount + aCount
+			if assessmentPerm:
+				respDict['respMsg'] = 'Assigned Permissions successfully for  %s Institutions and %s Assessments Assigned successfully' %(count, asmCount)
+			else:
+				respDict['respMsg'] = 'Assigned Permissions successfully for  %s Institutions' %(count)
 			respDict['isSuccess'] = True
 	if count == 0:
 		respDict['respMsg'] = 'No Institutions Found to Assign Permissions'
@@ -64,13 +74,27 @@ def KLP_Assign_Permissions(request):
 	
 	return HttpResponse(simplejson.dumps(respDict), content_type='application/json; charset=utf-8')	
 	
-def assignPermission(inst_list, deUserList, permissions, permissionType, assessmentId=None):
+def assignPermission(inst_list, deUserList, permissions, permissionType, assessmentId=None, assessmentPerm=None):
+	count = 0
 	for inst_id in inst_list:
 		instObj = Institution.objects.get(pk=inst_id)
 		for deUser in deUserList:
 			userObj = User.objects.get(id=deUser)
 			if permissionType == 'permissions':
 				userObj.set_perms(permissions, instObj)
+				if assessmentPerm:
+					sg_list = StudentGroup.objects.filter(institution__id=inst_id).values_list('id', flat=True).distinct()
+					asmIds = Assessment_StudentGroup_Association.objects.filter(student_group__id__in= sg_list, active=2).values_list("assessment__id", flat=True).distinct()
+					for asmId in asmIds:
+						assessmentObj = Assessment.objects.get(id=asmId)
+						try:
+							permObj = UserAssessmentPermissions(user = userObj, instituion = instObj, assessment = assessmentObj, access=True)
+							permObj.save()
+						except:
+							permObj = UserAssessmentPermissions.objects.get(user = userObj, instituion = instObj, assessment = assessmentObj)
+							permObj.access = True
+							permObj.save()
+					count = len(asmIds)
 			else:
 				assessmentObj = Assessment.objects.get(pk=assessmentId)
 				try:
@@ -80,7 +104,7 @@ def assignPermission(inst_list, deUserList, permissions, permissionType, assessm
 					permObj = UserAssessmentPermissions.objects.get(user = userObj, instituion = instObj, assessment = assessmentObj)
 					permObj.access = True
 					permObj.save()
-	return 'success'	
+	return count	
 
 def KLP_Users_list(request):
 	user = request.user

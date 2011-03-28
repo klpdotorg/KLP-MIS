@@ -31,7 +31,7 @@
 			</span>
 		{% endfor %}
 		</div>
-		<div style="float:left;width:45%;padding:20px 5px 5px 5px;">
+		<div style="float:left;width:35%;padding:20px 5px 5px 5px;">
 			<span style="color:#75AD0A;font-size:12px;font-weight:bold;width:100%;text-align:center;padding:5px;">Select User</span><br/>
 			<select name="assignToUser" id="id_assignToUser" multiple="true"  >
 				{% for dEUser in users %}
@@ -39,10 +39,16 @@
 				{% endfor %}
 			</select>
 		</div>
-		<div style="float:left;width:45%;padding:20px 5px 5px 5px;">
+		<div style="float:left;width:35%;padding:20px 5px 5px 5px;">
 			<span style="color:#75AD0A;font-size:12px;font-weight:bold;width:100%;text-align:center;padding:5px;">Select Permission</span><br/>
 			<input type="checkbox" name="userPermission" value="Acess" minlength=1 checked="true"/> Acess <br/>
 		</div>
+		{% if not assessmentId %}
+		<div style="float:left;width:20%;padding:20px 5px 5px 5px;">
+			<span style="color:#75AD0A;font-size:12px;font-weight:bold;width:100%;text-align:center;padding:5px;">Assign assessments also</span><br/>
+			<input type="checkbox" name="assessmentPerm" value="True" minlength=1 /> Acess <br/>
+		</div>
+		{% endif %}
 		<div style="float:left;width:100%;padding:20px 5px 5px 5px;">
 			<input type="submit" value="Assign" name="permissions"/>
 		</div>
