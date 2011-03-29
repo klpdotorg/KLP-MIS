@@ -18,7 +18,7 @@ def KLP_user_Perm(sender, **kwargs):
 	operation = kwargs['operation']
 	klp_UserGroups = userObj.groups.all()
 	user_GroupsList = ['%s' %(str(usergroup.name)) for usergroup in klp_UserGroups]
-	if userObj.id != None or userObj.is_active: 
+	if userObj.is_active: 
 		if userObj.is_superuser:
 			pass
 		elif 'AdminGroup' in user_GroupsList:
