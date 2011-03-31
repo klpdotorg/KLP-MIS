@@ -1,10 +1,5 @@
 {% load template_tags %}
-{% if  extra_context|displayValue:'replaceTrue'%}
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>{{title}}</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<div id="popData">
 <script type="text/javascript" src="/static_media/js/jquery.js"></script>
 <script language="javascript" type="text/javascript" src="/static_media/js/niceforms.js"></script>
 <script type="text/javascript" src="/static_media/js/thickbox.js" charset="utf-8"></script>
@@ -13,24 +8,7 @@
 <link rel="stylesheet" type="text/css" media="all" href="/static_media/css/thickbox.css" charset="utf-8"/>
 <link rel="stylesheet" type="text/css" media="all" href="/static_media/css/form.css" />
 <link rel="stylesheet" type="text/css" media="all" href="/static_media/css/style.css" />
-</head>
-
-<body>
-<div id="container">
-
-{% if entry == "Add" %}
-<fieldset>
-    <legend>{{legend}}</legend>
-{% else %}
-<div class="tablebg">
-{% endif %}
-{% endif %}
-<div id="popData">
-<div class="detailHead">
-<span class="hedText">Entry Form</span>
-</div>
-
-<form action="." method="POST" enctype="multipart/form-data" id="childForm" onsubmit="return false;" class="niceform">{% csrf_token %}
+<form action="." method="POST" enctype="multipart/form-data" id="childForm" onsubmit="return false;" >{% csrf_token %}
 			    {% if not extra_context|displayValue:'modelName' %}
                             <input type="hidden" name="url" value="/boundary/{{extra_context|displayValue:'referKey'}}/child/creator/" id="url" />
 			    {% else %}
@@ -48,178 +26,148 @@
 				{% for entryForm in form.forms %}
 
 				<tr>
-				    <td><label class="KLP_required">First Name:</label></td>
-				    <td>
+				    <td align="center"><label class="KLP_required">First Name:</label></td>
+				    <td align="center"><label>Middle Name:</label></td>
+				    <td align="center"><label>Last Name:</label></td>
+				    <td align="center"><label>UID:</label></td>
+				    <td align="center"><label>Other Studnet Id:</label></td>
+				    <td align="center" style="min-width:200px;max-width:200px"><label class="KLP_required">Date of Birth:</label></td>
+				    <td align="center"><label class="KLP_required">Gender:</label></td>
+				    <td align="center"><label class="KLP_required">Mother Tongue:</label></td>
+				    <td align="center">&nbsp;</td>
+				    <td align="center"><label class="KLP_required">Mother First Name:</label></td>
+				    <td align="center"><label>Mother Middle Name:</label></td>
+				    <td align="center"><label>Mother Last Name:</label></td>
+				    <td align="center"><label class="KLP_required">Father First Name:</label></td>
+				    <td align="center"><label>Father Middle Name:</label></td>
+				    <td align="center"><label>Father Last Name :</label></td>
+				    <td align="center">&nbsp;</td>
+				</tr>
+				<tr>
+				    <td align="center">
 					{% render_field entryForm.firstName 'tabindex=1' %}
 				    </td>
-				    <td>
-                                    	{% for error in entryForm.firstName.errors %}
-	                                	<span class="editErr">{{ error }}</span>
-	                                {% endfor %}
-                                    </td>
-				</tr>
-				<tr>
-				    <td><label>Middle Name:</label></td>
-				    <td>
-					{% render_field entryForm.middleName 'tabindex=2' %}
+				    <td align="center">
+					{% render_field entryForm.middleName 'tabindex=1' %}
 				    </td>
-				    <td>
-                                    	{% for error in entryForm.middleName.errors %}
-	                                	<span class="editErr">{{ error }}</span>
-	                                {% endfor %}
-                                    </td>
-				</tr>
-				<tr>
-				    <td><label>Last Name:</label></td>
-				    <td>
-					{% render_field entryForm.lastName 'tabindex=3' %}
+				    <td align="center">
+					{% render_field entryForm.lastName 'tabindex=1' %}
 				    </td>
-				    <td>
-                                    	{% for error in entryForm.lastName.errors %}
-	                                	<span class="editErr">{{ error }}</span>
-	                                {% endfor %}
-                                    </td>
-				</tr>
-				<tr>
-				    <td><label>UID:</label></td>
-				    <td>
-					{% render_field entryForm.uid 'tabindex=3' %}
+				    <td align="center">
+					{% render_field entryForm.uid 'tabindex=1' %}
 				    </td>
-				    <td>
-                                    	{% for error in entryForm.uid.errors %}
-	                                	<span class="editErr">{{ error }}</span>
-	                                {% endfor %}
-                                    </td>
-				</tr>
-				<tr>
-				    <td><label>Other Student Id:</label></td>
-				    <td>
-					<input type="text" name="form-0-otherId" id="id_form-0-otherId" value="" tabindex=3 />
+				    <td align="center">
+					<input type="text" name="form-0-otherId" id="id_form-0-otherId" value="" tabindex=1 size="3"/>
 				    </td>
-				    
-				</tr>
-				<tr>
-				    <td><label class="KLP_required">Date of Birth:</label></td>
-				    <td>
-					{% render_field entryForm.dob 'tabindex=4' %}
+				    <td align="center" style="min-width:200px;max-width:200px">
+					{% render_field entryForm.dob 'tabindex=1' %}
 				    </td>
-				    <td>
-                                    	{% for error in entryForm.dob.errors %}
-	                                	<span class="editErr">{{ error }}</span>
-	                                {% endfor %}
-                                    </td>
-				</tr>
-				<tr>
-				    <td><label class="KLP_required">Gender:</label></td>
-				    <td>
-					{% render_field entryForm.gender 'tabindex=5' %}
+				    <td align="center">
+					{% render_field entryForm.gender 'tabindex=1' %}
 				    </td>
-				    <td>
-                                    	{% for error in entryForm.gender.errors %}
-	                                	<span class="editErr">{{ error }}</span>
-	                                {% endfor %}
-                                    </td>
-				</tr>
-				<tr>
-				    <td><label class="KLP_required">Mother Tongue:</label></td>
-				    <td>
-					{% render_field entryForm.mt 'tabindex=6' %}
+				    <td align="center">
+					{% render_field entryForm.mt 'tabindex=1' %}
 					<input type="hidden" name="form-0-child" id="id_child" size="15" value=""/>
 					<input type="hidden" name="form-0-boundary" id="id_boundary" size="15" value="{{extra_context|displayValue:'referKey'}}"/>
 					<input type="hidden" name="form-0-active" id="id_active" size="15" value="2"/>
 					<input type="hidden" name="ModelName" id = "model" value="{{extra_context|displayValue:'modelName'}}" />
 				    </td>
-				    <td>
+				    <td align="center">&nbsp;</td>
+				    <td align="center">
+					<input type="text" name = "form-0-motherfirstname" id="id_form-0-motherfirstname" tabindex='1' size=8/>
+				    </td>
+				    <td align="center">
+					<input type="text" name = "form-0-mothermiddlename" id="id_form-0-mothermiddlename" tabindex='1' size=8/>
+				    </td>
+				    <td align="center">
+					<input type="text" name = "form-0-motherlastname" id="id_form-0-motherlastname" tabindex='1' size=8/>
+				    </td>
+				    <td align="center">
+					<input type="text" name = "form-0-fatherfirstname" id="id_form-0-fatherfirstname" tabindex='1' size=8/>
+					
+				    </td>
+				    <td align="center">
+					<input type="text" name = "form-0-fathermiddlename" id="id_form-0-fathermiddlename" tabindex='1' size=8/>
+					
+				    </td>
+				    <td align="center">
+					<input type="text" name = "form-0-fatherlastname" id="id_form-0-fatherlastname" tabindex='1' size=8/>
+					
+				    </td>
+				    <td align="center">
+				    	<input type="hidden" name="counter" id="id_counter" value="{{extra_context|displayValue:'counter'}}"/>
+                                    	<input type="submit" name="save" id="id_save" value="Save" tabindex="1"/>
+                                    </td>
+				</tr>
+				<tr>
+				   <td align="center">
+                                    	{% for error in entryForm.firstName.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+				    <td align="center">
+                                    	{% for error in entryForm.middleName.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+				    
+				    <td align="center">
+                                    	{% for error in entryForm.lastName.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+                                    <td align="center">
+                                    	{% for error in entryForm.uid.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+                                    <td align="center">&nbsp;</td>
+                                    <td align="center">
+                                    	{% for error in entryForm.dob.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+                                    <td align="center">
+                                    	{% for error in entryForm.gender.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+                                    <td align="center">
                                     	{% for error in entryForm.mt.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
                                     </td>
-				</tr>
-				<tr>
-				    <td>&nbsp;</td>
-				    <td>
+                                    <td align="center">&nbsp;</td>
+                                    <td align="center" colspan="5">
                                     	{% for error in entryForm.first_name.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
                                     </td>
-				</tr>
-
-			  	<tr>
-				    <td><label class="KLP_required">Mother First Name:</label></td>
-				    <td>
-					<input type="text" name = "form-0-motherfirstname" id="id_form-0-motherfirstname" tabindex='7' />
-				    </td>
-				</tr>
-				<tr>
-				    <td><label>Mother Middle Name:</label></td>
-				    <td>
-					<input type="text" name = "form-0-mothermiddlename" id="id_form-0-mothermiddlename" tabindex='7' />
-				    </td>
-				</tr>
-				<tr>
-				    <td><label>Mother Last Name:</label></td>
-				    <td>
-					<input type="text" name = "form-0-motherlastname" id="id_form-0-motherlastname" tabindex='7' />
-				    </td>
-				</tr>
-
-				<tr>
-				    <td><label class="KLP_required">Father First Name:</label></td>
-				    <td>
-					<input type="text" name = "form-0-fatherfirstname" id="id_form-0-fatherfirstname" tabindex='8' />
-					
-				    </td>
-				</tr>
-				<tr>
-				    <td><label>Father Middle Name:</label></td>
-				    <td>
-					<input type="text" name = "form-0-fathermiddlename" id="id_form-0-fathermiddlename" tabindex='8' />
-					
-				    </td>
-				</tr>
-				<tr>
-				    <td><label>Father Last Name:</label></td>
-				    <td>
-					<input type="text" name = "form-0-fatherlastname" id="id_form-0-fatherlastname" tabindex='8' />
-					
-				    </td>
-				</tr>
-				{% endfor %}
-                                <tr></tr>
-                    		<tr></tr>
-                    		<tr></tr>
-                    		<tr></tr>
-                    		<tr></tr>
-                                <tr>
-                                    <td>
-                                    	<input type="submit" name="save" id="id_save" value="Save" />
-                                    </td>
                                     
-				    <!--td>{% if not extra_context|displayValue:'modelName'%}
-					<input type="submit" name="save_and_continue" id="id_save_and_continue" value="Save And Continue" />
-				    </td>
-				    <td>
-					<input type="submit" name="save_and_create" id="id_save_and_create" value="Save And Create Another" />{% endif %}
-				    </td-->
-				    
-                                </tr>
+                                    <td align="center">&nbsp;</td>
+				</tr>
+				
+				
+				
+				{% endfor %}
+                                
 				</table>
-        </form>
-</div>
-
-<script>
+				<script>
   $(document).ready(function(){
-    setTimeout(function(){
-		$('input:visible:enabled:first').focus();
-	},200);
+   if ($("#id_counter").val() == '1' || $("#mapStudent").val() == '1'){
+     setTimeout(function(){
+	$('input:visible:enabled:first').focus();
+     },200);
+   } 
 
    var KLP_Hide_Msg = function(){
 	$("#successMsgHead").hide();
         $("#failureMsgHead").hide();
-}
+   }
 
    $("#id_save").click(function(){
 	KLP_Hide_Msg();
+	
 	parentVal = $("#id_boundary").val();
    	$("#id_form-buttonType").val('save');
    	KLP_form_submit(parentVal,'id_boundary');
@@ -243,56 +191,62 @@
     
     
    var KLP_form_submit = function(parentVal,parentId ){
+   	$("#id_save").attr("disabled", "true");
         modelName=$('#model').val();
-        $("#id_save").attr("disabled", "true");
         var studentgroup_id = $('#id_studentgroup').val()
    	$.post(
         	$('#url').val(),
         	$("#childForm").serialize(),
                 function(data){
                     if (data[0] == "{"){
-                    	var data = $.parseJSON(data);
-                    	window.parent.$("#ans_Student_Detail").append(data['detailStr']);
-                    	window.parent.$("#id_ans_data_point").append(data['ansEntryStr']);
-                    	window.parent.$('.blue').bt();
-                    	window.parent.tb_remove();
+                    	var data = $.parseJSON(data)
+                    	//alert(data['detailStr']);
+                    	window.parent.parent.$("#ans_Student_Detail").append(data['detailStr']);
+                    	window.parent.parent.$("#id_ans_data_point").append(data['ansEntryStr']);
+                    	window.parent.parent.$('.blue').bt();
+                    	window.parent.parent.tb_remove();
                     }
                     else{
-		            $("#popData").html(data);
-			    //window.parent.tb_init('a.thickbox, area.thickbox, input.thickbox');
+                    	    //alert("11111");
+		            $("#popData").replaceWith(data);
+		            $("#id_save").removeAttr("disabled");
+		            setTimeout(function(){
+				$('input:visible:enabled:first').focus();
+			    },200);
+			    //window.parent.parent.tb_init('a.thickbox, area.thickbox, input.thickbox');
 			    var successStatus = $("#success_status").val();
-			    $("#id_save").removeAttr("disabled");
 		            if (successStatus == 'True'){
+		            	$("body").html("Student Created Successfully");
 				if (modelName != 'student') {
 					$("#successMsgHead").show();
 					$("#klp_MsgTxt").html("Child Created Successfully")
-					window.parent.tb_remove();
+					//window.parent.parent.tb_remove();
 				}
 				else {
-					var Norecords = parseInt(window.parent.$("#Norecords").val());
-					var lenOfChilds = parseInt(window.parent.$("#id_StudentDetail  tr").length);
-					var resPerPage = parseInt(window.parent.$("#id_resultPerPage").val());
+					var Norecords = parseInt(window.parent.parent.$("#Norecords").val());
+					var lenOfChilds = parseInt(window.parent.parent.$("#id_StudentDetail  tr").length);
+					var resPerPage = parseInt(window.parent.parent.$("#id_resultPerPage").val());
 					if ( resPerPage <= lenOfChilds - 1){
 						KLP_New_Pagination(resPerPage,Norecords,studentgroup_id);
 					}
 					else {
-						window.parent.$('#id_StudentDetail  > tbody:last').append(data);
-						//window.parent.tb_init('#id_StudentDetail a.thickbox, area.thickbox, input.thickbox');
+						window.parent.parent.$('#id_StudentDetail  > tbody:last').append(data);
+						//window.parent.parent.tb_init('#id_StudentDetail a.thickbox, area.thickbox, input.thickbox');
 					}
-					window.parent.$("#Norecords").val(parseInt(Norecords)+1);
-					window.parent.$("#id_StudentDetail").show();
-					window.parent.tb_init('#id_StudentDetail a.thickbox, area.thickbox, input.thickbox');
-					window.parent.$("#student_pagenation").show();
-					window.parent.$("#id_No_students").hide();
-					window.parent.$("#successMsgHead").show();
-	   				window.parent.$("#klp_MsgTxt").html("Student Created Successfully");
-					window.parent.tb_remove();
+					window.parent.parent.$("#Norecords").val(parseInt(Norecords)+1);
+					window.parent.parent.$("#id_StudentDetail").show();
+					//window.parent.parent.tb_init('#id_StudentDetail a.thickbox, area.thickbox, input.thickbox');
+					window.parent.parent.$("#student_pagenation").show();
+					window.parent.parent.$("#id_No_students").hide();
+					window.parent.parent.$("#successMsgHead").show();
+	   				window.parent.parent.$("#klp_MsgTxt").html("Student Created Successfully");
+					//window.parent.parent.tb_remove();
 					}
 				}
 			    else {
 					$("#popData").html(data);
 					NFInit();
-					//window.parent.tb_init('a.thickbox, area.thickbox, input.thickbox');
+					//window.parent.parent.tb_init('a.thickbox, area.thickbox, input.thickbox');
 				
 				}
 		}	
@@ -300,8 +254,8 @@
 	    }
    
 var KLP_New_Pagination = function(resPerPage,Norecords,studentgroup){
-	var lastPage = window.parent.$("#id_lastPage").val();
-	var url = window.parent.$("#list_url").attr('value');
+	var lastPage = window.parent.parent.$("#id_lastPage").val();
+	var url = window.parent.parent.$("#list_url").attr('value');
 	//KLP_tot_Records(studentgroup);
 	Norecords =Norecords+1
 	totRec = parseInt(lastPage) * parseInt(resPerPage)
@@ -312,8 +266,8 @@ var KLP_New_Pagination = function(resPerPage,Norecords,studentgroup){
         	url: url,
         	data:'&page='+lastPage,
         	success: function(data) {
-			window.parent.$('#searchRes').html(data);
-			window.parent.tb_init('#id_StudentDetail a.thickbox, area.thickbox, input.thickbox');
+			window.parent.parent.$('#searchRes').html(data);
+			//window.parent.parent.tb_init('#id_StudentDetail a.thickbox, area.thickbox, input.thickbox');
         		return false;
 			
         	}
@@ -331,7 +285,5 @@ var KLP_New_Pagination = function(resPerPage,Norecords,studentgroup){
 
 });  
 </script>
-
-</body>
-</html>
-
+        </form>
+        </div>

@@ -1,194 +1,47 @@
-{% extends "index.html" %}
-{% block leftpart %}{% endblock %}
-{% block midpart %}
-
 {% load template_tags %}
 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>{{title}}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="/static_media/js/jquery.js"></script>
+<script language="javascript" type="text/javascript" src="/static_media/js/niceforms.js"></script>
+<script type="text/javascript" src="/static_media/js/thickbox.js" charset="utf-8"></script>
+
+
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/thickbox.css" charset="utf-8"/>
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/form.css" />
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/style.css" />
+
+</head>
+
+<body>
+<div id="container">
+
+{% if entry == "Add" %}
+<fieldset>
+    <legend>{{legend}}</legend>
+{% else %}
+<div class="tablebg">
+{% endif %}
+
+<div id="popData">
 <div class="detailHead">
-<span class="hedText">Student Entry Form</span>
+<span class="hedText">Entry Form</span>
 </div>
-<div id="studEntrForm">
-<form action="." method="POST" enctype="multipart/form-data" id="studentForm" onsubmit="return false;" class="niceform">{% csrf_token %}
-                            <input type="hidden" name="url" value="/studentgroup/{{extra_context|displayValue:'referKey'}}/student/creator/" id="url" />    
-                            <input type="hidden" name="parentId" value="{{extra_context|displayValue:'referKey'}}" id="parentId" />
-                            <input type="hidden" name="form-buttonType" id="id_form-buttonType" value="save" />
-			    <input type="hidden" id="success_status" size="15" value="{{extra_context|displayValue:'showsuccess'}}" / >
-			    <table class="tblprofile">
-                            {% with form|first as childForm %}
-				{{childForm.management_form}}
-				{% with childForm.forms|first as entryForm %}
-				<tr>
-				    <td><label class="KLP_required">First Name:</label></td>
-				    <td>
-					{% render_field entryForm.firstName 'tabindex=1' %}
-				    </td>
-				</tr>
-				<tr>
-				    <td><label class="KLP_required">Last Name:</label></td>
-				    <td>
-					{% render_field entryForm.lastName 'tabindex=2' %}
-				    </td>
-				</tr>
-				<tr>
-				    <td><label for="address">Date of Birth:</label></td>
-				    <td>
-					{% render_field entryForm.dob 'tabindex=3' %}
-				    </td>
-				</tr>
-				<tr>
-				    <td><label class="KLP_required">Gender:</label></td>
-				    <td>
-					{% render_field entryForm.gender 'tabindex=4' %}
-				    </td>
-				</tr>
-				<tr>
-				    <td><label class="KLP_required">Mother Tongue:</label></td>
-				    <td>
-					{% render_field entryForm.mt 'tabindex=5' %}
-					<input type="hidden" name="form-0-relations" id="id_relations" size="15" value=""/>
-					<input type="hidden" name="form-0-studentchecked" id="id_studentchecked" size="15" value="True"/>
-				    </td>
-				</tr>
-				{% endwith %}
-			    {% endwith %}
-				<tr>
-				    <td><label class="KLP_required">Mother Name:</label></td>
-				    <td>
-					<input type="text" name="form-0-mother" id="id_mother" size="15" value=""/>
-				    </td>
-				</tr>
-				<tr>
-				    <td><label class="KLP_required">Father Name:</label></td>
-				    <td>
-					<input type="text" name="form-0-father" id="id_father" size="15" value=""/>
-				    </td>
-				</tr>
-    			    
-    			    {% with form|last as studentForm %}
-				{{studentForm.management_form}}
-				{% with studentForm.forms|first as entryForm %}
-                                <tr>
-                                    <td><label class="KLP_required">Academic Year:</label></td>
-                                    <td>                                        
-                                        {% render_field entryForm.academic 'tabindex=6' %}
-					<input type="hidden" name="form-0-boundary" id="id_boundary" size="15" value="{{extra_context|displayValue:'boundary'}}"/>
-					<input type="hidden" name="form-0-student_group" id="id_student_group" size="15" value="{{extra_context|displayValue:'referKey'}}"/>
-					<input type="hidden" name="form-0-name" id="id_name" size="15" value=""/>
-					<input type="hidden" name="form-0-active" id="id_form-0-active" value="True" />
-                                    </td>
-				    <td>
-                                    	{% for error in entryForm.academic.errors %}
-	                                	<span class="editErr">{{ error }}</span>
-	                                {% endfor %}
-                                    </td>
-                                </tr>
-				{% endwith %}
-			    {% endwith %}
 
-                                <tr></tr>
-                    		<tr></tr>
-                    		<tr></tr>
-                    		<tr></tr>
-                    		<tr></tr>
-                                <tr>
-                                    <td>
-                                    	<input type="submit" name="save" id="id_save" value="Save" />
-                                    </td>
-                                    <!--td>
-                                    	<input type="submit" name="save_and_continue" id="id_save_and_continue" value="Save And Continue" />
-                                    </td>
-                                    <td>
-                    	    		<input type="submit" name="save_and_create" id="id_save_and_create" value="Save And Create Another" />
-      				    </td-->
-                                </tr>
-				</table>
-        </form>
+{% for student in totStudents %}
+<IFRAME SRC="/studentgroup/{{studentgroup_id}}/student/creator/{{forloop.counter}}/" 
+     WIDTH=800 HEIGHT=180 style="clear:both;float:none;border:none"
+     ALIGN=RIGHT
+     >
+</IFRAME>
+<br/><br/>
+{% endfor %}
 
-
-
-<script>
-  $(document).ready(function(){  
-   setTimeout(function(){
-		$('input:visible:enabled:first').focus();
-	},200);
-
-   $("#id_save").click(function(){
-   	$("#id_form-buttonType").val('save');
-   	KLP_form_submit();
-   });
-   
-   $("#id_save_and_continue").click(function(){
-   	$("#id_form-buttonType").val('save and continue');
-   });
-   
-   $("#id_save_and_create").click(function(){
-   	parentVal = $("#id_form-0-parent").val();
-   	$("#id_form-buttonType").val('save and add another');
-   	KLP_form_submit('id_form-0-parent', parentVal);
-   	
-   	
-   });
-    
-    
-   var KLP_form_submit = function(parentId, parentVal){
-   	$.post(
-        	$('#url').val(),
-        	$("#studentForm").serialize(),
-                function(data){
-			$("#studEntrForm").html(data);
-			var successStatus = $("#success_status").val();
-			if (successStatus == 'True'){
-				window.parent.tb_remove();
-				window.parent.$('#StudentDetail  > tbody:last').append(data);
-				window.parent.tb_init('#StudentDetail a.thickbox, area.thickbox, input.thickbox');
-				window.parent.$("#stud_Detail").show();
-			}
-			else{
-				$("#studEntrForm").html(data);
-				NFInit();
-			}
-                    //$("#dyncData").html(data);
-                    //NFInit();
-                    //if (parentId != null)
-                    //	$("#"+parentId).val(parentVal);
-               }
-           );
-   } 
-
-     
-   /*$("#schoolForm").submit(function(){
-   parentId=$('#id_boundary').val();
-    $.post(  
-        $('#url').val(),  
-        $("#schoolForm").serialize(),  
-                function(data){
-                    $("#dyncData").html(data);
-			ObjId='#boundary_'+parentId
-            		Obj=$(ObjId)
-                    	call_js(Obj,'school');
-               }  
-           );  
-       });  */
-});  
-</script>
 </div>
-<!--script>
 
-$("#studentForm").submit(function(){       
-    
-    $.post(  
-        '{{url}}',  
-        $("#studentForm").serialize(),  
-                function(data){
-			alert(data);
-                    //window.parent.tb_remove();
-		    //$('#student_'+{{child.id}}, self.parent.document).html(data);
-		    //window.parent.tb_init('#student_'+{{child.id}}+' a.thickbox, area.thickbox, input.thickbox');
-		
-                return false;
-               } 
-               
-           );  
-       });
-</script-->
-{% endblock %}
+</body>
+</html>
+
