@@ -17,10 +17,8 @@ class Command(BaseCommand):
                                 try:
                                 	strDate = startDate.split("/")
                                 	enDate = endDate.split("/")
-                                        deDict, respDict = {},{}
     					activePrgs = Programme.objects.filter(active=2).values_list("id", flat=True)
-    					assessments = Assessment.objects.filter(programme__id__in=activePrgs, active=2).distinct()
-    					respDict['assessments'] = assessments
+    					assessments = Assessment.objects.filter(programme__id__in=activePrgs, active=2).distinct().only("id", "name")
     					# get current working directory.
 					cwd = os.getcwd()
 					path = "%s/logFiles/" %(cwd)
@@ -34,31 +32,48 @@ class Command(BaseCommand):
 					headerList = ['Sl.No', 'User', 'sch_created', 'sch_mod', 'stud_created', 'stud_mod', 'teacher_created', 'teacher_mod']
 					for assessment in assessments:
 						asmName = assessment.name
-						headerList.append(asmName)
-						headerList.append(asmName+'_DE')
+						headerList.append(asmName+' Num Of correct Entries')
+						headerList.append(asmName+' Num Of incorrect Entries')
+						headerList.append(asmName+' Num Of verified Entries')
+						headerList.append(asmName+' Num Of rectified Entries')
 					historyFile.writerow(headerList)
 					count = 0
-    					for user in User.objects.filter(is_active=1):
+    					for user in User.objects.filter(is_active=1).order_by("username").only("id", "username"):
 						count +=1
 				    		dataList = [count, user.username]
-						actDict = {}
 						# get the content objects(instituion, staff, student)
 				    		for content in contentList:
 				    			contObj = ContentType.objects.get(app_label='schools', name=content)
 				    			# get all instituion/staff/student creates/Edited by user.
-				    		        dataList.append(len(FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, content_type__id=contObj.id, action='C')))
-				    			dataList.append(len(FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, content_type__id=contObj.id, action='U')))
+				    		        dataList.append(FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, content_type__id=contObj.id, action='C').count())
+				    			dataList.append(FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, content_type__id=contObj.id, action='U').count())
 				    			
 				    		for assessment in assessments:
-				    			questions = Question.objects.filter(assessment = assessment,active=2).values_list("id", flat=True).distinct()
-				    			answers = Answer.objects.filter(question__id__in=questions).values_list("id", flat=True).distinct()
+				    			answers = Answer.objects.filter(question__assessment=assessment).values_list("id", flat=True).distinct()
 				    			if len(answers) == 0:
+								dataList.append(0)
+								dataList.append(0)
 								dataList.append(0)
 								dataList.append(0)
 				    			else:	
 				    				nList = [i for i in answers]
-				    				dataList.append(len(FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, object_id__in=nList, action='C')))
-				    			 	dataList.append(len(FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, object_id__in=nList, action='U', _data__icontains='answer')))
+				    				crEntries = FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, object_id__in=nList, action='C').count()
+				    				if crEntries == 0:
+				    					inCrEntries = 0
+				    				else:
+				    					inCrEntries = FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), object_id__in=nList, action='U', _data__icontains='answer').count()
+				    					crEntries = crEntries - inCrEntries
+				    				
+				    				
+				    				vEntries = FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, object_id__in=nList, action='U').count()
+				    				
+				    				rEntries = FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, object_id__in=nList, action='U', _data__icontains='answer').count()
+				    				vEntries = vEntries - rEntries
+				    				
+				    				dataList.append(crEntries)
+								dataList.append(inCrEntries)
+								dataList.append(vEntries)
+								dataList.append(rEntries)
 				    		# Written data into file.
 						historyFile.writerow(dataList)				    							    		
 					print "%s.csv file has been created in %s/logFiles directory" %(fileName, cwd)

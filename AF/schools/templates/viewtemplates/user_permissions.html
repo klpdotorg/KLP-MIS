@@ -1,0 +1,31 @@
+{% extends "index.html" %}	
+{% load i18n %}
+{% load template_tags %}
+{% block midpart %}
+        <div class="leftCol">
+            <div id="successMsgHead" style="display:none;">
+    		<div class="shwMsg"> 
+    			<span >
+    				<img src="/static_media/images/correct_icon.jpg" height="18"/>
+    			</span>
+    			<span style="padding:2px;" id="klp_MsgTxt">
+    				Created Successfully 
+    			</span>
+    		</div>
+	   </div>
+	   <div id="failureMsgHead" style="display:none;">
+    		<div class="failMsg"> 
+    			<span >
+    				<img src="/static_media/images/err_icon.jpg" height="18"/>
+    			</span>
+    			<span style="padding:2px;" id="klp_fail_MsgTxt">
+    				Failure
+    			</span>
+    		</div>
+	    </div>
+	    <div id="dyncData">
+	    		<div class="klp"> User Permissions </div>
+	    </div>
+        </div>	    
+{% endblock %}
+

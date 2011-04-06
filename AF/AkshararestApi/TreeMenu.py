@@ -6,7 +6,7 @@ from django.http import *
 from Akshara.AkshararestApi.Treeresponder import *
 from django.db.models.query import QuerySet
 #from django_restapi.authentication import *
-def hasChild(query, typ, boundaryType, filterBy, secFilter, permFilter, assessmentPerm):
+def hasChild(query, typ, boundaryType, filterBy, secFilter, permFilter, assessmentPerm, shPerm, userSel):
     	subboundary = 0
 	childtree = 0
 	childDic={}
@@ -15,7 +15,9 @@ def hasChild(query, typ, boundaryType, filterBy, secFilter, permFilter, assessme
 		    if permFilter:
 		    	templist = [i.getPermissionChild(boundaryType), i.getPermissionViewUrl()]
 		    elif assessmentPerm:
-		    	templist = [i.getPermissionChild(boundaryType), i.getAssessmentPermissionViewUrl(secFilter)]	
+		    	templist = [i.getPermissionChild(boundaryType), i.getAssessmentPermissionViewUrl(secFilter)]
+		    elif shPerm:
+		    	templist = [i.getPermissionChild(boundaryType), i.showPermissionViewUrl(userSel)]		
 		    else:
 		    	templist = [i.getChild(boundaryType), i.getViewUrl(boundaryType)]
 		elif  typ == 'institution' and filterBy != 'None' and permFilter in ['', ' ', None]:
@@ -48,6 +50,8 @@ def SampleClass(request):
      boundaryType = request.GET['boundTyp']
      permFilter = request.GET.get('permission')
      assessmentPerm = request.GET.get('assesspermission')
+     shPerm = request.GET.get('shPerm')
+     userSel = request.GET.get('userSel')
      model = model.split('_')
      modelObjects = {'source':Boundary,'boundary':Institution,} 
      fields  = {'boundary':Institution,} 
@@ -142,7 +146,7 @@ def SampleClass(request):
 		  query = Student.objects.filter(student_group__id=model[1],active=2)
 		  
 
-     CDict=hasChild(query, typ, boundaryType, filterBy, secFilter, permFilter, assessmentPerm)
+     CDict=hasChild(query, typ, boundaryType, filterBy, secFilter, permFilter, assessmentPerm, shPerm, userSel)
      val= Collection(
      queryset = query,
      responder = TreeResponder(CDict=CDict),

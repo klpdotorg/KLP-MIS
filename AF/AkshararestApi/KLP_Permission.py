@@ -100,11 +100,11 @@ def assignPermission(inst_list, deUserList, permissions, permissionType, assessm
 			else:
 				assessmentObj = Assessment.objects.get(pk=assessmentId)
 				try:
-					permObj = UserAssessmentPermissions(user = userObj, instituion = instObj, assessment = assessmentObj, access=True)
-					permObj.save()
-				except:
 					permObj = UserAssessmentPermissions.objects.get(user = userObj, instituion = instObj, assessment = assessmentObj)
 					permObj.access = True
+					permObj.save()
+				except :
+					permObj = UserAssessmentPermissions(user = userObj, instituion = instObj, assessment = assessmentObj, access=True)
 					permObj.save()
 	return count	
 
@@ -126,98 +126,93 @@ def KLP_User_Delete(request, user_id):
 	userObj.is_active = 0
 	userObj.set_password(randomStr)
 	userObj.save()
-	return render_to_response('viewtemplates/userAction_done.html',{'user':request.user,'selUser':userObj,'message':'User Deletion Successful'})        
+	return render_to_response('viewtemplates/userAction_done.html',{'user':request.user,'selUser':userObj,'message':'User Deletion Successful'})       
 	
-def KLP_Show_Permissions(request, user_id):
+def KLP_User_Permissions(request, user_id):
 	check_user_perm.send(sender=None, user=request.user, model='Users', operation=None)
 	check_user_perm.connect(KLP_user_Perm)
 	userObj = User.objects.get(pk=user_id)
-	assignedInstTuple = KLP_user_AssignedInstitutions(user_id, typ='aIds')
-	assignedInst = assignedInstTuple[0]
-	assignedInstIds = assignedInstTuple[1]
-	#unAssignedInst = KLP_user_UnAssignedInstitutions(user_id, assignedInstIds)
+	boundType_List = Boundary_Type.objects.all()
+	try:
+		sessionVal = int(request.session['session_sch_typ'])
+	except:
+		sessionVal = 0
 	
-	assignedpermObjects = UserAssessmentPermissions.objects.filter(user=userObj, access=True)
-	assignedAsmIds, assignedAsmInstIds = [], []
-	'''unMapObjs = Assessment_StudentGroup_Association.objects.filter(active=2)
+	return render_to_response('viewtemplates/user_permissions.html',{'userId':user_id, 'userName':userObj.username, 'boundType_List':boundType_List, 'home':True, 'session_sch_typ':sessionVal, 'entry':"Add",  'shPerm':True, 'title':'KLP Permissions'}, context_instance=RequestContext(request))
+	
+	
+def KLP_Show_Permissions(request, boundary_id, user_id):
+	userObj = User.objects.get(pk=user_id)
+	boundType_List = Boundary_Type.objects.all()
+	try:
+		sessionVal = int(request.session['session_sch_typ'])
+	except:
+		sessionVal = 0
+	redUrl = '/list/%s/user/%s/permissions/' %(boundary_id, user_id)
+	assignedInst = Institution.objects.filter(Q(boundary__id=boundary_id)|Q(boundary__parent__id=boundary_id)|Q(boundary__parent__parent__id=boundary_id), active=2).extra(where=['''schools_institution.id in (SELECT "obj_id" FROM "public"."object_permissions_institution_perms" WHERE "user_id" = '%s' AND "Acess" = 't')''' %(user_id)]).only("id", "name", "boundary")
+	
+	assignedInstIds = assignedInst.values_list("id", flat=True)
+	unAssignedInst = Institution.objects.select_related("boundary").filter(Q(boundary__id=boundary_id)|Q(boundary__parent__id=boundary_id)|Q(boundary__parent__parent__id=boundary_id), active=2).exclude(pk__in=assignedInstIds).only("id", "name", "boundary")
+	assignedpermObjects = UserAssessmentPermissions.objects.filter(Q(instituion__boundary__id=boundary_id)|Q(instituion__boundary__parent__id=boundary_id)|Q(instituion__boundary__parent__parent__id=boundary_id), user=userObj, access=True).only("id", "assessment", "instituion")
+	unMapObjs = Assessment_StudentGroup_Association.objects.filter(Q(student_group__institution__boundary__id=boundary_id)|Q(student_group__institution__boundary__parent__id=boundary_id)|Q(student_group__institution__boundary__parent__parent__id=boundary_id), active=2)
 	for assignedPermObj in assignedpermObjects:
-		assignedAsmIds.append(assignedPermObj.assessment.id)
-		assignedAsmInstIds.append(assignedPermObj.instituion.id)  'unAssignedInst':unAssignedInst, 'unMapObjs':unMapObjs
 		qsets = (
 	            Q(assessment = assignedPermObj.assessment)&
 	            Q(student_group__institution = assignedPermObj.instituion)
 	        )
-		unMapObjs = unMapObjs.exclude(qsets)'''
-	return render_to_response('viewtemplates/show_permissions.html',{'assignedInst':assignedInst, 'userName':userObj.username, 'userId':user_id, 'entry':"Add", 'assignedpermObjects':assignedpermObjects}, context_instance=RequestContext(request))
-
-def KLP_user_AssignedInstitutions(userId, typ=None):
-	rawQuerySet = Institution.objects.raw(""" SELECT * FROM "public"."object_permissions_institution_perms" WHERE "user_id" = '%s' AND "Acess" = 't' """ %(userId))
-	inst_list=[]
-	ids_list = []
+		unMapObjs = unMapObjs.exclude(qsets)
+	return render_to_response('viewtemplates/show_permissions.html',{'assignedInst':assignedInst,  'userId':user_id, 'userName':userObj.username, 'unAssignedInst':unAssignedInst, 'assignedpermObjects':assignedpermObjects, 'unMapObjs':unMapObjs, 'redUrl':redUrl}, context_instance=RequestContext(request))		 
 	
-	for permObj in rawQuerySet:
-		instObj = Institution.objects.get(pk=permObj.obj_id)
-		instStr = "%s (%s --> %s --> %s)" %(instObj.name, instObj.boundary, instObj.boundary.parent, instObj.boundary.parent.parent)
-		ins_dict = {'Institute':instStr, 'instId':instObj.id}
-		inst_list.append(ins_dict)
-		if typ == 'aIds':
-			ids_list.append(permObj.obj_id)
-	return inst_list, ids_list	
-	
-def KLP_user_UnAssignedInstitutions(userId, assignedInstIds):
-	institutions = Institution.objects.filter(active=2).exclude(pk__in=assignedInstIds)
-	inst_list = []
-	for instObj in institutions:
-		instStr = "%s (%s --> %s --> %s)" %(instObj.name, instObj.boundary, instObj.boundary.parent, instObj.boundary.parent.parent)
-		ins_dict = {'Institute':instStr, 'instId':instObj.id}
-		inst_list.append(ins_dict)		
-	return inst_list				
 	
 def KLP_Revoke_Permissions(request, permissionType):
 	check_user_perm.send(sender=None, user=request.user, model='Users', operation=None)
 	check_user_perm.connect(KLP_user_Perm)
 	user_id = request.POST.get('userId')
-	
-	if permissionType == 'permissions':
-		userObj = User.objects.get(pk=user_id)
-		instList = request.POST.getlist('assignedInst')
-		for inst_id in instList:
-			instObj = Institution.objects.get(pk=inst_id)
-			userObj.revoke('Acess', instObj)
-	else:
-		assignedAsmList = request.POST.getlist('assignedAsm')
-		for userAsm_id in assignedAsmList:
-			permObj = UserAssessmentPermissions.objects.get(pk=userAsm_id)
-			permObj.access = False
-			permObj.save()
-		
-	redirectUrl = "/user/%s/show/permissions/" %(user_id)
-	return HttpResponseRedirect(redirectUrl)
+	opStatus = "success"
+	try:
+		if permissionType == 'permissions':
+			userObj = User.objects.get(pk=user_id)
+			instList = request.POST.getlist('assignedInst')
+			for inst_id in instList:
+				instObj = Institution.objects.get(pk=inst_id)
+				userObj.revoke('Acess', instObj)
+		else:
+			assignedAsmList = request.POST.getlist('assignedAsm')
+			for userAsm_id in assignedAsmList:
+				permObj = UserAssessmentPermissions.objects.get(pk=userAsm_id)
+				permObj.access = False
+				permObj.save()
+	except:
+		opStatus = "fail"		
+	return HttpResponse(opStatus)
 	
 def KLP_ReAssign_Permissions(request, permissionType):
 	check_user_perm.send(sender=None, user=request.user, model='Users', operation=None)
 	check_user_perm.connect(KLP_user_Perm)
 	userList = request.POST.getlist('userId')
 	permissions = ['Acess']
-	if permissionType== 'permissions':
-		inst_list = request.POST.getlist('unassignedInst')
-		assignPermission(inst_list, userList, permissions, permissionType)
-	else:
-		asmList = request.POST.getlist('unassignedAsm')
-		for asm in asmList:
-			asm_list = asm.split("_")
-			inst_list = [asm_list[0]]
-			assessmentId = asm_list[1]
-			assignPermission(inst_list, userList, permissions, permissionType, assessmentId)
-		
-	redirectUrl = "/user/%s/show/permissions/" %(userList[0])
-	return HttpResponseRedirect(redirectUrl)
+	opStatus = "success"
+	try:
+		if permissionType== 'permissions':
+			inst_list = request.POST.getlist('unassignedInst')
+			assignPermission(inst_list, userList, permissions, permissionType)
+		else:
+			asmList = request.POST.getlist('unassignedAsm')
+			for asm in asmList:
+				asm_list = asm.split("_")
+				inst_list = [asm_list[0]]
+				assessmentId = asm_list[1]
+				assignPermission(inst_list, userList, permissions, permissionType, assessmentId)
+	except:
+		opStatus = "fail"		
+	return HttpResponse(opStatus)
 
 urlpatterns = patterns('',             
    url(r'^assign/permissions/?$', KLP_Assign_Permissions),
    url(r'^list/users/?$', KLP_Users_list),
    url(r'^user/(?P<user_id>\d+)/delete?$', KLP_User_Delete),
-   url(r'^user/(?P<user_id>\d+)/show/permissions/?$', KLP_Show_Permissions),
+   url(r'^user/(?P<user_id>\d+)/permissions/?$', KLP_User_Permissions),
+   url(r'^list/(?P<boundary_id>\d+)/user/(?P<user_id>\d+)/permissions/?$', KLP_Show_Permissions),
    url(r'^revoke/user/(?P<permissionType>\w+)/?$', KLP_Revoke_Permissions),
    url(r'^assign/user/(?P<permissionType>\w+)/?$', KLP_ReAssign_Permissions),
 )

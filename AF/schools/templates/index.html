@@ -48,7 +48,7 @@
 		var sch_typ_val = $("#boundary_type").val();
 		var asEntryVal = $("#id_entry_view").val();
 		if (sch_typ_val && asEntryVal != 'True'){
-			treeUrl = '/tree/?home={{home}}&filter='+$("#filtProg").val()+'&secFilter='+$("#filtAsmnt").val()+'&boundTyp='+sch_typ_val+'&permission='+$("#id_perm_assign").val()+'&assesspermission='+$("#id_assess_perm_assign").val();
+			treeUrl = '/tree/?home={{home}}&filter='+$("#filtProg").val()+'&secFilter='+$("#filtAsmnt").val()+'&boundTyp='+sch_typ_val+'&permission='+$("#id_perm_assign").val()+'&assesspermission='+$("#id_assess_perm_assign").val()+'&shPerm='+$("#id_shPerm").val()+'&userSel='+$("#id_userSel").val();
 			$("#treeStruc").html('<ul id="treeBlk" class="filetree treeview-famfamfam"></ul>');
 			KLP_TreeBLK(treeUrl);
 			var homeView = $("#id_home_view").val();
@@ -73,7 +73,7 @@
 					KLP_Programme_List(typVal)
 				}
 				else{
-					treeUrl = '/tree/?home={{home}}&filter=None&secFilter='+$("#filtAsmnt").val()+'&boundTyp='+typVal+'&permission='+$("#id_perm_assign").val()+'&assesspermission='+$("#id_assess_perm_assign").val();
+					treeUrl = '/tree/?home={{home}}&filter=None&secFilter='+$("#filtAsmnt").val()+'&boundTyp='+typVal+'&permission='+$("#id_perm_assign").val()+'&assesspermission='+$("#id_assess_perm_assign").val()+'&userSel='+$("#id_userSel").val()+'&shPerm='+$("#id_shPerm").val();
 					$("#treeStruc").html('<ul id="treeBlk" class="filetree treeview-famfamfam"></ul>');
 					KLP_TreeBLK(treeUrl);
 					$("#rootBoundary").show()
@@ -160,6 +160,8 @@
 	            	<input type="hidden" name="perm" id="id_perm_assign" value="{{permission}}"/>
 	            	<input type="hidden" name="assessPerm" id="id_assess_perm_assign" value="{{assessmentpermission}}"/>
 	            	<input type="hidden" name="urHere" id="id_urHere" value="{{urHere}}"/>
+	            	<input type="hidden" name="shPerm" id="id_shPerm" value="{{shPerm}}"/>
+	            	<input type="hidden" name="userSel" id="id_userSel" value="{{userId}}"/>
             		<span style="{% if not filter %}display:none;{% endif %}">
 	        		<select id="filtProg" name="filtProg">
 	                		<option value="None">--</option>
@@ -179,7 +181,7 @@
             </div>
             
             
-            
+            {% if not shPerm %}
             {% if home and not filter%}
             	{% if user.is_superuser or user.is_staff %}
 			    <div class="addBound" id="rootBoundary" style="display:none;">
@@ -230,6 +232,7 @@
 		        	{% if user.is_superuser or 'AdminGroup' in usergroups %} | <a href='/dEHistory/'>DEO History </a>{% endif %}
 		        </div>
 		</div>
+            {% endif %}
             {% endif %}
        </div>
     {% endblock %}

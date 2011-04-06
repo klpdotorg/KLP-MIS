@@ -348,6 +348,10 @@ label.error, label.error {
 	padding:5px;
 	color:#5C5858;	
 }
+.pwdHead{
+    color:#fff;
+    font-weight:bold;
+}
 /* admin console css ends here */
 /* view page css */
 .cl-txtbx {
@@ -360,7 +364,7 @@ label.error, label.error {
 }
 .bng-cl {
 	float:left;
-	width:410px;
+	width:315px;
 	border:1px solid #000;
 	padding:3px 4px;
 	min-height:17px;
