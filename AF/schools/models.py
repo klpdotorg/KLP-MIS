@@ -129,9 +129,9 @@ class Boundary(models.Model):
 		return "%s"%(self.name)
 
 	def getChild(self, boundaryType):
-		if Boundary.objects.filter(parent__id=self.id ,active=2, boundary_type = boundaryType) :
+		if Boundary.objects.filter(parent__id=self.id ,active=2, boundary_type = boundaryType).count():
 			return True
-		elif Institution.objects.filter(boundary__id=self.id ,active=2):
+		elif Institution.objects.filter(boundary__id=self.id ,active=2).count():
 			return True
 		else:
 			return False
@@ -139,7 +139,7 @@ class Boundary(models.Model):
 	def getChildObjects(self):
 		results=Boundary.objects.filter(parent__id=self.id,active=2)
 		if not results:
-			results=Institution.objects.filter(boundary__id=self.id,active=2)
+			results=Institution.objects.filter(boundary__id=self.id,active=2).only("id", "name")
 		return results
 
 	def getModuleName(self):
@@ -197,7 +197,7 @@ class Institution(models.Model):
 		return Institution_Category.objects.all(categoryType = categoryType)
 
 	def getChild(self):
-		if StudentGroup.objects.filter(institution__id = self.id,active=2) :
+		if StudentGroup.objects.filter(institution__id = self.id,active=2).count():
 			return True
 		else:
 			return False
@@ -487,7 +487,7 @@ class Programme(models.Model):
 		return '/programme/%s/update/' %(self.id)
 
 	def getChild(self):
-		if Assessment.objects.filter(programme__id=self.id ,active=2) :
+		if Assessment.objects.filter(programme__id=self.id ,active=2).count():
 			return True
 		else:
 			return False
@@ -524,7 +524,7 @@ class Assessment(models.Model):
     	return '/assessment/%s/update/' %(self.id)
 
     def getChild(self):
-	if Question.objects.filter(assessment__id=self.id):
+	if Question.objects.filter(assessment__id=self.id).count():
 		return True
 	else:
 		return False
