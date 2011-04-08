@@ -110,35 +110,46 @@ def assignPermission(inst_list, deUserList, permissions, permissionType, assessm
 
 def KLP_Users_list(request):
 	user = request.user
-	check_user_perm.send(sender=None, user=request.user, model='Users', operation=None)
-        check_user_perm.connect(KLP_user_Perm)
-	user_list = User.objects.filter(is_active=1, is_staff=0, is_superuser=0)
-	return render_to_response('viewtemplates/show_users_form.html',{'user_list':user_list, 'user':user})     
+	if user.id:
+		check_user_perm.send(sender=None, user=user, model='Users', operation=None)
+		check_user_perm.connect(KLP_user_Perm)
+		user_list = User.objects.filter(is_active=1, is_staff=0, is_superuser=0)
+		return render_to_response('viewtemplates/show_users_form.html',{'user_list':user_list, 'user':user, 'title':'KLP Users', 'legend':'Karnataka Learning Partnership', 'entry':"Add"})     
+	else:
+		return HttpResponseRedirect('/login/')
 		
 def KLP_User_Delete(request, user_id):
-	check_user_perm.send(sender=None, user=request.user, model='Users', operation=None)
-        check_user_perm.connect(KLP_user_Perm)
-	import random
-	import string
-	rangeNum = 8
-        randomStr = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(rangeNum))
-	userObj = User.objects.get(pk=user_id)
-	userObj.is_active = 0
-	userObj.set_password(randomStr)
-	userObj.save()
-	return render_to_response('viewtemplates/userAction_done.html',{'user':request.user,'selUser':userObj,'message':'User Deletion Successful'})       
+	user = request.user
+	if user.id:
+		check_user_perm.send(sender=None, user=user, model='Users', operation=None)
+		check_user_perm.connect(KLP_user_Perm)
+		import random
+		import string
+		rangeNum = 8
+		randomStr = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(rangeNum))
+		userObj = User.objects.get(pk=user_id)
+		userObj.is_active = 0
+		userObj.set_password(randomStr)
+		userObj.save()
+		return render_to_response('viewtemplates/userAction_done.html',{'user':request.user,'selUser':userObj,'message':'User Deletion Successful', 'legend':'Karnataka Learning Partnership', 'entry':"Add"})       
+	else:
+		return HttpResponseRedirect('/login/')
 	
 def KLP_User_Permissions(request, user_id):
-	check_user_perm.send(sender=None, user=request.user, model='Users', operation=None)
-	check_user_perm.connect(KLP_user_Perm)
-	userObj = User.objects.get(pk=user_id)
-	boundType_List = Boundary_Type.objects.all()
-	try:
-		sessionVal = int(request.session['session_sch_typ'])
-	except:
-		sessionVal = 0
+	user = request.user
+	if user.id:
+		check_user_perm.send(sender=None, user=user, model='Users', operation=None)
+		check_user_perm.connect(KLP_user_Perm)
+		userObj = User.objects.get(pk=user_id)
+		boundType_List = Boundary_Type.objects.all()
+		try:
+			sessionVal = int(request.session['session_sch_typ'])
+		except:
+			sessionVal = 0
 	
-	return render_to_response('viewtemplates/user_permissions.html',{'userId':user_id, 'userName':userObj.username, 'boundType_List':boundType_List, 'home':True, 'session_sch_typ':sessionVal, 'entry':"Add",  'shPerm':True, 'title':'KLP Permissions'}, context_instance=RequestContext(request))
+		return render_to_response('viewtemplates/user_permissions.html',{'userId':user_id, 'userName':userObj.username, 'boundType_List':boundType_List, 'home':True, 'session_sch_typ':sessionVal, 'entry':"Add",  'shPerm':True, 'title':'KLP Permissions', 'legend':'Karnataka Learning Partnership'}, context_instance=RequestContext(request))
+	else:
+		return HttpResponseRedirect('/login/')
 	
 	
 def KLP_Show_Permissions(request, boundary_id, user_id):
@@ -149,19 +160,22 @@ def KLP_Show_Permissions(request, boundary_id, user_id):
 	except:
 		sessionVal = 0
 	redUrl = '/list/%s/user/%s/permissions/' %(boundary_id, user_id)
-	assignedInst = Institution.objects.filter(Q(boundary__id=boundary_id)|Q(boundary__parent__id=boundary_id)|Q(boundary__parent__parent__id=boundary_id), active=2).extra(where=['''schools_institution.id in (SELECT "obj_id" FROM "public"."object_permissions_institution_perms" WHERE "user_id" = '%s' AND "Acess" = 't')''' %(user_id)]).only("id", "name", "boundary")
+	assignedInst = Institution.objects.filter(Q(boundary__id=boundary_id)|Q(boundary__parent__id=boundary_id)|Q(boundary__parent__parent__id=boundary_id), active=2).extra(where=['''schools_institution.id in (SELECT "obj_id" FROM "public"."object_permissions_institution_perms" WHERE "user_id" = '%s' AND "Acess" = 't')''' %(user_id)]).only("id", "name", "boundary").order_by("boundary", "boundary__parent")
 	
 	assignedInstIds = assignedInst.values_list("id", flat=True)
-	unAssignedInst = Institution.objects.select_related("boundary").filter(Q(boundary__id=boundary_id)|Q(boundary__parent__id=boundary_id)|Q(boundary__parent__parent__id=boundary_id), active=2).exclude(pk__in=assignedInstIds).only("id", "name", "boundary")
-	assignedpermObjects = UserAssessmentPermissions.objects.filter(Q(instituion__boundary__id=boundary_id)|Q(instituion__boundary__parent__id=boundary_id)|Q(instituion__boundary__parent__parent__id=boundary_id), user=userObj, access=True).only("id", "assessment", "instituion")
-	unMapObjs = Assessment_StudentGroup_Association.objects.filter(Q(student_group__institution__boundary__id=boundary_id)|Q(student_group__institution__boundary__parent__id=boundary_id)|Q(student_group__institution__boundary__parent__parent__id=boundary_id), active=2)
+	unAssignedInst = Institution.objects.select_related("boundary").filter(Q(boundary__id=boundary_id)|Q(boundary__parent__id=boundary_id)|Q(boundary__parent__parent__id=boundary_id), active=2).exclude(pk__in=assignedInstIds).only("id", "name", "boundary").order_by("boundary", "boundary__parent")
+	assignedpermObjects = UserAssessmentPermissions.objects.filter(Q(instituion__boundary__id=boundary_id)|Q(instituion__boundary__parent__id=boundary_id)|Q(instituion__boundary__parent__parent__id=boundary_id), user=userObj, access=True).only("id", "assessment", "instituion").order_by("instituion__boundary", "instituion__boundary__parent")
+	unMapObjs = Assessment_StudentGroup_Association.objects.filter(Q(student_group__institution__boundary__id=boundary_id)|Q(student_group__institution__boundary__parent__id=boundary_id)|Q(student_group__institution__boundary__parent__parent__id=boundary_id), active=2).order_by("student_group__institution__boundary", "student_group__institution__boundary__parent")
 	for assignedPermObj in assignedpermObjects:
 		qsets = (
 	            Q(assessment = assignedPermObj.assessment)&
 	            Q(student_group__institution = assignedPermObj.instituion)
 	        )
 		unMapObjs = unMapObjs.exclude(qsets)
-	return render_to_response('viewtemplates/show_permissions.html',{'assignedInst':assignedInst,  'userId':user_id, 'userName':userObj.username, 'unAssignedInst':unAssignedInst, 'assignedpermObjects':assignedpermObjects, 'unMapObjs':unMapObjs, 'redUrl':redUrl}, context_instance=RequestContext(request))		 
+	return render_to_response('viewtemplates/show_permissions.html',{'assignedInst':assignedInst,  'userId':user_id, 'userName':userObj.username, 'unAssignedInst':unAssignedInst, 'assignedpermObjects':assignedpermObjects, 'unMapObjs':unMapObjs, 'redUrl':redUrl}, context_instance=RequestContext(request))		
+	
+def KLP_Show_User_Permissions(request, boundary_id, user_id):	
+	return render_to_response('viewtemplates/show_permissions.html',{'userId':user_id, 'boundary_id':boundary_id, 'confirmMsg':True}, context_instance=RequestContext(request))	 
 	
 	
 def KLP_Revoke_Permissions(request, permissionType):
@@ -215,4 +229,5 @@ urlpatterns = patterns('',
    url(r'^list/(?P<boundary_id>\d+)/user/(?P<user_id>\d+)/permissions/?$', KLP_Show_Permissions),
    url(r'^revoke/user/(?P<permissionType>\w+)/?$', KLP_Revoke_Permissions),
    url(r'^assign/user/(?P<permissionType>\w+)/?$', KLP_ReAssign_Permissions),
+   url(r'^show/(?P<boundary_id>\d+)/user/(?P<user_id>\d+)/permissions/?$', KLP_Show_User_Permissions),
 )

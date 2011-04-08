@@ -173,7 +173,10 @@ class Boundary(models.Model):
 		return '<a href="/boundary/%s/assessmentpermissions/%s/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/boundary.gif" title="boundary" />  %s </a>' % (self.id, assessment_id , self.name, self.name)
 		
 	def showPermissionViewUrl(self, userSel):
-		return '<a href="/list/%s/user/%s/permissions/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/boundary.gif" title="boundary" />  %s </a>' % (self.id, userSel, self.name, self.name) 
+		if self.boundary_category.id in [9, 10, 13, 14]:
+			return '<a href="/show/%s/user/%s/permissions/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/boundary.gif" title="boundary" />  %s </a>' % (self.id, userSel, self.name, self.name) 
+		else:
+			return '<a href="/list/%s/user/%s/permissions/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/boundary.gif" title="boundary" />  %s </a>' % (self.id, userSel, self.name, self.name) 
 		
 
 register_model(Boundary)

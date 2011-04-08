@@ -28,7 +28,8 @@
 
 <div id="popData">
 <div class="detailHead">
-<span class="hedText">Entry Form</span>
+	<span class="hedText">Entry Form</span>
+	<span class="KLP_DE_AdStudent"><a href="#" onclick="closeForm()"> Click here to Close </a></span>
 </div>
 
 {% for student in totStudents %}
@@ -38,8 +39,26 @@
      >
 </IFRAME>
 <br/><br/>
+{% if forloop.last %}
+    <script>
+    	$(document).ready(function(){
+    		firstIframe = $.find("iframe:first");
+    		$(firstIframe).load(function(){
+    			setTimeout(function(){
+				$('body', $(firstIframe).contents()).find("#id_form-0-firstName").focus();
+    		        },200);
+    			
+    		});
+    		
+    	});
+    </script>
+{% endif %}
 {% endfor %}
-
+<script>
+	function closeForm(){
+		window.parent.tb_remove();
+	}
+</script>
 </div>
 
 </body>

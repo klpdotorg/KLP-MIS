@@ -23,16 +23,16 @@ def KLP_addNewUser(request,template_name='viewtemplates/add_new_user.html', post
                 form.save()
                 return HttpResponseRedirect(post_change_redirect)
             else:
-                return render_to_response(template_name,{'form':form},context_instance=RequestContext(request)) 
+                return render_to_response(template_name,{'form':form, 'title':'KLP User', 'legend':'Karnataka Learning Partnership', 'entry':"Add"},context_instance=RequestContext(request)) 
         else:   	
             form = UserCreationFormExtended()
             print form
-            return render_to_response(template_name,{'form':form},context_instance=RequestContext(request)) 
+            return render_to_response(template_name,{'form':form, 'title':'KLP User', 'legend':'Karnataka Learning Partnership', 'entry':"Add"},context_instance=RequestContext(request)) 
     else:
         return HttpResponseRedirect('/login/') 
         
 def KLP_addNewUser_done(request):
-    return render_to_response('viewtemplates/userAction_done.html',{'message':'User Creation Successful'},context_instance=RequestContext(request))
+    return render_to_response('viewtemplates/userAction_done.html',{'message':'User Creation Successful', 'title':'KLP User', 'legend':'Karnataka Learning Partnership', 'entry':"Add"},context_instance=RequestContext(request))
     
 
 
@@ -56,10 +56,10 @@ def KLP_password_change(request, template_name='viewtemplates/password_change_fo
                 form.save()
                 return HttpResponseRedirect(post_change_redirect)
             else:                                        
-                return render_to_response(template_name,{'form':form, 'returnUrl':returnUrl},context_instance=RequestContext(request))    
+                return render_to_response(template_name,{'form':form, 'returnUrl':returnUrl, 'title':'KLP Change Password', 'legend':'Karnataka Learning Partnership', 'entry':"Add"},context_instance=RequestContext(request))    
         else:
             form = PasswordChangeForm(request.user)
-            return render_to_response(template_name,{'form':form, 'returnUrl':returnUrl},context_instance=RequestContext(request))
+            return render_to_response(template_name,{'form':form, 'returnUrl':returnUrl, 'title':'KLP Change Password', 'legend':'Karnataka Learning Partnership', 'entry':"Add"},context_instance=RequestContext(request))
     else:
         return HttpResponseRedirect('/login/')    
         
@@ -73,7 +73,7 @@ def KLP_password_change_done(request, template_name='viewtemplates/password_chan
         else:
         	userGroup = user.groups.all()[0].name
         	returnUrl = usrUrl[userGroup]
-	return render_to_response(template_name,{'returnUrl':returnUrl},context_instance=RequestContext(request))         
+	return render_to_response(template_name,{'returnUrl':returnUrl, 'title':'KLP Change Password', 'legend':'Karnataka Learning Partnership', 'entry':"Add"},context_instance=RequestContext(request))         
     
     
     
