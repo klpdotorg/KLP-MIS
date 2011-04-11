@@ -8,10 +8,10 @@
 
 <div class="KLP_Button_Header">
 	<span class="KLP_Sub">
-		<a class="KLP_Button" href="/studentgroup/{{studentgroup.id}}/update/?group_typ={{studentgroup.group_type}}&sch_typ={{studentgroup.institution.boundary.boundary_category}}" onclick="return KLP_View(this);">Edit</a>
+		<a class="KLP_Button" href="/studentgroup/{{studentgroup.id}}/update/?group_typ={{studentgroup.group_type}}&sch_typ={{studentgroup.institution.boundary.boundary_category}}" onclick="return KLP_View(this);">Edit {% if studentgroup.group_type|lower == 'center' %}Center{% else %}Class{% endif %}</a>
 	</span>
 	<span class="KLP_Sub">
-		<span class="KLP_SpanButton" onclick="KLP_Del('{{studentgroup.id}}', '{{studentgroup.group_type}}', '{{studentgroup.name}}')">Delete</span>
+		<span class="KLP_SpanButton" onclick="KLP_Del('{{studentgroup.id}}', '{{studentgroup.group_type}}', '{{studentgroup.name}}')">Delete {% if studentgroup.group_type|lower == 'center' %}Center{% else %}Class{% endif %}</span>
 	</span>
 	<span class="KLP_Sub">
 		<a class="KLP_Button thickbox" href="/studentgroup/{{studentgroup.id}}/student/call/?keepThis=true&TB_iframe=true&height=600&width=950" title="Add Student">Add Students</a>
@@ -72,7 +72,7 @@
 			<span style="padding-right:5px;">Centres</span>
 			<span style="padding-right:5px;"><select name="StdgrpCtr"><option value="None">--</option>{% for stdgrp in studentGroups %}<option value="{{stdgrp.id}}">{{stdgrp.name}}</option>{% endfor %}</select></span>
 			<input type="hidden" name="school" value="{{studgrpParent.id}}" />
-			<span><input type="submit" value="submit"/></span>
+			<span><input id="student_Map" type="submit" disabled="true" value="Map"/></span>
 </div>
 
 <div style="padding:20px 0px;text-align:center;{% if studentgroup.group_type|lower == 'center' %}display:none;{% endif %}">

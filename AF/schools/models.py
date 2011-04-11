@@ -124,6 +124,9 @@ class Boundary(models.Model):
 	boundary_category = models.ForeignKey(Boundary_Category,blank=True,null=True)
 	boundary_type = models.ForeignKey(Boundary_Type,blank=True,null=True)
 	active = models.IntegerField(blank = True, null = True,default=2)
+
+	class Meta:
+		ordering = ["name"]
 	
 	def __unicode__(self):
 		return "%s"%(self.name)
@@ -190,8 +193,11 @@ class Institution(models.Model):
 	institution_gender = models.CharField(max_length=10,choices=Institution_Gender,default="co-ed")
 	languages = models.ManyToManyField(Moi_Type)
 	mgmt = models.ForeignKey(Institution_Management,default="ed")
-	inst_address = models.ForeignKey(Institution_address)
+	inst_address = models.ForeignKey(Institution_address,blank=True,null=True)
 	active = models.IntegerField(blank = True, null = True,default=2)
+
+        class Meta:
+		ordering = ["name"]
 	
 	def __unicode__(self):
 		return "%s"%(self.name)
@@ -260,6 +266,9 @@ class Child(models.Model):
 	gender = models.CharField(max_length=10,choices=Gender,default="male")
 	mt =  models.ForeignKey(Moi_Type,default="kannada")
 
+	class Meta: 
+		ordering = ["firstName", "middleName", "lastName"]
+
 	def __unicode__(self):
 		return "%s"%(self.firstName)
 
@@ -307,6 +316,7 @@ class StudentGroup(models.Model):
 
 	class Meta: 
 		unique_together = (('institution', 'name', 'section'),) 
+		ordering = ["name", "section"]
 
 	def __unicode__(self):
 		return "%s"%(self.name)
@@ -392,6 +402,9 @@ class Staff(models.Model):
 	staff_type = models.ForeignKey(Staff_Type, default=1)
 	active = models.IntegerField(blank = True, null = True,default=2)
 
+	class Meta: 
+		ordering = ["firstName", "middleName", "lastName"]
+
 	def __unicode__(self):
 		return "%s %s %s"%(self.firstName, self.middleName, self.lastName)
 		
@@ -404,6 +417,9 @@ class Student(models.Model):
 	child = models.ForeignKey(Child)
 	otherStudentId = models.CharField(max_length = 100,blank = True, null = True)
 	active = models.IntegerField(blank = True, null = True,default=2)
+
+	class Meta:
+		ordering = ["child__firstName"]
 	
 	def GetName(self):
 		return self.child.firstName
@@ -480,6 +496,9 @@ class Programme(models.Model):
 	programme_institution_category = models.ForeignKey(Boundary_Type,blank=True,null=True)
 	active = models.IntegerField(blank = True, null = True,default=2)
 
+	class Meta: 
+		ordering = ["name"]
+
 	def __unicode__(self):
 		return "%s"%(self.name)
 
@@ -516,6 +535,7 @@ class Assessment(models.Model):
     
     class Meta: 
 		unique_together = (('programme', 'name'),)
+		ordering = ["name"]
 
     def __unicode__(self):
         return "%s"%(self.name)
