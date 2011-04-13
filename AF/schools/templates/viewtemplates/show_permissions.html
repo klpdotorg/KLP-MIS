@@ -1,6 +1,6 @@
 <table>
 	<tr>
-		<td colspan="5">
+		<td colspan="6">
 	       	 	<a href="/list/users/"> << Back To List Users</a>
 	       	</td>
 	</tr>
@@ -16,7 +16,7 @@
 		<tr>&nbsp;</tr>
 	{% else %}
 	<tr>
-    	       	<td colspan="4" bgcolor="#336699" align="Center"><span class="pwdHead">Permissions For User {{userName}}</span> </td>    	        
+    	       	<td colspan="6" bgcolor="#336699" align="Center"><span class="pwdHead">Permissions For User {{userName}}</span> </td>    	        
     	</tr>
     	
 	{% if assignedInst %}
@@ -31,10 +31,11 @@
 			
 				    	    
 				    	    	<tr>
-						    	<td align="Center" colspan="4">&nbsp;</td>
+						    	<td align="Center" colspan="5">&nbsp;</td>
 					    	</tr>
 					    	<tr bgcolor="#408080">
 					    		<td align="center"><input type="checkbox" name="checkInst" id="id_checkInst"/></td>
+					    		<td align="center"><font color="#fff"><b>Institution&nbsp;ID</b></font> </td>
 					    		<td align="center" colspan="3"><font color="#fff"><b>Assigned Institutions</b></font> </td>
 					    	</tr>
 					    	
@@ -42,6 +43,9 @@
 							<tr>
 								<td align="center">
 									<input type="checkbox" name="assignedInst" id="id_assignedInst" value="{{inst.id}}"/>
+								</td>
+								<td>
+									{{inst.id}}  
 								</td>
 								<td>
 									{{inst}}  
@@ -54,7 +58,7 @@
 						<tr>&nbsp;</tr>
 					    	<tr>&nbsp;</tr>
 					    	<tr>
-					    		<td colspan=4 align="center">
+					    		<td colspan=5 align="center">
 					    			<input type="submit" name="revoke" formId="id_form-assignedInst" actUrl="/revoke/user/permissions/" redUrl="{{redUrl}}" id="id_revokeIntPerm" value="Revoke" />
 					    		</td>
 					    	</tr>	            	
@@ -71,17 +75,21 @@
 	    				<input type="hidden" name="userId" value="{{userId}}" />
 	    				<table align="center" width="500">					    	
 				    	    	<tr>
-						    	<td align="Center" colspan="4">&nbsp;</td>
+						    	<td align="Center" colspan="5">&nbsp;</td>
 					    	</tr>
 					    	<tr bgcolor="#408080">
 					    		<td align="center"><input type="checkbox" name="checkunassignInst" id="id_checkunassignInst"/></td>
-					    		<td align="center" colspan="3"><font color="#fff"><b>Un Assigned Institutions</b></font> </td>
+					    		<td align="center"><font color="#fff"><b>Institution&nbsp;ID</b></font> </td>
+					    		<td align="center" colspan="3"><font color="#fff"><b>Unassigned Institutions</b></font> </td>
 					    	</tr>
 					    	
 						{% for inst in unAssignedInst %}
 							<tr>
 								<td align="center">
 									<input type="checkbox" name="unassignedInst" id="id_unassignedInst" value="{{inst.id}}"/>
+								</td>
+								<td>
+									{{inst.id}} 
 								</td>
 								<td>
 									{{inst}} 
@@ -94,8 +102,8 @@
 						<tr>&nbsp;</tr>
 					    	<tr>&nbsp;</tr>
 					    	<tr>
-					    		<td colspan=4 align="center">
-					    			<input type="submit" name="assign" id="id_assignInstPerm" formId="id_form-unassignedInst" actUrl="/assign/user/permissions/" redUrl="{{redUrl}}" value="Assign" />
+					    		<td colspan=5 align="center">
+					    			<input type="submit" name="assign" id="id_assignInstPerm" formId="id_form-unassignedInst" actUrl="/assign/user/permissions/" redUrl="{{redUrl}}" value="Assign Institutions And Related Assessments" />
 					    		</td>
 					    	</tr>	
 				    	
@@ -107,7 +115,7 @@
 	<tr>&nbsp;</tr>
         <tr>&nbsp;</tr>
 	<tr>
-    		<td colspan="5" bgcolor="#336699" align="Center"><span class="pwdHead">Assessment Permissions For User {{userName}}</span> </td>    	        
+    		<td colspan="6" bgcolor="#336699" align="Center"><span class="pwdHead">Assessment Permissions For User {{userName}}</span> </td>    	        
     	</tr>
 	{% if assignedpermObjects %}
 		<tr>
@@ -118,10 +126,11 @@
 					    	<tr>&nbsp;</tr>
 					    	<tr>&nbsp;</tr>					    	
 				    	    	<tr>
-						    	<td align="Center" colspan="5">&nbsp;</td>
+						    	<td align="Center" colspan="6">&nbsp;</td>
 					    	</tr>
 					    	<tr bgcolor="#408080">
 					    		<td align="center"><input type="checkbox" name="checkAsmInst" id="id_checkAsmInst"/></td>
+					    		<td align="center"><font color="#fff"><b>Institution&nbsp;ID</b></font> </td>
 					    		<td align="center" colspan="2"><font color="#fff"><b>Institute</b></font> </td> 
 					    		<td align="center" colspan="2"> <font color="#fff" weight="bold"><b>Assessment</b></font> 
 					    		
@@ -132,6 +141,9 @@
 					    			<td align="center">
 					    				<input type="checkbox" name="assignedAsm" id="id_assignedAsm" value="{{permObj.id}}"/>
 					    			</td>
+					    			<td>
+					    				{{permObj.instituion.id}} 
+								</td>
 					    			<td>
 					    				{{permObj.instituion}} 
 								</td>
@@ -145,7 +157,7 @@
 					    	<tr>&nbsp;</tr>
 					    	<tr>&nbsp;</tr>
 					    	<tr>
-					    		<td colspan="5" align="center">
+					    		<td colspan="6" align="center">
 					    			<input type="submit" name="revoke" id="id_revokeAsmIntPerm" value="Revoke" formId="id_form-assignedAsmt" actUrl="/revoke/user/asmpermissions/" redUrl="{{redUrl}}"/>
 					    		</td>
 					    	</tr>
@@ -163,12 +175,13 @@
 			    		<table align="center" width="600">
 				
 				    	    	<tr>
-						    	<td align="Center" colspan="3">&nbsp;</td>
+						    	<td align="Center" colspan="6">&nbsp;</td>
 					    	</tr>
 					    	<tr bgcolor="#408080">
 					    		<td align="center"><input type="checkbox" name="uncheckAsmInst" id="id_uncheckAsmInst"/></td>
-					    		<td align="center" colspan="2"><font color="#fff"><b>UnAssigned Institute</b></font> </td> 
-					    		<td align="center" colspan="2"> <font color="#fff" weight="bold"><b>UnAssigned Assessment</b></font> 
+					    		<td align="center"><font color="#fff"><b>Institution&nbsp;ID</b></font> </td>
+					    		<td align="center" colspan="2"><font color="#fff"><b>Unassigned Institute</b></font> </td> 
+					    		<td align="center" colspan="2"> <font color="#fff" weight="bold"><b>Unassigned Assessment</b></font> 
 					    		
 					    	</tr>
 					    	
@@ -176,6 +189,9 @@
 					    		<tr id="id_assessment_pems_{{permObj.id}}">
 					    			<td align="center">
 					    				<input type="checkbox" name="unassignedAsm" id="id_unassignedAsm" value="{{permObj.student_group.institution.id}}_{{permObj.assessment.id}}"/>
+					    			</td>
+					    			<td>
+					    				{{permObj.student_group.institution.id}}
 					    			</td>
 					    			<td>
 					    				{{permObj.student_group.institution}}
@@ -190,7 +206,7 @@
 					    	<tr>&nbsp;</tr>
 			    			<tr>&nbsp;</tr>
 					    	<tr>
-					    		<td colspan="5" align="center"><input type="submit" name="assignAsmPerm" id="id_assignAsmPerm" value="Assign" formId="id_form-unassignedAsmt" actUrl="/assign/user/asmpermissions/" redUrl="{{redUrl}}" /></td>
+					    		<td colspan="6" align="center"><input type="submit" name="assignAsmPerm" id="id_assignAsmPerm" value="Assign" formId="id_form-unassignedAsmt" actUrl="/assign/user/asmpermissions/" redUrl="{{redUrl}}" /></td>
 					    	</tr>
 			    	
 			    		</table>	
@@ -200,7 +216,7 @@
 	{% endif %}
 	{% endif %}
 	<tr>
-		<td colspan="4">
+		<td colspan="6">
 	       	 	<a href="/list/users/"> << Back To List Users</a>
 	       	</td>
 	</tr>

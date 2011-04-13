@@ -81,9 +81,9 @@ def KLP_Institution_Boundary(request, boundary_id, permissionType, assessment_id
 	klp_UserGroups = user.groups.all()
 	klp_GroupsList = ['%s' %(usergroup.name) for usergroup in klp_UserGroups]
 	if user.is_superuser or 'AdminGroup' in klp_GroupsList:
-		users = User.objects.filter(groups__name__in=['Data Entry Executive', 'Data Entry Operator'], is_active=1)
+		users = User.objects.filter(groups__name__in=['Data Entry Executive', 'Data Entry Operator'], is_active=1).order_by("username")
 		boundaryObj = Boundary.objects.get(id=boundary_id)
-		respDict = {'users':users, 'boundary':boundaryObj, 'permissionType':permissionType}
+		respDict = {'users':users, 'boundary':boundaryObj, 'permissionType':permissionType, 'url':request.path}
 		bound_cat = boundaryObj.boundary_category.boundary_category.lower()
 		respDict['bound_cat'] = bound_cat
 		if permissionType == 'permissions':

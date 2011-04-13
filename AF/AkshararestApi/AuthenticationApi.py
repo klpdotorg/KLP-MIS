@@ -28,17 +28,17 @@ def KLP_Login(request):
         	return HttpResponseRedirect(usrUrl[userGroup])
       else:
         # disabled account
-        return direct_to_template(request, 'login.html', {'message':'Please enter a correct username and password'}, context_instance=RequestContext(request))
+        return direct_to_template(request, 'login.html', {'message':'Please enter a correct username and password', 'title':'Karnataka Learning Partnership', 'legend':'Karnataka Learning Partnership', 'entry':"Add"}, context_instance=RequestContext(request))
     else:
       # invalid login
-      return direct_to_template(request, 'login.html', {'message':'Please enter a correct username and password'}, context_instance=RequestContext(request))
+      return direct_to_template(request, 'login.html', {'message':'Please enter a correct username and password', 'title':'Karnataka Learning Partnership', 'legend':'Karnataka Learning Partnership', 'entry':"Add"}, context_instance=RequestContext(request))
   else:
-      return render_to_response('login.html',{'user':user}, context_instance=RequestContext(request))   
+      return render_to_response('login.html',{'user':user, 'title':'Karnataka Learning Partnership', 'legend':'Karnataka Learning Partnership', 'entry':"Add"}, context_instance=RequestContext(request))   
       
 def KLP_Logout_user(request):  
     # Method For Logout          
     logout(request)
-    return render_to_response('login.html',context_instance=RequestContext(request))
+    return render_to_response('login.html', {'title':'Karnataka Learning Partnership', 'legend':'Karnataka Learning Partnership', 'entry':"Add"},context_instance=RequestContext(request))
     
 def KLP_User_Auth(request):
 	return HttpResponse(request.user.is_authenticated())    

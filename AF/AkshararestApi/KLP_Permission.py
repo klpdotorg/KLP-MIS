@@ -113,7 +113,7 @@ def KLP_Users_list(request):
 	if user.id:
 		check_user_perm.send(sender=None, user=user, model='Users', operation=None)
 		check_user_perm.connect(KLP_user_Perm)
-		user_list = User.objects.filter(is_active=1, is_staff=0, is_superuser=0)
+		user_list = User.objects.filter(is_active=1, is_staff=0, is_superuser=0).order_by("username")
 		return render_to_response('viewtemplates/show_users_form.html',{'user_list':user_list, 'user':user, 'title':'KLP Users', 'legend':'Karnataka Learning Partnership', 'entry':"Add"})     
 	else:
 		return HttpResponseRedirect('/login/')
@@ -160,12 +160,12 @@ def KLP_Show_Permissions(request, boundary_id, user_id):
 	except:
 		sessionVal = 0
 	redUrl = '/list/%s/user/%s/permissions/' %(boundary_id, user_id)
-	assignedInst = Institution.objects.filter(Q(boundary__id=boundary_id)|Q(boundary__parent__id=boundary_id)|Q(boundary__parent__parent__id=boundary_id), active=2).extra(where=['''schools_institution.id in (SELECT "obj_id" FROM "public"."object_permissions_institution_perms" WHERE "user_id" = '%s' AND "Acess" = 't')''' %(user_id)]).only("id", "name", "boundary").order_by("boundary", "boundary__parent")
+	assignedInst = Institution.objects.select_related("boundary").filter(Q(boundary__id=boundary_id)|Q(boundary__parent__id=boundary_id)|Q(boundary__parent__parent__id=boundary_id), active=2).extra(where=['''schools_institution.id in (SELECT "obj_id" FROM "public"."object_permissions_institution_perms" WHERE "user_id" = '%s' AND "Acess" = 't')''' %(user_id)]).only("id", "name", "boundary").order_by("boundary", "boundary__parent", "name")
 	
 	assignedInstIds = assignedInst.values_list("id", flat=True)
-	unAssignedInst = Institution.objects.select_related("boundary").filter(Q(boundary__id=boundary_id)|Q(boundary__parent__id=boundary_id)|Q(boundary__parent__parent__id=boundary_id), active=2).exclude(pk__in=assignedInstIds).only("id", "name", "boundary").order_by("boundary", "boundary__parent")
-	assignedpermObjects = UserAssessmentPermissions.objects.filter(Q(instituion__boundary__id=boundary_id)|Q(instituion__boundary__parent__id=boundary_id)|Q(instituion__boundary__parent__parent__id=boundary_id), user=userObj, access=True).only("id", "assessment", "instituion").order_by("instituion__boundary", "instituion__boundary__parent")
-	unMapObjs = Assessment_StudentGroup_Association.objects.filter(Q(student_group__institution__boundary__id=boundary_id)|Q(student_group__institution__boundary__parent__id=boundary_id)|Q(student_group__institution__boundary__parent__parent__id=boundary_id), active=2).order_by("student_group__institution__boundary", "student_group__institution__boundary__parent")
+	unAssignedInst = Institution.objects.select_related("boundary").filter(Q(boundary__id=boundary_id)|Q(boundary__parent__id=boundary_id)|Q(boundary__parent__parent__id=boundary_id), active=2).exclude(pk__in=assignedInstIds).only("id", "name", "boundary").order_by("boundary", "boundary__parent", "name")
+	assignedpermObjects = UserAssessmentPermissions.objects.select_related("assessment", "instituion").filter(Q(instituion__boundary__id=boundary_id)|Q(instituion__boundary__parent__id=boundary_id)|Q(instituion__boundary__parent__parent__id=boundary_id), user=userObj, access=True).defer("access").order_by("instituion__boundary", "instituion__boundary__parent", "instituion__name",)
+	unMapObjs = Assessment_StudentGroup_Association.objects.select_related("student_group", "assessment").filter(Q(student_group__institution__boundary__id=boundary_id)|Q(student_group__institution__boundary__parent__id=boundary_id)|Q(student_group__institution__boundary__parent__parent__id=boundary_id), active=2).defer("active").order_by("student_group__institution__boundary", "student_group__institution__boundary__parent", "student_group__institution__name").distinct("student_group__institution")
 	for assignedPermObj in assignedpermObjects:
 		qsets = (
 	            Q(assessment = assignedPermObj.assessment)&
@@ -209,7 +209,7 @@ def KLP_ReAssign_Permissions(request, permissionType):
 	try:
 		if permissionType== 'permissions':
 			inst_list = request.POST.getlist('unassignedInst')
-			assignPermission(inst_list, userList, permissions, permissionType)
+			assignPermission(inst_list, userList, permissions, permissionType, None, True)
 		else:
 			asmList = request.POST.getlist('unassignedAsm')
 			for asm in asmList:
