@@ -68,10 +68,8 @@ def KLP_staff_view(request, institution_id):
 	
 def KLP_Staff_Update(request, staff_id):
 	""" To update Selected staff staff/(?P<staff_id>\d+)/update/"""
-	#print '*****************************'
 	check_user_perm.send(sender=None, user=request.user, model='Staff', operation='Update')
         check_user_perm.connect(KLP_user_Perm)
-        #print 1111111111111111111111
 	buttonType = request.POST.get('form-buttonType')
 	referKey = request.POST.get('form-0-boundary')
 	staff = Staff.objects.get(pk=staff_id)
@@ -83,11 +81,8 @@ def KLP_Staff_Update(request, staff_id):
 	else:
 		institutionType = 'Institution'
 		Staff_Types = Staff_Type.objects.filter(categoryType=1)
-	#print 'aaaaaaaaaaaaaaaaaa'
 	KLP_Edit_Staff =KLP_Staff(queryset = Staff.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'staff', extra_context={'buttonType':buttonType, 'referKey':referKey, 'stgrps':stgrps, 'institutionType':institutionType, 'Staff_Types':Staff_Types}), receiver = XMLReceiver(),)
-	#print 'bbbbbbbbbbbbbbbbbb'
 	response = KLP_Edit_Staff.responder.update_form(request, pk=staff_id, form_class=Staff_Form)
-	#print 'sssssssssssssssssssssssss'
 	return HttpResponse(response)		
 			      
 

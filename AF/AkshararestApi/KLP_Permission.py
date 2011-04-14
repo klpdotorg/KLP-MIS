@@ -164,15 +164,25 @@ def KLP_Show_Permissions(request, boundary_id, user_id):
 	
 	assignedInstIds = assignedInst.values_list("id", flat=True)
 	unAssignedInst = Institution.objects.select_related("boundary").filter(Q(boundary__id=boundary_id)|Q(boundary__parent__id=boundary_id)|Q(boundary__parent__parent__id=boundary_id), active=2).exclude(pk__in=assignedInstIds).only("id", "name", "boundary").order_by("boundary", "boundary__parent", "name")
+	
+	
+	
 	assignedpermObjects = UserAssessmentPermissions.objects.select_related("assessment", "instituion").filter(Q(instituion__boundary__id=boundary_id)|Q(instituion__boundary__parent__id=boundary_id)|Q(instituion__boundary__parent__parent__id=boundary_id), user=userObj, access=True).defer("access").order_by("instituion__boundary", "instituion__boundary__parent", "instituion__name",)
-	unMapObjs = Assessment_StudentGroup_Association.objects.select_related("student_group", "assessment").filter(Q(student_group__institution__boundary__id=boundary_id)|Q(student_group__institution__boundary__parent__id=boundary_id)|Q(student_group__institution__boundary__parent__parent__id=boundary_id), active=2).defer("active").order_by("student_group__institution__boundary", "student_group__institution__boundary__parent", "student_group__institution__name").distinct("student_group__institution")
+	
+	
+	
+	unMapObjs = Assessment_StudentGroup_Association.objects.select_related("student_group", "assessment").filter(Q(student_group__institution__boundary__id=boundary_id)|Q(student_group__institution__boundary__parent__id=boundary_id)|Q(student_group__institution__boundary__parent__parent__id=boundary_id), active=2).defer("active").order_by("student_group__institution__boundary", "student_group__institution__boundary__parent", "student_group__institution__name")
 	for assignedPermObj in assignedpermObjects:
 		qsets = (
 	            Q(assessment = assignedPermObj.assessment)&
 	            Q(student_group__institution = assignedPermObj.instituion)
 	        )
 		unMapObjs = unMapObjs.exclude(qsets)
-	return render_to_response('viewtemplates/show_permissions.html',{'assignedInst':assignedInst,  'userId':user_id, 'userName':userObj.username, 'unAssignedInst':unAssignedInst, 'assignedpermObjects':assignedpermObjects, 'unMapObjs':unMapObjs, 'redUrl':redUrl}, context_instance=RequestContext(request))		
+	unMapList = unMapObjs.values_list("student_group__institution", "assessment").distinct()
+	
+	qList=[Assessment_StudentGroup_Association.objects.select_related("student_group", "assessment").filter(student_group__institution__id=unMapVal[0], assessment__id=unMapVal[1]).defer("active")[0] for unMapVal in unMapList]
+	
+	return render_to_response('viewtemplates/show_permissions.html',{'assignedInst':assignedInst,  'userId':user_id, 'userName':userObj.username, 'unAssignedInst':unAssignedInst, 'assignedpermObjects':assignedpermObjects, 'redUrl':redUrl, 'qList':qList}, context_instance=RequestContext(request))		
 	
 def KLP_Show_User_Permissions(request, boundary_id, user_id):	
 	return render_to_response('viewtemplates/show_permissions.html',{'userId':user_id, 'boundary_id':boundary_id, 'confirmMsg':True}, context_instance=RequestContext(request))	 

@@ -63,7 +63,7 @@ class Relations_Form(ModelForm):
 class Child_Form(Relations_Form):
     thisyear = datetime.date.today().year
     startyear = thisyear-20
-    dob=forms.DateField( widget=SelectDateWidget(years=range(startyear,thisyear+1),attrs={'tabindex':3}))
+    dob=forms.DateField( widget=SelectDateWidget(years=range(startyear,thisyear+1),attrs={'tabindex':1}))
     class Meta:
 	model = Child
 

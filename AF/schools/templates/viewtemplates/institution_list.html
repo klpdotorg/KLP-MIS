@@ -50,6 +50,7 @@
 		</div>
 		{% endif %}
 		<div style="float:left;width:100%;padding:20px 5px 5px 5px;">
+			<input type="hidden" name="cur_Url" id="id_cur_Url" value={{url}} />
 			<input type="submit" value="Assign" name="permissions"/>
 		</div>
 	</form>
@@ -78,6 +79,15 @@
 							NFDo('start');
 						}
 					);
+					
+					$.ajax({
+						url: $("#id_cur_Url").val(),
+						success: function(data) {
+							$("#dyncData").html(data);
+							NFInit();
+						}
+		
+					});
 				}
 			});
 		});

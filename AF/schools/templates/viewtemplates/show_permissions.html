@@ -167,7 +167,7 @@
 	    		</td>	    	    
 	    	</tr>
 	{% endif %}
-	{% if unMapObjs %}
+	{% if qList %}
 		<tr>	    	
 	    		<td valign="top">
 	    			<form name="assignedAsmt" id="id_form-unassignedAsmt" onsubmit="return false;" method="POST">{%csrf_token%}
@@ -185,7 +185,7 @@
 					    		
 					    	</tr>
 					    	
-					    	{% for permObj in unMapObjs %}
+					    	{% for permObj in qList %}
 					    		<tr id="id_assessment_pems_{{permObj.id}}">
 					    			<td align="center">
 					    				<input type="checkbox" name="unassignedAsm" id="id_unassignedAsm" value="{{permObj.student_group.institution.id}}_{{permObj.assessment.id}}"/>

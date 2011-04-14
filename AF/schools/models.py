@@ -547,7 +547,7 @@ class Assessment(models.Model):
     	return '/assessment/%s/update/' %(self.id)
 
     def getChild(self):
-	if Question.objects.filter(assessment__id=self.id).count():
+	if Question.objects.filter(assessment__id=self.id, active=2).count():
 		return True
 	else:
 		return False

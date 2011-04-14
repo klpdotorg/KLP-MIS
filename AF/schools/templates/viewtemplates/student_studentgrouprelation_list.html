@@ -14,7 +14,7 @@
 		<span class="KLP_SpanButton" onclick="KLP_Del('{{studentgroup.id}}', '{{studentgroup.group_type}}', '{{studentgroup.name}}')">Delete</span>
 	</span>
 	<span class="KLP_Sub">
-		<a class="KLP_Button thickbox" href="/studentgroup/{{studentgroup.id}}/student/creator/?keepThis=true&TB_iframe=true&height=400&width=800" title="Add Student">Add Student</a>
+		<a class="KLP_Button thickbox" href="/studentgroup/{{studentgroup.id}}/student/call/?keepThis=true&TB_iframe=true&height=600&width=950" title="Add Student">Add Students</a>
 	</span>
 </div>
 
@@ -28,7 +28,8 @@
 <table border="0" cellpadding="0" cellspacing="0" id="id_StudentDetail" style="width:100%;overflow:hidden;text-align:center;{% if not students_list %}display:none;{% endif %}">
    <tbody>
     <tr>
-	<th class="tot-border3">First Name</th> <th  class="tot-border3">Last Name</th> <th  class="tot-border3"> DOB</th> <th  class="tot-border3">Mother Tongue</th><th  class="tot-border3">Gender</th> <th  class="tot-border3">Relations</th> {% if studentgroup.group_type|lower == 'class' %}<th  class="tot-border3">Map Students to Groups</th><th  class="tot-border4">Edit</th>{% endif %}
+	<th class="tot-border3">First Name</th> <th class="tot-border3">Last Name</th> <th class="tot-border3"> DOB</th> <th class="tot-border3">Mother Tongue</th><th class="tot-border3">Gender</th> <th class="tot-border3">Relations</th> {% if studentgroup.group_type|lower == 'class' %}<th class="tot-border4">Select <span style="cursor:pointer;color:#1569C7;" onclick="checkAll()">All</span>&nbsp;/&nbsp;<span style="cursor:pointer;color:#1569C7;" onclick="unCheckAll()">None</span> </th> {% endif %}
+	
     </tr>
     {% for student in students_list %}
     <tr id = "student_{{student.student.id}}">
@@ -42,9 +43,7 @@
 		<td class="tot-border1"><input type="checkbox" value = "{{student.student.id}}" name="students"/></td>
 
 		<td class="tot-border2">
-			<a href="/student/{{student.student.child.id}}/update/?keepThis=true&TB_iframe=true&height=400&width=800" title="Edit Student" title="Edit Student" class="thickbox"><img title="Edit" src="/static_media/images/pagebuilder_edit.gif"></a>
-
-			<span style="color:blue;cursor:pointer"  onclick="KLP_Del('{{student.student.id}}', 'student', '{{student.student.child.firstName}}')"><img width="11" title="Delete" src="/static_media/images/PageRow_delete.gif" title="Delete"></span>
+			<input type="checkbox" value = "{{student.student.child.id}}" name="students"/>
 		</td>
 	{% endif %}
     </tr>
@@ -75,6 +74,14 @@
 			<span style="padding-right:5px;"><select name="StdgrpCtr"><option value="None">--</option>{% for stdgrp in studentGroups %}<option value="{{stdgrp.id}}">{{stdgrp.name}}</option>{% endfor %}</select></span>
 			<input type="hidden" name="school" value="{{studgrpParent.id}}" />
 			<span><input type="submit" value="submit"/></span>
+</div>
+
+<div style="padding:20px 0px;text-align:center;{% if studentgroup.group_type|lower == 'center' %}display:none;{% endif %}">
+	<div class="detailHead">
+			<span class="hedText">Edit</span><span class="hedText" style="padding-left:40px;">Delete</span>
+	</div>
+	<span><input type="button" id="student_Edit" href="/studentgroup/{{studentgroup.id}}/student/editCall/?keepThis=true&TB_iframe=true&height=600&width=950" disabled="true" value="Edit"><input type="hidden" id="id_StudEditUrl" value="/studentgroup/{{studentgroup.id}}/student/editCall/?keepThis=true&TB_iframe=true&height=600&width=950"/></span>
+	<span style="padding-left:35px;"><button type="button" id="student_Delete" disabled="true">Delete</button></span>
 </div>
 
 

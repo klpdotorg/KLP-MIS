@@ -6,6 +6,6 @@
 	<td  class="tot-border1">{{child.mt}} </td>
 	<td  class="tot-border1">{{child.gender}}</td>
 	<td  class="tot-border1">{% if child.getMother.first_name %}Mother: {{child.getMother.first_name}} <br />{% endif %} {% if child.getFather.first_name%}Father: {{child.getFather.first_name}}{% endif %}</td> 
-        <td  class="tot-border2"><input type="checkbox" value = "{{child.id}}" name="students" /></td>
+        <td  class="tot-border2"><input type="checkbox" value = "{{child.id}}" name="students" onchange="updateEditUrl()"/></td>
 		
 </tr>
