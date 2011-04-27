@@ -4,7 +4,12 @@
 <td  class="tot-border1">{{staff.doj|date:"d-m-Y"}}</td>
 <td  class="tot-border1">{{staff.gender}}</td>
 <td  class="tot-border1">{{staff.mt}}</td>
-<td  class="tot-border1">{{staff.qualification}}</td>
+<td  class="tot-border1">
+	{% for qualification in staff.qualification.all %}
+		{{qualification}}
+		{% if not forloop.last %}, {% endif %}
+	{% endfor %}
+</td>
 <td  class="tot-border1">{{staff.staff_type}}</td>
 <td  class="tot-border1">
 	{% for assignedGrup in staff.getAssigendClasses%}

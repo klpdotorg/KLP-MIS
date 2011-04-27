@@ -24,18 +24,18 @@ class KLP_ChangeAns(Resource):
         programId = request.POST.get('programId')
         assessmentId = request.POST.get('assessmentId')
         student_groupId = request.POST.get('student_groupId')
-        studentObj = Student.objects.get(pk=student)
-        Questions_list = Question.objects.filter(assessment__id=assessmentId)
-        student_groupObj = StudentGroup.objects.get(pk = student_groupId)
-        assessmentObj = Assessment.objects.get(pk=assessmentId)
-        instObj = student_groupObj.institution
+        studentObj = Student.objects.filter(pk=student).defer("child")[0]
+        Questions_list = Question.objects.filter(assessment__id=assessmentId).defer("assessment")
+        student_groupObj = StudentGroup.objects.filter(pk = student_groupId).values("institution")[0]
+        assessmentObj = Assessment.objects.filter(pk=assessmentId).defer("programme")[0]
+        instObj = Institution.objects.filter(pk=student_groupObj["institution"]).defer("boundary")[0]
         check_perm.send(sender=None, user=user, instance=instObj, Assessment=assessmentObj, permission='Acess')
         check_perm.connect(KLP_obj_Perm)
         for question in Questions_list:
         	textField = 'student_%s_%s' %(student, question.id)
         	textFieldVal = request.POST.get(textField)
         	try:
-        		ansObj = Answer.objects.get(question = question, student = studentObj)
+        		ansObj = Answer.objects.filter(question = question, student = studentObj).defer("question", "student")[0]
         		if textFieldVal:
         			if textFieldVal.lower() == 'ab':
         				ansObj.answerGrade = None
@@ -58,7 +58,7 @@ class KLP_ChangeAns(Resource):
 					ansObj.lastmodifiedBy = user
 				       	ansObj.user2 = user
         			ansObj.save()	
-        	except Answer.DoesNotExist:
+        	except :
         		if textFieldVal:
 				ansObj = Answer(question=question, student=studentObj, doubleEntry=1)
 				ansObj.save()
@@ -82,8 +82,7 @@ def KLP_DataValidation(request):
     validateId = request.POST.get('validateField')
     validateValue = request.POST.get('validateValue')
     listIds = validateId.split('_')
-    ansObj = Answer.objects.get(student__id=listIds[1], question__id=listIds[2])
-    #respStr = 'Data mismatch'
+    ansObj = Answer.objects.filter(student__id=listIds[1], question__id=listIds[2]).defer("student","user1", "user2", "lastmodifiedBy")[0]
     respStr = False
     dEntry = int(ansObj.doubleEntry)
     if dEntry in [0,2]:
@@ -94,12 +93,14 @@ def KLP_DataValidation(request):
 	    		if ansObj.status == -99999:
 	    			respStr = True
 	    	elif validateValue.lower() == 'uk':
-	    		if ansObj.status == -1:
+	    		if ansObj.status == 0:
 	    			respStr = True
 	    	elif ansObj.question.questionType == 2:
 	    	    try:
 		    	    if ansObj.answerGrade.lower() == validateValue.lower():
 		    	        respStr = True
+		    	    elif float(ansObj.answerGrade) == float(validateValue):
+		    	    	respStr = True
 		    except:
 		    	pass
 	    	else:

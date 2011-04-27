@@ -22,16 +22,16 @@
 				    		</div>
 				    	</td>
 	    			</tr>
-	    			{% for i in students_list%}
+	    			{% for i in chList%}
 	    				<tr class="KLP_txt_cen">
 	    					<td class="KLP_Ans_Fix">
 	    						<div class="KLP_Fix_Div">
 		    						<table>
 		    							<tr>
-		    								{% with i.student_set.all|first as firstStud %}
-										<td class="KLP_td_width">{{firstStud.id}}</td>
+		    								{% with childDict|displayValue:i as cDic %}
+										<td class="KLP_td_width">{{i}}</td>
 										<td class="KLP_td_width" style="min-width:108px;max-width:108px;">
-											<span class="blue" title="Father: {{i.getFather.first_name}}, Mother: {{i.getMother.first_name}}, Gender: {{i.gender}}, MT: {{i.mt}}, DOB: {% if i.dob %}{{i.dob|date:'d-m-Y'}}{% endif %}">{{i.firstName}} {{i.lastName}}</span><span class="KLP_Form_status" id="id_Student_{{firstStud.id}}_status">Form Status</span>
+											<span class="blue" title="Father: {{cDic|displayValue:'fName'}}, Mother: {{cDic|displayValue:'mName'}}, Gender: {{cDic|displayValue:'Gender'}}, DOB: {{cDic|displayValue:'dob'}}">{{cDic|displayValue:'firstName'}} {{cDic|displayValue:'lastName'}}</span><span class="KLP_Form_status" id="id_Student_{{i}}_status">Form Status</span>
 										
 										</td>
 										{% endwith%}
@@ -51,8 +51,8 @@
 	     					<div class="KLP_Fix_Div">
 		     					<table>
 		     						<tr>
-									{% if question_list %}
-										{% for ques in question_list %}
+									{% if qNamesList %}
+										{% for ques in qNamesList %}
 						    					<td class="KLP_td_height"><span class="blue" title="{{ques}}">{{ques}}</span></td>
 										{% endfor %}
 										<td class="KLP_td_height"> Submit </td>
@@ -66,36 +66,36 @@
 	     				</td>
 	     			</tr>
 	     
-	     			{% for i in students_list%}
+	     			{% for i in studIdList%}
 	     				<tr class="KLP_txt_cen">
 						<td class="KLP_Ans_Fix">
 							<div class="KLP_Fix_Div">
-								{% with i.student_set.all|first as firstStud %}
-								<form name="student_{{firstStud.id}}" id="id_Student_{{firstStud.id}}" class="validForm" onsubmit="return false;">
+								<form name="student_{{i}}" id="id_Student_{{i}}" class="validForm" onsubmit="return false;">
 									<input type="hidden" name="student_groupId" value="{{studentgroup_id}}" />
 									<input type="hidden" name="programId" value="{{filter_id}}"/>
 									<input type="hidden" name="assessmentId" value="{{assessment_id}}"/>
-									<input type="hidden" name="student" value="{{firstStud.id}}"/>
+									<input type="hidden" name="student" value="{{i}}"/>
 								
 									<table>
 										<tr>
 										
-											{% for ques in question_list %}
-											
+											{% for qId in qIdList %}
+											{% with rDict|displayValue:qId as qData %}
+											{% with qData|displayValue:i as qDict %}
 			        							<td class="KLP_td_height">
-			        								{% if ques|dEStatus:firstStud == 2 or user.id == ques|firstUser:firstStud and ques|dEStatus:firstStud > 1%}
-													{{ques|getAnswerValue:firstStud}}
+			        								{% if not qDict|displayValue:'iBox' %}
+													{{qDict|displayValue:'ansVal'}}
 			        								{% else %}
 			        								
-			        								<span style="color:#736F6E;">{{ques.order}}</span><br/>
+			        								<span style="color:#736F6E;">{{qDict|displayValue:'qOrder'}}</span><br/>
 												<input type="text"	
-									   					       name="student_{{firstStud.id}}_{{ques.id}}" 
-									   					       id="id_student_{{firstStud.id}}_{{ques.id}}" 
+									   					       name="student_{{i}}_{{qDict|displayValue:'qId'}}" 
+									   					       id="id_student_{{i}}_{{qDict|displayValue:'qId'}}" 
 									   					       tabindex="1"
-									   					       value="{% if ques|getAnswer:firstStud %}{%if user.id == ques|firstUser:firstStud and ques|dEStatus:firstStud == 1  %}{{ques|getAnswerValue:firstStud}}{% endif %}{% endif %}" 
+									   					       value="{%if qDict|displayValue:'shVal' %}{{qDict|displayValue:'ansVal'}}{% endif %}" 
 									   					       size="3"
-									   					       class="required {% if ques.questionType == 2 %}letters{%else%}number{%endif%}"
-									   					       {% if user.id != ques|firstUser:firstStud and ques|dEStatus:firstStud == 1%}dE="true" sE="true"{% endif %}
+									   					       class="required {% if qDict|displayValue:'qType' == 2 %}letters{%else%}number{%endif%}"
+									   					       {% if qDict|displayValue:'dE'%}dE="true" sE="true"{% endif %}
 									   					       />
 									   					       
 									   			{% endif %}
@@ -104,22 +104,23 @@
 			                					
 			            							</td>
 			            							{% if forloop.last %}
-			            								<td class="KLP_td_height"> <input id="id_Student_{{firstStud.id}}_submit" type="submit" tabindex="1"   value="submit"  {%if ques|firstUser:firstStud == user.id and ques|dEStatus:firstStud > 1 or ques|dEStatus:firstStud == 2%}disabled{%endif%}/>       
+			            								<td class="KLP_td_height"> <input id="id_Student_{{i}}_submit" type="submit" tabindex="1"   value="submit"  {% if not qDict|displayValue:'iBox' %}disabled{%endif%}/>       
 			            								
 			            								<script>
 													$().ready(function() {
-														KLP_validateScript("id_Student_{{firstStud.id}}");
+														KLP_validateScript("id_Student_{{i}}");
 													});
 												</script>
 
 			            							{% endif %}
-			            							
+			            							{% endwith%}
+			            							{% endwith%}
 			        						{% endfor %}
 											
 										</tr>
 									</table>
 			        				</form>
-			        				{% endwith%}
+			        				
 	                				</div>
 	                				
 	                			</td>
@@ -131,7 +132,7 @@
 			</table>
 			
 </div><br/>
-<div id="student_pagenation" style="{% if not students_list %}display:none;{% endif %}">
+<div id="student_pagenation" style="{% if not childs_list %}display:none;{% endif %}">
 	
 		page <span id="id_currentPage">{{page}}</span> of <span id="id_totPages">{{pages}}</span>
 		<input type="hidden" name="resultPerPage" id="id_resultPerPage" value="{{results_per_page}}" />
@@ -147,11 +148,9 @@
 <span id ="list_url" style="display:none;" value = "{{url}}"></span>
 <div class="KLP_DE_Submit">
 	<span class="KLP_SpanButton"  id="id_ans_global_submit">Submit</span>
-	{% if group_typ|lower == 'class' %}
 	<span class="KLP_DE_AdStudent">
 		<a href="/studentgroup/{{studentgroup_id}}/student/creator/?keepThis=True&map_Student=1&assessment_id={{assessment_id}}&TB_iframe=True&height=400&width=800" title="Create New Student to Map" class="thickbox KLP_Button"> Add Student </a>
 	</span>
-	{% endif %}
 </div>
 
 

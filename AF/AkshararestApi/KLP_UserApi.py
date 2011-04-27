@@ -14,11 +14,9 @@ def KLP_addNewUser(request,template_name='viewtemplates/add_new_user.html', post
     if user.id is not None and (user.is_superuser or 'AdminGroup' in user_GroupsList):
         if post_change_redirect is None:
             post_change_redirect = reverse('Akshara.AkshararestApi.KLP_UserApi.KLP_addNewUser_done')
-        print request.POST
         if request.method == "POST":
         
             form = UserCreationFormExtended(request.POST)
-            print form
             if form.is_valid():      	       	          	    
                 form.save()
                 return HttpResponseRedirect(post_change_redirect)
@@ -26,7 +24,6 @@ def KLP_addNewUser(request,template_name='viewtemplates/add_new_user.html', post
                 return render_to_response(template_name,{'form':form, 'title':'KLP User', 'legend':'Karnataka Learning Partnership', 'entry':"Add"},context_instance=RequestContext(request)) 
         else:   	
             form = UserCreationFormExtended()
-            print form
             return render_to_response(template_name,{'form':form, 'title':'KLP User', 'legend':'Karnataka Learning Partnership', 'entry':"Add"},context_instance=RequestContext(request)) 
     else:
         return HttpResponseRedirect('/login/') 

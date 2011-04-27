@@ -67,7 +67,10 @@
  	</div>
 	<div class="bng-cl">
 		<span>
-			{{staff.qualification}}
+			{% for qualification in staff.qualification.all %}
+				{{qualification}}
+				{% if not forloop.last %}, {% endif %}
+			{% endfor %}
 		</span>
 	</div>
 </div>

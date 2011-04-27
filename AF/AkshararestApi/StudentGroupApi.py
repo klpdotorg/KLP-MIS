@@ -69,15 +69,116 @@ def KLP_StudentGroup_Update(request, studentgroup_id):
 	response = KLP_Edit_StudentGroup.responder.update_form(request, pk=studentgroup_id, form_class=StudentGroup_Form)
 	return HttpResponse(response)	
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assessment_id):
 	""" To Show Answer Entry Form studentgroup/(?P<studentgroup_id>\d+)/programme/(?P<programme_id>\d+)/assessment/(?P<assessment_id>\d+)/view/"""
 	user = request.user
 	url = "/studentgroup/%s/programme/%s/assessment/%s/view/" %(studentgroup_id, programme_id, assessment_id)
-	students = Student_StudentGroupRelation.objects.filter(student_group__id = studentgroup_id, academic=current_academic, active=2).values_list('student__child', flat=True).distinct()
-	grupObj = StudentGroup.objects.get(pk = studentgroup_id)
-	students_list = Child.objects.filter(id__in=students).extra(select={'lower_firstname':'lower(trim("firstName"))' }).order_by('lower_firstname')
-	question_list = Question.objects.filter(assessment__id=assessment_id, active=2)
-	val=Collection(students_list, permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'prgtemplates', template_object_name = 'students', paginate_by=20, extra_context={'filter_id':programme_id, 'assessment_id':assessment_id, 'user':user, 'studentgroup_id':studentgroup_id, 'question_list':question_list,  'group_typ':grupObj.group_type, 'url':url}), entry_class = ChoiceEntry, )
+	students = Student_StudentGroupRelation.objects.select_related("student").filter(student_group__id = studentgroup_id, academic=current_academic, active=2).values_list('student__child', flat=True).distinct()
+	grupObj = StudentGroup.objects.filter(pk = studentgroup_id).only("group_type")
+	childs_list = Child.objects.filter(id__in=students).extra(select={'lower_firstname':'lower(trim("firstName"))' }).order_by('lower_firstname').defer("mt")
+	question_list = Question.objects.filter(assessment__id=assessment_id, active=2).defer("assessment")
+	studIdList, qNamesList, qIdList, chList, rDict, childDict, counter=[], [], [], [], {}, {}, 0
+	paginator = Paginator(childs_list, 20)
+	
+	page = request.GET.get('page')
+	try:
+		page = int(page)
+	except (ValueError, TypeError):
+		page = 1
+	try:
+		pagchilds_list = paginator.page(page)
+	except (EmptyPage, InvalidPage):
+		# If page is out of range (e.g. 9999), deliver last page of results.
+		pagchilds_list = paginator.page(paginator.num_pages)
+	
+	for child in pagchilds_list.object_list:
+		chDic={}
+		
+		chId = child.id
+		chList.append(chId)
+		
+		student = Student.objects.filter(child=child, active=2).defer("child")
+		studId = student[0].id
+		
+		chDic = {'Gender':child.gender, 'dob':child.dob.strftime("%d-%m-%Y"), 'firstName':child.firstName, 'lastName':child.lastName}
+		
+		try:
+			relObj = Relations.objects.filter(child=child, relation_type="Father").only("first_name")
+			chDic['fName'] = relObj[0].first_name
+		except:
+			chDic['fName'] = ''
+		
+		try:
+			relObj = Relations.objects.filter(child=child, relation_type="Mother").only("first_name")
+			chDic['mName'] = relObj[0].first_name
+		except:
+			chDic['mName'] = ''
+			
+		studIdList.append(studId)
+		childDict[chId] = chDic
+	rDict, ansStudList={}, []
+	counter = counter +1 
+	
+	for ques in question_list:
+		qNamesList.append(ques.name)
+		qId = ques.id
+		qIdList.append(qId)
+		dataDict={'qId':qId, 'qOrder':ques.order}
+		qType = ques.questionType
+		dataDict['qType'] = qType
+		qDict={}	
+		ansList = Answer.objects.select_related("user1").filter(question=ques, student__id__in = studIdList).defer("question").values()
+		if ansList:
+			for ansObj in ansList:
+				ansDict=dict(dataDict)
+				dEntry = ansObj['doubleEntry']
+			
+				firstUser = ansObj['user1_id']
+				studentId = ansObj['student_id']
+				ansStudList.append(studentId)
+				if dEntry == 2 or (dEntry > 1 and firstUser == user.id):
+					ansDict['iBox'] = False
+				else:
+					ansDict['iBox'] = True
+		                status = ansObj['status']
+				if status == -99999:
+		    			ansVal = 'AB'
+		    		elif status == 0:
+		    			ansVal = 'UK'
+		    		elif qType == 2:
+		    			ansVal = ansObj['answerGrade']
+		    		else:
+		    			ansVal = ansObj['answerScore']
+				ansDict['ansVal']=ansVal								
+				ansDict['shVal'] = False	  
+				if firstUser != user.id and dEntry ==1:
+					ansDict['dE'] = True
+				elif firstUser == user.id and dEntry ==1:
+					ansDict['shVal'] = True
+				
+			        qDict[studentId] = ansDict
+				
+		
+		rDict[qId] = qDict	
+	noAnsList = list(set(studIdList).difference(set(ansStudList)))
+	if noAnsList:
+		for ques in question_list:
+			qId = ques.id
+			dataDict={'qId':qId, 'qOrder':ques.order}
+			qType = ques.questionType
+			dataDict['qType'] = qType
+			qDict=rDict[qId]
+			for stId in noAnsList:
+				ansDict=dict(dataDict)
+				ansDict['iBox'] = True
+				ansDict['ansVal'] = ''
+				qDict[stId] = ansDict
+			
+			
+				
+			
+	val=Collection(childs_list, permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'prgtemplates', template_object_name = 'childs', paginate_by=20, extra_context={'filter_id':programme_id, 'assessment_id':assessment_id, 'user':user, 'studentgroup_id':studentgroup_id, 'question_list':question_list,  'group_typ':grupObj[0].group_type, 'url':url, 'studIdList':studIdList, 'rDict':rDict, 'qNamesList':qNamesList, 'chList':chList, 'childDict':childDict, 'rDict':rDict, 'qIdList':qIdList}), entry_class = ChoiceEntry, )
 	return HttpResponse(val(request))
 	
 

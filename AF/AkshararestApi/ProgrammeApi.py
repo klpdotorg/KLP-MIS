@@ -58,10 +58,10 @@ class KLP_Get_Programms(Resource):
     """ To get  programmes based on type selected filter/(?P<type_id>\d+)/programme/"""
     def read(self,request,type_id):     
          try:     
-            programme_list = Programme.objects.filter(programme_institution_category=type_id, active=2)
+            programme_list = Programme.objects.filter(programme_institution_category=type_id, active=2).order_by("name").only("id", "name")
             respStr = ''
             for programme in programme_list:
-                respStr += '%s$$%s&&' %(programme.id, programme)
+                respStr += '%s$$%s&&' %(programme.id, programme.name)
             return HttpResponse(respStr[0:len(respStr)-2])         
          except:
             return HttpResponse('fail')	            

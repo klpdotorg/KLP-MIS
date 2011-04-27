@@ -1,13 +1,12 @@
 <div class="KLP_Button_Header">
 	<span class="KLP_Sub">
-		<a class="KLP_Button"  href="/studentgroup/{{studentgroup.id}}/update/?group_typ={{studentgroup.group_type}}&sch_typ={{studentgroup.institution.boundary.boundary_category}}" onclick="return KLP_View(this);">Edit</a>
+		<a class="KLP_Button"  href="/studentgroup/{{studentgroup.id}}/update/?group_typ={{studentgroup.group_type}}&sch_typ={{studentgroup.institution.boundary.boundary_category}}" onclick="return KLP_View(this);">Edit {% if studentgroup.group_type|lower == 'center' %}Center{% else %}Class{% endif %}</a>
 	</span>
 	<span class="KLP_Sub">
-		<span class="KLP_SpanButton"  onclick="KLP_Del('{{studentgroup.id}}', 'studentgroup', '{{studentgroup.name}}')">Delete</span>
+		<span class="KLP_SpanButton"  onclick="KLP_Del('{{studentgroup.id}}', 'studentgroup', '{{studentgroup.name}}')">Delete {% if studentgroup.group_type|lower == 'center' %}Center{% else %}Class{% endif %}</span>
 	</span>
 	<span class="KLP_Sub">
-		<a class="KLP_Button thickbox" href="/studentgroup/{{studentgroup.id}}/student/creator/?keepThis=true&TB_iframe=true&height=400&width=800" title="Add Student" >Add Student</a>
-		
+		<a class="KLP_Button thickbox" href="/studentgroup/{{studentgroup.id}}/student/call/?keepThis=true&TB_iframe=true&height=600&width=950" title="Add Students">Add Students</a>	
 	</span>
 </div>
 <script>

@@ -62,7 +62,7 @@ class KLP_Get_Assessments(Resource):
     """ To get  assessment under programme filter/programme/(?P<programme_id>\d+)/assessments/"""
     def read(self,request,programme_id):     
          try:     
-            assessments_list = Assessment.objects.filter(programme__id=programme_id, active=2)
+            assessments_list = Assessment.objects.filter(programme__id=programme_id, active=2).defer("programme")
             respStr = ''
             for assessment in assessments_list:
                 respStr += '%s$$%s&&' %(assessment.id, assessment)
