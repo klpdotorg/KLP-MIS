@@ -50,18 +50,16 @@ class TreeSerializeResponder(object):
         """
         # Hide unexposed fields
         hidden_fields = []
-	#print " am working"
-	#print self.format
+	
         for obj in list(object_list):
             for field in obj._meta.fields:
                 if not field.name in self.expose_fields and field.serialize:
                     field.serialize = False
                     hidden_fields.append(field)
-        #print object_list
-	#print serializers.serialize(self.format, object_list)	
+        
         response = serializers.serialize(self.format, object_list)
         # Show unexposed fields again
-        #print response 
+        
         response1 = serializers.serialize(self.format, object_list,use_natural_keys=True)
        
         response1= simplejson.loads(response)

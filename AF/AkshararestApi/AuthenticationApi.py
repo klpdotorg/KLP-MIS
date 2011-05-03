@@ -12,9 +12,10 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 
 def KLP_Login(request):
-  # Method For Login  
-  user = request.user
-  if request.method == 'POST':
+  """ This method is for user login """
+  user = request.user  
+  if request.method == 'POST':  
+    # check method is post 
     user = authenticate(username=request.POST['username'], password=request.POST['password'])
     if user is not None:
       if user.is_active:
@@ -36,11 +37,12 @@ def KLP_Login(request):
       return render_to_response('login.html',{'user':user, 'title':'Karnataka Learning Partnership', 'legend':'Karnataka Learning Partnership', 'entry':"Add"}, context_instance=RequestContext(request))   
       
 def KLP_Logout_user(request):  
-    # Method For Logout          
+    """ This method is for user logout """
     logout(request)
     return render_to_response('login.html', {'title':'Karnataka Learning Partnership', 'legend':'Karnataka Learning Partnership', 'entry':"Add"},context_instance=RequestContext(request))
     
 def KLP_User_Auth(request):
+	""" This method checks, user is authenticated or not """
 	return HttpResponse(request.user.is_authenticated())    
 
 

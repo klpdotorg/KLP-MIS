@@ -27,7 +27,7 @@ def KLP_Assign_Permissions(request):
 	inst_list = request.POST.getlist('instName')
 	bound_list = request.POST.getlist('boundaryName')
 	assessmentPerm = request.POST.get('assessmentPerm')
-	count, asmCount = 0, 0
+	count, asmCount, assignedAsmIds = 0, 0, []
 	if not deUserList:
 		respDict['respMsg'] = 'Select Atleast One User'
 		respDict['isSuccess'] = False
@@ -43,15 +43,17 @@ def KLP_Assign_Permissions(request):
 				for bound in bound_list:
 					inst_list = Institution.objects.filter(boundary__parent__id = bound, active=2).values_list('id', flat=True).distinct()
 					count = count + len(inst_list)
-					aCount = assignPermission(inst_list, deUserList, permissions, permissionType, assessmentId, assessmentPerm)
-					asmCount = asmCount + aCount
+					asmIdList = assignPermission(inst_list, deUserList, permissions, permissionType, assessmentId, assessmentPerm)
+					assignedAsmIds.extend(asmIdList)
 			elif bound_cat in [ 'block', 'project']:
 				for bound in bound_list:
 					inst_list = Institution.objects.filter(boundary__id = bound, active=2).values_list('id', flat=True).distinct() 
 					count = count + len(inst_list)
-					aCount = assignPermission(inst_list, deUserList, permissions, permissionType, assessmentId, assessmentPerm)
-					asmCount = asmCount + aCount
+					asmIdList = assignPermission(inst_list, deUserList, permissions, permissionType, assessmentId, assessmentPerm)
+					assignedAsmIds.extend(asmIdList)
 			if assessmentPerm:
+				assignedAsmIds =  list(set(assignedAsmIds))
+				asmCount = len(assignedAsmIds)
 				respDict['respMsg'] = 'Assigned Permissions successfully for %s Institutions  and %s Assessments Assigned successfully' %(count, asmCount)
 			else:
 				respDict['respMsg'] = 'Assigned Permissions successfully for %s Institutions' %(count)
@@ -63,9 +65,11 @@ def KLP_Assign_Permissions(request):
 			respDict['isSuccess'] = False				
 		else:
 			count = count + len(inst_list)
-			aCount = assignPermission(inst_list, deUserList, permissions, permissionType, assessmentId, assessmentPerm)
-			asmCount = asmCount + aCount
+			asmIdList = assignPermission(inst_list, deUserList, permissions, permissionType, assessmentId, assessmentPerm)
+			assignedAsmIds.extend(asmIdList)
 			if assessmentPerm:
+				assignedAsmIds =  list(set(assignedAsmIds))
+				asmCount = len(assignedAsmIds)
 				respDict['respMsg'] = 'Assigned Permissions successfully for  %s Institutions and %s Assessments Assigned successfully' %(count, asmCount)
 			else:
 				respDict['respMsg'] = 'Assigned Permissions successfully for  %s Institutions' %(count)
@@ -77,7 +81,7 @@ def KLP_Assign_Permissions(request):
 	return HttpResponse(simplejson.dumps(respDict), content_type='application/json; charset=utf-8')	
 	
 def assignPermission(inst_list, deUserList, permissions, permissionType, assessmentId=None, assessmentPerm=None):
-	count = 0
+	assignedAsmIds = []
 	for inst_id in inst_list:
 		instObj = Institution.objects.get(pk=inst_id)
 		for deUser in deUserList:
@@ -90,13 +94,14 @@ def assignPermission(inst_list, deUserList, permissions, permissionType, assessm
 					for asmId in asmIds:
 						assessmentObj = Assessment.objects.get(id=asmId)
 						try:
-							permObj = UserAssessmentPermissions(user = userObj, instituion = instObj, assessment = assessmentObj, access=True)
-							permObj.save()
-						except:
 							permObj = UserAssessmentPermissions.objects.get(user = userObj, instituion = instObj, assessment = assessmentObj)
 							permObj.access = True
+							permObj.save()							
+						except:
+							permObj = UserAssessmentPermissions(user = userObj, instituion = instObj, assessment = assessmentObj, access=True)
 							permObj.save()
-					count = len(asmIds)
+							
+					assignedAsmIds.extend(asmIds)
 			else:
 				assessmentObj = Assessment.objects.get(pk=assessmentId)
 				try:
@@ -106,7 +111,8 @@ def assignPermission(inst_list, deUserList, permissions, permissionType, assessm
 				except :
 					permObj = UserAssessmentPermissions(user = userObj, instituion = instObj, assessment = assessmentObj, access=True)
 					permObj.save()
-	return count	
+	assignedAsmIds = list(set(assignedAsmIds))
+	return assignedAsmIds	
 
 def KLP_Users_list(request):
 	user = request.user

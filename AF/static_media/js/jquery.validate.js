@@ -270,8 +270,9 @@ $.extend($.validator, {
 		minlength: $.validator.format("Please enter at least {0} characters."),
 		rangelength: $.validator.format("Please enter a value between {0} and {1} characters long."),
 		range: $.validator.format("Please enter a value between {0} and {1}."),
-		max: $.validator.format("Please enter a value less than or equal to {0}."),
-		min: $.validator.format("Please enter a value greater than or equal to {0}.")
+		max: $.validator.format("Data Not Allowed"),
+		min: $.validator.format("Data Not Allowed"),
+		isinGrades: "Data Not Allowed"
 	},
 	
 	autoCreateRanges: false,
@@ -992,12 +993,22 @@ $.extend($.validator, {
 		
 		// http://docs.jquery.com/Plugins/Validation/Methods/min
 		min: function( value, element, param ) {
-			return this.optional(element) || value >= param;
+			if (value.toLowerCase() == 'ab' || value.toLowerCase() == 'uk'){
+				return  true
+			}
+			else{
+				return this.optional(element) || value >= param;
+			}
 		},
 		
 		// http://docs.jquery.com/Plugins/Validation/Methods/max
 		max: function( value, element, param ) {
-			return this.optional(element) || value <= param;
+			if (value.toLowerCase() == 'ab' || value.toLowerCase() == 'uk'){
+				return  true
+			}
+			else{
+				return this.optional(element) || value <= param;
+			}
 		},
 		
 		// http://docs.jquery.com/Plugins/Validation/Methods/range
@@ -1047,7 +1058,12 @@ $.extend($.validator, {
 			}
 		},
 		letters: function(value, element) {
-			return this.optional(element) || /^[a-zA-Z\ \']+$/.test(value);
+			if (value == 1 || value == 0){
+		        	return true
+		        }
+		        else{
+				return this.optional(element) || /^[a-zA-Z\ \']+$/.test(value);
+			}
 		},
 		
 		// http://docs.jquery.com/Plugins/Validation/Methods/creditcard
@@ -1093,7 +1109,34 @@ $.extend($.validator, {
 				$(element).valid();
 			});
 			return value == target.val();
-		}
+		},
+		
+		isinGrades: function(value, element, param) {
+			var paramList = new Array()
+			paramList = param.split(",")
+			value2=value;
+			value1=parseInt(value);
+			if (!isNaN(value1))
+				ovalue=value1
+			else
+				ovalue=value2.toLowerCase()
+			resp = false
+			for (i=0; i<paramList.length; i++){
+				param=paramList[i];
+				param2=paramList[i];
+				param1=parseInt(param);
+				if (!isNaN(param1))
+					oparam=param1
+				else
+					oparam=param2.toLowerCase()
+					
+				if (oparam ==ovalue || ovalue == 'ab' || ovalue == 'uk'){
+					resp = true
+					break;
+				}
+			}
+			return resp
+		},
 		
 	}
 	

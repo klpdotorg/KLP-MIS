@@ -16,6 +16,7 @@ from schools.receivers import KLP_user_Perm
 class KLP_Staff(Collection):
     """To get Paricular Staff """
     def get_entry(self, staff_id):        
+    	# Query For Selected Staff based on staff_id
         staff = Staff.objects.get(id=int(staff_id))
         return ChoiceEntry(self, staff)     
         
@@ -27,6 +28,7 @@ def KLP_Staff_View(request, staff_id):
         
 def KLP_Staff_Create(request, referKey):
 	""" To Create New Staff institution/(?P<referKey>\d+)/staff/creator/"""
+	# Checking user Permissions for Staff creation
 	check_user_perm.send(sender=None, user=request.user, model='Staff', operation='Add')
         check_user_perm.connect(KLP_user_Perm)
 	buttonType = request.POST.get('form-buttonType')
@@ -36,9 +38,11 @@ def KLP_Staff_Create(request, referKey):
 	extra_dict['stgrps'] = StudentGroup.objects.filter(institution__id = referKey, active=2).order_by("name","section")
 	institutionObj = Institution.objects.get(pk = referKey)
 	if institutionObj.boundary.boundary_category.boundary_category.lower() == 'circle':
+		# if the boundary category is circle get anganwadi staff types.
 		extra_dict['institutionType'] = 'Anganwadi'
 		Staff_Types = Staff_Type.objects.filter(categoryType=2)
 	else:
+		# if the boundary category is not circle get Institution staff types.
 		extra_dict['institutionType'] = 'Institution'
 		Staff_Types = Staff_Type.objects.filter(categoryType=1)
 	extra_dict['Staff_Types'] = Staff_Types	
@@ -49,8 +53,7 @@ def KLP_Staff_Create(request, referKey):
 
 
 def KLP_staff_view(request, institution_id):
-	""" To view list of staff in school school/(?P<school_id>\d+)/staff/view/"""
-	#stdgrp_list = StudentGroup.objects.filter(content_type__model = "school", object_id=school_id)
+	""" To view list of staff in school school/(?P<school_id>\d+)/staff/view/"""	
 	queryset = Staff.objects.filter(institution__id = institution_id, active=2).order_by('firstName')
 	url = '/institution/%s/staff/view/' %(institution_id)
 	val= Collection(queryset,
@@ -68,6 +71,7 @@ def KLP_staff_view(request, institution_id):
 	
 def KLP_Staff_Update(request, staff_id):
 	""" To update Selected staff staff/(?P<staff_id>\d+)/update/"""
+	# Checking user Permissions for Staff update
 	check_user_perm.send(sender=None, user=request.user, model='Staff', operation='Update')
         check_user_perm.connect(KLP_user_Perm)
 	buttonType = request.POST.get('form-buttonType')
@@ -76,9 +80,11 @@ def KLP_Staff_Update(request, staff_id):
 	stgrps = StudentGroup.objects.filter(institution = staff.institution, active=2)
 	institutionObj = staff.institution
 	if institutionObj.boundary.boundary_category.boundary_category.lower() == 'circle':
+		# if the boundary category is circle get anganwadi staff types.
 		institutionType = 'Anganwadi'
 		Staff_Types = Staff_Type.objects.filter(categoryType=2)
 	else:
+		# if the boundary category is not circle get Institution staff types.
 		institutionType = 'Institution'
 		Staff_Types = Staff_Type.objects.filter(categoryType=1)
 	KLP_Edit_Staff =KLP_Staff(queryset = Staff.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'staff', extra_context={'buttonType':buttonType, 'referKey':referKey, 'stgrps':stgrps, 'institutionType':institutionType, 'Staff_Types':Staff_Types}), receiver = XMLReceiver(),)

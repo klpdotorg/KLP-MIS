@@ -5,8 +5,10 @@ from schools.models import *
 from django.http import *
 from Akshara.AkshararestApi.Treeresponder import *
 from django.db.models.query import QuerySet
-#from django_restapi.authentication import *
+
+
 def hasChild(query, typ, boundaryType, filterBy, secFilter, permFilter, assessmentPerm, shPerm, userSel):
+	""" This method checks for child objects and get urls """
     	subboundary = 0
 	childtree = 0
 	childDic={}
@@ -32,6 +34,7 @@ def hasChild(query, typ, boundaryType, filterBy, secFilter, permFilter, assessme
 	return childDic
 
 def KLP_assignedInstitutions(userId):
+	""" This method returns assigned institutions for the user"""
 	rawQuerySet = Institution.objects.raw(""" SELECT "id","obj_id" FROM "public"."object_permissions_institution_perms" WHERE "user_id" = '%s' AND "Acess" = 't' """ %(userId))
 	inst_list=[]
 	for permObj in rawQuerySet:
@@ -39,10 +42,11 @@ def KLP_assignedInstitutions(userId):
 	return inst_list
 	
 def KLP_assignedAssessmentInst(userId, assessmentId):
+	""" This method returns assigned Assessments for the user"""
 	inst_list = UserAssessmentPermissions.objects.filter(user__id=userId, assessment__id=assessmentId, access=True).values_list("instituion__id", flat=True).distinct()
 	return inst_list	
 
-def SampleClass(request):
+def TreeClass(request):
      model = request.GET['root']
      data = request.GET['home']
      filterBy = request.GET['filter']
@@ -53,25 +57,28 @@ def SampleClass(request):
      shPerm = request.GET.get('shPerm')
      userSel = request.GET.get('userSel')
      model = model.split('_')
-     modelObjects = {'source':Boundary,'boundary':Institution,} 
-     fields  = {'boundary':Institution,} 
-     childs = {}
      typ = model[0]
      logUser = request.user
      klp_UserGroups = logUser.groups.all()
      user_GroupsList = ['%s' %(usergroup.name) for usergroup in klp_UserGroups]
-     if model[0] == "source":
+     if typ == "source":
+     	# if type is source
 	if data:
-	    
+	    # if home is true query for boundaries		
 	    if (logUser.is_superuser or logUser.is_staff or 'AdminGroup' in user_GroupsList) and filterBy == 'None':
+	    	# if logged in user is super user or staff or in AdminGroup and filterBy is none query all active boundary's where parent is 1 and based on boundaryType
 	    	query = Boundary.objects.filter(parent__id=1,active=2, boundary_type=boundaryType).order_by("name").extra(select={'lower_name':'lower(name)'}).order_by("lower_name")
 	    else:
 	    	if (logUser.is_superuser or logUser.is_staff or 'AdminGroup' in user_GroupsList) :
+	    		# if logged in user is super user or staff or in AdminGroup and filterBy is not none query all active SG's based on assessments
 	    		studentgroup_list = Assessment_StudentGroup_Association.objects.filter(assessment__id=secFilter, active=2).values_list('student_group', flat=True).distinct()
+	    		# Query institutions based SG's
 	    		institutions_list = StudentGroup.objects.filter(id__in=studentgroup_list, active=2).values_list('institution__id', flat=True).distinct()
 	    	elif filterBy == 'None':
+	    		# if user is not superuser and not staff and not related to admin group and filterby is none get all assigned institutions.
 	    		institutions_list = KLP_assignedInstitutions(logUser.id)
 	    	else:
+	    		# else query for institutions based on map Sg's
 	    		studentgroup_list = Assessment_StudentGroup_Association.objects.filter(assessment__id=secFilter, active=2).values_list('student_group', flat=True).distinct()
 	    		map_institutions_list = StudentGroup.objects.filter(id__in=studentgroup_list, active=2).values_list('institution__id', flat=True).distinct()
 	    		
@@ -84,25 +91,34 @@ def SampleClass(request):
 	        query = Boundary.objects.filter(pk__in=boundary_list, active=2, parent__id=1).distinct().extra(select={'lower_name':'lower(name)'}).order_by("lower_name")
 		
 	else:
+		# if data is not true query for all active programmes.
 		query = Programme.objects.filter(active=2, programme_institution_category=boundaryType).extra(select={'lower_name':'lower(name)'}).order_by("lower_name")
 		typ = 'programme'
      else:
-	if model[0] == 'boundary':
+     	# typ is not source
+	if typ == 'boundary':
+		# if typ is boundary Query for sub boundaries or Institutions
 		if (logUser.is_superuser or logUser.is_staff or 'AdminGroup' in user_GroupsList) and filterBy == 'None':
+			# if logged in user is super user or staff or in AdminGroup and filterBy is none query all active boundary's where parent is 1 and based on boundaryType
 			query = Boundary.objects.filter(parent__id=model[1], active=2, boundary_type=boundaryType).extra(select={'lower_name':'lower(name)'}).order_by("lower_name")
 		else:
 			if (logUser.is_superuser or logUser.is_staff or 'AdminGroup' in user_GroupsList):
+				# if logged in user is super user or staff or in AdminGroup and filterBy is not none query all active SG's based on assessments
 				studentgroup_list = Assessment_StudentGroup_Association.objects.filter(assessment__id=secFilter, active=2).values_list('student_group', flat=True).distinct()
+				# Query institutions based SG's
 				institutions_list = StudentGroup.objects.filter(id__in=studentgroup_list, active=2).values_list('institution_id', flat=True).distinct()
 			elif filterBy == 'None':
+				# if user is not superuser and not staff and not related to admin group and filterby is none get all assigned institutions.
 				institutions_list = KLP_assignedInstitutions(logUser.id)
 			else:
+				# else query for institutions based on map Sg's
 				studentgroup_list = Assessment_StudentGroup_Association.objects.filter(assessment__id=secFilter, active=2).values_list('student_group', flat=True).distinct()
 				map_institutions_list = StudentGroup.objects.filter(id__in=studentgroup_list, active=2).values_list('institution_id', flat=True).distinct()
 				institutions_list = list(set(map_institutions_list)&set(KLP_assignedAssessmentInst(logUser.id, secFilter)))
 				
 			parentBoundary = Boundary.objects.get(id=model[1])
 			if parentBoundary.boundary_category.boundary_category in ['district',]:
+				# Query for Boundaries based on institutions
 				boundary_list = Boundary.objects.filter(institution__pk__in=institutions_list, active=2, boundary_type=boundaryType).values_list('parent', flat=True).distinct()
 				query = Boundary.objects.filter(parent__id=model[1], pk__in = boundary_list, active=2, boundary_type=boundaryType).distinct().extra(select={'lower_name':'lower(name)'}).order_by("lower_name")
 			else:
@@ -111,17 +127,22 @@ def SampleClass(request):
 			
 		
 		if not query:
+			# If Query is Empty Query for Institutions under boundary
 			if (logUser.is_superuser or logUser.is_staff or 'AdminGroup' in user_GroupsList) and filterBy == 'None':
+				# if logged in user is super user or staff or in AdminGroup and filterBy is none query all active institutions's based on boundary
 				query = Institution.objects.filter(boundary__id=model[1],active=2).extra(select={'lower_name':'lower(name)'}).order_by("lower_name")	
 				typ = 'sch'
 			else:
 				if (logUser.is_superuser or logUser.is_staff or 'AdminGroup' in user_GroupsList):
+					# if logged in user is super user or staff or in AdminGroup and filterBy is not none query all active SG's based on assessments
 					studentgroup_list = Assessment_StudentGroup_Association.objects.filter(assessment__id=secFilter, active=2).values_list('student_group', flat=True).distinct()
 					institutions_list = StudentGroup.objects.filter(id__in=studentgroup_list, active=2).values_list('institution_id', flat=True).distinct()
 					
 				elif filterBy == 'None':
+					# if user is not superuser and not staff and not related to admin group and filterby is none get all assigned institutions.
 					institutions_list = KLP_assignedInstitutions(logUser.id)
 				else:
+					# else query for institutions based on map Sg's
 					studentgroup_list = Assessment_StudentGroup_Association.objects.filter(assessment__id=secFilter, active=2).values_list('student_group', flat=True).distinct()
 					map_institutions_list = StudentGroup.objects.filter(id__in=studentgroup_list, active=2).values_list('institution_id', flat=True).distinct()
 					institutions_list = list(set(map_institutions_list)&set(KLP_assignedAssessmentInst(logUser.id, secFilter)))
@@ -130,47 +151,33 @@ def SampleClass(request):
 				typ = 'sch'
 			
 				
-	elif model[0] == 'programme':
+	elif typ == 'programme':
+		# if typ is programme Query For active assessment based On programme id
 		query = Assessment.objects.filter(programme__id=model[1],active=2).extra(select={'lower_name':'lower(name)'}).order_by("lower_name")
-	elif model[0] == 'assessment':
+	elif typ == 'assessment':
+		# if typ is assessment Query For active Questions based On assessment id
 		query = Question.objects.filter(assessment__id=model[1],active=2)	
 	else:
-		if model[0] == 'institution':
+		if typ == 'institution':
+			# if typ is Institution Query For active Sgs 
 			if filterBy != 'None':
 				
 				studentgroup_list = Assessment_StudentGroup_Association.objects.filter(assessment__id=secFilter, active=2).values_list('student_group', flat=True).distinct()
 				query = StudentGroup.objects.filter(institution__id = model[1], active=2, id__in=studentgroup_list).distinct().extra(select={'lower_class': 'lower(name)'}).order_by("lower_class","section")
 			else:
 		  		query = StudentGroup.objects.filter(institution__id = model[1], active=2).extra(select={'lower_class': 'lower(name)'}).order_by("lower_class","section")
-		if model[0] == 'studentgroup':
-		  query = Student.objects.filter(student_group__id=model[1],active=2)
 		  
-
-     CDict=hasChild(query, typ, boundaryType, filterBy, secFilter, permFilter, assessmentPerm, shPerm, userSel)
+   
+     CDict=hasChild(query, typ, boundaryType, filterBy, secFilter, permFilter, assessmentPerm, shPerm, userSel)  # Checking for child objects
      val= Collection(
      queryset = query,
      responder = TreeResponder(CDict=CDict),
      )
      return HttpResponse(val(request),mimetype="application/json")
-#authentication = HttpBasicAuthentication()           
-xml_poll_resource = Collection(
-    queryset = Boundary.objects.all(),
-    permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'),
-    expose_fields = ('id', 'question', 'pub_date'),
-    responder = XMLResponder(paginate_by = 10)
-)
 
-xml_choice_resource = Collection(
-    queryset = Boundary.objects.all(),
-    permitted_methods = ('GET',),
-    expose_fields = ('id', 'poll_id', 'choice'),
-    responder = XMLResponder(paginate_by = 5)
-)
 
 urlpatterns = patterns('',
-   url(r'^tree/$', SampleClass),
-   url(r'^xml/polls/(.*?)/?$', xml_poll_resource),
-   url(r'^xml/choices/(.*?)/?$', xml_choice_resource)
+   url(r'^tree/$', TreeClass),
 )
 
 

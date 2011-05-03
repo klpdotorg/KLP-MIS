@@ -13,17 +13,15 @@ from django.contrib.contenttypes.models import ContentType
 from schools.signals import check_user_perm
 from schools.receivers import KLP_user_Perm
 
-class KLP_StudentGroup(Collection):    
-    """ To view selected Class details
-    To view selected Class boundary/(?P<boundary_id>\d+)/schools/(?P<school_id>\d+)/view/
-    To edit selected Class boundary/(?P<boundary_id>\d+)/schools/(?P<school_id>\d+)/edit/
-    To Create New StudentGroup boundary/(?P<bounday>\d+)/schools/(?P<school>\d+)/class/creator/"""
-    def get_entry(self, studentgroup_id):        
+class KLP_StudentGroup(Collection):
+    def get_entry(self, studentgroup_id):    
+    	# Query For Selected Student Group based on studentgroup_id    
         StudentGroups = StudentGroup.objects.get(id=studentgroup_id)          
         return ChoiceEntry(self,StudentGroups )
 
 def KLP_StudentGroup_Create(request, referKey):
 	""" To Create New StudentGroup boundary/(?P<bounday>\d+)/schools/(?P<school>\d+)/class/creator/"""
+	#Checking user Permissions for SG add
 	check_user_perm.send(sender=None, user=request.user, model='StudentGroup', operation='Add')
         check_user_perm.connect(KLP_user_Perm)
 	buttonType = request.POST.get('form-buttonType')
@@ -47,9 +45,11 @@ def KLP_StudentGroup_View(request, studentgroup_id):
 	url = '/studentgroup/'+studentgroup_id+'/view/'
 	school = Institution.objects.get(id = studentgroup.institution.id)
 	studgrpParent = school
+	# Get All centers under Institution
 	studentGroups = StudentGroup.objects.filter(institution__id=studgrpParent.id,group_type="Center", active=2)
-	
-	Norecords = len(Student_StudentGroupRelation.objects.filter(student_group__id = studentgroup_id,academic=current_academic, active=2))
+	# Get Total Number of students 
+	Norecords = Student_StudentGroupRelation.objects.filter(student_group__id = studentgroup_id,academic=current_academic, active=2).count()
+	# Query Child onjects
 	child_list = Student_StudentGroupRelation.objects.filter(student_group__id = studentgroup_id, academic=current_academic, active=2, student__active=2).values_list('student__child', flat=True)
 	
 	students = Child.objects.filter(id__in=child_list).extra(select={'lower_firstname':'lower(trim("firstName"))', 'lower_midname':'lower(trim("middleName"))', 'lower_lastname':'lower(trim("lastName"))' }).order_by('lower_firstname', 'lower_midname', 'lower_lastname')
@@ -58,6 +58,7 @@ def KLP_StudentGroup_View(request, studentgroup_id):
 
 def KLP_StudentGroup_Update(request, studentgroup_id):
 	""" To update Selected School school/(?P<school_id>\d+)/update/"""
+	#Checking user Permissions for SG update
 	check_user_perm.send(sender=None, user=request.user, model='StudentGroup', operation='Update')
         check_user_perm.connect(KLP_user_Perm)
 	buttonType = request.POST.get('form-buttonType')
@@ -72,8 +73,9 @@ def KLP_StudentGroup_Update(request, studentgroup_id):
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assessment_id):
 	""" To Show Answer Entry Form studentgroup/(?P<studentgroup_id>\d+)/programme/(?P<programme_id>\d+)/assessment/(?P<assessment_id>\d+)/view/"""
-	user = request.user
+	user = request.user  #get logged in user
 	url = "/studentgroup/%s/programme/%s/assessment/%s/view/" %(studentgroup_id, programme_id, assessment_id)
+	# Query Childs based on studentgroup relation
 	students = Student_StudentGroupRelation.objects.select_related("student").filter(student_group__id = studentgroup_id, academic=current_academic, active=2).values_list('student__child', flat=True).distinct()
 	grupObj = StudentGroup.objects.filter(pk = studentgroup_id).only("group_type")
 	childs_list = Child.objects.filter(id__in=students).extra(select={'lower_firstname':'lower(trim("firstName"))' }).order_by('lower_firstname').defer("mt")
@@ -81,11 +83,11 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 	studIdList, qNamesList, qIdList, chList, rDict, childDict, counter=[], [], [], [], {}, {}, 0
 	paginator = Paginator(childs_list, 20)
 	
-	page = request.GET.get('page')
+	page = request.GET.get('page')  #get page to show result
 	try:
-		page = int(page)
+		page = int(page)        # If page is there convert to inr 
 	except (ValueError, TypeError):
-		page = 1
+		page = 1                # else default page is 1
 	try:
 		pagchilds_list = paginator.page(page)
 	except (EmptyPage, InvalidPage):
@@ -100,9 +102,9 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 		
 		student = Student.objects.filter(child=child, active=2).defer("child")
 		studId = student[0].id
-		
-		chDic = {'Gender':child.gender, 'dob':child.dob.strftime("%d-%m-%Y"), 'firstName':child.firstName, 'lastName':child.lastName}
-		
+		# get Child and student information to show in grid.
+		chDic = {'studId':studId, 'Gender':child.gender, 'dob':child.dob.strftime("%d-%m-%Y"), 'firstName':child.firstName, 'lastName':child.lastName}
+		# get relations
 		try:
 			relObj = Relations.objects.filter(child=child, relation_type="Father").only("first_name")
 			chDic['fName'] = relObj[0].first_name
@@ -122,15 +124,24 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 	
 	for ques in question_list:
 		qNamesList.append(ques.name)
+		# get Question Information
 		qId = ques.id
 		qIdList.append(qId)
 		dataDict={'qId':qId, 'qOrder':ques.order}
 		qType = ques.questionType
 		dataDict['qType'] = qType
+		if qType == 2:
+			ansIn =  ques.grade
+			dataDict['ansIn'] = ansIn
+		else:
+			dataDict['scMin'] = ques.scoreMin
+			dataDict['scMax'] = ques.scoreMax
 		qDict={}	
+		# Query For Answers based on question id and studens
 		ansList = Answer.objects.select_related("user1").filter(question=ques, student__id__in = studIdList).defer("question").values()
 		if ansList:
 			for ansObj in ansList:
+				# If answers is there get answer Information
 				ansDict=dict(dataDict)
 				dEntry = ansObj['doubleEntry']
 			
@@ -163,11 +174,18 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 		rDict[qId] = qDict	
 	noAnsList = list(set(studIdList).difference(set(ansStudList)))
 	if noAnsList:
+		# If No Answers Found get only Question Information to show empty text box.
 		for ques in question_list:
 			qId = ques.id
 			dataDict={'qId':qId, 'qOrder':ques.order}
 			qType = ques.questionType
 			dataDict['qType'] = qType
+			if qType == 2:
+				ansIn =  ques.grade
+				dataDict['ansIn'] = ansIn
+			else:
+				dataDict['scMin'] = ques.scoreMin
+				dataDict['scMax'] = ques.scoreMax
 			qDict=rDict[qId]
 			for stId in noAnsList:
 				ansDict=dict(dataDict)
@@ -177,12 +195,13 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 			
 			
 				
-			
+	
 	val=Collection(childs_list, permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'prgtemplates', template_object_name = 'childs', paginate_by=20, extra_context={'filter_id':programme_id, 'assessment_id':assessment_id, 'user':user, 'studentgroup_id':studentgroup_id, 'question_list':question_list,  'group_typ':grupObj[0].group_type, 'url':url, 'studIdList':studIdList, 'rDict':rDict, 'qNamesList':qNamesList, 'chList':chList, 'childDict':childDict, 'rDict':rDict, 'qIdList':qIdList}), entry_class = ChoiceEntry, )
 	return HttpResponse(val(request))
 	
 
 def MapStudents(request,id):
+	""" To Map Students With Centers"""
 	student_id = request.POST.getlist('students')
 	count = 0
 	if request.POST['StdgrpCtr'] == 'None':
@@ -190,9 +209,11 @@ def MapStudents(request,id):
 	else:
 		studentgroup_id = request.POST['StdgrpCtr']
 	if student_id and studentgroup_id:
+		# if Student and Student Group Id
 		studentgroup =  StudentGroup.objects.get(pk = studentgroup_id)
 		school =  Institution.objects.get(pk = request.POST['school'])
 		academic =  Academic_Year.objects.get(pk = current_academic().id)
+		# Create Relation between Student and center
 		for student in student_id:
 			student = Student.objects.get(pk = student)
 			param={'id':None,'student':student,'student_group':studentgroup,'academic':academic,'active':2}

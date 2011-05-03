@@ -12,35 +12,39 @@ from schools.signals import check_user_perm
 from schools.receivers import KLP_user_Perm
 
 class KLP_Question(Collection):    
-    """ To create new Question assessment/question/(?P<referKey>\d+)/creator/"""
-    def get_entry(self,question_id):        
+    def get_entry(self,question_id):   
+        # Query For Selected Question based on question_id
         question = Question.objects.get(id=question_id)          
         return ChoiceEntry(self, question)   
         
 
 
 def KLP_Question_View(request, question_id):
-	""" To View Selected Assessment question/(?P<question_id>\d+)/view/"""
+	""" To View Selected Question question/(?P<question_id>\d+)/view/"""
 	kwrg = {'is_entry':True}
 	resp=KLP_Question(queryset = Question.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'question',),)(request, question_id, **kwrg)
         return HttpResponse(resp) 
 
         
 def KLP_Question_Create(request, referKey):
-	""" To Create New Assessment assessment/question/(?P<referKey>\d+)/creator/"""
+	""" To Create New Question assessment/question/(?P<referKey>\d+)/creator/"""
+	# Checking user Permissions for Question add
 	check_user_perm.send(sender=None, user=request.user, model='Question', operation='Add')
         check_user_perm.connect(KLP_user_Perm)
-	buttonType = request.POST.get('form-buttonType')
-	order = len(Question.objects.filter(assessment__id=referKey))+1
+	buttonType = request.POST.get('form-buttonType') # Get Button Type
+	# get number of questions under assessments for question order
+	order = Question.objects.filter(assessment__id=referKey).count()+1
         KLP_Create_Question = KLP_Question(queryset = Question.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'question', extra_context={'buttonType':buttonType, 'referKey':referKey, 'order':order}), receiver = XMLReceiver(),)
         response = KLP_Create_Question.responder.create_form(request,form_class=Question_Form)
         			
         return HttpResponse(response)               
         
 def KLP_Question_Update(request, question_id):
-	""" To update Selected Boundary question/(?P<question_id>\d+)/update/"""
+	""" To update Selected Question question/(?P<question_id>\d+)/update/"""
+	# Checking user Permissions for Question add
 	check_user_perm.send(sender=None, user=request.user, model='Question', operation='Update')
         check_user_perm.connect(KLP_user_Perm)
+        # Get Button Type
 	buttonType = request.POST.get('form-buttonType')
 	referKey = request.POST.get('form-0-assessment')
 	KLP_Edit_Question =KLP_Question(queryset = Question.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'question', extra_context={'buttonType':buttonType, 'referKey':referKey}), receiver = XMLReceiver(),)

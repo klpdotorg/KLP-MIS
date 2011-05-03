@@ -20,12 +20,9 @@ class ChoiceEntry(Entry):
       pass
 
 class KLP_Boundary(Collection):
-    """To get all boundary details
-    To get all boundary details boundary/
-    To create new boundary boundary/creator/
-    To edit particular boundary boundary/(?P<boundary_id>\d+)/edit/
-    """
-    def get_entry(self, boundary_id):        
+    """To get Selected Boundary """
+    def get_entry(self, boundary_id): 
+    	# Query For selected boundary based on boundary_id
         boundary = Boundary.objects.get(id=int(boundary_id))
         return ChoiceEntry(self, boundary)     
   
@@ -40,6 +37,7 @@ def KLP_Boundary_View(request, boundary_id, boundarytype_id):
 
 def KLP_Boundary_Create(request):
 	""" To Create New Boundary boundary/creator/"""
+	# Checking user Permissions
 	check_user_perm.send(sender=None, user=request.user, model='Boundary', operation='Add')
         check_user_perm.connect(KLP_user_Perm)
 	buttonType = request.POST.get('form-buttonType')
@@ -51,6 +49,7 @@ def KLP_Boundary_Create(request):
 	
 def KLP_Boundary_Update(request, boundary_id):
 	""" To update Selected Boundary boundary/(?P<boundary_id>\d+)/update/"""
+	# Checking user Permissions
 	check_user_perm.send(sender=None, user=request.user, model='Boundary', operation='Update')
         check_user_perm.connect(KLP_user_Perm)
 	buttonType = request.POST.get('form-buttonType')
@@ -60,12 +59,15 @@ def KLP_Boundary_Update(request, boundary_id):
 	
 	return HttpResponse(response)
 
-class KLP_Create_Node(Resource):
+class KLP_Create_Node(Resource):    
     def read(self, request, model_name, new_id):
-	objDict = {'boundary':Boundary, 'institution':Institution, 'programme':Programme, 'assessment':Assessment, 'question':Question, 'studentgroup':StudentGroup, 'student':Student}
+    	""" This method uses to create new node for tree """
+	objDict = {'boundary':Boundary, 'institution':Institution, 'programme':Programme, 'assessment':Assessment, 'question':Question, 'studentgroup':StudentGroup,}
 	boundaryType =  request.GET.get('boundaryType')
 	modelObj = objDict[model_name]
+	# Get Object based on id and model
         GetData = modelObj.objects.get(pk=new_id)
+        # Call CreateNewFolder Method
 	if model_name == 'boundary':
 		return HttpResponse(GetData.CreateNewFolder(boundaryType))
         return HttpResponse(GetData.CreateNewFolder())
@@ -74,13 +76,15 @@ class KLP_Delete(Resource):
     """ To delete boundary boundary/(?P<boundary_id>\d+)/delete/"""
     def read(self,request,model_name, referKey):
         modelDict = {'boundary':Boundary, 'institution':Institution, 'programme':Programme, 'assessment':Assessment, 'question':Question, 'studentgroup':StudentGroup, 'student':Student, 'staff':Staff, 'class':StudentGroup, 'center':StudentGroup}
+        # Checking user Permissions
         check_user_perm.send(sender=None, user=request.user, model=modelDict[model_name.lower()], operation='Delete')
         check_user_perm.connect(KLP_user_Perm)
+        # Get Object based on id and model to delete
         obj = modelDict[model_name.lower()].objects.get(pk=referKey)
 	if model_name == 'student':
 		Student_StudentGroupRelation.objects.filter(student__id = referKey).update(active=0)
-        obj.active=0 
-        obj.save()
+        obj.active=0 # Change active to 0
+        obj.save() # Save Data
         return HttpResponse('Deleted')
 
 

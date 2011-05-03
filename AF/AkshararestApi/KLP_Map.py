@@ -10,6 +10,7 @@ from django.template import Template, Context, RequestContext
 from schools.models import *
 
 def KLP_Map_SG(request):
+	""" This method uses to map Student Groups With Assessment"""
 	boundary_id= request.GET.get("boundary")
 	asssessment_id = request.GET.get("assessment")
 	assessmentObj = Assessment.objects.get(id=asssessment_id) 

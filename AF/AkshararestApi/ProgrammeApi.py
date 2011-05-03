@@ -12,8 +12,8 @@ from schools.signals import check_user_perm
 from schools.receivers import KLP_user_Perm
 
 class KLP_Programme(Collection):    
-    """ To create new Programme programme/creator/"""
     def get_entry(self,programme_id):        
+    	# Query For Programme 
         programme = Programme.objects.get(id=programme_id)          
         return ChoiceEntry(self, programme)   
 
@@ -25,8 +25,10 @@ def KLP_Programme_View(request, programme_id):
         
 def KLP_Programme_Create(request):
 	""" To Create New Programme programme/creator/"""
+	# Checking user Permissions for programme add
 	check_user_perm.send(sender=None, user=request.user, model='Programme', operation='Add')
         check_user_perm.connect(KLP_user_Perm)
+        # Get Current date for to pass for calendar
 	now = datetime.date.today()
 	buttonType = request.POST.get('form-buttonType')
 	currentMont = int(now.strftime('%m'))
@@ -40,8 +42,10 @@ def KLP_Programme_Create(request):
         
 def KLP_Programme_Update(request, programme_id):
 	""" To update Selected Programme programme/(?P<programme_id>\d+)/update/"""
+	# Checking user Permissions for programme update
 	check_user_perm.send(sender=None, user=request.user, model='Programme', operation='Update')
         check_user_perm.connect(KLP_user_Perm)
+        # Get Current date for to pass for calendar
 	now = datetime.date.today()
 	buttonType = request.POST.get('form-buttonType')
 	currentMont = int(now.strftime('%m'))
@@ -58,10 +62,11 @@ class KLP_Get_Programms(Resource):
     """ To get  programmes based on type selected filter/(?P<type_id>\d+)/programme/"""
     def read(self,request,type_id):     
          try:     
+            # Query for active programmes based on category
             programme_list = Programme.objects.filter(programme_institution_category=type_id, active=2).order_by("name").only("id", "name")
             respStr = ''
             for programme in programme_list:
-                respStr += '%s$$%s&&' %(programme.id, programme.name)
+                respStr += '%s$$%s&&' %(programme.id, programme.name)    
             return HttpResponse(respStr[0:len(respStr)-2])         
          except:
             return HttpResponse('fail')	            

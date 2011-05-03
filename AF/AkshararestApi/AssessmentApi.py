@@ -12,8 +12,8 @@ from schools.signals import check_user_perm
 from schools.receivers import KLP_user_Perm
 
 class KLP_Assessment(Collection):    
-    """ To create new Assessment programme/assessment/(?P<referKey>\d+)/creator/"""
     def get_entry(self,assessment_id):        
+    	# Query For Selected assessment based on assessment_id
         assessment = Assessment.objects.get(id=assessment_id)          
         return ChoiceEntry(self, assessment)   
 
@@ -27,8 +27,10 @@ def KLP_Assessment_View(request, assessment_id):
         
 def KLP_Assessment_Create(request, referKey):
 	""" To Create New Assessment programme/assessment/(?P<referKey>\d+)/creator/"""
+	# Checking user Permissions for Assessment add
 	check_user_perm.send(sender=None, user=request.user, model='Assessment', operation='Add')
         check_user_perm.connect(KLP_user_Perm)
+        # Get Current date for to pass for calendar
 	now = datetime.date.today()
 	buttonType = request.POST.get('form-buttonType')
 	currentMont = int(now.strftime('%m'))
@@ -43,8 +45,10 @@ def KLP_Assessment_Create(request, referKey):
         
 def KLP_Assessment_Update(request, assessment_id):
 	""" To update Selected Boundary assessment/(?P<assessment_id>\d+)/update/"""
-	check_user_perm.send(sender=None, user=request.user, model='Assessment', operation='Add')
+	# Checking user Permissions for Assessment add
+	check_user_perm.send(sender=None, user=request.user, model='Assessment', operation='Update')
         check_user_perm.connect(KLP_user_Perm)
+        # Get Current date for to pass for calendar
 	now = datetime.date.today()
 	buttonType = request.POST.get('form-buttonType')
 	referKey = request.POST.get('form-0-programme')
@@ -62,6 +66,7 @@ class KLP_Get_Assessments(Resource):
     """ To get  assessment under programme filter/programme/(?P<programme_id>\d+)/assessments/"""
     def read(self,request,programme_id):     
          try:     
+            # Query all active assessments based on programme id
             assessments_list = Assessment.objects.filter(programme__id=programme_id, active=2).defer("programme")
             respStr = ''
             for assessment in assessments_list:

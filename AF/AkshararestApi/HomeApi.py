@@ -14,15 +14,20 @@ from django.contrib.auth import authenticate, login, logout
 
 class KLP_Home(Resource):
     """ To generate Home Page home/"""
-    def read(self,request):
-    	user = request.user    
-    	if user.id:
+    def read(self,request):    
+    	user = request.user # Get logged In User    
+    	if user.id:    		
 	    	try:
+	    		# read session value
 	    		sessionVal = int(request.session['session_sch_typ'])
 	    	except:
+	    		# if session is not set default is 0
 	    		sessionVal = 0
+	    	# Get the Resp Type to show the view.
 		respType = request.GET.get('respType') or None
+		# Get all Boundary Types
 		boundType_List = Boundary_Type.objects.all()
+		# Get Logged in user group
 		klp_UserGroups = user.groups.all()
 		user_GroupsList = ['%s' %(usergroup.name) for usergroup in klp_UserGroups]
 		respDict = {'legend':'Karnataka Learning Partnership ', 'title':'Karnataka Learning Partnership ', 'entry':'Add', 'boundType_List':boundType_List,  'session_sch_typ':sessionVal, 'user':user, 'usergroups':user_GroupsList}
@@ -58,10 +63,12 @@ class KLP_Home(Resource):
 		respTemplate = render_to_response("viewtemplates/home.html",respDict)
 		return HttpResponse(respTemplate)
 	else:
+		# If user is not login redirects to login page
 		return HttpResponseRedirect('/login/')
 
 
 def KLP_Set_Session(request):
+	""" This method uses for set the session """
 	request.session['session_sch_typ'] = request.GET.get('sessionVal')
 	return HttpResponse('Success')            
         
