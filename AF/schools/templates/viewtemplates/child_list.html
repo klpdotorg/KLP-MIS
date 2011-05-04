@@ -8,12 +8,15 @@
 
 <div class="KLP_Button_Header">
 	<span class="KLP_Sub">
+		<!-- Edit Class/Center Button -->
 		<a class="KLP_Button" href="/studentgroup/{{studentgroup.id}}/update/?group_typ={{studentgroup.group_type}}&sch_typ={{studentgroup.institution.boundary.boundary_category}}" onclick="return KLP_View(this);">Edit {% if studentgroup.group_type|lower == 'center' %}Center{% else %}Class{% endif %}</a>
 	</span>
 	<span class="KLP_Sub">
+		<!-- Delete Class/Center Button -->
 		<span class="KLP_SpanButton" onclick="KLP_Del('{{studentgroup.id}}', '{{studentgroup.group_type}}', '{{studentgroup.name}}')">Delete {% if studentgroup.group_type|lower == 'center' %}Center{% else %}Class{% endif %}</span>
 	</span>
 	<span class="KLP_Sub">
+		<!-- Add Students Button -->
 		<a class="KLP_Button thickbox" href="/studentgroup/{{studentgroup.id}}/student/call/?keepThis=true&TB_iframe=true&height=600&width=950" title="Add Students">Add Students</a>
 	</span>
 </div>
@@ -28,11 +31,13 @@
 <table border="0" cellpadding="0" cellspacing="0" id="id_StudentDetail" style="width:100%;overflow:hidden;text-align:center;{% if not students_list %}display:none;{% endif %}">
    <tbody>
     <tr>
+    	<!-- Header row -->
 	<th class="tot-border3">First Name</th> <th class="tot-border3">Last Name</th> <th class="tot-border3"> DOB</th> <th class="tot-border3">Mother Tongue</th><th class="tot-border3">Gender</th> <th class="tot-border3">Relations</th> {% if studentgroup.group_type|lower == 'class' %}<th class="tot-border4">Select <span style="cursor:pointer;color:#1569C7;" onclick="checkAll()">All</span>&nbsp;/&nbsp;<span style="cursor:pointer;color:#1569C7;" onclick="unCheckAll()">None</span> </th> {% endif %}
     </tr>
     {% for child in students_list %}
     {% with child.student_set.all|first as student %}
     <tr id = "student_{{child.id}}">
+    	<!-- Child Information -->
 	<td class="tot-border1">{{child.firstName}}</td>
 	<td class="tot-border1">{{child.lastName}}</td>
 	<td class="tot-border1">{{child.dob|date:"d M Y" }}</td>
@@ -51,11 +56,13 @@
 </table>
 </div>
 <div id="student_pagenation" style="{% if not students_list %}display:none;{% endif %}">
+	<!-- pagination -->
 	page <span id="id_currentPage">{{page}}</span> of <span id="id_totPages">{{pages}}</span>
 	<input type="hidden" name="resultPerPage" id="id_resultPerPage" value="{{results_per_page}}" />
 	<input type="hidden" value = "{{Norecords}}" id="Norecords" name="Norecords"/>
 	<input type="hidden" name="lastPage" id="id_lastPage" value="{{pages}}" />
 	{% if pages > 1 %}
+		<!-- Links for page if there are more pages -->
 		{% for i in pages|KLPrange %}  
 			<span page='page_{{forloop.counter}}' onclick="Pagination(this)" style="cursor:pointer;color:blue;padding-left:10px;">{{ forloop.counter }}</span>
 		{% endfor %}  
@@ -70,8 +77,17 @@
 			<span class="hedText">Select Centre To Map Students</span>
 		</div>
 			<span style="padding-right:5px;">Centres</span>
-			<span style="padding-right:5px;"><select name="StdgrpCtr"><option value="None">--</option>{% for stdgrp in studentGroups %}<option value="{{stdgrp.id}}">{{stdgrp.name}}</option>{% endfor %}</select></span>
+			<!-- Shows Centers Drop Down -->
+			<span style="padding-right:5px;">
+				<select name="StdgrpCtr">
+					<option value="None">--</option>
+					{% for stdgrp in studentGroups %}
+						<option value="{{stdgrp.id}}">{{stdgrp.name}}</option>
+					{% endfor %}
+				</select>
+			</span>
 			<input type="hidden" name="school" value="{{studgrpParent.id}}" />
+			<!-- Map Button -->
 			<span><input id="student_Map" type="submit" disabled="true" value="Map"/></span>
 </div>
 
@@ -79,7 +95,9 @@
 	<div class="detailHead">
 			<span class="hedText">Edit</span><span class="hedText" style="padding-left:40px;">Delete</span>
 	</div>
+	<!-- Bulk Students Edit Button -->
 	<span><input type="button" id="student_Edit" href="/studentgroup/{{studentgroup.id}}/student/editCall/?keepThis=true&TB_iframe=true&height=600&width=950" disabled="true" value="Edit"><input type="hidden" id="id_StudEditUrl" value="/studentgroup/{{studentgroup.id}}/student/editCall/?keepThis=true&TB_iframe=true&height=600&width=950"/></span>
+	<!-- Bulk Students Delete Button -->
 	<span style="padding-left:35px;"><button type="button" id="student_Delete" disabled="true">Delete</button></span>
 </div>
 
@@ -90,6 +108,7 @@
 <script>
 $(document).ready(function(){
     $('#mapstudents').submit(function (){
+        /* By map Students submit call mapstudents method and post values */
 	$.post(
 		'/mapstudents/'+{{studentgroup.id}}+'/',
 		$('#mapstudents').serialize(),
@@ -101,8 +120,10 @@ $(document).ready(function(){
     });
     
     $("#student_Delete").click(function(){
+        /* By Clicking on students bulk delete button Show Confirmation message */
         var conf = confirm("Are you sure, you want to delete selected Students");
         if (conf==true){ 
+                /* If Confirmed call delete students method */
 	    	$.post(
 	    		'/deletestudents/'+{{studentgroup.id}}+'/',
 	    		$('#mapstudents').serialize(),
@@ -135,6 +156,7 @@ $(document).ready(function(){
 });
 
 function Pagination(thisObj){
+        /* Paginaton function */
 	pages = $(thisObj).attr('page')
 	page = pages.split('_')[1]
         $.ajax({
@@ -183,6 +205,7 @@ var unCheckAll = function(){
 
 
 var updateEditUrl = function(){
+	/* Update Url For Edit Students by check or uncheck check boxes */
 	checkedStuds = $('input:checkbox[name=students]:checked');
     	
     	studUrl =''

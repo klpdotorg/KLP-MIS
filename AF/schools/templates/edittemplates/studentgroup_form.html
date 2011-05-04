@@ -16,8 +16,10 @@
         			<td><label class="KLP_required">Name:</label></td>
         			<td>
         				{% render_field entryForm.name 'tabindex=1' %}
+        				<!-- SG Name Field -->
                 	        </td>
                                 <td>
+                                	<!-- If Name field has errors show errors -->
                                 	{% for error in entryForm.name.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
@@ -27,8 +29,10 @@
                 		<td><label for="address">Section:</label></td>
                 		<td>
                 			{% render_field entryForm.section 'tabindex=2' %}
+                			<!-- SG section Field -->
 				</td>
                                 <td>
+                                	<!-- If section field has errors show errors -->
                                 	{% for error in entryForm.section.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
@@ -42,8 +46,10 @@
 		                	<td><label>Group Type</label></td>
 		                        <td>
 		                        	{% render_field entryForm.group_type 'tabindex=3' %}
+		                        	<!-- SG group type Field -->
 		                        </td>
 		                        <td>
+		                        	<!-- If group type field has errors show errors -->
 		                        	{% for error in entryForm.group_type.errors %}
 			                        	<span class="editErr">{{ error }}</span>
 			                        {% endfor %}
@@ -80,6 +86,7 @@
 $(document).ready(function(){  
   
    $("#id_save").click(function(){
+   	/* Clicking on save button hide all prv msgs and call form submit and pass button type is save */
    	KLP_Hide_Msg();
    	parentVal = $("#parentId").val();
    	typeName = $("#id_form-0-group_type").val();
@@ -89,6 +96,7 @@ $(document).ready(function(){
    });
    
    $("#id_save_and_continue").click(function(){
+   	/* Clicking on save and continue button hide all prv msgs and call form submit and pass button type is save and continue */
    	KLP_Hide_Msg();
    	$("#id_form-buttonType").val('save and continue');
    	parentVal = $("#parentId").val();
@@ -98,6 +106,7 @@ $(document).ready(function(){
    });
    
    $("#id_save_and_create").click(function(){
+   	/* Clicking on save and add another button hide all prv msgs and call form submit and pass button type is save and add another */
    	KLP_Hide_Msg();
    	parentVal = $("#parentId").val();
    	typeName = $("#id_form-0-group_type").val();
@@ -110,16 +119,20 @@ $(document).ready(function(){
    var KLP_form_submit = function(parentVal, typeName, parentId){
     oldName = $('#id_old').val(); 
     newName = $('#id_form-0-name').val()+' '+$("#id_form-0-section").val();
+    /* capture old name and new name to change values in node */
+    /* post data using post method */
     $.post(  
         '{{studentgroup.get_update_url}}',  
         $("#studentgroupForm").serialize(),  
         function(data){          
+        	/* Get Response */
         	$('#dyncData').html(data);
 		tb_init('a.thickbox, area.thickbox, input.thickbox');
 		NFInit();
 		$('input:visible:enabled:first').focus();
 		var successStatus = $("#success_status").val();
                 if (successStatus == 'True'){
+                	/* If It success show success msg and update node in tree */
 		        treeNode=$("#studentgroup_{{studentgroup.id}}").find("a:first");
                     	$(treeNode).attr("title", newName);
                     	$("#studentgroup_{{studentgroup.id}}_text").html(newName);

@@ -275,94 +275,49 @@ class TemplateResponder(object):
         return response
     
     def create_form(self, request, queryset, form_class):
-        """
-        Render form for creation of new collection entry.
-        if not isinstance(form_class, list):
-                     form_classes=[form_class]
-	             retform=False
-        else:
-                form_classes=form_class
-		retform=True
-                retFormlist=[]
-	Additional Changes
-        1)Passing extra_context to form :
-                This is using for to pass parent Ids, and to pass Currently Saving object ids. And to check form save is success or not.
-        2)Added if condition (form.is_valid):
-                   This is to validate the form submitted.
-        
-        3)Checking Boundary And Scholl after save:
-                  Boundary Checking:
-                  1.If the Boundary name is same and aboundary category is distict then it will create boundary type relation with existing boundary.
-                  2.If the Boundary created is lower level (Cluster or Circle). Then it will refer top most parent of parent of particular boundary . This is usefull to filter boundaries easily in assessment entry link.
- 			School Checking:
-1.If the School is Anganwadi then it creates class automatically.
-			StudentGroup Checking:
-			      1. Here we will check where to add school group to school are boundary
-        
-        4)Checking Button type:
-			Save:
-				If button type is Save then the page redirects to view page.
-			Save And Continue:
-				If button type is Save and Continue it redirects to edit page.
-			Save And Add Another:
-				If button type is Save and Add Another thean page will add new form.
-
-       5)And form = ResourceForm() is changed to form = ResourceForm(queryset=form_class.objects.none()) .
-                      This is to get only one form . Other wise it gives the all the forms which has same model name.
-       MultiForms:
-
-          6)If we have more than one form we will send fom Api as a list of forms.
-             There we assign it to like this
-             ResourceForm = modelformset_factory(Child) 
-             ResourceForm1 = modelformset_factory(Relations)
-             Here we use 2 and 3 forms, so if two forms we do like mentioned above 
-             if 3 forms we check for  condition 
-                     if len(form_class)!= 2:
-                     ResourceForm2 = modelformset_factory(Student)
-          7)If request.POST:
-                 We save the content 
-		     Save:
-			If button type is Save then the page redirects to view page.
-		     Save And Continue:
-			If button type is Save and Continue it redirects to edit page.
-		     Save And Add Another:
-			If button type is Save and Add Another thean page will add new form.
-
-        """ 
-	ResourceForm = modelformset_factory(queryset.model,form=form_class)
-	self.extra_context['showsuccess']=False
+        """  Render form for creation of new collection entry. """ 
+	ResourceForm = modelformset_factory(queryset.model,form=form_class) #get model formset factory based on model and form
+	self.extra_context['showsuccess']=False   # Pass showsuccess True or false for message
 	if  request.POST.get('replaceTrue',None)==None:
 	        self.extra_context['replaceTrue'] = True
 	else:
                self.extra_context['replaceTrue'] = False
 	 
 	if request.POST:
-	  	form = ResourceForm(request.POST)
-	  	Valid=form.is_valid()
+		# If request method is post, post data
+	  	form = ResourceForm(request.POST) # post data to form
+	  	Valid=form.is_valid()  # Validate form
 		RelationValid=True
-		ChildTrue=queryset.model._meta.module_name=='child' and True or False
+		# Check if current model is child then pass ChildTrue to True else false
+		ChildTrue=queryset.model._meta.module_name=='child' and True or False 
 		if  ChildTrue:
+			# Check for realtion names if names are not there validation fail
 			if not (request.POST.get('form-0-fatherfirstname','') or request.POST.get('form-0-motherfirstname','')):
 				RelationValid=False
 				Valid=False
 				
 		if form_class == Institution_Form:
+			# If Institution Check for address information save data
 			if request.POST.get('form-0-address') and request.POST.get('form-0-languages') and request.POST.get('form-0-name'):
 				addressObj = Institution_address(address=request.POST.get('form-0-address'), area = request.POST.get('form-0-area'), pincode = request.POST.get('form-0-pincode'), instidentification = request.POST.get('form-0-instidentification'), landmark = request.POST.get('form-0-landmark'), routeInformation = request.POST.get('form-0-routeInformation'))
 				addressObj.save()
 				Valid = True		
 	  	if Valid:
+	  		# If From is valid then save data
 	  		if form_class == Institution_Form:
 				new_data = request.POST.copy()
 	  			new_data['form-0-inst_address'] = addressObj.id
+	  			# pass address id to the institution to save data
 				form = ResourceForm(new_data)
-				obj = form.save()[0]
+				obj = form.save()[0]  # save data				
 				boundaryObj = Boundary.objects.get(pk=request.POST.get('form-0-boundary'))
-				
+				request.user.set_perms(['Acess'], obj)
 				if boundaryObj.boundary_category.boundary_category.lower() == 'circle' and boundaryObj.boundary_type.boundary_type.lower() =='anganwadi':
+					# if boundary category is circle and boundary type is anganwadi create a class with name Anganwadi Class
 					newClass = StudentGroup(name="Anganwadi Class", active=2, institution_id=obj.id)
 					newClass.save()
 			elif form_class == Staff_Form:
+				# If Staff save data for staff and create relation with SG
 				obj = form.save()[0]
 				classes = request.POST.getlist('form-0-student_group')
 				for clas in classes:
@@ -370,8 +325,10 @@ class TemplateResponder(object):
 					relObj = Staff_StudentGroupRelation(staff=obj, student_group=studGrupObj, academic=current_academic(), active=2)
 					relObj.save()		
 	  		else:
+	  			# else save data
 				obj = form.save()[0]
 				if queryset.model._meta.module_name=='child':
+					# If current model is child save relations data.
 					relation = {'form-0-motherfirstname':'Mother','form-0-fatherfirstname':'Father'}
 					names = {'Mother-MiddleName':'form-0-mothermiddlename','Mother-LastName':'form-0-motherlastname','Father-MiddleName':'form-0-fathermiddlename', 'Father-LastName':'form-0-fatherlastname'}
 					for rel_type,rel_value in relation.iteritems():
@@ -380,29 +337,26 @@ class TemplateResponder(object):
 							relation.save()
 	  			
 
-			buttonType = str(self.extra_context['buttonType'])
-			self.extra_context['showsuccess']=True
+			buttonType = str(self.extra_context['buttonType']) # get button type
+			self.extra_context['showsuccess']=True # make showsuccess is True
 			
 			if buttonType == 'save':
+				# If Button type is Save
 				respDict = {queryset.model._meta.module_name.lower():obj,'showsuccess':True}
 				
-				'''if queryset.model._meta.module_name == "studentgroup":
-					stdgrp = StudentGroup.objects.get(id=obj.id)
-					if stdgrp.content_type.model == "institution":
-						school = Institution.objects.get(id = stdgrp.object_id)
-						studgrpParent = school
-					else:
-						boundary = Boundary.objects.get(id = stdgrp.object_id)
-						studgrpParent = boundary
-					respDict['studgrpParent'] = studgrpParent'''
+				
 				if queryset.model._meta.module_name=='child':
 				    if request.POST['ModelName']=="student":
+				    	# if current model is Chils and ModelName is Student
 					respDict['student'] = True
+					# Create Student Object With as foreign key
 					student = Student(child=obj, otherStudentId=request.POST.get('form-0-otherId'), active=2)
 					student.save()
+					# Create relation ship with SG for current academic year.
 					std_stdgrp_relation = Student_StudentGroupRelation(student=student,student_group=self.extra_context['studentgroup'],academic=current_academic(),active=2)
 					std_stdgrp_relation.save()
 					if self.extra_context['mapStudent'] in [1 , '1']:
+						# mapstudent has value 1 add row in the assessment data entry screen.
 						assessmentObj = Assessment.objects.get(pk=self.extra_context['assessment_id'])
 						questions_list = Question.objects.filter(assessment = assessmentObj, active=2)
 						entryStr = '''<tr class='KLP_txt_cen'><td><form onsubmit='return false;' id='id_Student_%s' name='student_%s' class="validForm"><input type='hidden' value='%s' name='programId'><input type='hidden' value='%s' name='assessmentId'><input type='hidden' value='%s' name='student'><input type='hidden' value='%s' name='student_groupId'><table><tbody><tr>''' %(student.id, student.id, assessmentObj.programme.id, self.extra_context['assessment_id'], student.id, self.extra_context['studentgroup_id'])
@@ -416,20 +370,23 @@ class TemplateResponder(object):
 						detailStr = '''<tr class='KLP_txt_cen'><td><table><tr><td class='KLP_td_width'>%s</td><td class='KLP_td_width'><span class='blue' title='Father: %s, Mother: %s, Gender: %s, MT: %s, DOB: %s'>%s&nbsp;%s</span><span class='KLP_Form_status' id='id_Student_%s_status'>Form Status</span></td></tr></table></td></tr>''' %(student.id, request.POST['form-0-fatherfirstname'], request.POST['form-0-motherfirstname'], student.child.gender, student.child.mt, student.child.dob.strftime("%d-%m-%Y"), student.child.firstName, student.child.lastName, student.id)
 						mapStudenStr = {'detailStr':detailStr, 'ansEntryStr':entryStr}
 						return HttpResponse(simplejson.dumps(mapStudenStr), content_type='application/json; charset=utf-8')
-
+				# Show detail about newly create Object		
 				template_name = '%s/%s_detail.html' % (self.template_dir, queryset.model._meta.module_name)
                 		response = render_to_response(template_name, respDict)
                 		return response
                 	elif buttonType == 'save and continue':
+                		# If buttonType is save and continue show edit form for the object
                 		elem = queryset.get(**{queryset.model._meta.pk.name : obj.id})
                 		ResourceForm = modelformset_factory(queryset.model, extra=0)
                 		form = ResourceForm(queryset=queryset.model.objects.filter(pk=obj.id))
                 		template_name = '%s/%s_form.html' % ('edittemplates', elem._meta.module_name)
         			return render_to_response(template_name, {'form':form, 'update':True, self.template_object_name:elem, 'extra_context':self.extra_context})
 			elif buttonType == 'save and add another':
+				# # If buttonType is save and add another show new entry form
 				self.extra_context['prevousId'] = obj.id
 				if form_class == Question_Form:
-					self.extra_context['order'] = len(Question.objects.filter(assessment__id=self.extra_context['referKey']))+1
+					# If it is a question form pass order
+					self.extra_context['order'] = Question.objects.filter(assessment__id=self.extra_context['referKey']).count()+1
 				form = ResourceForm(queryset=queryset.model.objects.none())
 			else:
 				if form_class in [Institution_Category_Form, Moi_Type_Form, Institution_Management_Form]:	
@@ -438,6 +395,7 @@ class TemplateResponder(object):
 				return obj
 					
 		else:
+			# If form is not valid response back to entry form
 			form = 	ResourceForm(request.POST)
 			if not RelationValid:
 				form.errors[0]['first_name']=['Any of these fields is required.']
@@ -446,83 +404,38 @@ class TemplateResponder(object):
 			return response
 		
 	else:
+		# If request method is not post get form for the model
 		form = ResourceForm(queryset=queryset.model.objects.none())
 	
-	
+	# Show the form
 	template_name = '%s/%s_form.html' % (self.template_dir, queryset.model._meta.module_name)
 	return render_to_response(template_name, {'form':form,'extra_context':self.extra_context })
 
     def update_form(self, request, pk, queryset, form_class):
-        """
-        Render edit form for single entry.
-
-        Update_form:
-            1)Changed ResourceForm = forms.form_for_instance(elem, form=form_class) to ResourceForm = modelformset_factory(queryset.model, extra=0) .To get Only One Form.
-
-            2)forms.form_for_instance changed to  modelformset_factory. Because it is not supporting form_for_instance.
-
-            3)Using  request.POST instead of request.PUT
-			request is not supporting PUT.
-
-            4)Added if form_is_valid(): This is to vaidate the form.
-
-            5)If form is submitted without changing data then it throws an error. So using try except to avoid exception.
-            6)Passing extra_context to form :
-                   This is using for to pass parent Ids, and to pass Currently Saving object ids. And to check form save is success or not.
-
-            7)Checking Button type:
-			Save:
-				If button type is Save then the page redirects to view page.
-			Save And Continue:
-				If button type is Save and Continue it redirects to edit page.
-			Save And Add Another:
-				If button type is Save and Add Another thean page will add new form.
-           MultiForms Update:
-	         1) If we have more than one form we will send fom Api as a list of forms.
-                              There we assign it to like this
-                              ResourceForm = modelformset_factory(Child , extra=0) 
-                              ResourceForm1 = modelformset_factory(Relations, extra=0)
-                              Here we use 2 and 3 forms, so if two forms we do like mentioned above 
-                              if 3 forms we check for  condition 
-                              if len(form_class)!= 2:
-			         ResourceForm2 = modelformset_factory(Student, extra=0)
-	        2)  If request.POST:
-		             Here  we need to mention pk value
-
-		             form = ResourceForm2(new_data, queryset=Student.objects.filter(pk=pk), )
-		             Now it knows which data is edited.
-
-                            Then we save the content 
-		            Save:
-			          If button type is Save then the page redirects to view page.
-		           Save And Continue:
-			           Here we will send all forms to edit.
-			      If button type is Save and Continue it redirects to edit page.
-		          Save And Add Another:
-			        After saveing content we will fresh forms to add one more record.
-			        If button type is Save and Add Another thean page will add new form.
-        """
-        # Remove queryset cache by cloning the queryset
-        #queryset = queryset._clone()
-        elem = queryset.get(**{queryset.model._meta.pk.name : pk})
-        #ResourceForm = forms.form_for_instance(elem, form=form_class)
-	ResourceForm = modelformset_factory(queryset.model,form=form_class, extra=0)
-	self.extra_context['showsuccess']=False
+        """ Render edit form for single entry."""
+        
+        elem = queryset.get(**{queryset.model._meta.pk.name : pk}) # get object based on model and pk
+	ResourceForm = modelformset_factory(queryset.model,form=form_class, extra=0) # get model formset factory based on model and form
+	self.extra_context['showsuccess']=False  # Pass showsuccess True or false for message
 	if  request.POST.get('replaceTrue',None)==None:
 	        self.extra_context['replaceTrue'] = True
 	else:
                self.extra_context['replaceTrue'] = False
 
 	if request.POST:
+		# If request method is post, post data for object
 		form = ResourceForm(request.POST, queryset=queryset.model.objects.filter(pk=pk), )
-		Valid=form.is_valid()
+		Valid=form.is_valid()  # Validate form
 		RelationValid=True
+		# Check if current model is child then pass ChildTrue to True else false
 		ChildTrue=queryset.model._meta.module_name=='child' and True or False
 		if  ChildTrue:
+			# Check for realtion names if names are not there validation fail
 			if not (request.POST.get('form-0-fatherfirstname','') or request.POST.get('form-0-motherfirstname','')):
 				RelationValid=False
 				Valid=False
 		if queryset.model._meta.module_name == 'institution':
+			# If Institution Check for address information and if it there update data
 			if request.POST.get('form-0-address') and request.POST.get('form-0-languages') and request.POST.get('form-0-name'):
 				addressObj = elem.inst_address
 				addressObj.address = request.POST.get('form-0-address')
@@ -534,19 +447,19 @@ class TemplateResponder(object):
 				addressObj.save()
 				Valid = True			
 		if Valid:
-			'''try:
-				obj = form.save()[0]
-			except:
-				obj = queryset.model.objects.get(pk=pk)'''
+			# If From is valid then update data
 			if queryset.model._meta.module_name=='institution':
+				# if model isinstitution  pass address id to the institution to save data
 				new_data = request.POST.copy()
 				new_data['form-0-inst_address'] = addressObj.id	
 				form = ResourceForm(new_data, queryset=queryset.model.objects.filter(pk=pk),)
 				obj = form.save()[0]		
 			else:	
+				# else save data
 				form.save()
 				obj = queryset.model.objects.get(pk=pk)
 			if queryset.model._meta.module_name=='child':
+				# If model name is child update student data and relations data
 				studObj = obj.getStudent()
 				studObj.otherStudentId = request.POST.get('form-0-otherId')
 				studObj.save()
@@ -556,40 +469,35 @@ class TemplateResponder(object):
 					if request.POST[rel_type]:
 						relation=Relations.objects.filter(relation_type=rel_value,child=obj).update(first_name=request.POST[rel_type], middle_name=request.POST[names[rel_value+'-MiddleName']], last_name=request.POST[names[rel_value+'-LastName']])
 			elif queryset.model._meta.module_name=='staff':
-				mappedClasses = elem.getAssigendClasses()
+				# If model name is staff update Sg classes
+				mappedClasses = elem.getAssigendClasses() # get already assigned classes
 				mapClasIds = []
-				classes = request.POST.getlist("form-0-student_group")
+				classes = request.POST.getlist("form-0-student_group") # get newly assigned classes
 				newclasses = [int(i) for i in classes]
 				for mapClas in mappedClasses:
 					mapClasIds.append(mapClas.id)
 					if mapClas.id not in newclasses:
-						
+						# if already assigned class not in newly assigned clasess change relation by changing active state.
 						staff_StudentGroup = Staff_StudentGroupRelation.objects.filter(staff__id = pk, student_group = mapClas, academic=current_academic(),)[0]
 						staff_StudentGroup.active = 1 
 						staff_StudentGroup.save()
 				
 				for clas in newclasses:
 					if clas not in mapClasIds:
+						# if newly assigned class not in already assigned class create relation ship with SG.
 						clasObj = StudentGroup.objects.get(pk=clas)
-						staff_StudentGroup = Staff_StudentGroupRelation(staff = elem, student_group = clasObj, academic=current_academic())
+						staff_StudentGroup = Staff_StudentGroupRelation(staff = elem, student_group = clasObj, academic=current_academic(), active=2)
 						staff_StudentGroup.save()			
 
-			buttonType = str(self.extra_context['buttonType'])
-			self.extra_context['showsuccess']=True
+			buttonType = str(self.extra_context['buttonType']) # get button type
+			self.extra_context['showsuccess']=True # make showsuccess is True
 			if buttonType == 'save':
+				#  If Button type is Save show detail information about updated object
 				respDict = {elem._meta.module_name.lower():obj,'showsuccess':True,}
 				if queryset.model._meta.module_name=='child':
 					if request.POST['ModelName']=="student":
 						respDict['student'] = True
-				'''if queryset.model._meta.module_name == "studentgroup":
-					stdgrp = StudentGroup.objects.get(id=obj.id)
-					if stdgrp.content_type.model == "school":
-						school = School.objects.get(id = stdgrp.object_id)
-						studgrpParent = school
-					else:
-						boundary = Boundary.objects.get(id = stdgrp.object_id)
-						studgrpParent = boundary
-					respDict['studgrpParent'] = studgrpParent'''
+				
 				if form_class == Staff_Form:
 					template_name = '%s/%s_detail.html' % ('edittemplates', elem._meta.module_name)
 				else:
@@ -597,8 +505,10 @@ class TemplateResponder(object):
                 		response = render_to_response(template_name, respDict)
                 		return response	
                 	elif  buttonType == 'save and continue':
+                		# If buttonType is save and continue show edit form for the object
                 		retFormlist = ResourceForm(queryset=queryset.model.objects.filter(pk=obj.id))
                 	elif buttonType == 'save and add another':
+                		# # If buttonType is save and add another show new entry form
                 		self.extra_context['prevousId'] = obj.id
                 		if form_class == Question_Form:
 					self.extra_context['order'] = len(Question.objects.filter(assessment__id=self.extra_context['referKey']))+1
@@ -610,7 +520,7 @@ class TemplateResponder(object):
                 			
 			
 		else:
-			
+			# If form is not valid response back to Edit form
 			form = 	ResourceForm(request.POST)
 			if not RelationValid:
 				form.errors[0]['first_name']=['Any of these fields is required.']
@@ -618,10 +528,10 @@ class TemplateResponder(object):
 			return render_to_response(template_name, {'form':form, 'update':True, self.template_object_name:elem, 'extra_context':self.extra_context})
 			
 	else:
+		# If request method is not post get form for the model based on pk
 		form = ResourceForm(queryset=queryset.model.objects.filter(pk=pk))
-	
-        template_name = '%s/%s_form.html' % (self.template_dir, elem._meta.module_name)
-        #print template_name
-        #print 'cccccccccccccc'
+		
+	# Show the form
+        template_name = '%s/%s_form.html' % (self.template_dir, elem._meta.module_name)        
         return render_to_response(template_name, 
                 {'form':form, 'update':True, self.template_object_name:elem, 'extra_context':self.extra_context})

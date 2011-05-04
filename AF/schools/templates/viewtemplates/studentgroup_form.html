@@ -20,8 +20,10 @@
                                     <td><label class="KLP_required">Name:</label></td>
                                     <td>
                                         {% render_field entryForm.name 'tabindex=1' %}
+                                        <!-- SG Name Field -->
                                     </td>
 				    <td>
+				    	<!-- If Name field has errors show errors -->
                                     	{% for error in entryForm.name.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
@@ -31,12 +33,14 @@
                                     <td><label for="address">Section:</label></td>
                                     <td>
                                         {% render_field entryForm.section 'tabindex=2' %}
+                                         <!-- SG section Field -->
 					<input type="hidden" name="form-0-institution" id="id_institution" size="15" value="{{extra_context|displayValue:'ParentKey'}}"/>
 					<input type="hidden" name="contentname" id="id_content_name" size="15" value="{{extra_context|displayValue:'contentname'}}"/>
 					<input type="hidden" name="form-0-object_id" id="id_object_id" size="15" value='{{extra_context|displayValue:'ParentKey'}}'/>
 					<input type="hidden" name="form-0-active" id="id_form-0-active" value="2" />
                                     </td>
 				    <td>
+				    	<!-- If section field has errors show errors -->
                                     	{% for error in entryForm.section.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
@@ -49,8 +53,10 @@
 		                        	<td><label>Group Type</label></td>
 		                        	<td>
 		                        		{% render_field entryForm.group_type 'tabindex=3' %}
+		                        		 <!-- SG group type Field -->
 		                        	</td>
 		                        	<td>
+		                        		<!-- If group type field has errors show errors -->
 		                            		{% for error in entryForm.group_type.errors %}
 			                        		<span class="editErr">{{ error }}</span>
 			                        	{% endfor %}
@@ -81,6 +87,7 @@
   $(document).ready(function(){  
   
    $("#id_save").click(function(){
+   	/* Clicking on save button hide all prv msgs and call form submit and pass button type is save */
 	KLP_Hide_Msg();
 	parentVal = $("#id_institution").val();
 	typeName = $("#id_form-0-group_type").val();
@@ -89,6 +96,7 @@
    });
    
    $("#id_save_and_continue").click(function(){
+   	/* Clicking on save and continue button hide all prv msgs and call form submit and pass button type is save and continue */
 	KLP_Hide_Msg();
 	parentVal = $("#id_institution").val();
 	typeName = $("#id_form-0-group_type").val();
@@ -97,6 +105,7 @@
    });
    
    $("#id_save_and_create").click(function(){
+   	/* Clicking on save and add another button hide all prv msgs and call form submit and pass button type is save and add another */
 	KLP_Hide_Msg();
    	parentVal = $("#id_institution").val();
    	typeName = $("#id_form-0-group_type").val();
@@ -108,18 +117,20 @@
     
     
    var KLP_form_submit = function(parentVal, typeName, parentName, parentId){
+   	/* post data using post method */
    	$.post(
         	$('#url').val(),
         	$("#studentgroupForm").serialize(),
                 function(data){
+                    /* Get Response */
                     $("#dyncData").html(data);
                     NFInit();
                     $('input:visible:enabled:first').focus();
 		     var successStatus = $("#success_status").val();
                      if (successStatus == 'True'){
+                     	/* If It success show success msg and create new node in tree */
                     	$("#successMsgHead").show();
    		    	$("#klp_MsgTxt").html(typeName+" Created Successfully")
-			//tb_init('#id_StudentDetail a.thickbox, area.thickbox, input.thickbox');
 			if (parentId != null)
                     		$("#"+parentId).val(parentVal);
                    	ObjId="#institution_"+parentVal;

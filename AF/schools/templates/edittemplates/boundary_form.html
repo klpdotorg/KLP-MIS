@@ -17,8 +17,10 @@
       					                <td class="rightprofile"><label class="KLP_required">Name</label></td>
       					                <td class="leftprofile">
                                             			{% render_field entryForm.name 'tabindex=1' %}
+                                            			<!-- Boundary Name Field -->
                                         		</td>
                                         		<td>
+                                        			<!-- If Name field has errors show errors -->
                         					{% for error in entryForm.name.errors %}
 	                                				<span class="editErr">{{ error }}</span>
 	                                			{% endfor %}
@@ -65,6 +67,7 @@
    
      
    $("#id_save").click(function(){
+   	/* Clicking on save button hide all prv msgs and call form submit and pass button type is save */
    	KLP_Hide_Msg();
    	$("#id_form-buttonType").val('save');
    	parentVal = $("#id_form-0-parent").val();
@@ -73,6 +76,7 @@
    });
    
    $("#id_save_and_continue").click(function(){
+   	/* Clicking on save and continue button hide all prv msgs and call form submit and pass button type is save and continue */
    	KLP_Hide_Msg();
    	parentVal = $("#id_form-0-parent").val();
    	categoryVal = $("#id_form-0-boundary_category").val();
@@ -81,6 +85,7 @@
    });
    
    $("#id_save_and_create").click(function(){
+   	/* Clicking on save and add another button hide all prv msgs and call form submit and pass button type is save and add another */
    	KLP_Hide_Msg();
    	categoryVal = $("#id_form-0-boundary_category").val();
    	parentVal = $("#id_form-0-parent").val();
@@ -94,11 +99,14 @@
    
    
    var KLP_form_submit = function(parentVal, categoryId, categoryVal, parentId){
+        /* post data using post method */
+        /* capture new name to change values in node */
     	newName = $('#id_form-0-name').val();
    	$.post(
         	'{{boundary.get_update_url}}',
         	$("#boundaryForm").serialize(),
                 function(data){
+                    /* Get Response */
                     $("#dyncData").html(data);
                     NFInit();
                     $('input:visible:enabled:first').focus();
@@ -108,6 +116,7 @@
                     	$("#"+parentId).val(parentVal);
                     var successStatus = $("#success_status").val();
                     if 	(successStatus == 'True'){	
+                        /* If It success show success msg and update node in tree */
                     	treeNode=$("#boundary_{{boundary.id}}").find("a:first");
                     	$(treeNode).attr("title", newName);
                     	$("#boundary_{{boundary.id}}_text").html(newName);

@@ -1,30 +1,33 @@
 <div class="KLP_Button_Header">
 	{% if institution.boundary.boundary_category.boundary_category|lower == 'cluster' %}
+		<!-- Shows Add Class Button if boundary category is cluster -->
 		<span class="KLP_Sub">
 			<a class="KLP_Button"  href="/boundary/institution/{{institution.id}}/studentgroup/creator/" onclick="return KLP_View(this);">Add Class</a>
 		</span>
 	{% endif %}
 	{% if institution.boundary.boundary_category.boundary_category|lower == 'circle' %}
+		<!-- Shows Add Circle Button if boundary category is circle -->
 		<span class="KLP_Sub">
 			<a class="KLP_Button"  href="/boundary/institution/{{institution.id}}/studentgroup/creator/?group_typ=center" onclick="return KLP_View(this);">Add Center</a>
 		</span>
 	{% endif %}
 	<span class="KLP_Sub">
-		<a class="KLP_Button"  href="/institution/{{institution.id}}/update/" onclick="return KLP_View(this);">Edit</a>
+		<a class="KLP_Button"  href="/institution/{{institution.id}}/update/" onclick="return KLP_View(this);">Edit</a> <!-- Edit Button -->
 	</span>
 	<span class="KLP_Sub">
-		<span class="KLP_SpanButton"  onclick="KLP_Del('{{institution.id}}', 'institution', '{{institution.name}}')">Delete</span>
+		<span class="KLP_SpanButton"  onclick="KLP_Del('{{institution.id}}', 'institution', '{{institution.name}}')">Delete</span>  <!-- Delete Button -->
 	</span>
 	<span class="KLP_Sub">
-		<a class="KLP_Button"  href="/institution/{{institution.id}}/staff/creator/" onclick="return KLP_View(this);">Add Teacher</a>
+		<a class="KLP_Button"  href="/institution/{{institution.id}}/staff/creator/" onclick="return KLP_View(this);">Add Teacher</a> <!-- Add Teacher button -->
 	</span>
 	<span class="KLP_Sub">
-		<a class="KLP_Button"  href="/institution/{{institution.id}}/staff/view/" onclick="return KLP_View(this);">View Teachers</a>
+		<a class="KLP_Button"  href="/institution/{{institution.id}}/staff/view/" onclick="return KLP_View(this);">View Teachers</a> <!-- View Teachers button -->
 	</span>
 	
 </div>
 
 <div class="detailHead">
+<!-- Shows Institution/Anganwadi details -->
 <span class="hedText">{% if institution.boundary.boundary_category.boundary_category|lower == 'cluster' %} Institution {% else %} Anganwadi {% endif %}Details</span>
 </div>
 <div class="boundDetail">

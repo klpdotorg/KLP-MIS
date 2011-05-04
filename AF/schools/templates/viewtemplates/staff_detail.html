@@ -11,7 +11,7 @@
 	<div class="cl-txtbx"> 
  		<label>First Name</label>
  	</div>
-	<div class="bng-cl">	
+	<div class="bng-cl">	<!-- Show Staff first Name -->
 		<span>{{staff.firstName}}<input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / ></span>
 	</div>
 </div>
@@ -20,7 +20,7 @@
  		<label>Middle Name</label>
  	</div>
 	<div class="bng-cl">
-		<span>
+		<span> <!-- Show Staff middle Name -->
 			{{staff.middleName}}
 		</span>
 	</div>
@@ -30,7 +30,7 @@
  		<label>Last Name</label>
  	</div>
 	<div class="bng-cl">
-		<span>
+		<span> <!-- Show Staff last Name -->
 			{{staff.lastName}}
 		</span>
 	</div>
@@ -39,7 +39,7 @@
 	<div class="cl-txtbx"> 
  		<label>Date of Joining</label>
  	</div>
-	<div class="bng-cl">
+	<div class="bng-cl"> <!-- Show Staff doj -->
 		<span>{{staff.doj|date:'d-m-Y'}}</span>
 	</div>
 </div>
@@ -48,7 +48,7 @@
  		<label>Gender</label>
  	</div>
 	<div class="bng-cl">
-		<span>
+		<span> <!-- Show Staff gender -->
 			{{staff.gender}}
 		</span>
 	</div>
@@ -57,7 +57,7 @@
 	<div class="cl-txtbx"> 
  		<label>MT</label>
  	</div>
-	<div class="bng-cl">
+	<div class="bng-cl"> <!-- Show Staff mt -->
 		<span>{{staff.mt}}</span>
 	</div>
 </div>
@@ -66,7 +66,7 @@
  		<label>Qualifiaction</label>
  	</div>
 	<div class="bng-cl">
-		<span>
+		<span>  <!-- Show Staff Qualification -->
 			{% for qualification in staff.qualification.all %}
 				{{qualification}}
 				{% if not forloop.last %}, {% endif %}
@@ -79,7 +79,7 @@
  		<label>Staff Type</label>
  	</div>
 	<div class="bng-cl">
-		<span>
+		<span>  <!-- Show Staff type -->
 			{{staff.staff_type}}
 		</span>
 	</div>
@@ -89,7 +89,7 @@
  		<label>Classes</label>
  	</div>
 	<div class="bng-cl">
-		<span>
+		<span>  <!-- Show Assigned Classes -->
 			{% for assignedGrup in staff.getAssigendClasses%}
 				{% if assignedGrup.name == '0' %}Anganwadi Class{% else %}{{assignedGrup.name}}{{assignedGrup.section}}{% endif %}
 				{% if not forloop.last %}, {% endif %}

@@ -1,12 +1,14 @@
-{% extends "index.html" %}
-{% block leftpart%}{% endblock %}	
-{% block midpart %} 
-<div style="width:90%">
-    {% if user.is_authenticated %}
+{% extends "index.html" %}  <!-- Extends Index.html -->
+{% block leftpart%}{% endblock %}	<!-- Dont Show Left side part -->
+{% block midpart %}    <!-- Middle Part Starts Here -->
+<div style="width:90%">    
+    {% if user.is_authenticated %}  
+    	<!-- If User Already login show msg -->
         <div class="KLP_logUser">
             <span>Welcome {{user.username}} You Already Login Here!  </span>            
         </div>
     {% else %}
+        <!-- else show form -->
     <form method="post" action="/login/" class="niceform">{% csrf_token %}
         <table cellspacing="0" cellpadding="0" border="0" align="center" width="300">
             <tbody>
@@ -17,6 +19,7 @@
                     <td align="center" colspan="2">&nbsp;</td>
                 </tr>
                 {% if message %}
+                    <!-- Form is not valid show message -->
                     <tr>
                         <td colspan="2" bgcolor="#FFF8C6"><span class="editErr">{{message}}</span></td>
                     </tr>  
@@ -49,6 +52,6 @@
     {% endif %}
 </div>    
 {% endblock %}
-
+<!-- Middle Part Ends Here -->
 
 

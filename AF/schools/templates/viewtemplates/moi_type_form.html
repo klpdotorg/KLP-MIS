@@ -40,8 +40,10 @@
       		                <td class="rightprofile"><label class="KLP_required">Language</label></td>
       		                <td class="leftprofile">
       		                    {% render_field entryForm.name 'tabindex=1' %}
+      		                    <!-- Language Name Field -->
       		                </td>
       		                <td>
+      		                	<!-- If Name field has errors show errors -->
                                 	{% for error in entryForm.name.errors %}
 	                            		<span class="editErr">{{ error }}</span>
 	                           	{% endfor %}
@@ -63,7 +65,8 @@
   		setTimeout(function(){
         		$('input:visible:enabled:first').focus();
     		},200); 
-   		$("#languageForm").submit(function(){       
+   		$("#languageForm").submit(function(){      
+   			/* Post data and get reponse on form submit */     
 			newlyAdded = $("#id_form-0-name").val();
     			$.post(  
         			'/language/creator/',  

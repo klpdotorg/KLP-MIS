@@ -40,9 +40,11 @@
       		                <td class="rightprofile"><label class="KLP_required">{% if extra_context|displayValue:'categoryType' == '1'%}Anganwadi{% else %}Institution{% endif %} Category</label></td>
       		                <td class="leftprofile">
       		                    {% render_field entryForm.name 'tabindex=1' %}
+      		                    <!-- Category Name Field -->
       		                    <input type="hidden" name="form-0-categoryType" value="{{extra_context|displayValue:'categoryType'}}"/>
       		                </td>
       		                <td>
+      		                	<!-- If Name field has errors show errors -->
                                 	{% for error in entryForm.name.errors %}
 	                            		<span class="editErr">{{ error }}</span>
 	                           	{% endfor %}
@@ -64,12 +66,14 @@
 		setTimeout(function(){
         		$('input:visible:enabled:first').focus();
     		},200);
-		$("#catForm").submit(function(){       
+		$("#catForm").submit(function(){   
+			/* Post data and get reponse on form submit */    
    			newlyAdded = $("#id_form-0-name").val();
    			$.post(  
         			'/institution-category/creator/',  
         			$("#catForm").serialize(),  
                 		function(data){ 
+                			/* Get Reponse */
                 			$("#popData").html(data);        
                 			NFInit();
                     			$('input:visible:enabled:first').focus();

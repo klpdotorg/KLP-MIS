@@ -1,3 +1,4 @@
+<!-- This is to show Boundaries/Instituions In Assign Permissions Screen -->
 <div>
 	<span style="color:#75AD0A;font-size:12px;font-weight:bold;padding:5px;">
 		{%if boundary.boundary_type.boundary_type|lower == 'pre-school' %}
@@ -19,19 +20,24 @@
 		<span style="float:left;width:100%;color:#000;font-weight:bold;">
 			Select <span style="cursor:pointer;color:#1569C7;" onclick="checkAll()">All</span> / <span style="cursor:pointer;color:#1569C7;" onclick="unCheckAll()">None</span>
 		</span>
+		<!-- Display Institutions -->
 		{% for inst in institution_list %}
 			<span style="float:left;width:100%;color:#000;font-weight:bold;">
+				<!-- Check box to select and institution name -->
 				<input type="checkbox" name="instName" value="{{inst.id}}" />  {{inst.name}}
 			</span>
 		{% endfor %}
+		<!-- Display Boundaries -->
 		{% for boundary in boundary_list %}
 			<span style="float:left;width:100%;color:#000;font-weight:bold;">
+				<!-- Check box to select and Boundary name -->
 				<input type="checkbox" name="boundaryName" value="{{boundary.id}}" />  {{boundary.name}} 
 				
 			</span>
 		{% endfor %}
 		</div>
 		<div style="float:left;width:35%;padding:20px 5px 5px 5px;">
+			<!-- Multi Select drop down for selecting users -->
 			<span style="color:#75AD0A;font-size:12px;font-weight:bold;width:100%;text-align:center;padding:5px;">Select User</span><br/>
 			<select name="assignToUser" id="id_assignToUser" multiple="true"  >
 				{% for dEUser in users %}
@@ -58,6 +64,7 @@
 		$(document).ready(function(){
 			
 			$("#id_klp_PermissionForm").submit(function(){
+				/* Post Data on Form Submit */
 				KLP_Hide_Msg();
 				NFDo('stop');
 				isValid = $("#id_klp_PermissionForm").valid();

@@ -26,6 +26,7 @@
 				{% for entryForm in form.forms %}
 
 				<tr>
+				    <!-- Child Form Headings -->
 				    <td align="center"><label class="KLP_required">First Name:</label></td>
 				    <td align="center"><label>Middle Name:</label></td>
 				    <td align="center"><label>Last Name:</label></td>
@@ -44,6 +45,7 @@
 				    <td align="center">&nbsp;</td>
 				</tr>
 				<tr>
+				    <!-- render all fields for child -->
 				    <td align="center">
 					{% render_field entryForm.firstName 'tabindex=1' %}
 				    </td>
@@ -101,6 +103,7 @@
                                     </td>
 				</tr>
 				<tr>
+				   <!-- Show error msgs if field id not valid -->
 				   <td align="center">
                                     	{% for error in entryForm.firstName.errors %}
 	                                	<span class="editErr">{{ error }}</span>
@@ -165,30 +168,20 @@
 }
 
    $("#id_save").click(function(){
+        /* Clicking on save button hide all prv msgs and call form submit and pass button type is save */
 	KLP_Hide_Msg();
 	parentVal = $("#id_boundary").val();
    	$("#id_form-buttonType").val('save');
    	KLP_form_submit(parentVal,'id_boundary');
    });
 
-   $("#id_save_and_continue").click(function(){
-	KLP_Hide_Msg();
-	parentVal = $("#id_boundary").val();
-   	$("#id_form-buttonType").val('save and continue');
-	KLP_form_submit(parentVal,'id_boundary');
-   });
-
-   $("#id_save_and_create").click(function(){
-	KLP_Hide_Msg();
-   	parentVal = $("#id_boundary").val();
-   	$("#id_form-buttonType").val('save and add another');
-   	KLP_form_submit(parentVal,'id_boundary');
-   });
+   
 
 var KLP_form_submit = function(parentVal, parentId){
     $("#id_save").attr("disabled", "true");
     modelName=$('#model').val();
     replaceId =  'student_'+$('#replace_id').val()
+    /* post data using post method */
     $.post(  
         $("#id_StudUpdateUrl").val(),  
         $("#childForm").serialize(),  
@@ -198,6 +191,7 @@ var KLP_form_submit = function(parentVal, parentId){
 		$("#id_save").removeAttr("disabled");
 		var successStatus = $("#success_status").val();
 		if (successStatus == 'True'){
+			/* If Success update row */
 			$('#'+replaceId, self.parent.parent.document).replaceWith(data);
 			window.parent.parent.tb_init('#'+replaceId+' a.thickbox, area.thickbox, input.thickbox');
 			window.parent.parent.$("#successMsgHead").show();

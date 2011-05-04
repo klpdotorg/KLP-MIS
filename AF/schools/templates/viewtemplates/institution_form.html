@@ -14,9 +14,11 @@
                                     <td><label class="KLP_required">Name:</label></td>
                                     <td>
                                          {% render_field entryForm.name 'tabindex=1' %}
+                                         <!-- Name Field -->
                                     </td>
                                     <td>&nbsp;</td>
                                     <td>
+                                    	<!-- If Name field has errors show errors -->
                                     	{% for error in entryForm.name.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
@@ -35,6 +37,7 @@
 								{% endif %}
 							{% endfor %}
 						</select>
+						<!-- Category Field -->
 					</td>
 					<td class="gallery clearfix">					    
 						<span class="adNewBoundTyp">
@@ -42,6 +45,7 @@
 						</span>					    
 					</td>
 					<td>
+						<!-- If Category field has errors show errors -->
 						{% for error in entryForm.cat.errors %}
 	                                		<span class="editErr">{{ error }}</span>
 	                                	{% endfor %}
@@ -53,9 +57,11 @@
                                     <td><label class="KLP_required">{{extra_context|displayValue:'institutionType'}} Gender:</label></td>
                                     <td>                                        
                                         {% render_field entryForm.institution_gender 'tabindex=3' %}
+                                        <!-- Instituion Gender Field -->
                                     </td>
                                     <td>&nbsp;</td>
                                     <td>
+                                    	<!-- If Instituion Gender field has errors show errors -->
                                     	{% for error in entryForm.institution_gender.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
@@ -65,9 +71,11 @@
                                     <td><label>Dise Code:</label></td>
                                     <td>
                                         {% render_field entryForm.dise_code 'tabindex=4' %}
+                                        <!-- Dise Code Field -->
                                     </td>
                                     <td>&nbsp;</td>
                                     <td>
+                                    	<!-- If Dise Code field has errors show errors -->
                                     	{% for error in entryForm.dise_code.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
@@ -77,6 +85,7 @@
                                     <td><label class="KLP_required">Language:</label></td>
                                     <td>
                                         {% render_field entryForm.languages 'tabindex=5' %}
+                                        <!-- Language Field -->
                                     </td>
                                     <td class="gallery clearfix">					    
 					<span class="adNewBoundTyp">						    
@@ -84,6 +93,7 @@
 				    	</span>					    
 				    </td>
                                     <td>
+                                    	<!-- If Language field has errors show errors -->
                                     	{% for error in entryForm.languages.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
@@ -94,6 +104,7 @@
                                     <td><label class="KLP_required">Management:</label></td>
                                     <td>
                                         {% render_field entryForm.mgmt 'tabindex=6' %}
+                                        <!-- Management Field -->
                                     </td>
                                     <td class="gallery clearfix">					    
 				    	<span class="adNewBoundTyp">						    
@@ -101,6 +112,7 @@
 					</span>					    
 				    </td>
                                     <td>
+                                    	<!-- If Management field has errors show errors -->
                                     	{% for error in entryForm.mgmt.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
@@ -112,9 +124,11 @@
                                     <td>
        	        			<input type="hidden" name="form-0-boundary" id="id_boundary" size="15" value='{{extra_context|displayValue:'referKey'}}'/>
                                          {% render_field entryForm.address 'tabindex=7' %}
+                                         <!-- Address Field -->
                                     </td>
                                     <td>&nbsp;</td>
                                     <td>
+                                    	<!-- If address field has errors show errors -->
                                     	{% for error in entryForm.address.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
@@ -124,9 +138,11 @@
                                     <td><label>Area:</label></td>
                                     <td>
                                         {% render_field entryForm.area 'tabindex=8' %}
+                                        <!-- Area Field -->
                                     </td>
                                     <td>&nbsp;</td>
                                     <td>
+                                    	<!-- If area field has errors show errors -->
                                     	{% for error in entryForm.area.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
@@ -136,10 +152,12 @@
                                     <td><label>Pincode:</label></td>
                                     <td>
                                         {% render_field entryForm.pincode 'tabindex=9' %}
+                                        <!-- Pincode Field -->
                                         <input type="hidden" name="form-0-active" id="id_form-0-active" value="2" />
                                     </td>
                                     <td>&nbsp;</td>
                                     <td>
+                                    	<!-- If pincode field has errors show errors -->
                                     	{% for error in entryForm.pincode.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
@@ -149,9 +167,11 @@
                                     <td><label>Landmark:</label></td>
                                     <td>
                                         {% render_field entryForm.landmark 'tabindex=10' %}
+                                        <!-- Landmark Field -->
                                     </td>
                                     <td>&nbsp;</td>
                                     <td>
+                                    	<!-- If landmark field has errors show errors -->
                                     	{% for error in entryForm.landmark.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
@@ -162,9 +182,11 @@
                                     <td><label>Identification:</label></td>
                                     <td>
                                         {% render_field entryForm.instidentification 'tabindex=11' %}
+                                        <!-- Identification Field -->
                                     </td>
                                     <td>&nbsp;</td>
                                     <td>
+                                    	<!-- If Identification field has errors show errors -->
                                     	{% for error in entryForm.instidentification.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
@@ -174,9 +196,11 @@
                                     <td><label>Route Information:</label></td>
                                     <td>
                                         {% render_field entryForm.routeInformation 'tabindex=11' %}
+                                        <!-- Route Information Field -->
                                     </td>
                                     <td>&nbsp;</td>
                                     <td>
+                                    	<!-- If routeInformation field has errors show errors -->
                                     	{% for error in entryForm.routeInformation.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
@@ -207,6 +231,7 @@ $(document).ready(function(){
    
    
    $("#id_save").click(function(){
+   	/* Clicking on save button hide all prv msgs and call form submit and pass button type is save */
    	KLP_Hide_Msg();
    	parentVal = $("#id_boundary").val();
    	$("#id_form-buttonType").val('save');
@@ -215,6 +240,7 @@ $(document).ready(function(){
    });
    
    $("#id_save_and_continue").click(function(){
+   	/* Clicking on save and continue button hide all prv msgs and call form submit and pass button type is save and continue */
    	KLP_Hide_Msg();
    	$("#id_form-buttonType").val('save and continue');
    	parentVal = $("#id_boundary").val();
@@ -222,6 +248,7 @@ $(document).ready(function(){
    });
    
    $("#id_save_and_create").click(function(){
+   	/* Clicking on save and add another button hide all prv msgs and call form submit and pass button type is save and add another */
    	KLP_Hide_Msg();
    	parentVal = $("#id_boundary").val();
    	$("#id_form-buttonType").val('save and add another');
@@ -232,15 +259,18 @@ $(document).ready(function(){
     
     
    var KLP_form_submit = function(parentVal, parentId){
+   	/* post data using post method */
    	$.post(
         	$('#url').val(),
         	$("#institutionForm").serialize(),
                 function(data){
+                     /* Get Response */
                     $("#dyncData").html(data);
                     NFInit();
                     $('input:visible:enabled:first').focus();
                     var successStatus = $("#success_status").val();
                     if (successStatus == 'True'){
+                    	/* If It success show success msg and create new node in tree */
                     	$("#successMsgHead").show();
    		    	$("#klp_MsgTxt").html("{{extra_context|displayValue:'institutionType'}} Created Successfully")
                     	if (parentId != null)

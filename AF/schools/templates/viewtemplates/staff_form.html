@@ -15,9 +15,11 @@
                                     <td><label class="KLP_required">First Name:</label></td>
                                     <td>
                                          {% render_field entryForm.firstName 'tabindex=1' %}
+                                         <!-- Staff First Name Field -->
                                     </td>
                                     <td>&nbsp;</td>
                                     <td>
+                                    	<!-- If First Name field has errors show errors -->
                                     	{% for error in entryForm.firstName.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
@@ -27,9 +29,11 @@
 					<td><label>Middle Name:</label></td>
 					<td>
                                         	{% render_field entryForm.middleName 'tabindex=2' %}
+                                        	<!-- Staff Middle Name Field -->
                                     	</td>
                                     	<td>&nbsp;</td>
                                     	<td>
+                                    		<!-- If Middle Name field has errors show errors -->
                                     		{% for error in entryForm.middleName.errors %}
 	                                		<span class="editErr">{{ error }}</span>
 	                                	{% endfor %}
@@ -41,9 +45,11 @@
 					<td><label>Last Name:</label></td>
 					<td>
                                         	{% render_field entryForm.lastName 'tabindex=3' %}
+                                        	<!-- Staff Last Name Field -->
                                     	</td>
                                     	<td>&nbsp;</td>
                                     	<td>
+                                    		<!-- If Last Name field has errors show errors -->
                                     		{% for error in entryForm.lastName.errors %}
 	                                		<span class="editErr">{{ error }}</span>
 	                                	{% endfor %}
@@ -55,9 +61,11 @@
 					<td><label>UID:</label></td>
 					<td>
                                         	{% render_field entryForm.uid 'tabindex=4' %}
+                                        	<!-- Staff UID Field -->
                                     	</td>
                                     	<td>&nbsp;</td>
                                     	<td>
+                                    		<!-- If UID field has errors show errors -->
                                     		{% for error in entryForm.uid.errors %}
 	                                		<span class="editErr">{{ error }}</span>
 	                                	{% endfor %}
@@ -69,14 +77,17 @@
 				    <td><label for="address">Date of Joining:</label></td>
 				    <td>
 					{% render_field entryForm.doj 'tabindex=5' %}
+					<!-- Staff DOJ Field -->
 				    </td>
 				</tr>
 				<tr>
 				    <td><label class="KLP_required">Gender:</label></td>
 				    <td>
 					{% render_field entryForm.gender 'tabindex=6' %}
+					<!-- Staff Gender Field -->
 				    </td>
 				    <td>
+				    	<!-- If gender field has errors show errors -->
                                     	{% for error in entryForm.gender.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
@@ -86,8 +97,10 @@
 				    <td><label class="KLP_required">Mother Tongue:</label></td>
 				    <td>
 					{% render_field entryForm.mt 'tabindex=7' %}
+					<!-- Staff Mother Tongue  Field -->
 				    </td>
 				    <td>
+				    	<!-- If Mother Tongue field has errors show errors -->
                                     	{% for error in entryForm.mt.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
@@ -97,8 +110,10 @@
 				    <td><label>Qualification:</label></td>
 				    <td>
 					{% render_field entryForm.qualification 'tabindex=8' %}
+					<!-- Staff Qualification  Field -->
 				    </td>
 				    <td>
+				    	<!-- If qualification field has errors show errors -->
                                     	{% for error in entryForm.qualification.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
@@ -107,7 +122,7 @@
                                 <tr>
 				    <td><label class="KLP_required">Staff Type:</label></td>
 				    <td>
-					
+					<!-- Staff type  Field -->
 					<select name="form-0-staff_type" id="id_form-0-staff_type" tabindex=9>
 						{% for staffType in extra_context|displayValue:'Staff_Types' %}
 							<option value="{{staffType.id}}">{{staffType.staffType}}</option>
@@ -116,6 +131,7 @@
 					<input type="hidden" name="form-0-active" id="id_form-0-active" value="2" />
 				    </td>
 				    <td>
+				    	<!-- If staff type field has errors show errors -->
                                     	{% for error in entryForm.staff_type.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
@@ -124,6 +140,7 @@
 				<tr style="{% if extra_context|displayValue:'institutionType' == 'Anganwadi'%}display:none;{% endif %}">
 				    <td><label>Classes:</label></td>
 				    <td>
+				       <!-- Staff classes  Field -->
 					<select name="form-0-student_group" id="id_form-0-student_group" multiple="multiple" tabindex=10>
 						{% for studGrup in extra_context|displayValue:'stgrps' %}
 							<option value="{{studGrup.id}}" {%if studGrup.name == 'Anganwadi Class' or studGrup.name == '0'%}selected{%endif%} >{{studGrup.name}}{% if studGrup.section != None %}{{studGrup.section}}{% endif %}</option>
@@ -131,6 +148,7 @@
 					</select>
 				    </td>
 				    <td>
+				    	<!-- If classes field has errors show errors -->
                                     	{% for error in entryForm.student_group.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}

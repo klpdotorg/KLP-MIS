@@ -3,6 +3,7 @@
 <head>
 <title>{{title}}</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- Import js files -->
 <script type="text/javascript" src="/static_media/js/jquery.js"></script>
 <script language="javascript" type="text/javascript" src="/static_media/js/niceforms.js"></script>
 <script type="text/javascript" src="/static_media/js/jquery.autocomplete.js"></script>
@@ -18,7 +19,7 @@
 <script type="text/javascript" src="/static_media/js/tooltip/jquery.easing.1.3.js" charset="utf-8"></script>
 <script type="text/javascript" src="/static_media/js/jquery.validate.js"></script>
 <script type="text/javascript" src="/static_media/js/KLP_script.js"></script>
-
+<!-- import css files -->
 <link rel="stylesheet" type="text/css" media="all" href="/static_media/css/thickbox.css" charset="utf-8"/>
 <link rel="stylesheet" type="text/css" media="all" href="/static_media/css/form.css" />
 <link rel="stylesheet" type="text/css" media="all" href="/static_media/css/style.css" />
@@ -29,16 +30,19 @@
 
 <body>
 <script type="text/javascript">
+	/* Add loading image to body */
 	$("body").append("<div id='KLP_overlay' class='KLP_overlayBG'></div>");
 	$("body").append("<div id='KLP_load'><img src='/static_media/images/loadingAnimation.gif' alt='Process'></div>");
-
+        
 	$("#KLP_load").ajaxStart(function(){
+	  /* Check whether user is logged in or not and show process loading image on ajax start*/
 	  KLP_isLog();
 	  $("#KLP_overlay").show();	
 	  $(this).show();
 	});
 
 	$("#KLP_load").ajaxStop(function(){
+	  /* Hide process loading image on ajax stop*/
 	  $(this).hide();
 	  $("#KLP_overlay").hide();
 	});	
@@ -64,15 +68,18 @@
 	
 		    
 		$("#boundary_type").change(function(){
-			typVal = $("#boundary_type").val();
-			KLP_Set_Session(typVal);
+			/* Call TreeMenu on change of boundary type */
+			typVal = $("#boundary_type").val();  // get selected boundary type values
+			KLP_Set_Session(typVal); // set Session val for boundary type selected
 			if (typVal){
 				assessmentEntry = $("#id_entry_view").val();
 				if (assessmentEntry == 'True'){
+					/* If assessment entry is true get all related programmes to show in drop down */
 					$("#treeStruc").html('<ul id="treeBlk" class="filetree treeview-famfamfam"></ul>');
 					KLP_Programme_List(typVal)
 				}
 				else{
+					/* Else Call Tree Menu*/
 					treeUrl = '/tree/?home={{home}}&filter=None&secFilter='+$("#filtAsmnt").val()+'&boundTyp='+typVal+'&permission='+$("#id_perm_assign").val()+'&assesspermission='+$("#id_assess_perm_assign").val()+'&userSel='+$("#id_userSel").val()+'&shPerm='+$("#id_shPerm").val();
 					$("#treeStruc").html('<ul id="treeBlk" class="filetree treeview-famfamfam"></ul>');
 					KLP_TreeBLK(treeUrl);
@@ -89,6 +96,7 @@
 		});
 		   
 		$("#filtProg").change(function(){
+			/* On programme value change get all related assessments under programme*/
 			$.ajax({                    
 		        	url: '/filter/programme/'+$('#filtProg option:selected').val()+'/assessments/',
 		        	success: function(data) {
@@ -107,6 +115,7 @@
 		});
 	
 		$("#filtAsmnt").change(function(){
+			/* On Assessment value change Call Tree Menu*/
 			var asmVal = $("#filtAsmnt").val();
 			if (asmVal){
 				treeUrl = '/tree/?home={{home}}&filter='+$("#filtProg").val()+'&secFilter='+asmVal+'&boundTyp='+$("#boundary_type").val()+'&permission='+$("#id_perm_assign").val()+'&assesspermission='+$("#id_assess_perm_assign").val();
@@ -136,6 +145,7 @@
 	
 	<div class="leftPane">
 		{% if user.id %}
+			<!-- This block shows logged in user name and change password link if user login -->
 			<div class="KLP_Log">
 	    			<span class="KLP_brCrumb">Welcome: </span>
 	    			<span>{% if user.first_name%}{{user.first_name}}{% else %}{{user.username}}{%endif%}<span>
@@ -144,9 +154,10 @@
 	    		</div>
  		{% endif %}
 		<div class="addBound">
+			<!-- Drop Down shows boundary types -->
             		<select id="boundary_type" name="boundary_type">
 	            		<option value="">----</option>
-	                		{% for boundType in boundType_List %}
+	                		{% for boundType in boundType_List %}	                			
 	                			{% if session_sch_typ ==  boundType.id %}
 	                    				<option value="{{boundType.id}}" selected="true">{{boundType}}</option>
 	                    			{% else %}
@@ -161,14 +172,16 @@
 	            	<input type="hidden" name="assessPerm" id="id_assess_perm_assign" value="{{assessmentpermission}}"/>
 	            	<input type="hidden" name="urHere" id="id_urHere" value="{{urHere}}"/>
 	            	<input type="hidden" name="shPerm" id="id_shPerm" value="{{shPerm}}"/>
-	            	<input type="hidden" name="userSel" id="id_userSel" value="{{userId}}"/>
+	            	<input type="hidden" name="userSel" id="id_userSel" value="{{userId}}"/>	            	
             		<span style="{% if not filter %}display:none;{% endif %}">
+            			<!-- Drop Down shows programmes -->
 	        		<select id="filtProg" name="filtProg">
 	                		<option value="None">--</option>
 	                    		{% for prg in prgsList %}
 	                        		<option value="{{prg.id}}">{{prg}}</option>
 	                    		{% endfor %}
 	                	</select>
+	                	<!-- Drop Down shows Assessments -->
 	                	<select id="filtAsmnt" name="filtAsmnt">
 	                    		<option value="None">--</option>
 	                	</select>

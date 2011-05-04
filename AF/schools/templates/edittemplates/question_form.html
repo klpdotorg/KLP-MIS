@@ -19,8 +19,10 @@
       								<input type="hidden" name="old" id="id_old" value="{{question.name}}" />
       								<input type="hidden" id="question_id" value="{{question.id}}" />
                             					<input type="hidden" name="form-0-assessment" id="id_form-0-assessment" value="{{question.assessment.id}}" />
+                            					<!-- Question Name Field -->
                         				</td>
                         				<td>
+                        					<!-- If Name field has errors show errors -->
                                     				{% for error in entryForm.name.errors %}
 	                                				<span class="editErr">{{ error }}</span>
 	                                			{% endfor %}
@@ -30,8 +32,10 @@
       				    			<td class="rightprofile">Type</td>
       							<td class="leftprofile">
                             					{% render_field entryForm.questionType 'tabindex=2' %}
+                            					<!-- Question type Field -->
                         				</td>
                         				<td>
+                        					<!-- If Question type field has errors show errors -->
                                     				{% for error in entryForm.questionType.errors %}
 	                                				<span class="editErr">{{ error }}</span>
 	                                			{% endfor %}
@@ -41,8 +45,10 @@
       				    			<td class="rightprofile"><label class="KLP_required">Score Min</label></td>
       							<td class="leftprofile">
                             					{% render_field entryForm.scoreMin 'tabindex=3' %}
+                            					<!-- Question score min Field -->
                         				</td>
                         				<td>
+                        					<!-- If scoreMin field has errors show errors -->
                                     				{% for error in entryForm.scoreMin.errors %}
 	                                				<span class="editErr">{{ error }}</span>
 	                                			{% endfor %}
@@ -52,8 +58,10 @@
       				    			<td class="rightprofile"><label class="KLP_required">Score Max</label></td>
       							<td class="leftprofile">
                             					{% render_field entryForm.scoreMax 'tabindex=4' %}
+                            					<!-- Question score max Field -->
                         				</td>
                         				<td>
+                        					<!-- If scoreMax field has errors show errors -->
                                     				{% for error in entryForm.scoreMax.errors %}
 	                                				<span class="editErr">{{ error }}</span>
 	                                			{% endfor %}
@@ -63,8 +71,10 @@
       				    			<td class="rightprofile"><label class="KLP_required">Grade</label></td>
       							<td class="leftprofile">
                             					{% render_field entryForm.grade 'tabindex=3' %}
+                            					<!-- Question grade Field -->
                         				</td>
                         				<td>
+                        					<!-- If grade field has errors show errors -->
                                     				{% for error in entryForm.grade.errors %}
 	                                				<span class="editErr">{{ error }}</span>
 	                                			{% endfor %}
@@ -74,8 +84,10 @@
       				    			<td class="rightprofile"><label class="KLP_required">Question Order:</label></td>
       							<td class="leftprofile">
                             					{% render_field entryForm.order 'tabindex=5' %}
+                            					<!-- Question order Field -->
                         				</td>
                         				<td>
+                        					<!-- If order field has errors show errors -->
                                     				{% for error in entryForm.order.errors %}
 	                                				<span class="editErr">{{ error }}</span>
 	                                			{% endfor %}
@@ -130,8 +142,10 @@
    }
   
    $("#id_form-0-questionType").change(function(){
+   	/* If Value is change in question type field hide and show score min, score max and grade fields based on value */
    	quesType = $("#id_form-0-questionType").val();
    	if (quesType == '2'){
+   		/* If type 2 (grade) hide score min and max, show grade field */
    		$("#markTypMin").hide();
    		$("#id_form-0-scoreMin").val('');
    		$("#markTypMax").hide();
@@ -140,6 +154,7 @@
    		$('#gradeTyp').focus();
    	}
    	else{
+   		/* If type 1 (marks) show score min and max, hide grade field */
    		$("#markTypMin").show();
    		$("#markTypMax").show();
    		$("#gradeTyp").hide();
@@ -150,6 +165,7 @@
    
    
    $("#id_save").click(function(){
+   	/* Clicking on save button hide all prv msgs and call form submit and pass button type is save */
    	KLP_Hide_Msg();
    	parentVal = $("#id_form-0-assessment").val();
    	$("#id_form-buttonType").val('save');
@@ -158,6 +174,7 @@
    });
    
    $("#id_save_and_continue").click(function(){
+   	/* Clicking on save and continue button hide all prv msgs and call form submit and pass button type is save and continue */
    	KLP_Hide_Msg();
    	$("#id_form-buttonType").val('save and continue');
    	parentVal = $("#id_form-0-assessment").val();
@@ -165,6 +182,7 @@
    });
    
    $("#id_save_and_create").click(function(){
+   	/* Clicking on save and add another button hide all prv msgs and call form submit and pass button type is save and add another */
    	KLP_Hide_Msg();
    	parentVal = $("#id_form-0-assessment").val();
    	$("#id_form-buttonType").val('save and add another');
@@ -176,16 +194,20 @@
    
    var KLP_form_submit = function(parentVal, parentId){
    	oldName = $('#id_old').val();  
-   	newName = $('#id_form-0-name').val();   
+   	newName = $('#id_form-0-name').val();  
+   	/* capture old name and new name to change values in node */
+   	/* post data using post method */ 
    	$.post(
         	$('#url').val(),
         	$("#questionForm").serialize(),
                 function(data){
+                    /* Get Response */
                     $("#dyncData").html(data);
                     NFInit();
                     $('input:visible:enabled:first').focus();
                     var successStatus = $("#success_status").val();
                     if (successStatus == 'True'){
+                        /* If It success show success msg and update node in tree */
                     	treeNode=$("#question_{{question.id}}").find("a:first");
                     	$(treeNode).attr("title", newName);
                     	$("#question_{{question.id}}_text").html(newName);

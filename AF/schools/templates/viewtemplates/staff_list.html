@@ -1,4 +1,5 @@
 {% load template_tags %}
+<!-- This is for list all staff under institution -->
 <div  id="searchRes">
 <input type="hidden" id = "url"  value = "{{url}}">
 
@@ -13,9 +14,11 @@
 	<input type="hidden" name="studentGroup" id="student_group_id" value="{{studentgroup_id}}" />
 	<div class="tot-border">
 		<table border="0" cellpadding="0" cellspacing="0" style="text-align:center;width:100%" id="id_staffDetail">
+		    <!-- Staff Heading Row -->
 		    <th class="tot-border3">Name</th>  <th class="tot-border3">Date of Joining</th>  <th class="tot-border3">Gender</th>  <th class="tot-border3">Mother Tongue</th> <th class="tot-border3">Qualifiaction</th> <th class="tot-border3">Staff Type</th> <th class="tot-border3">Classes</th>
 		    {%if map%}<th class="tot-border3">Map</th>{% else %}<th class="tot-border3">Edit</th><th class="tot-border4">Delete</th>{% endif %}
-		    {% for staff in staff_list %}
+		    <!-- Staff Details -->
+		    {% for staff in staff_list %}		    	
 			<tr id='staff_{{staff.id}}'>
 				<td  class="tot-border1">{{staff.firstName}} {{staff.middleName}} {{staff.lastName}}</td>
 				<td  class="tot-border1">{{staff.doj|date:"d-m-Y"}}</td>
@@ -56,6 +59,7 @@
 		</table>
 	</div>
 <div id="student_pagenation">
+	<!-- Pagination block -->
 	<span id = 'page_{{previous}}' onclick="Pagination(this)" style="cursor:pointer;color:blue;padding-right:15px;{% if not has_previous %}display:none;{% endif %}"> previous </span>
 		page <span id="id_currentPage">{{page}}</span> of <span id="id_totPages">{{pages}}</span>
 	<span id='page_{{next}}' onclick="Pagination(this)" style="cursor:pointer;color:blue;padding-left:15px;{% if not has_next %}display:none;{% endif %}"> next </span>

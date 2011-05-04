@@ -40,8 +40,10 @@
       		                <td class="rightprofile"><label class="KLP_required">Management</label></td>
       		                <td class="leftprofile">
       		                    {% render_field entryForm.name 'tabindex=1' %}
+      		                    <!-- Management Name Field -->
       		                </td>
       		                <td>
+      		                	<!-- If Name field has errors show errors -->
                                 	{% for error in entryForm.name.errors %}
 	                            		<span class="editErr">{{ error }}</span>
 	                           	{% endfor %}
@@ -65,6 +67,7 @@
     	},200);
    	$("#mgmtForm").submit(function(){
    		newlyAdded = $("#id_form-0-name").val();
+   		/* Post data and get reponse on form submit */    
     		$.post(  
         		'/institution-management/creator/',  
         		$("#mgmtForm").serialize(),  

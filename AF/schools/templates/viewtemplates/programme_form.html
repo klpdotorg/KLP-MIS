@@ -17,9 +17,10 @@
       					    		<td class="rightprofile"><label class="KLP_required">Name</label></td>
       							<td class="leftprofile">
                             					{% render_field entryForm.name 'tabindex=1' %}
+                            					<!-- Programme Name Field -->
                         				</td> 
                         				<td>
-                        					
+                        					<!-- If Name field has errors show errors -->
                                     				{% for error in entryForm.name.errors %}
 	                                				<span class="editErr">{{ error }}</span>
 	                                			{% endfor %}
@@ -28,6 +29,7 @@
       						<tr>
       					    		<td class="rightprofile"><label>Description</label></td>
       							<td class="leftprofile">
+      								<!-- Programme description Field -->
                             					<textarea id="id_form-0-description" name="form-0-description" tabindex=2></textarea>
                         				</td>                                                    
       						</tr>
@@ -35,8 +37,10 @@
       					    		<td class="rightprofile"><label class="KLP_required">Start Date</label></td>
       							<td class="leftprofile">
                             					{% render_field entryForm.startDate 'tabindex=3' %}
+                            					<!-- Programme start date Field -->
                         				</td> 
                         				<td>
+                        					<!-- If startdate has errors show errors -->
                                     				{% for error in entryForm.startDate.errors %}
 	                                				<span class="editErr">{{ error }}</span>
 	                                			{% endfor %}
@@ -46,13 +50,16 @@
       					    		<td class="rightprofile"><label class="KLP_required">End Date</label></td>
       							<td class="leftprofile">
                             					{% render_field entryForm.endDate 'tabindex=4' %}
+                            					<!-- Programme end date Field -->
                         				</td>   
                         				<td>
+                        					<!-- If enddate has errors show errors -->
                                     				{% for error in entryForm.endDate.errors %}
 	                                				<span class="editErr">{{ error }}</span>
 	                                			{% endfor %}
                                     			</td>                      
 	                    				<script>
+	                    					/* To Show Calendar on focus on date fields */
 	                        				$("#id_form-0-startDate").datepick({dateFormat: 'dd-mm-yyyy'});
 	                        				$( "#id_form-0-endDate" ).datepick({defaultDate: new Date("{{extra_context|displayValue:'endDate'}} {{extra_context|displayValue:'endMonth'}} {{extra_context|displayValue:'endYear'}}"), dateFormat: 'dd-mm-yyyy'});
 	                    				</script>
@@ -89,6 +96,7 @@ $(document).ready(function(){
 	$("#id_form-0-programme_institution_category").val($("#boundary_type").val());
 
 	$("#id_save").click(function(){
+		/* Clicking on save button hide all prv msgs and call form submit and pass button type is save */
 		KLP_Hide_Msg();
    		$("#id_form-buttonType").val('save');
    		KLP_form_submit();
@@ -96,12 +104,14 @@ $(document).ready(function(){
    	});
    
    	$("#id_save_and_continue").click(function(){
+   		/* Clicking on save and continue button hide all prv msgs and call form submit and pass button type is save and continue */
    		KLP_Hide_Msg();
    		$("#id_form-buttonType").val('save and continue');
    		KLP_form_submit();
    	});
    
    	$("#id_save_and_create").click(function(){
+   		/* Clicking on save and add another button hide all prv msgs and call form submit and pass button type is save and add another */
    		KLP_Hide_Msg();
    		$("#id_form-buttonType").val('save and add another');
    		KLP_form_submit();
@@ -109,15 +119,18 @@ $(document).ready(function(){
    	
    	
    	var KLP_form_submit = function(){
+   	/* post data using post method */
    	$.post(
         	'/programme/creator/',
         	$("#programmeForm").serialize(),
                 function(data){
+                    /* Get Response */
                     $("#dyncData").html(data);
                     NFInit();
                     $('input:visible:enabled:first').focus();
                     var successStatus = $("#success_status").val();
                     if (successStatus == 'True'){
+                        /* If It success show success msg and create new node in tree */
                     	$("#successMsgHead").show();
    		    	$("#klp_MsgTxt").html("Programme Created Successfully");
 			ObjId='#treeBlk'

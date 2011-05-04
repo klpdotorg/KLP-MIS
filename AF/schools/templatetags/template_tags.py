@@ -24,42 +24,6 @@ def assesmentUpdation(dictionary, key):
         return dictionary[key+'_u']
     except:
         pass                
-
-@register.filter(name='getAnswer')        
-def getAnswer(question, student):
-    if Answer.objects.filter(question=question, student=student):
-    	return True
-    else:
-    	return False
-    	
-@register.filter(name='getAnswerValue')        
-def getAnswerValue(question, student):
-    try:
-    	ansObj = Answer.objects.get(question=question, student=student)
-    	if ansObj.status == -99999:
-    		return 'AB'
-    	elif ansObj.status == -1:
-    		return 'UK'
-    	elif question.questionType == 2:
-    		return ansObj.answerGrade
-    	else:
-    		return ansObj.answerScore
-    except Answer.DoesNotExist:
-    	return ''
-    		
-@register.filter(name='dEStatus')        
-def dEStatus(question, student): 
-	try:
-		return Answer.objects.filter(question=question, student=student).values_list("doubleEntry", flat=True)[0]
-	except:
-		return 0
-		
-@register.filter(name='firstUser')        
-def firstUser(question, student): 
-	try:
-		return Answer.objects.filter(question=question, student=student).values_list("user1__id", flat=True)[0]
-	except:
-		return ''        
         
 @register.inclusion_tag("render_field.html")
 def render_field(field,attributes=''):

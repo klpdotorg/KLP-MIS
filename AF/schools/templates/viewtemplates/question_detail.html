@@ -1,9 +1,9 @@
 <div class="KLP_Button_Header">
 	<span class="KLP_Sub">
-		<a class="KLP_Button"  href="/question/{{question.id}}/update/" onclick="return KLP_View(this);">Edit</a>
+		<a class="KLP_Button"  href="/question/{{question.id}}/update/" onclick="return KLP_View(this);">Edit</a> <!-- Question Edit Button -->
 	</span>
 	<span class="KLP_Sub">
-		<span class="KLP_SpanButton"  onclick="KLP_Del('{{question.id}}', 'question', '{{question.name}}')">Delete</span>
+		<span class="KLP_SpanButton"  onclick="KLP_Del('{{question.id}}', 'question', '{{question.name}}')">Delete</span> <!-- Question Delete Button -->
 	</span>
 	
 </div>
@@ -18,7 +18,7 @@
     	<label>Question</label>
     </div>
     <div class="bng-cl">
-	    <span>{{question}}</span>
+	    <span>{{question}}</span> <!-- Question Name -->
 	    <input type="hidden" name="id" id="question_id" size="15" value="{{question.id}}" / >
 	    <input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / >
     </div>
@@ -28,10 +28,11 @@
     <div class="cl-txtbx">
     	<label>Question Type</label>
     </div>
-    <div class="bng-cl">
+    <div class="bng-cl"> <!-- Shows Question type if type is 1 question type is Marks else grade -->
     	<span>{% if question.questionType == 1 %}Marks{%else%}Grade{%endif%}</span>
     </div>
 </div>
+<!-- If Quetion type is 1 show score min and score max -->
 {% if question.questionType == 1 %}
 	<div class="boundDetail">    
     		<div class="cl-txtbx">
@@ -41,8 +42,7 @@
    			<span>{{question.scoreMin}}</span>
    		</div>
 	</div>
-{% endif %}	
-{% if question.questionType == 1 %}
+
 	<div class="boundDetail">    
     		<div class="cl-txtbx">
     			<label>ScoreMax</label>
@@ -52,6 +52,7 @@
    		</div>
 	</div>
 {% endif %}
+<!-- If Quetion type is 2 show question grades -->
 {% if question.questionType == 2 %}
 	<div class="boundDetail">    
     		<div class="cl-txtbx">
@@ -67,6 +68,7 @@
     		<label>Question Order</label>
     	</div>
     	<div class="bng-cl">
+    		<!-- Question Order -->
    		<span>{{question.order}}</span>
  	</div>
 </div>

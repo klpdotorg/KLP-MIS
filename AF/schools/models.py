@@ -70,7 +70,7 @@ class Institution_Management(models.Model):
 
 	def __unicode__(self):
 		return "%s"%self.name
-register_model(Institution_Management)
+register_model(Institution_Management) # Register model for to store information in fullhistory
 		
 		
 class Institution_address(models.Model):
@@ -81,7 +81,7 @@ class Institution_address(models.Model):
 	landmark = models.CharField(max_length = 1000, blank=True, null=True, help_text="Can be comma separated")
 	instidentification = models.CharField(max_length = 1000, blank=True, null=True, help_text="Can be comma separated")
 	routeInformation = models.CharField(max_length = 500, blank=True, null=True, help_text="Can be comma separated")		
-register_model(Institution_address)
+register_model(Institution_address)  # Register model for to store information in fullhistory
 
 
 class Boundary_Category(models.Model):
@@ -90,7 +90,7 @@ class Boundary_Category(models.Model):
 
 	def __unicode__(self):
 		return "%s" %(self.boundary_category)
-register_model(Boundary_Category)
+register_model(Boundary_Category)  # Register model for to store information in fullhistory
 
 class Boundary_Type(models.Model):
 	'''This Class stores the Boundary Type Information'''
@@ -98,7 +98,7 @@ class Boundary_Type(models.Model):
 
 	def __unicode__(self):
 		return "%s" %(self.boundary_type)
-register_model(Boundary_Type)
+register_model(Boundary_Type)  # Register model for to store information in fullhistory
 
 class Staff_Type(models.Model):
 	'''This Class stores information about Staff Type'''
@@ -107,7 +107,7 @@ class Staff_Type(models.Model):
 	
 	def __unicode__(self):
 		return "%s" %(self.staffType)
-register_model(Staff_Type)
+register_model(Staff_Type)  # Register model for to store information in fullhistory
 		
 class Staff_Qualifications(models.Model):
 	''' This Class Stores Information about staff qualification '''
@@ -115,7 +115,7 @@ class Staff_Qualifications(models.Model):
 	
 	def __unicode__(self):
 		return '%s' %(self.qualification)			
-register_model(Staff_Qualifications)
+register_model(Staff_Qualifications)  # Register model for to store information in fullhistory
 
 class Boundary(models.Model):
 	'''This class specifies the longitude and latitute of the area'''
@@ -126,6 +126,7 @@ class Boundary(models.Model):
 	active = models.IntegerField(blank = True, null = True,default=2)
 
 	class Meta:
+		""" Used For ordering """
 		ordering = ["name"]
 	
 	def __unicode__(self):
@@ -249,12 +250,13 @@ class Institution(models.Model):
 		return retStr
 
 
-register(['Acess'], Institution)
-register_model(Institution)
+register(['Acess'], Institution) # Register model for Object permissions
+register_model(Institution)  # Register model for to store information in fullhistory
 
 from django.db.models.signals import post_save, pre_save
 from schools.receivers import KLP_NewInst_Permission
-post_save.connect(KLP_NewInst_Permission, sender=Institution)
+# Call KLP_NewInst_Permission method on Institution save
+post_save.connect(KLP_NewInst_Permission, sender=Institution) 
 
 class Child(models.Model):
 	''' This class stores the personnel information of the childrens'''
@@ -289,7 +291,7 @@ class Child(models.Model):
 
 	def get_update_url(self):
 		return '/child/%d/update/' %(self.id)
-register_model(Child)		
+register_model(Child)		# Register model for to store information in fullhistory
 
 class Relations(models.Model):
     ''' This class stores relation information of the childrens'''
@@ -304,7 +306,7 @@ class Relations(models.Model):
 
     def get_view_url(self):
 		return ''
-register_model(Relations)
+register_model(Relations)  # Register model for to store information in fullhistory
 
 class StudentGroup(models.Model):
 	''' Here it holds the informaion of the class and section of the Institutions'''
@@ -363,7 +365,7 @@ class StudentGroup(models.Model):
 		if groupName == '0':
 			groupName = 'Anganwadi Class'
 		return '<span><a href="/studentgroup/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s %s"> <img src="/static_media/tree-images/reicons/studentgroup_%s.gif" title="%s" /> &nbsp; <span id="studentgroup_%s_text">%s %s</span> </a></span>' %(self.id, groupName, sec, self.group_type, self.group_type, self.id,  groupName, sec)
-register_model(StudentGroup)
+register_model(StudentGroup)  # Register model for to store information in fullhistory
 
 class Academic_Year(models.Model):
 	''' Its stores the academic years information'''
@@ -371,14 +373,14 @@ class Academic_Year(models.Model):
 	
 	def __unicode__(self):
 		return self.name
-register_model(Academic_Year)
+register_model(Academic_Year)  # Register model for to store information in fullhistory
 
 def current_academic():
     ''' To select current academic year'''
     now = datetime.date.today()
     currentYear = int(now.strftime('%Y'))
     currentMont = int(now.strftime('%m'))
-    if currentMont>=1 and currentMont<4:
+    if currentMont>=1 and currentMont<=5:
         academic = '%s-%s' %(currentYear-1, currentYear)
     else:
         academic = '%s-%s' %(currentYear, currentYear+1)
@@ -398,7 +400,8 @@ class Staff(models.Model):
 	doj = models.DateField(max_length = 20,blank=True,null=True)
 	gender = models.CharField(max_length=10,choices=Gender, default="female")
 	mt =  models.ForeignKey(Moi_Type,default="kannada")
-	qualification = models.ForeignKey(Staff_Qualifications,blank=True,null=True, default=1)
+	#qualification = models.ForeignKey(Staff_Qualifications,blank=True,null=True, default=1)
+        qualification = models.ManyToManyField(Staff_Qualifications,blank=True,null=True)
 	staff_type = models.ForeignKey(Staff_Type, default=1)
 	active = models.IntegerField(blank = True, null = True,default=2)
 
@@ -410,7 +413,7 @@ class Staff(models.Model):
 		
 	def getAssigendClasses(self):
 		return 	StudentGroup.objects.filter(staff_studentgrouprelation__staff__id = self.id, staff_studentgrouprelation__active=2)
-register_model(Staff)
+register_model(Staff)  # Register model for to store information in fullhistory
 
 class Student(models.Model):
 	''' This class gives information regarding the students class , academic year and personnel details'''
@@ -451,7 +454,7 @@ class Student(models.Model):
 	def CreateNewFolder(self):
 		return '<span><img src="/static_media/tree-images/reicons/student.gif" title="student" /> &nbsp;<a href="/boundary/%s/institution/%s/classes/%s/sections/%s/students/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt"> %s </a><a href="/boundary/%s/institution/%s/classes/%s/sections/%s/students/%s/edit/" onclick="return KLP_View(this)"> <img src="/static_media/images/pagebuilder_edit.gif" title="Edit"/></a><span class="delConf" onclick="deleteSchool(\'%s\', \'student\', \'%s\')"><img width="11" title="Delete" src="/static_media/images/PageRow_delete.gif" title="Delete"></span></span>' %(self.class_section.classname.sid.boundary.id, self.class_section.classname.sid.id, self.class_section.classname.id, self.class_section.id,self.id,self.name, self.class_section.classname.sid.boundary.id, self.class_section.classname.sid.id, self.class_section.classname.id,self. class_section.id, self.id, self.id, self.name)
 
-register_model(Student)
+register_model(Student)  # Register model for to store information in fullhistory
 
 class Student_StudentGroupRelation(models.Model):
 	'''This Class stores the Student and Student Group Realation Information'''
@@ -462,7 +465,7 @@ class Student_StudentGroupRelation(models.Model):
 	
 	class Meta: 
 		unique_together = (('student', 'student_group', 'academic'),) 
-register_model(Student_StudentGroupRelation)	
+register_model(Student_StudentGroupRelation)	# Register model for to store information in fullhistory
 	
 class Staff_StudentGroupRelation(models.Model): 
 	'''This Class stores the Staff and Student Group Realation Information'''
@@ -473,7 +476,7 @@ class Staff_StudentGroupRelation(models.Model):
  	
  	class Meta: 
 		unique_together = (('staff', 'student_group', 'academic'),) 	
-register_model(Staff_StudentGroupRelation)		
+register_model(Staff_StudentGroupRelation)		# Register model for to store information in fullhistory
 
 def default_end_date():
     ''' To select academic year end date'''
@@ -522,7 +525,7 @@ class Programme(models.Model):
 
 	def CreateNewFolder(self):
 		return '<span><a href="/programme/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/programme.gif" title="Programme" /> &nbsp; <span id="programme_%s_text">%s</span></a></span>' %(self.id,self.name, self.id, self.name)	
-register_model(Programme)
+register_model(Programme)   # Register model for to store information in fullhistory
 
 class Assessment(models.Model):
     """ This class stores information about Assessment """
@@ -560,7 +563,7 @@ class Assessment(models.Model):
 
     def CreateNewFolder(self):
 		return '<span><a id="assessment_%s_view" href="/assessment/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/assessment.gif" title="Assessment" /> &nbsp; <span id="assessment_%s_text">%s</span></a></span>' %(self.id, self.id, self.name, self.id, self.name)
-register_model(Assessment)
+register_model(Assessment)  # Register model for to store information in fullhistory
 
 class Assessment_StudentGroup_Association(models.Model):
 	'''This Class stores the Assessment and Student Group Association Information'''
@@ -570,7 +573,7 @@ class Assessment_StudentGroup_Association(models.Model):
 	
 	class Meta: 
 		unique_together = (('assessment', 'student_group'),) 
-register_model(Assessment_StudentGroup_Association)
+register_model(Assessment_StudentGroup_Association)  # Register model for to store information in fullhistory
 
 class Question(models.Model):
     """ This class stores Assessment detail information """
@@ -618,7 +621,7 @@ class Question(models.Model):
     def CreateNewFolder(self):
 		return '<span><a href="/question/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/question.gif" title="Question" /> &nbsp; <span id="question_%s_text">%s</span></a></span>' %(self.id, self.name, self.id, self.name)
 
-register_model(Question)
+register_model(Question)  # Register model for to store information in fullhistory
 
 class Answer(models.Model):
     """ This class stores information about student marks and grade """
@@ -636,7 +639,7 @@ class Answer(models.Model):
     
     class Meta: 
 		unique_together = (('question', 'student'),)
-register_model(Answer)
+register_model(Answer)   # Register model for to store information in fullhistory
 
 class UserAssessmentPermissions(models.Model):
 	""" This class stores information about user, instituion and assessment permissions"""

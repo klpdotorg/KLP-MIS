@@ -22,6 +22,7 @@
 				    		</div>
 				    	</td>
 	    			</tr>
+	    			<!-- Shows Student Id and Name -->
 	    			{% for i in chList%}
 	    				<tr class="KLP_txt_cen">
 	    					<td class="KLP_Ans_Fix">
@@ -50,6 +51,7 @@
 	     				<td class="KLP_Ans_Fix">
 	     					<div class="KLP_Fix_Div">
 		     					<table>
+		     						<!-- Question names row -->
 		     						<tr>
 									{% if qNamesList %}
 										{% for ques in qNamesList %}
@@ -65,7 +67,7 @@
 	     					</div>
 	     				</td>
 	     			</tr>
-	     
+	                        <!-- shows grid for the each student -->
 	     			{% for i in studIdList%}
 	     				<tr class="KLP_txt_cen">
 						<td class="KLP_Ans_Fix">
@@ -78,16 +80,19 @@
 								
 									<table>
 										<tr>
-										
+										        <!-- Repeat Question -->
 											{% for qId in qIdList %}
 											{% with rDict|displayValue:qId as qData %}
 											{% with qData|displayValue:i as qDict %}
+											<!-- Get Question data based on question id and student id -->
 			        							<td class="KLP_td_height">
+			        								<!-- if ibox value false show answer value -->
 			        								{% if not qDict|displayValue:'iBox' %}
 													{{qDict|displayValue:'ansVal'}}
 			        								{% else %}
-			        								
+			        								<!-- else Show question order with input box -->
 			        								<span style="color:#736F6E;">{{qDict|displayValue:'qOrder'}}</span><br/>
+			        								<!-- If 2nd user login hide data and attributes dE and sE -->
 												<input type="text"	
 									   					       name="student_{{i}}_{{qDict|displayValue:'qId'}}" 
 									   					       id="id_student_{{i}}_{{qDict|displayValue:'qId'}}" 
@@ -135,7 +140,7 @@
 			
 </div><br/>
 <div id="student_pagenation" style="{% if not childs_list %}display:none;{% endif %}">
-	
+	        <!-- Pagination -->
 		page <span id="id_currentPage">{{page}}</span> of <span id="id_totPages">{{pages}}</span>
 		<input type="hidden" name="resultPerPage" id="id_resultPerPage" value="{{results_per_page}}" />
 		<input type="hidden" value = "{{Norecords}}" id="Norecords" name="Norecords"/>
@@ -158,10 +163,11 @@
 
 <script>
 $(document).ready(function(){
-      $('.blue').bt();
+      $('.blue').bt(); // For tool tip
 	
        
        $("#id_ans_global_submit").click(function(){
+       		/* Clicking on submit get all forms and validate and submits the forms */
        		var forms = $("form");
        		forms.each(function(index){
        			var dataForm = $(this).find("input[type=text]:visible").length
