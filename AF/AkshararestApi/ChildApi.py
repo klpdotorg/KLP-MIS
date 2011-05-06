@@ -21,7 +21,7 @@ def KLP_Child_Create(request, referKey):
 	""" To Create New Child boundary/(?P<bounday>\d+)/Child/creator/"""
 	buttonType = request.POST.get('form-buttonType')
         queryset = Child.objects.all() 
-        KLP_Create_Child = KLP_Child(queryset , permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'child', extra_context={'buttonType':buttonType, 'referKey':referKey}), receiver = XMLReceiver(),)
+        KLP_Create_Child = KLP_Child(queryset , permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'child', extra_context={'buttonType':buttonType, 'referKey':referKey}), receiver = XMLReceiver(),)
         response = KLP_Create_Child.responder.create_form(request,form_class=Child_Form)
         return HttpResponse(response)
 	
@@ -29,63 +29,17 @@ def KLP_Child_Create(request, referKey):
 def KLP_Child_View(request, child_id):
 	""" To View Selected Child Child/(?P<Child_id>\d+)/view/?$"""
 	kwrg = {'is_entry':True}
-	resp=KLP_Child(queryset = Child.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'child',),)(request, child_id, **kwrg)
+	resp=KLP_Child(queryset = Child.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'child',),)(request, child_id, **kwrg)
         return HttpResponse(resp)
 
 def KLP_Child_Update(request, child_id):
 	""" To update Selected Child Child/(?P<Child_id>\d+)/update/"""
 	buttonType = request.POST.get('form-buttonType')
 	referKey = request.POST.get('form-0-boundary')
-	KLP_Edit_Child =KLP_Child(queryset = Child.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'child',extra_context={'buttonType':buttonType, 'referKey':referKey} ), receiver = XMLReceiver(),)
+	KLP_Edit_Child =KLP_Child(queryset = Child.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'child',extra_context={'buttonType':buttonType, 'referKey':referKey} ), receiver = XMLReceiver(),)
 	response = KLP_Edit_Child.responder.update_form(request, pk=child_id, form_class=Child_Form)
 	return HttpResponse(response)
 
-'''def getStudentSearch(request, boundary, fieldName,searchtext):
-
-	 To get the Child details by category
-
-          name wise to get the child details list either api/child/name/<child-name> or api/xml/child/name/<child-name>
-                  
-         In json format api/json/child/name/<child-name>
-
-         date of birth wise to get the child details list either api/child/dob/yyyymmdd or api/child/dob/yyyymmdd
-                  
-         In json format api/json/child/dob/yyyymmdd
-
-         sex wise to get the child details list either api/child/sex/male or api/child/sex/female
-                  
-         In json format api/json/child/sex/male
-
-            
-         mother language wise to get the child details list either api/child/ml/1 or api/child/ml/2
-                  
-         In json format api/json/ml/1
-	queryset = []
-	if fieldName=='firstname':
-		queryset=Child.objects.filter(firstName__startswith=searchtext, boundary__id = boundary).order_by('firstName')
-
-	if fieldName=='lastname':
-		queryset=Child.objects.filter(lastName__startswith=searchtext, boundary__id = boundary).order_by('firstName')
-
-	if fieldName=='dobyear':
-		queryset=Child.objects.filter(dob__year=searchtext, boundary__id = boundary).order_by('firstName')
-
-	if fieldName=='dob':
-		child_year=searchtext[0:4]+'-'+searchtext[4:6]+'-'+searchtext[6:8]
-		queryset=Child.objects.filter(dob=searchtext, boundary__id = boundary).order_by('firstName')
-
-	if fieldName=='gender':
-		queryset=Child.objects.filter(gender__startswith=searchtext, boundary__id = boundary).order_by('firstName')
-
-	if fieldName=='mt':
-		queryset=Child.objects.filter(mt__name__startswith=searchtext, boundary__id = boundary).order_by('firstName')
-
-	if fieldName=='mother':
-		queryset=Child.objects.filter(relations__mother__startswith=searchtext, boundary__id = boundary).order_by('firstName')
-
-	if fieldName=='father':
-		queryset=Child.objects.filter(relations__father__startswith=searchtext, boundary__id = boundary).order_by('firstName')
-	return queryset'''
 
 def getStudentSearch(request, boundary, fieldName,searchtext):
 
@@ -159,7 +113,7 @@ def ChildrenList(request, boundary_id):
 		queryset=Child.objects.exclude(id__in = studentslist, boundary__id = boundary_id).order_by('firstName')
 	boundary = Boundary.objects.get(pk = boundary_id)
 	val=Collection(queryset,
-	permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'),
+	permitted_methods = ('GET', 'POST'),
 	responder = TemplateResponder(
 	paginate_by = 10,
 	template_dir = 'viewtemplates',
@@ -220,6 +174,6 @@ urlpatterns = patterns('',
    url(r'^child/(?P<child_id>\d+)/view/?$', KLP_Child_View),
    url(r'^child/(?P<child_id>\d+)/update/?$', KLP_Child_Update),
    url(r'^boundary/(?P<boundary_id>\d+)/child/view/$',ChildrenList),
-   url(r'^filter/(?P<school_id>\d+)/schgrp/$', StdGrpFilter(permitted_methods=('POST','PUT','GET','DELETE'))),
+   url(r'^filter/(?P<school_id>\d+)/schgrp/$', StdGrpFilter(permitted_methods=('POST','GET'))),
    url(r'^childsql/(?P<boundary_id>\d+)/$', childsql),
 )

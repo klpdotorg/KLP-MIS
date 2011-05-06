@@ -30,7 +30,7 @@ def KLP_Student_Create(request, studentgroup_id, counter=0):
 	assessment_id = request.GET.get('assessment_id') or request.POST.get('assessment_id') or 0
 	referKey = Institution.objects.get(id = model.institution.id).boundary.id
         queryset = Child.objects.all() 
-        KLP_Create_Student = KLP_Student(queryset , permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'child', extra_context={'buttonType':buttonType, 'referKey':referKey,"studentgroup_id":studentgroup_id, 'studentgroup':model, 'modelName':"student", "mapStudent":mapStudent, 'assessment_id':assessment_id, 'counter':counter}), receiver = XMLReceiver(),)
+        KLP_Create_Student = KLP_Student(queryset , permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'child', extra_context={'buttonType':buttonType, 'referKey':referKey,"studentgroup_id":studentgroup_id, 'studentgroup':model, 'modelName':"student", "mapStudent":mapStudent, 'assessment_id':assessment_id, 'counter':counter}), receiver = XMLReceiver(),)
         response = KLP_Create_Student.responder.create_form(request,form_class=Child_Form)
         return HttpResponse(response)
 
@@ -47,7 +47,7 @@ def KLP_Student_Edit_Call(request, studentgroup_id):
 def KLP_Student_View(request, student_id):
 	""" To View Selected Student studentsroup/(?P<studentsroup_id>\d+)/view/?$"""
 	kwrg = {'is_entry':True}
-	resp=KLP_Student(queryset = Student.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'student',),)(request, student_id, **kwrg)
+	resp=KLP_Student(queryset = Student.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'student',),)(request, student_id, **kwrg)
         return HttpResponse(resp)
 
 def KLP_Student_Update(request, student_id, counter=0):
@@ -56,7 +56,7 @@ def KLP_Student_Update(request, student_id, counter=0):
 	check_user_perm.send(sender=None, user=request.user, model='Student', operation='Update')
         check_user_perm.connect(KLP_user_Perm)
 	buttonType = request.POST.get('form-buttonType')
-	KLP_Edit_Student =KLP_Student(queryset = Child.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'child',extra_context={'buttonType':buttonType,'modelName':"student", 'counter':counter} ), receiver = XMLReceiver(),)
+	KLP_Edit_Student =KLP_Student(queryset = Child.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'child',extra_context={'buttonType':buttonType,'modelName':"student", 'counter':counter} ), receiver = XMLReceiver(),)
 	response = KLP_Edit_Student.responder.update_form(request, pk=student_id, form_class=Child_Form)
 	
 	return HttpResponse(response)

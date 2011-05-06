@@ -23,7 +23,7 @@ def KLP_Run_Query(request):
     ''' To run SQl Queries Entered by admin''' 
     adminQuery = request.POST.get('form-klp-query')
     #connection = sqlite.connect('/home/akshara/Akshara/akshara.db')
-    connection = psycopg2.connect(database="newklp", user="aksharadb", password="RObu15tFTG")
+    connection = psycopg2.connect(database="klpnew", user="aksharadb", password="RObu15tFTG")
     cursor = connection.cursor()
     isExecute = False
     if adminQuery:

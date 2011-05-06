@@ -16,7 +16,7 @@ class BoundaryTypeView(Collection):
 
 template_boundary_type_view =  BoundaryTypeView(
     queryset = Boundary_Type.objects.all(),
-    permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'),    
+    permitted_methods = ('GET', 'POST'),    
     responder = TemplateResponder(
         template_dir = 'viewtemplates',
         template_object_name = 'boundary_type',        

@@ -16,7 +16,7 @@ class KLP_Language(Collection):
 def KLP_Language_Create(request):
 	""" To Create new language language/creator/"""
 	buttonType = request.POST.get('form-buttonType')
-	KLP_Language_Create = KLP_Language(queryset = Moi_Type.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'Language',extra_context={'buttonType':buttonType}), receiver = XMLReceiver(),)
+	KLP_Language_Create = KLP_Language(queryset = Moi_Type.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'Language',extra_context={'buttonType':buttonType}), receiver = XMLReceiver(),)
 	response = KLP_Language_Create.responder.create_form(request,form_class=Moi_Type_Form)
 	
 	return HttpResponse(response)

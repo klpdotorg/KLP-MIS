@@ -41,7 +41,7 @@ def KLP_Institution_Create(request, referKey):
 		categoryType = 2
 	# Query for Institution Category based on  categoryType
 	categoryList = Institution_Category.objects.filter(categoryType = categoryType)
-        KLP_Create_Institution = KLP_Institution(queryset = Institution.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'institution', extra_context={'buttonType':buttonType, 'referKey':referKey, 'institutionType':institutionType, 'categoryList':categoryList, 'selCategoryTyp':selCategoryTyp}), receiver = XMLReceiver(),)
+        KLP_Create_Institution = KLP_Institution(queryset = Institution.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'institution', extra_context={'buttonType':buttonType, 'referKey':referKey, 'institutionType':institutionType, 'categoryList':categoryList, 'selCategoryTyp':selCategoryTyp}), receiver = XMLReceiver(),)
         response = KLP_Create_Institution.responder.create_form(request,form_class=Institution_Form)
         
         return HttpResponse(response)
@@ -50,7 +50,7 @@ def KLP_Institution_Create(request, referKey):
 def KLP_Institution_View(request, institution_id):
 	""" To View Selected Institution institution/(?P<institution_id>\d+)/view/?$"""
 	kwrg = {'is_entry':True}
-	resp=KLP_Institution(queryset = Institution.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'institution',),)(request, institution_id, **kwrg)
+	resp=KLP_Institution(queryset = Institution.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'institution',),)(request, institution_id, **kwrg)
         return HttpResponse(resp) 	
 
 
@@ -71,7 +71,7 @@ def KLP_Institution_Update(request, institution_id):
 		institutionType = 'Anganwadi'
 		categoryType = 2
 	categoryList = Institution_Category.objects.filter(categoryType = categoryType)
-	KLP_Edit_Institution =KLP_Institution(queryset = Institution.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'institution', extra_context={'buttonType':buttonType, 'referKey':referKey, 'institutionType':institutionType, 'categoryList':categoryList, 'selCategoryTyp':selCategoryTyp}), receiver = XMLReceiver(),)
+	KLP_Edit_Institution =KLP_Institution(queryset = Institution.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'institution', extra_context={'buttonType':buttonType, 'referKey':referKey, 'institutionType':institutionType, 'categoryList':categoryList, 'selCategoryTyp':selCategoryTyp}), receiver = XMLReceiver(),)
 	response = KLP_Edit_Institution.responder.update_form(request, pk=institution_id, form_class=Institution_Form)
 	
 	return HttpResponse(response)	

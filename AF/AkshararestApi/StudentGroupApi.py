@@ -27,7 +27,7 @@ def KLP_StudentGroup_Create(request, referKey):
 	buttonType = request.POST.get('form-buttonType')
 	instObj = Institution.objects.get(id = referKey)
 	group_typ = request.GET.get("group_typ") or request.POST.get("group_typ")
-        KLP_Create_StudentGroup = KLP_StudentGroup(queryset = StudentGroup.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'studentgroup', extra_context={'buttonType':buttonType, 'ParentKey':referKey, 'group_typ':group_typ, 'sch_typ':instObj.boundary.boundary_category.boundary_category}), receiver = XMLReceiver(),)
+        KLP_Create_StudentGroup = KLP_StudentGroup(queryset = StudentGroup.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'studentgroup', extra_context={'buttonType':buttonType, 'ParentKey':referKey, 'group_typ':group_typ, 'sch_typ':instObj.boundary.boundary_category.boundary_category}), receiver = XMLReceiver(),)
         response = KLP_Create_StudentGroup.responder.create_form(request,form_class=StudentGroup_Form)
         return HttpResponse(response)
 	
@@ -53,7 +53,7 @@ def KLP_StudentGroup_View(request, studentgroup_id):
 	child_list = Student_StudentGroupRelation.objects.filter(student_group__id = studentgroup_id, academic=current_academic, active=2, student__active=2).values_list('student__child', flat=True)
 	
 	students = Child.objects.filter(id__in=child_list).extra(select={'lower_firstname':'lower(trim("firstName"))', 'lower_midname':'lower(trim("middleName"))', 'lower_lastname':'lower(trim("lastName"))' }).order_by('lower_firstname', 'lower_midname', 'lower_lastname')
-	resp=Collection(students, permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'students',paginate_by = 20,extra_context={'studgrpParent':studgrpParent,'studentgroup':studentgroup,'url':url, 'students':students,'Norecords':Norecords, 'studentGroups':studentGroups,'count':count}),)
+	resp=Collection(students, permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'students',paginate_by = 20,extra_context={'studgrpParent':studgrpParent,'studentgroup':studentgroup,'url':url, 'students':students,'Norecords':Norecords, 'studentGroups':studentGroups,'count':count}),)
         return HttpResponse(resp(request))
 
 def KLP_StudentGroup_Update(request, studentgroup_id):
@@ -66,13 +66,14 @@ def KLP_StudentGroup_Update(request, studentgroup_id):
 	group_typ = request.GET.get("group_typ") or request.POST.get("group_typ")
 	sgObj = StudentGroup.objects.get(pk=studentgroup_id)
 	sch_typ = request.GET.get("sch_typ") or sgObj.institution.boundary.boundary_category
-	KLP_Edit_StudentGroup =KLP_StudentGroup(queryset = StudentGroup.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'studentgroup', extra_context={'buttonType':buttonType,'ParentKey':ParentKey, 'group_typ':group_typ, 'sch_typ':sch_typ}), receiver = XMLReceiver(),)
+	KLP_Edit_StudentGroup =KLP_StudentGroup(queryset = StudentGroup.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'studentgroup', extra_context={'buttonType':buttonType,'ParentKey':ParentKey, 'group_typ':group_typ, 'sch_typ':sch_typ}), receiver = XMLReceiver(),)
 	response = KLP_Edit_StudentGroup.responder.update_form(request, pk=studentgroup_id, form_class=StudentGroup_Form)
 	return HttpResponse(response)	
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assessment_id):
 	""" To Show Answer Entry Form studentgroup/(?P<studentgroup_id>\d+)/programme/(?P<programme_id>\d+)/assessment/(?P<assessment_id>\d+)/view/"""
+	""" This Method is used for to generate student answers grid to enter data/answers for the assessment questions """
 	user = request.user  #get logged in user
 	url = "/studentgroup/%s/programme/%s/assessment/%s/view/" %(studentgroup_id, programme_id, assessment_id)
 	# Query Childs based on studentgroup relation
@@ -196,7 +197,7 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 			
 				
 	
-	val=Collection(childs_list, permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'prgtemplates', template_object_name = 'childs', paginate_by=20, extra_context={'filter_id':programme_id, 'assessment_id':assessment_id, 'user':user, 'studentgroup_id':studentgroup_id, 'question_list':question_list,  'group_typ':grupObj[0].group_type, 'url':url, 'studIdList':studIdList, 'rDict':rDict, 'qNamesList':qNamesList, 'chList':chList, 'childDict':childDict, 'rDict':rDict, 'qIdList':qIdList}), entry_class = ChoiceEntry, )
+	val=Collection(childs_list, permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'prgtemplates', template_object_name = 'childs', paginate_by=20, extra_context={'filter_id':programme_id, 'assessment_id':assessment_id, 'user':user, 'studentgroup_id':studentgroup_id, 'question_list':question_list,  'group_typ':grupObj[0].group_type, 'url':url, 'studIdList':studIdList, 'rDict':rDict, 'qNamesList':qNamesList, 'chList':chList, 'childDict':childDict, 'rDict':rDict, 'qIdList':qIdList}), entry_class = ChoiceEntry, )
 	return HttpResponse(val(request))
 	
 

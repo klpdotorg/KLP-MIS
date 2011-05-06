@@ -16,7 +16,7 @@ class KLP_Institution_Management(Collection):
 def KLP_Institution_Management_Create(request):
 	""" To Create new institution management institution-management/creator/"""
 	buttonType = request.POST.get('form-buttonType')
-	KLP_Institution_Management_Create = KLP_Institution_Management(queryset = Institution_Management.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'InstitutionManagement',extra_context={'buttonType':buttonType}), receiver = XMLReceiver(),)
+	KLP_Institution_Management_Create = KLP_Institution_Management(queryset = Institution_Management.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'InstitutionManagement',extra_context={'buttonType':buttonType}), receiver = XMLReceiver(),)
 	response = KLP_Institution_Management_Create.responder.create_form(request,form_class=Institution_Management_Form)
 	
 	return HttpResponse(response)

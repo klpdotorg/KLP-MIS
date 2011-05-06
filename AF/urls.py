@@ -33,4 +33,6 @@ urlpatterns = patterns('',
     url(r'', include('Akshara.AkshararestApi.KLP_Permission')),
     url(r'', include('Akshara.AkshararestApi.KLP_UserApi')),
     url(r'', include('Akshara.AkshararestApi.KLP_Map')),
+    url(r'', include('Akshara.AkshararestApi.KLP_AuditTrial')),
+    url(r'', include('Akshara.AkshararestApi.KLP_Common')),
 )

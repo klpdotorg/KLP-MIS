@@ -73,7 +73,7 @@ def KLP_Set_Session(request):
 	return HttpResponse('Success')            
         
 urlpatterns = patterns('',             
-   url(r'^home/$', KLP_Home(permitted_methods=('POST','PUT','GET','DELETE'))),
-   url(r'^$', KLP_Home(permitted_methods=('POST','PUT','GET','DELETE'))),
+   url(r'^home/$', KLP_Home(permitted_methods=('POST','GET'))),
+   url(r'^$', KLP_Home(permitted_methods=('POST','GET'))),
    url(r'^set/session/$', KLP_Set_Session),
 )        

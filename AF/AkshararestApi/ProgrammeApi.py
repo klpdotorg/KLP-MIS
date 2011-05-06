@@ -20,7 +20,7 @@ class KLP_Programme(Collection):
 def KLP_Programme_View(request, programme_id):
 	""" To View Selected Programme programme/(?P<programme_id>\d+)/view/"""
 	kwrg = {'is_entry':True}
-	resp=KLP_Programme(queryset = Programme.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'programme',),)(request, programme_id, **kwrg)
+	resp=KLP_Programme(queryset = Programme.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'programme',),)(request, programme_id, **kwrg)
         return HttpResponse(resp) 
         
 def KLP_Programme_Create(request):
@@ -35,7 +35,7 @@ def KLP_Programme_Create(request):
 	endYear = int(now.strftime('%Y'))
 	if currentMont>4:
 		endYear = endYear + 1 
-        KLP_Create_Programme = KLP_Programme(queryset = Programme.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'programme', extra_context={'buttonType':buttonType, 'endDate':30, 'endYear':endYear, 'endMonth':'APRIL'}), receiver = XMLReceiver(),)
+        KLP_Create_Programme = KLP_Programme(queryset = Programme.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'programme', extra_context={'buttonType':buttonType, 'endDate':30, 'endYear':endYear, 'endMonth':'APRIL'}), receiver = XMLReceiver(),)
         response = KLP_Create_Programme.responder.create_form(request,form_class=Programme_Form)
         					
         return HttpResponse(response)  
@@ -52,7 +52,7 @@ def KLP_Programme_Update(request, programme_id):
 	endYear = int(now.strftime('%Y'))
 	if currentMont>4:
 		endYear = endYear + 1
-	KLP_Edit_Programme =KLP_Programme(queryset = Programme.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'programme', extra_context={'buttonType':buttonType, 'endDate':30, 'endYear':endYear, 'endMonth':'APRIL'}), receiver = XMLReceiver(),)
+	KLP_Edit_Programme =KLP_Programme(queryset = Programme.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'programme', extra_context={'buttonType':buttonType, 'endDate':30, 'endYear':endYear, 'endMonth':'APRIL'}), receiver = XMLReceiver(),)
 	response = KLP_Edit_Programme.responder.update_form(request, pk=programme_id, form_class=Programme_Form)
 	
 	return HttpResponse(response)              
@@ -78,5 +78,5 @@ urlpatterns = patterns('',
    url(r'^programme/(?P<programme_id>\d+)/view/?$', KLP_Programme_View),    
    url(r'^programme/creator/?$', KLP_Programme_Create),   
    url(r'^programme/(?P<programme_id>\d+)/update/$', KLP_Programme_Update),
-   url(r'^filter/(?P<type_id>\d+)/programms/$', KLP_Get_Programms(permitted_methods=('POST','PUT','GET','DELETE'))),
+   url(r'^filter/(?P<type_id>\d+)/programms/$', KLP_Get_Programms(permitted_methods=('POST','GET'))),
 )

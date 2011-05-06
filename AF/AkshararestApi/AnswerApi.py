@@ -15,7 +15,7 @@ from schools.signals import check_perm
 from schools.receivers import KLP_obj_Perm
          
 def KLP_DataEnry(request):
-        return HttpResponse(KLP_ChangeAns(permitted_methods=('POST','PUT','GET','DELETE')).read(request))
+        return HttpResponse(KLP_ChangeAns(permitted_methods=('POST','GET')).read(request))
         
         
 class KLP_ChangeAns(Resource):

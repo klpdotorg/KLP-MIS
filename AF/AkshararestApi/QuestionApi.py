@@ -22,7 +22,7 @@ class KLP_Question(Collection):
 def KLP_Question_View(request, question_id):
 	""" To View Selected Question question/(?P<question_id>\d+)/view/"""
 	kwrg = {'is_entry':True}
-	resp=KLP_Question(queryset = Question.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'question',),)(request, question_id, **kwrg)
+	resp=KLP_Question(queryset = Question.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'question',),)(request, question_id, **kwrg)
         return HttpResponse(resp) 
 
         
@@ -34,7 +34,7 @@ def KLP_Question_Create(request, referKey):
 	buttonType = request.POST.get('form-buttonType') # Get Button Type
 	# get number of questions under assessments for question order
 	order = Question.objects.filter(assessment__id=referKey).count()+1
-        KLP_Create_Question = KLP_Question(queryset = Question.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'question', extra_context={'buttonType':buttonType, 'referKey':referKey, 'order':order}), receiver = XMLReceiver(),)
+        KLP_Create_Question = KLP_Question(queryset = Question.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'question', extra_context={'buttonType':buttonType, 'referKey':referKey, 'order':order}), receiver = XMLReceiver(),)
         response = KLP_Create_Question.responder.create_form(request,form_class=Question_Form)
         			
         return HttpResponse(response)               
@@ -47,7 +47,7 @@ def KLP_Question_Update(request, question_id):
         # Get Button Type
 	buttonType = request.POST.get('form-buttonType')
 	referKey = request.POST.get('form-0-assessment')
-	KLP_Edit_Question =KLP_Question(queryset = Question.objects.all(), permitted_methods = ('GET', 'POST', 'PUT', 'DELETE'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'question', extra_context={'buttonType':buttonType, 'referKey':referKey}), receiver = XMLReceiver(),)
+	KLP_Edit_Question =KLP_Question(queryset = Question.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'question', extra_context={'buttonType':buttonType, 'referKey':referKey}), receiver = XMLReceiver(),)
 	response = KLP_Edit_Question.responder.update_form(request, pk=question_id, form_class=Question_Form)
 	
 	return HttpResponse(response)                  

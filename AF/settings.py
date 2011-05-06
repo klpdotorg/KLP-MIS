@@ -3,24 +3,41 @@
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
+SERVER_EMAIL = 'support@mahiti.org'
+
+SEND_BROKEN_LINK_EMAILS = True
+
+IGNORABLE_404_ENDS = ('.css','.html', 'favicon.ico',)
+
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
+    ('Sree', 'sree@mahiti.org'),
+    ('RamaKrishna', 'ramakrishna.marouthu@mahiti.org'),
 )
 
 MANAGERS = ADMINS
 
+TESTING = 0
 
+SESSION_COOKIE_AGE = 3600
+SESSION_SAVE_EVERY_REQUEST = True
 
 DATABASES = {
     'default': {
         'ENGINE': 'postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'newklp',                      # Or path to database file if using sqlite3.
+        'NAME': 'klpnew',                      # Or path to database file if using sqlite3.
         'USER': 'aksharadb',                      # Not used with sqlite3.
         'PASSWORD': 'RObu15tFTG',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
+
+EMAIL_HOST_USER = 'webmaster@mahiti.info'
+EMAIL_HOST_PASSWORD = '2leWay7fMn'
+EMAIL_HOST = 'smtp.1and1.com'
+EMAIL_PORT = '25'
+DEFAULT_FROM_EMAIL = 'support@mahiti.org'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -77,6 +94,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'fullhistory.fullhistory.FullHistoryMiddleware',
+    'schools.middleware.QueryLogMiddleware', 
 )
 
 ROOT_URLCONF = 'Akshara.urls'
