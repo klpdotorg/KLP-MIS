@@ -1,3 +1,9 @@
+"""
+Boundary Api is used 
+1) To view Individual Boundary details
+2) To create new boundary
+3) To update existing boundary
+"""
 from django.conf.urls.defaults import *
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response

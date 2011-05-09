@@ -1,3 +1,6 @@
+"""
+TreeMenu is used to filter all objects to genrate tree menu
+"""
 from django.conf.urls.defaults import *
 from django_restapi.model_resource import Collection
 from django_restapi.responder import *

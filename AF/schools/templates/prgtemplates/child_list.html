@@ -101,7 +101,7 @@
 									   					       
 									   					       size="3"
 									   					       {% if qDict|displayValue:'qType' == 2 %}isinGrades="{{qDict|displayValue:'ansIn'}}"{% else %}min="{{qDict|displayValue:'scMin'}}" max="{{qDict|displayValue:'scMax'}}" {% endif %}
-									   					       class="required {% if qDict|displayValue:'qType' == 2 %}letters{%else%}number{%endif%}"
+									   					       class="required {% if qDict|displayValue:'qType' == 1 %}number{%endif%}"
 									   					       {% if qDict|displayValue:'dE'%}dE="true" sE="true"{% endif %}
 									   					       />
 									   					       

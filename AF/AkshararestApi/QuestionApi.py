@@ -1,3 +1,9 @@
+"""
+QuestionApi is used 
+1) To view Individual Question details.
+2) To create new Question
+3) To update existing Question
+"""
 from django.conf.urls.defaults import *
 from django_restapi.resource import Resource
 from django.http import HttpResponse

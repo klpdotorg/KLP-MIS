@@ -1,3 +1,10 @@
+"""
+Institution Api is used
+1) To view Individual Institution details.
+2) To create new Institution
+3) To update existing Institution
+4) To list boundaries/institutions while assign permissions
+"""
 from django.conf.urls.defaults import *
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
@@ -98,14 +105,14 @@ def KLP_Institution_Boundary(request, boundary_id, permissionType, assessment_id
 		if permissionType == 'permissions':
 			# If permissionType is permissions do..
 			if bound_cat in ['district', 'block', 'project']:
-				# if bound_cat in "district, block, project" get child boundaries
+				# if bound_cat in "district, block, project" get active(2) child boundaries
 				respDict['boundary_list'] = Boundary.objects.filter(parent = boundaryObj, active=2).distinct()
 			else:
-				# else get all child Institutions
+				# else get all active(2) child Institutions
 				respDict['institution_list'] = Institution.objects.filter(boundary = boundaryObj, active=2).distinct()
 		else:
 			# If permissionType is not permissions 
-			# Get All Mapped Sg's
+			# Get All active(2) Mapped Sg's
 			studentgroup_list = Assessment_StudentGroup_Association.objects.filter(assessment__id=assessment_id, active=2).values_list('student_group', flat=True).distinct()
 			# Get Institutions based Sg's
 			map_institutions_list = StudentGroup.objects.filter(id__in=studentgroup_list, active=2).values_list('institution__id', flat=True).distinct()

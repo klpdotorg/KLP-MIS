@@ -1,3 +1,10 @@
+"""
+Assessment Api file is used 
+1) To view Assessment Details
+2) To Create new assessment
+3) To Update existing assessment
+4) To get list of assessment while filtering based on programme in filter by programme link
+"""
 from django.conf.urls.defaults import *
 from django_restapi.resource import Resource
 from schools.models import *
@@ -66,11 +73,12 @@ class KLP_Get_Assessments(Resource):
     """ To get  assessment under programme filter/programme/(?P<programme_id>\d+)/assessments/"""
     def read(self,request,programme_id):     
          try:     
-            # Query all active assessments based on programme id
+            # Query all active(2) assessments based on programme id
             assessments_list = Assessment.objects.filter(programme__id=programme_id, active=2).defer("programme")
             respStr = ''
             for assessment in assessments_list:
                 respStr += '%s$$%s&&' %(assessment.id, assessment)
+            # slice string to remove "&&" added at last of string    
             return HttpResponse(respStr[0:len(respStr)-2])         
          except:
             return HttpResponse('fail')	          

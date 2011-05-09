@@ -1,3 +1,8 @@
+"""
+HomeApi is used
+1) To view home page based on user roles
+2) To set/change session value on change of boundary type.
+"""
 from django.conf.urls.defaults import *
 from django.http import HttpResponse
 from django.shortcuts import render_to_response

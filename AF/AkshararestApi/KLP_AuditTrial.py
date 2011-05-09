@@ -1,3 +1,6 @@
+"""
+KLP_AuditTrial is used to generate audit trail report using fullhistory.
+"""
 from django.conf.urls.defaults import *
 from django.core.urlresolvers import reverse
 from django.contrib.auth.forms import *
@@ -15,16 +18,24 @@ import datetime
 from django.contrib.contenttypes.models import ContentType
 
 def KLP_audit(request):
-    user = request.user     
+    """ This method is used to show audit trail report for the users using fullhistory """
+    user = request.user     # get logged in user
+    # check user permissions to access audit trial report
     check_user_perm.send(sender=None, user=user, model='Audit', operation=None)
     check_user_perm.connect(KLP_user_Perm)
+    # get all active(1) user to show in drop down.
     userList = User.objects.filter(is_active=1)
     respDict = {'userList':userList, 'title':'Karanataka Learning Partnership'}
+    # check requested method
     if request.POST:
+    	# if request methos is post get selcted user from drop down
     	selUser = request.POST.get('selUser')
-    	defaultDate = datetime.date.today().strftime("%d")+'-'+datetime.date.today().strftime("%m")+'-'+datetime.date.today().strftime("%Y")
+    	today = datetime.date.today()
+    	defaultDate = today.strftime("%d")+'-'+today.strftime("%m")+'-'+today.strftime("%Y")
+    	# get start date and end date
     	startDate = request.POST.get('startDate')
     	endDate = request.POST.get('endDate')
+    	# if start date and end date are empty then default start date and end date are current date.
     	if not startDate:
     		startDate = defaultDate
     	if not endDate:
@@ -34,61 +45,14 @@ def KLP_audit(request):
     	respDict['selUser'] = int(selUser)
     	strDate = startDate.split('-')
     	enDate = endDate.split('-')
-    	fullHistoryList = FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=selUser)
+    	# Query fullhistory table based on start date, end date and selected user
+    	fullHistoryList = FullHistory.objects.filter(action_time__range=(datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0]))), request__user_pk=selUser)
     	respDict['fullHistoryList'] = fullHistoryList
+    	# return reponse to template
     	return render_to_response('viewtemplates/auditTrial.html',respDict,context_instance=RequestContext(request)) 
     return render_to_response('viewtemplates/auditTrial.html',respDict,context_instance=RequestContext(request)) 
-        
- 
-def  KLP_dEHistory(request):
-    user = request.user     
-    #check_user_perm.send(sender=None, user=user, model='Audit', operation=None)
-    #check_user_perm.connect(KLP_user_Perm)
-    userList = User.objects.filter(is_active=1)
-    respDict = {'title':'Karanataka Learning Partnership'}
-    contentList = ['institution', 'student', 'staff']
-    if request.POST:
-    	selUser = request.POST.get('selUser')
-    	defaultDate = datetime.date.today().strftime("%d")+'-'+datetime.date.today().strftime("%m")+'-'+datetime.date.today().strftime("%Y")
-    	startDate = request.POST.get('startDate')
-    	endDate = request.POST.get('endDate')
-    	if not startDate:
-    		startDate = defaultDate
-    	if not endDate:
-    		endDate = defaultDate
-    	respDict['startDate'] = startDate
-    	respDict['endDate'] = endDate
-    	strDate = startDate.split('-')
-    	enDate = endDate.split('-')
-    	deDict = {}
-    	activePrgs = Programme.objects.filter(active=2).values_list("id", flat=True)
-    	assessments = Assessment.objects.filter(programme__id__in=activePrgs, active=2).distinct()
-    	respDict['assessments'] = assessments
-    	for user in userList:
-    		actDict = {}
-    		for content in contentList:
-    			contObj = ContentType.objects.get(app_label='schools', name=content)
-    			actDict[content+'_c'] = len(FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, content_type__id=contObj.id, action='C'))
-    			actDict[content+'_u'] = len(FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, content_type__id=contObj.id, action='U'))
-    		for assessment in assessments:
-    			questions = Question.objects.filter(assessment = assessment,active=2).values_list("id", flat=True).distinct()
-    			answers = Answer.objects.filter(question__id__in=questions).values_list("id", flat=True).distinct()
-    			if len(answers) == 0:
-    				actDict[assessment.name] = 0
-    				actDict[assessment.name+'_u'] = 0
-    			else:	
-    				nList = [i for i in answers]
-    				actDict[assessment.name] = len(FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, object_id__in=nList, action='C'))
-    			 	actDict[assessment.name+'_u'] = len(FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, object_id__in=nList, action='U', _data__icontains='answer'))
-    			
-    		
-    		deDict[user.username]=actDict
-    	respDict['deDict'] = deDict
-    	return render_to_response('viewtemplates/dEHistory.html',respDict,context_instance=RequestContext(request)) 
-    return render_to_response('viewtemplates/dEHistory.html',respDict,context_instance=RequestContext(request)) 
     
     
 urlpatterns = patterns('',           
    url(r'^audit/trial/$', KLP_audit),
-   url(r'^dEHistory/$', KLP_dEHistory),
 )    

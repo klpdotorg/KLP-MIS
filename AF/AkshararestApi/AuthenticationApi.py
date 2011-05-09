@@ -1,3 +1,9 @@
+"""
+AuthenticationApi is used 
+1) To login
+2) To logout
+3) To check user is logged in or not.
+"""
 from django.conf.urls.defaults import *
 from django.shortcuts import render_to_response
 from django_restapi.resource import Resource
@@ -17,14 +23,18 @@ def KLP_Login(request):
   if request.method == 'POST':  
     # check method is post 
     user = authenticate(username=request.POST['username'], password=request.POST['password'])
+    # check user is logged in
     if user is not None:
+      # If user not logged in check user is active user
       if user.is_active:
         login(request, user)
         # success        
         usrUrl = {'Data Entry Executive':'/home/', 'Data Entry Operator':'/home/?respType=filter', 'AdminGroup':'/home/?respType=userpermissions'}
         if user.is_superuser or user.is_staff:
+        	# If user is super user or staff redirect to home page after login.
         	return HttpResponseRedirect('/home/')
         else:
+        	# else redirect to respective paths defined in usrUrl dictionary based on group.
         	userGroup = user.groups.all()[0].name
         	return HttpResponseRedirect(usrUrl[userGroup])
       else:

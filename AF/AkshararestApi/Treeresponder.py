@@ -60,69 +60,29 @@ class TreeSerializeResponder(object):
         response = serializers.serialize(self.format, object_list)
         # Show unexposed fields again
         
-        response1 = serializers.serialize(self.format, object_list,use_natural_keys=True)
-       
+        response1 = serializers.serialize(self.format, object_list,use_natural_keys=True)       
         response1= simplejson.loads(response)
-        boundary_id = ''
+        """ This is customised to generate list of dictionaries for tree structure"""
         for k in response1:
-		   if k['model'] == "schools.school":
-			boundary_id = k['fields']['boundary']
-		   imageName=modelName = k['model'].split('.')[-1]
-		   if modelName=='studentgroup':
-                        imageName=imageName+'_'+k['fields']['group_type']
+		   
 		   modelName = k['model'].split('.')[-1]
                    childkey= modelName+'_'+str(k['pk'])
                    temval=self.CDict[childkey]
                    childval=temval[0]
                   
                    if childval:
-                          childvals='true'  
-                          k['hasChildren']=childvals
+                          # if object has childval(has child objects) pass haschildren true
+                          k['hasChildren']='true'
                    k['id']=childkey
 		   names =  k['fields']
+		   # get names of object to show in tree structure
                    try:
                         titleval=names['name']
 		   except:
 			titleval = names['question']
 		   k['text'] = temval[1]
 
-	response3 = []
-	if boundary_id:
-		if self.CDict['filterBy'] != 'None':
-			students_list = Answer.objects.filter(question__assessment__programme__id=self.CDict['filterBy'], question__assessment__id=self.CDict['secFilter']).values_list('student',flat=True).distinct('student')
-			studentgroup_list = Student_StudentGroupRelation.objects.filter(student__id__in=students_list, active=2,).values_list('student_group', flat=True).distinct()
-			object_list1 = StudentGroup.objects.filter(content_type__model="boundary",object_id = boundary_id, active=2,  id__in=studentgroup_list).distinct()
-		else:
-			object_list1 = StudentGroup.objects.filter(content_type__model="boundary",object_id = boundary_id, active=2,group_type="Center")
-		#object_list1 = StudentGroup.objects.filter(content_type__model="boundary",object_id = boundary_id, active=2,group_type="Center")
-		response2 = serializers.serialize(self.format, object_list1)
-		response3= simplejson.loads(response2)
-
-		for k in response3:
-			   imageName=modelName = k['model'].split('.')[-1]
-			   if modelName=='studentgroup':
-				imageName=imageName+'_'+k['fields']['group_type']
-			   childkey= modelName+'_'+str(k['pk'])
-
-			   if self.CDict['filterBy'] != 'None':
-				viewlink = '<a href="/studentgroup/'+str(k['pk'])+'/programme/'+str(self.CDict['filterBy'])+'/assessment/'+str(self.CDict['secFilter'])+'/view" onclick="return KLP_View(this)" class="KLP_treetxt" title="">' +k['fields']['name']+'</a>'
-			   else:
-				viewlink = '<a href="/studentgroup/'+str(k['pk'])+'/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="">' +k['fields']['name']+'</a>'
-
-		           temval=[False,viewlink]
-		           childval=temval[0]
-		           if childval:
-		                  childvals='true'  
-		                  k['hasChildren']=childvals
-		           k['id']=childkey
-			   names =  k['fields']
-		           try:
-		                titleval=names['name']
-			   except:
-				titleval = names['question']
-			   k['text'] = '<img src="/static_media/tree-images/reicons/'+imageName+'.gif" title='+modelName+' /> &nbsp;'+temval[1]
-
-	response1 = response1+response3
+	
 
         response=simplejson.dumps(response1)
         for field in hidden_fields:

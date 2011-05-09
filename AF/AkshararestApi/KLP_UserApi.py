@@ -1,3 +1,8 @@
+"""
+KLP_UserApi is used 
+1) To add new user 
+2) To change password .
+"""
 from django.conf.urls.defaults import *
 from django.core.urlresolvers import reverse
 from django.contrib.auth.forms import *

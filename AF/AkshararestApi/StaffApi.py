@@ -1,3 +1,10 @@
+"""
+StaffApi is used 
+1) To view Individual Staff details.
+2) To create new Staff
+3) To update existing Staff
+4) To list Staffs under institution
+"""
 from django.conf.urls.defaults import *
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
@@ -52,7 +59,7 @@ def KLP_Staff_Create(request, referKey):
 	return HttpResponse(response)  
 
 
-def KLP_staff_view(request, institution_id):
+def KLP_staff_list(request, institution_id):
 	""" To view list of staff in school school/(?P<school_id>\d+)/staff/view/"""	
 	queryset = Staff.objects.filter(institution__id = institution_id, active=2).order_by('firstName')
 	url = '/institution/%s/staff/view/' %(institution_id)
@@ -95,7 +102,7 @@ def KLP_Staff_Update(request, staff_id):
 urlpatterns = patterns('',
    url(r'^staff/(?P<staff_id>\d+)/view/$', KLP_Staff_View),
    url(r'institution/(?P<referKey>\d+)/staff/creator/?$', KLP_Staff_Create),
-   url(r'^institution/(?P<institution_id>\d+)/staff/view/$', KLP_staff_view),
+   url(r'^institution/(?P<institution_id>\d+)/staff/view/$', KLP_staff_list),
    url(r'^staff/(?P<staff_id>\d+)/update/$', KLP_Staff_Update),
    
 )	

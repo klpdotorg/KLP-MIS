@@ -1,3 +1,6 @@
+"""
+LanguageApi is used to create new language 
+"""
 from django.conf.urls.defaults import *
 from django_restapi.resource import Resource
 from schools.models import *

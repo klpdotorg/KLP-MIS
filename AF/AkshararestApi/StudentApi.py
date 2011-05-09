@@ -1,3 +1,11 @@
+"""
+StudentApi is used 
+1) To view Individual Student details.
+2) To create new Student
+3) To update existing Student
+4) To call bulk create/edit students form
+5) To delete selected students
+"""
 from django.conf.urls.defaults import *
 from django.http import HttpResponse
 from django.shortcuts import render_to_response

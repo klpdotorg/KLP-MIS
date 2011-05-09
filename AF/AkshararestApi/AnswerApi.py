@@ -1,3 +1,5 @@
+""" AnswerApi file is used to store answers entered by data entry operators And also do validation while double entry"""
+
 from django.conf.urls.defaults import *
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
@@ -31,7 +33,7 @@ class KLP_ChangeAns(Resource):
         student_groupObj = StudentGroup.objects.filter(pk = student_groupId).values("institution")[0]  # get SG Object based on id
         assessmentObj = Assessment.objects.filter(pk=assessmentId).defer("programme")[0]  # get assessment Object based on id
         instObj = Institution.objects.filter(pk=student_groupObj["institution"]).defer("boundary")[0]  # get Institution Object based on id
-        #Checking permission based on institution and assessment
+        #Checking user permission based on institution and assessment
         check_perm.send(sender=None, user=user, instance=instObj, Assessment=assessmentObj, permission='Acess')
         check_perm.connect(KLP_obj_Perm)
         for question in Questions_list:
@@ -42,12 +44,12 @@ class KLP_ChangeAns(Resource):
         		ansObj = Answer.objects.filter(question = question, student = studentObj).defer("question", "student")[0]
         		if textFieldVal:
         			if textFieldVal.lower() == 'ab':
-        				# If text field value is ab then change answerGrade and answerScore to none and status to -99999
+        				# If text field value is ab(absent) then change answerGrade and answerScore to none and status to -99999
         				ansObj.answerGrade = None
         				ansObj.answerScore = None
         				ansObj.status = -99999
         			elif textFieldVal.lower() == 'uk':
-        				# If text field value is uk then change answerGrade and answerScore to none and status to -1
+        				# If text field value is uk(unknown) then change answerGrade and answerScore to none and status to -1
         				ansObj.answerGrade = None
         				ansObj.answerScore = None
         				ansObj.status = -1
@@ -60,10 +62,10 @@ class KLP_ChangeAns(Resource):
         				ansObj.status = None	
         				ansObj.answerScore = textFieldVal
         			if ansObj.doubleEntry == 1 and ansObj.user1 == user:
-        				# if the doubleEntry value for answer is 1 and user1 is same as logged in user change lastmodifiedBy to current user
+        				# if the doubleEntry value for answer is 1(only first user enter data) and user1 is same as logged in user change lastmodifiedBy to current user
 					ansObj.lastmodifiedBy = user
 				else:
-					# else update doubleEntry to 2, lastmodifiedBy and user2 to logged user
+					# else update doubleEntry to 2(second user also submits data), lastmodifiedBy and user2 to logged user
 					ansObj.doubleEntry = 2
 					ansObj.lastmodifiedBy = user
 				       	ansObj.user2 = user
@@ -74,10 +76,10 @@ class KLP_ChangeAns(Resource):
 				ansObj = Answer(question=question, student=studentObj, doubleEntry=1)
 				ansObj.save()
 				if textFieldVal.lower() == 'ab':
-					# If text field value is ab then set status to -99999
+					# If text field value is ab(absent) then set status to -99999
 					ansObj.status = -99999
 				elif textFieldVal.lower() == 'uk':
-					# If text field value is uk then set status to -1
+					# If text field value is uk(unknown) then set status to -1
 					ansObj.status = -1
 				elif question.questionType == 2:
 					# else if  question type is 2(Grade) then store textfield value in answerGrade
@@ -108,11 +110,11 @@ def KLP_DataValidation(request):
     	# else check text field value
     	if validateValue:    		
 	    	if validateValue.lower() == 'ab':
-	    		# If text field value is ab and answer status is -99999 then return true
+	    		# If text field value is ab(absent) and answer status is -99999 then return true
 	    		if ansObj.status == -99999:
 	    			respStr = True
 	    	elif validateValue.lower() == 'uk':
-	    		# If text field value is uk and answer status is -1 then return true
+	    		# If text field value is uk(unknown) and answer status is -1 then return true
 	    		if ansObj.status == -1:
 	    			respStr = True
 	    	elif ansObj.question.questionType == 2:	    	

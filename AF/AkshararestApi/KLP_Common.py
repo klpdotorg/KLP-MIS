@@ -1,3 +1,8 @@
+"""
+KLP_common is used
+1) To create new node for tree on creation of new boundary, institution, sg, programme, assessment and question.
+2) To Delete (deactive object) boundary, institution, sg, staff, programme, assessment and question.
+"""
 from django.conf.urls.defaults import *
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
@@ -35,7 +40,7 @@ class KLP_Delete(Resource):
         obj = modelDict[model_name.lower()].objects.get(pk=referKey)
 	if model_name == 'student':
 		Student_StudentGroupRelation.objects.filter(student__id = referKey).update(active=0)
-        obj.active=0 # Change active to 0
+        obj.active=0 # Change active to 0(object is deleted)
         obj.save() # Save Data
         return HttpResponse('Deleted')
         

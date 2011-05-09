@@ -1,3 +1,10 @@
+"""
+ProgrammeApi is used 
+1) To view Individual Programme details.
+2) To create new Programme
+3) To update existing Programme
+4) To list Programmes onchange of boundary type in filterbyprogramme link.
+"""
 from django.conf.urls.defaults import *
 from django_restapi.resource import Resource
 from schools.models import *

@@ -1,3 +1,6 @@
+"""
+BoundaryTypeApi is used to create new boundary type
+"""
 from django.conf.urls.defaults import *
 from django.shortcuts import render_to_response
 from django_restapi.resource import Resource

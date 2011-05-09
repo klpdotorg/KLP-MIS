@@ -1,3 +1,10 @@
+"""
+StudentGroupApi is used 
+1) To view Individual StudentGroup details.
+2) To create new StudentGroup
+3) To update existing StudentGroup
+4) To view assessment entry screen or grid to enter answers data.
+"""
 from django.conf.urls.defaults import *
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
@@ -100,13 +107,13 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 		
 		chId = child.id
 		chList.append(chId)
-		
+		# Query for active student using child object
 		student = Student.objects.filter(child=child, active=2).defer("child")
 		studId = student[0].id
 		# get Child and student information to show in grid.
 		chDic = {'studId':studId, 'Gender':child.gender, 'dob':child.dob.strftime("%d-%m-%Y"), 'firstName':child.firstName, 'lastName':child.lastName}
 		# get relations
-		try:
+		try:			
 			relObj = Relations.objects.filter(child=child, relation_type="Father").only("first_name")
 			chDic['fName'] = relObj[0].first_name
 		except:
@@ -130,11 +137,13 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 		qIdList.append(qId)
 		dataDict={'qId':qId, 'qOrder':ques.order}
 		qType = ques.questionType
-		dataDict['qType'] = qType
+		dataDict['qType'] = qType		
 		if qType == 2:
+			# if quetion type is 2(marks) get grades to do validation while data entry
 			ansIn =  ques.grade
 			dataDict['ansIn'] = ansIn
 		else:
+			# else get minmum and maximum score to do validation while data entry
 			dataDict['scMin'] = ques.scoreMin
 			dataDict['scMax'] = ques.scoreMax
 		qDict={}	
@@ -149,24 +158,32 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 				firstUser = ansObj['user1_id']
 				studentId = ansObj['student_id']
 				ansStudList.append(studentId)
-				if dEntry == 2 or (dEntry > 1 and firstUser == user.id):
+				if dEntry == 2:
+					# if dEntry is 2 (doubleentry is finished) then dont show input box
 					ansDict['iBox'] = False
 				else:
+					# else show input box
 					ansDict['iBox'] = True
 		                status = ansObj['status']
 				if status == -99999:
+					# if answer status is -99999(absent) then show answer value as 'AB'.
 		    			ansVal = 'AB'
-		    		elif status == 0:
+		    		elif status == -1:
+		    			# if answer status is -1(unknown) then show answer value as 'UK'.
 		    			ansVal = 'UK'
 		    		elif qType == 2:
+		    			# if question type is 2(grade) then show answer grade
 		    			ansVal = ansObj['answerGrade']
 		    		else:
+		    			# else show answer score
 		    			ansVal = ansObj['answerScore']
 				ansDict['ansVal']=ansVal								
 				ansDict['shVal'] = False	  
 				if firstUser != user.id and dEntry ==1:
+					# if dEntry is 1, (first entry finished doubleentry is not finished) and logged in user is not match with first user who enter data, then make dE attribute true to do validation while doubleentry
 					ansDict['dE'] = True
 				elif firstUser == user.id and dEntry ==1:
+					# if dEntry is 1, (first entry finished doubleentry is not finished) and logged in user is match with first user who enter data, then make shVal attribute true to show answer value in input box.
 					ansDict['shVal'] = True
 				
 			        qDict[studentId] = ansDict
