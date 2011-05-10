@@ -1,4 +1,6 @@
+/* This File Contains user defined JQuery functions */
 
+/* KLP_Programme_List is used to get list of programmes on change of boundary type value */
 var KLP_Programme_List = function(typVal){
 	$.ajax({
 		url: '/filter/'+typVal+'/programms/',
@@ -29,6 +31,7 @@ var KLP_TreeBLK = function(treeUrl){
 }
 
 
+/* KLP_Set_Session is used to change or set session value, on change of boundary type value */
 var KLP_Set_Session = function(typVal){
 	$.ajax({
 		url: '/set/session/',
@@ -40,6 +43,7 @@ var KLP_Set_Session = function(typVal){
 }
 
 
+/* This method shows an error, if reponse has any error. The error is shown based on status of reponse*/
 $.ajaxSetup({
 	error:function(x,e){
 		if(x.status==0){
@@ -68,6 +72,7 @@ $.ajaxSetup({
 });
 
 
+/* KLP_Del method is used to call common delete method, to delete boundary, institution, sg, programme, assessment and question */
 var KLP_Del = function(referKey,type, msgText){
 	KLP_Hide_Msg();
 	if (type.toLowerCase()=='class' || type.toLowerCase()=='center')
@@ -111,7 +116,7 @@ var KLP_Boundary_Add = function(thisObj){
 	return false;
 }
 
-
+/* KLP_view method is used to show view on clicking on nodes in tree or clicking add or edit buttons */
 var KLP_View = function(thisObj){
 	$("body").append("<div id='TB_load'><img src='/static_media/images/loadingAnimation.gif'></div>");
 	$('#TB_load').show();
@@ -140,13 +145,13 @@ var KLP_View = function(thisObj){
 	return false;
 }
 
-
+/* KLP_Hide_Msg is used to hide success or failure messages*/
 var KLP_Hide_Msg = function(){
 	$("#successMsgHead").hide();
         $("#failureMsgHead").hide();
 }
 
-
+/* KLP_Create_Node is used to create new node in tree, on creation of new boundary, institution, sg, programme, assessment and question */
 var KLP_Create_Node = function(thisObj,ObjValue){
 	currentId=thisObj;
 	ccid = currentId.attr('id');
@@ -220,7 +225,7 @@ var KLP_toggler = function(thisObj) {
 		$(e1).find(">ul:first")[ parseInt(data) ? "show" : "hide" ]();
 }
 
-
+/* KLP_BreadCrumb is used to show the breadcrumb on clicking on tree node */
 var KLP_BredaCrumb = function(currentObj){
 	var isParent =false;
 	var thisClass = $(currentObj).attr('class');
@@ -247,16 +252,16 @@ var KLP_BredaCrumb = function(currentObj){
 	}
 }
 
-
+/* KLP_validateScript is used to validate answer data on submiting the form */
 var KLP_validateScript=function(formId){
-        
  	$('#'+formId).validate({
       		submitHandler: function(){
       			$("#"+formId+"_submit").hide();
       			formName = formId;
 	             	form=$('#'+formName)
 	             	count = 0
-	             	
+	             	$("#successMsgHead").hide();
+        		$("#failureMsgHead").hide();
         		var txtFields = $(form).find("input[type=text]:visible");
         	        DeFlag=false		
        			txtFields.each(function(index){
@@ -289,7 +294,7 @@ var KLP_validateScript=function(formId){
 
 }
 
-
+/* KLP_post_script is used to post answers data */
 var KLP_post_script=function(form,formName){
 	$.post(
 		"/answer/data/entry/",
@@ -309,7 +314,7 @@ var KLP_post_script=function(form,formName){
 
 }
 
-
+/* KLP_isLog is used to check user authentication*/
 var KLP_isLog = function(){
 	$.ajax({
 		url: '/user/authentication',

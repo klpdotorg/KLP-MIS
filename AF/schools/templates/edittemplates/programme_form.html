@@ -126,7 +126,9 @@ $(document).ready(function(){
    var KLP_form_submit = function(){
    	oldName = $('#id_old').val();  
    	newName = $('#id_form-0-name').val();
-   	/* capture old name and new name to change values in node */
+   	startDate = $("#id_form-0-startDate").val();
+   	endDate = $("#id_form-0-endDate").val();
+   	/* capture old name and new name to change values in node after editing*/
    	/* post data using post method */
    	$.post(
         	$('#url').val(),
@@ -140,8 +142,11 @@ $(document).ready(function(){
                     if (successStatus == 'True'){
                         /* If It success show success msg and update node in tree */
                     	treeNode=$("#programme_{{programme.id}}").find("a:first");
-                    	$(treeNode).attr("title", newName);
-                    	$("#programme_{{programme.id}}_text").html(newName);
+                    	stYear = startDate.split("-")[2]
+                    	enYear = endDate.split("-")[2]
+                    	prgName = newName +"("+stYear+"-"+enYear+")"
+                    	$(treeNode).attr("title", prgName);
+                    	$("#programme_{{programme.id}}_text").html(prgName);
                     	KLP_BredaCrumb(treeNode);
                     	$("#successMsgHead").show();
    		    	$("#klp_MsgTxt").html("Programme Updated Successfully");

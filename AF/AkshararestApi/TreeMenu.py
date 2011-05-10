@@ -156,7 +156,7 @@ def TreeClass(request):
 				
 	elif typ == 'programme':
 		# if typ is programme Query For active assessment based On programme id
-		query = Assessment.objects.filter(programme__id=model[1],active=2).extra(select={'lower_name':'lower(name)'}).order_by("lower_name")
+		query = Assessment.objects.filter(programme__id=model[1],active=2)
 	elif typ == 'assessment':
 		# if typ is assessment Query For active Questions based On assessment id
 		query = Question.objects.filter(assessment__id=model[1],active=2)	

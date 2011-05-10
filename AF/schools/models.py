@@ -503,7 +503,7 @@ class Programme(models.Model):
 		ordering = ["name"]
 
 	def __unicode__(self):
-		return "%s"%(self.name)
+		return "%s (%s-%s)"%(self.name, self.startDate.strftime("%Y"), self.endDate.strftime("%Y"))
 
 	def get_view_url(self):
 		return '/programme/%s/view/' %self.id
@@ -521,10 +521,10 @@ class Programme(models.Model):
 		return 'programme'
 
 	def getViewUrl(self):
-		return '<a href="/programme/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/programme.gif" title="Programme" /> &nbsp; <span id="programme_%s_text">%s</span> </a>' %(self.id, self.name, self.id, self.name)
+		return '<a href="/programme/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s (%s-%s)"> <img src="/static_media/tree-images/reicons/programme.gif" title="Programme" /> &nbsp; <span id="programme_%s_text">%s (%s-%s)</span> </a>' %(self.id, self.name, self.startDate.strftime("%Y"), self.endDate.strftime("%Y"), self.id, self.name, self.startDate.strftime("%Y"), self.endDate.strftime("%Y"))
 
 	def CreateNewFolder(self):
-		return '<span><a href="/programme/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/programme.gif" title="Programme" /> &nbsp; <span id="programme_%s_text">%s</span></a></span>' %(self.id,self.name, self.id, self.name)	
+		return '<span><a href="/programme/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s (%s-%s)"> <img src="/static_media/tree-images/reicons/programme.gif" title="Programme" /> &nbsp; <span id="programme_%s_text">%s (%s-%s)</span></a></span>' %(self.id,self.name, self.startDate.strftime("%Y"), self.endDate.strftime("%Y"), self.id, self.name, self.startDate.strftime("%Y"), self.endDate.strftime("%Y"))	
 register_model(Programme)   # Register model for to store information in fullhistory
 
 class Assessment(models.Model):
@@ -538,7 +538,7 @@ class Assessment(models.Model):
     
     class Meta: 
 		unique_together = (('programme', 'name'),)
-		ordering = ["name"]
+		ordering = ["startDate"]
 
     def __unicode__(self):
         return "%s"%(self.name)

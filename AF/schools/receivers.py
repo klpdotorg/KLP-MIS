@@ -1,24 +1,27 @@
 """ This file containd the receivers definations. Once Signal get call the respective receiver will get execute """
 
-from schools.models import *
+
 def KLP_obj_Perm(sender, **kwargs):
 	""" This receiver method is used to check user object level permissions """
 	""" Get user, instance(Instituion), assessment objects to check permissions"""
+        from schools.models import UserAssessmentPermissions
 	userObj = kwargs['user']
 	instObj =  kwargs['instance']
 	permission = kwargs['permission']
 	assessmentObj = kwargs['Assessment']
-	# Check user is logged in or not if logged in check user is active user or not and check assessment object state is active(2)
-	if (userObj.id != None or userObj.is_active)  and assessmentObj.active ==2:
-		# If true check user has permissions to access intitution object
-		chkPerm = userObj.has_any_perms(instObj, perms=[permission])
+	# Check user is logged in or not if logged in, check user is active user or not
+	if (userObj.id is not None or userObj.is_active):
+		# If true check user has permissions to access intitution and assessment object
+		chkPerm = False
+		userAsmList = UserAssessmentPermissions.objects.filter(user=userObj, instituion=instObj, assessment=assessmentObj).values()
+		if userAsmList:
+		    chkPerm = userAsmList[0].get('access') or False
 	else:
 		# else raise Insufficient Previliges exception
 		raise Exception("Insufficient Previliges")
 	if not(userObj.is_superuser or userObj.is_staff or chkPerm):
 		# If user is not super user and he is not in staff and user doesn't has permission with intitution object raise Insufficient Previliges exception
 		raise Exception("Insufficient Previliges")
-
 		
 def KLP_user_Perm(sender, **kwargs):
 	""" This receiver method is used to check user operational permissions based on model """
@@ -61,6 +64,8 @@ def KLP_NewInst_Permission(sender, instance, created, **kwargs):
 	""" This receiver method is used to assign permissions to users on new institution creation"""
 	# Check institution is creating or editing.
 	if created:	
+		from schools.models import Institution
+                from django.contrib.auth.models import User
 		# If new institution is creating get parent boundary of institution
 		parentBoundary = instance.boundary
 		# Get all instititons under boundary to check permissions
