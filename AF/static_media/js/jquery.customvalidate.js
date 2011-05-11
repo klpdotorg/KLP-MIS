@@ -13,6 +13,8 @@
  *   http://www.gnu.org/licenses/gpl.html
  */
 
+/* This is customised file. numbers validation got cutomised and messages are changed and addedd isingrades validtion*/
+
 (function($) {
 
 $.extend($.fn, {
@@ -919,6 +921,7 @@ $.extend($.validator, {
 		
 		// http://docs.jquery.com/Plugins/Validation/Methods/remote
 		remote: function(value, element, param) {
+			/* This is cusomised to remove remote and dE attributes from field after validation*/
 			if ( this.optional(element) )
 				return "dependency-mismatch";
 			
@@ -1040,6 +1043,7 @@ $.extend($.validator, {
 	
 		// http://docs.jquery.com/Plugins/Validation/Methods/number
 		number: function(value, element) {
+			/* This is customised toaccept ab and uk values for anwers*/
 			if (value.toLowerCase() == 'ab' || value.toLowerCase() == 'uk'){
 				return true
 			}
@@ -1058,12 +1062,7 @@ $.extend($.validator, {
 			}
 		},
 		letters: function(value, element) {
-			if (value == 1 || value == 0){
-		        	return true
-		        }
-		        else{
-				return this.optional(element) || /^[a-zA-Z\ \']+$/.test(value);
-			}
+			return this.optional(element) || /^[a-zA-Z\ \']+$/.test(value);			
 		},
 		
 		// http://docs.jquery.com/Plugins/Validation/Methods/creditcard
@@ -1112,6 +1111,7 @@ $.extend($.validator, {
 		},
 		
 		isinGrades: function(value, element, param) {
+			/* This is used to check entered grade value is valid grade or not */
 			var paramList = new Array()
 			paramList = param.split(",")
 			value2=value;

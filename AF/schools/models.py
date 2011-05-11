@@ -140,12 +140,6 @@ class Boundary(models.Model):
 		else:
 			return False
 
-	def getChildObjects(self):
-		results=Boundary.objects.filter(parent__id=self.id,active=2)
-		if not results:
-			results=Institution.objects.filter(boundary__id=self.id,active=2).only("id", "name")
-		return results
-
 	def getModuleName(self):
 		return 'boundary'
 
@@ -212,8 +206,6 @@ class Institution(models.Model):
 		else:
 			return False
 
-	def getChildObjects(self):
-		return Class.objects.filter(institution__id=self.id ,active=2)
 
 	def get_all_mgmt(self):
 		return institution_Management.objects.all()
@@ -323,8 +315,6 @@ class StudentGroup(models.Model):
 	def __unicode__(self):
 		return "%s"%(self.name)
 
-	def getChildObjects(self):
-		return Sections.objects.filter(classname__id=self.id ,active=2)
 
 	def getChild(self):
 		return False
@@ -483,10 +473,10 @@ def default_end_date():
     now = datetime.date.today()
     currentYear = int(now.strftime('%Y'))
     currentMont = int(now.strftime('%m'))
-    if currentMont>4:
-        academic_end_date = datetime.date(currentYear+1, 4, 30)
+    if currentMont>5:
+        academic_end_date = datetime.date(currentYear+1, 5, 30)
     else:
-        academic_end_date = datetime.date(currentYear, 4, 30)
+        academic_end_date = datetime.date(currentYear, 5, 30)
     return academic_end_date
 
 

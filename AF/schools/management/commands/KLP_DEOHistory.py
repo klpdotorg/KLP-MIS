@@ -2,6 +2,8 @@ from django.core.management.base import BaseCommand, CommandError
 from schools.models import *
 from django.contrib.contenttypes.models import ContentType
 from fullhistory.models import FullHistory
+from django.db.models import Q 
+from django.contrib.auth.models import User
 import django, datetime, os, csv
 
 class Command(BaseCommand):
@@ -12,13 +14,12 @@ class Command(BaseCommand):
                         startDate = args[0]
                         endDate = args[1]
                         fileName = args[2]
-			contentList = ['institution', 'student', 'staff']
+			contentList = ['boundary', 'institution', 'student', 'staff']
                         if fileName and startDate and endDate:
                                 try:
                                 	strDate = startDate.split("/")
                                 	enDate = endDate.split("/")
-    					activePrgs = Programme.objects.filter(active=2).values_list("id", flat=True)
-    					assessments = Assessment.objects.filter(programme__id__in=activePrgs, active=2).distinct().only("id", "name")
+    					assessments = Assessment.objects.select_related("programme").filter(programme__active=2, active=2).distinct().only("id", "name")
     					# get current working directory.
 					cwd = os.getcwd()
 					path = "%s/logFiles/" %(cwd)
@@ -29,45 +30,61 @@ class Command(BaseCommand):
 					genFile = "%s/%s.csv" %(path, fileName)
 					historyFile = csv.writer(open(genFile, 'wb'))
 					# Write header
-					headerList = ['Sl.No', 'User', 'sch_created', 'sch_mod', 'stud_created', 'stud_mod', 'teacher_created', 'teacher_mod']
+					headerList = ['Sl.No', 'User', 'boundary_created', 'boundary_mod', 'sch_created', 'sch_mod', 'stud_created', 'stud_mod', 'teacher_created', 'teacher_mod']
+					asmDict, asmList ={}, []
 					for assessment in assessments:
-						asmName = assessment.name
+						asmName = "%s-%s" %(assessment.programme.name, assessment.name)
 						headerList.append(asmName+' Num Of correct Entries')
 						headerList.append(asmName+' Num Of incorrect Entries')
 						headerList.append(asmName+' Num Of verified Entries')
 						headerList.append(asmName+' Num Of rectified Entries')
+						assessmentId = assessment.id
+						asmList.append(assessmentId)
+						answers = Answer.objects.filter(question__assessment=assessment).values_list("id", flat=True).distinct()
+						if  not answers:
+							asmDict[assessmentId] = answers
+						else:
+							nList = [i for i in answers]
+							nList.append(0)
+							asmDict[assessmentId] = nList
 					historyFile.writerow(headerList)
 					count = 0
+					sDate = datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0]))
+					eDate = datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0]))
     					for user in User.objects.filter(is_active=1).order_by("username").only("id", "username"):
 						count +=1
+						userId = user.id
 				    		dataList = [count, user.username]
 						# get the content objects(instituion, staff, student)
 				    		for content in contentList:
 				    			contObj = ContentType.objects.get(app_label='schools', name=content)
-				    			# get all instituion/staff/student creates/Edited by user.
-				    		        dataList.append(FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, content_type__id=contObj.id, action='C').count())
-				    			dataList.append(FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, content_type__id=contObj.id, action='U').count())
+				    			# get all boundary/instituion/staff/student creates/Edited by user.
+				    		        dataList.append(FullHistory.objects.filter(action_time__range=(sDate, eDate), request__user_pk=userId, content_type__id=contObj.id, action='C').count())
+				    			dataList.append(FullHistory.objects.filter(action_time__range=(sDate, eDate), request__user_pk=userId, content_type__id=contObj.id, action='U').count())
 				    			
-				    		for assessment in assessments:
-				    			answers = Answer.objects.filter(question__assessment=assessment).values_list("id", flat=True).distinct()
-				    			if len(answers) == 0:
+				    		for asmId in asmList:
+				    			answers =  asmDict[asmId]
+				    			if  not answers:
 								dataList.append(0)
 								dataList.append(0)
 								dataList.append(0)
 								dataList.append(0)
 				    			else:	
-				    				nList = [i for i in answers]
-				    				crEntries = FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, object_id__in=nList, action='C').count()
+				    				
+				    				crEntries = FullHistory.objects.filter(action_time__range=(sDate, eDate), request__user_pk=userId, object_id__in=answers, action='C').count()
 				    				if crEntries == 0:
 				    					inCrEntries = 0
 				    				else:
-				    					inCrEntries = FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), object_id__in=nList, action='U', _data__icontains='answer').count()
+				    					inCrEntries = FullHistory.objects.filter(action_time__range=(sDate, eDate), object_id__in=answers, action='U', _data__icontains='answer').exclude(request__user_pk=userId,).count()
+				    					
 				    					crEntries = crEntries - inCrEntries
 				    				
 				    				
-				    				vEntries = FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, object_id__in=nList, action='U').count()
+				    				vEntries = FullHistory.objects.filter(action_time__range=(sDate, eDate), request__user_pk=userId, object_id__in=answers, action='U', _data__icontains='user2').count()
 				    				
-				    				rEntries = FullHistory.objects.filter(action_time__gte=datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0])), action_time__lte=datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0])), request__user_pk=user.id, object_id__in=nList, action='U', _data__icontains='answer').count()
+				    				rEntries = FullHistory.objects.filter(Q(_data__icontains='answer') & Q(_data__icontains='user2'), action_time__range=(sDate, eDate), request__user_pk=userId, object_id__in=answers, action='U').count() 
+				    				
+				    				
 				    				vEntries = vEntries - rEntries
 				    				
 				    				dataList.append(crEntries)
