@@ -256,6 +256,8 @@ var KLP_BredaCrumb = function(currentObj){
 var KLP_validateScript=function(formId){
  	$('#'+formId).validate({
       		submitHandler: function(){
+      			$("body").append("<div id='KLP_overlay' class='KLP_overlayBG'></div>");
+			$("#KLP_overlay").show();
       			$("#"+formId+"_submit").hide();
       			formName = formId;
 	             	form=$('#'+formName)
@@ -307,8 +309,11 @@ var KLP_post_script=function(form,formName){
        				isSE = $(this).attr("sE");
        				if (isSE == "true"){
        					$(this).attr("disabled", "true");
+       					$("#"+formName+"_submit").show()
+       					$("#"+formName+"_submit").attr("disabled", "true");
        				}
-       			});   
+       			}); 
+       			 
 		}
 	);    
 

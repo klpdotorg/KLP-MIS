@@ -73,7 +73,7 @@ class KLP_Get_Programms(Resource):
             programme_list = Programme.objects.filter(programme_institution_category=type_id, active=2).order_by("name").only("id", "name")
             respStr = ''
             for programme in programme_list:
-                respStr += '%s$$%s&&' %(programme.id, programme.name)    
+                respStr += '%s$$%s&&' %(programme.id, programme)    
             return HttpResponse(respStr[0:len(respStr)-2])         
          except:
             return HttpResponse('fail')	            

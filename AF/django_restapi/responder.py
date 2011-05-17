@@ -361,11 +361,10 @@ class TemplateResponder(object):
 						questions_list = Question.objects.filter(assessment = assessmentObj, active=2)
 						entryStr = '''<tr class='KLP_txt_cen'><td><form onsubmit='return false;' id='id_Student_%s' name='student_%s' class="validForm"><input type='hidden' value='%s' name='programId'><input type='hidden' value='%s' name='assessmentId'><input type='hidden' value='%s' name='student'><input type='hidden' value='%s' name='student_groupId'><table><tbody><tr>''' %(student.id, student.id, assessmentObj.programme.id, self.extra_context['assessment_id'], student.id, self.extra_context['studentgroup_id'])
 						for question in questions_list:
-							qType = 'digits'
-							if question.questionType == 2:
-								qType = 'letters'
-							
-							entryStr = entryStr + '''<td class='KLP_td_height'><input type='text' class='required %s' size='3' value='' id='id_student_%s_%s' name='student_%s_%s' tabindex='1'></td>''' %(qType, student.id, question.id, student.id, question.id)
+							if question.questionType == 1:
+								entryStr = entryStr + '''<td class='KLP_td_height'><span style="color:#736F6E;">%s</span><br/><input type='text' class='required digits' size='3' value='' id='id_student_%s_%s' name='student_%s_%s' tabindex='1' min="%s" max="%s"></td>''' %(question.order, student.id, question.id, student.id, question.id, question.scoreMin, question.scoreMax)
+							else:
+								entryStr = entryStr + '''<td class='KLP_td_height'><span style="color:#736F6E;">%s</span><br/><input type='text' class='required' size='3' value='' id='id_student_%s_%s' name='student_%s_%s' tabindex='1' isinGrades="%s"></td>''' %(question.order, student.id, question.id, student.id, question.id, question.grade)
 						entryStr = entryStr + '''<td class='KLP_td_height'> <input type='submit' value='submit' formname='id_Student_%s' url='/answer/data/entry/' tabindex='1'><script>$().ready(function() {KLP_validateScript("id_Student_%s");});</script></td></tr></tbody></table></form></td></tr>''' %(student.id, student.id)
 						detailStr = '''<tr class='KLP_txt_cen'><td><table><tr><td class='KLP_td_width'>%s</td><td class='KLP_td_width'><span class='blue' title='Father: %s, Mother: %s, Gender: %s, MT: %s, DOB: %s'>%s&nbsp;%s</span><span class='KLP_Form_status' id='id_Student_%s_status'>Form Status</span></td></tr></table></td></tr>''' %(student.id, request.POST['form-0-fatherfirstname'], request.POST['form-0-motherfirstname'], student.child.gender, student.child.mt, student.child.dob.strftime("%d-%m-%Y"), student.child.firstName, student.child.lastName, student.id)
 						mapStudenStr = {'detailStr':detailStr, 'ansEntryStr':entryStr}

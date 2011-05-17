@@ -32,18 +32,23 @@ class Command(BaseCommand):
 					# Write header
 					headerList = ['Sl.No', 'User', 'boundary_created', 'boundary_mod', 'sch_created', 'sch_mod', 'stud_created', 'stud_mod', 'teacher_created', 'teacher_mod']
 					asmDict, asmList ={}, []
+					users = User.objects.filter(is_active=1).order_by("username").only("id", "username")
+					userIds = users.values_list("id", flat=True)
+					sDate = datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0]))
+					eDate = datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0]))
+					sTime = datetime.datetime(int(strDate[2]), int(strDate[1]), int(strDate[0]), 00, 00, 00)
+					eTime = datetime.datetime(int(enDate[2]), int(enDate[1]), int(enDate[0]), 23, 59, 00)
 					for assessment in assessments:
-						asmName = "%s-%s" %(assessment.programme.name, assessment.name)
-						headerList.append(asmName+' Num Of correct Entries')
-						headerList.append(asmName+' Num Of incorrect Entries')
-						headerList.append(asmName+' Num Of verified Entries')
-						headerList.append(asmName+' Num Of rectified Entries')
-						assessmentId = assessment.id
-						asmList.append(assessmentId)
-						answers = Answer.objects.filter(question__assessment=assessment).values_list("id", flat=True).distinct()
-						if  not answers:
-							asmDict[assessmentId] = answers
-						else:
+						
+						answers = Answer.objects.filter(Q(user1__id__in=userIds) | Q(user2__id__in=userIds), lastModifiedDate__range=(sDate, eDate), question__assessment=assessment).values_list("id", flat=True).distinct()
+						if answers:
+							assessmentId = assessment.id
+							asmList.append(assessmentId)
+							asmName = "%s-%s" %(assessment.programme.name, assessment.name)
+							headerList.append(asmName+' Num Of correct Entries')
+							headerList.append(asmName+' Num Of incorrect Entries')
+							headerList.append(asmName+' Num Of verified Entries')
+							headerList.append(asmName+' Num Of rectified Entries')
 							nList = [i for i in answers]
 							nList.append(0)
 							asmDict[assessmentId] = nList
@@ -64,13 +69,8 @@ class Command(BaseCommand):
 				    			
 				    		for asmId in asmList:
 				    			answers =  asmDict[asmId]
-				    			if  not answers:
-								dataList.append(0)
-								dataList.append(0)
-								dataList.append(0)
-								dataList.append(0)
-				    			else:	
-				    				
+				    			if  answers:
+								
 				    				crEntries = FullHistory.objects.filter(action_time__range=(sDate, eDate), request__user_pk=userId, object_id__in=answers, action='C').count()
 				    				if crEntries == 0:
 				    					inCrEntries = 0
