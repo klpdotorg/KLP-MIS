@@ -54,8 +54,7 @@ class Command(BaseCommand):
 							asmDict[assessmentId] = nList
 					historyFile.writerow(headerList)
 					count = 0
-					sDate = datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0]))
-					eDate = datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0]))
+					
     					for user in User.objects.filter(is_active=1).order_by("username").only("id", "username"):
 						count +=1
 						userId = user.id
@@ -64,25 +63,25 @@ class Command(BaseCommand):
 				    		for content in contentList:
 				    			contObj = ContentType.objects.get(app_label='schools', name=content)
 				    			# get all boundary/instituion/staff/student creates/Edited by user.
-				    		        dataList.append(FullHistory.objects.filter(action_time__range=(sDate, eDate), request__user_pk=userId, content_type__id=contObj.id, action='C').count())
-				    			dataList.append(FullHistory.objects.filter(action_time__range=(sDate, eDate), request__user_pk=userId, content_type__id=contObj.id, action='U').count())
+				    		        dataList.append(FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, content_type__id=contObj.id, action='C').count())
+				    			dataList.append(FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, content_type__id=contObj.id, action='U').count())
 				    			
 				    		for asmId in asmList:
 				    			answers =  asmDict[asmId]
 				    			if  answers:
 								
-				    				crEntries = FullHistory.objects.filter(action_time__range=(sDate, eDate), request__user_pk=userId, object_id__in=answers, action='C').count()
+				    				crEntries = FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, object_id__in=answers, action='C').count()
 				    				if crEntries == 0:
 				    					inCrEntries = 0
 				    				else:
-				    					inCrEntries = FullHistory.objects.filter(action_time__range=(sDate, eDate), object_id__in=answers, action='U', _data__icontains='answer').exclude(request__user_pk=userId,).count()
+				    					inCrEntries = FullHistory.objects.filter((Q(_data__icontains='answer') | Q(_data__icontains='status')) & Q(_data__icontains='user2'), action_time__range=(sTime, eTime), object_id__in=answers, action='U').exclude(request__user_pk=userId,).count()
 				    					
 				    					crEntries = crEntries - inCrEntries
 				    				
 				    				
-				    				vEntries = FullHistory.objects.filter(action_time__range=(sDate, eDate), request__user_pk=userId, object_id__in=answers, action='U', _data__icontains='user2').count()
+				    				vEntries = FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, object_id__in=answers, action='U', _data__icontains='user2').count()
 				    				
-				    				rEntries = FullHistory.objects.filter(Q(_data__icontains='answer') & Q(_data__icontains='user2'), action_time__range=(sDate, eDate), request__user_pk=userId, object_id__in=answers, action='U').count() 
+				    				rEntries = FullHistory.objects.filter((Q(_data__icontains='answer') | Q(_data__icontains='status')) & Q(_data__icontains='user2'), action_time__range=(sTime, eTime), request__user_pk=userId, object_id__in=answers, action='U').count() 
 				    				
 				    				
 				    				vEntries = vEntries - rEntries

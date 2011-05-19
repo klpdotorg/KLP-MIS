@@ -41,7 +41,7 @@ class KLP_ChangeAns(Resource):
         	textFieldVal = request.POST.get(textField)  # get each text field values
         	try:
         		# If answer object already exists update data.
-        		ansObj = Answer.objects.filter(question = question, student = studentObj).defer("question", "student")[0]
+        		ansObj = Answer.objects.get(question = question, student = studentObj)
         		if textFieldVal:
         			if textFieldVal.lower() == 'ab':
         				# If text field value is ab(absent) then change answerGrade and answerScore to none and status to -99999
@@ -73,22 +73,21 @@ class KLP_ChangeAns(Resource):
         	except :
         		if textFieldVal:
         			# If Answer object not exists create new answer object
-				ansObj = Answer(question=question, student=studentObj, doubleEntry=1)
-				ansObj.save()
-				if textFieldVal.lower() == 'ab':
+        			status, answerGrade, answerScore=None, None, None
+        			if textFieldVal.lower() == 'ab':
 					# If text field value is ab(absent) then set status to -99999
-					ansObj.status = -99999
+					status = -99999
 				elif textFieldVal.lower() == 'uk':
 					# If text field value is uk(unknown) then set status to -1
-					ansObj.status = -1
+					status = -1
 				elif question.questionType == 2:
 					# else if  question type is 2(Grade) then store textfield value in answerGrade
-        				ansObj.answerGrade = textFieldVal
+        				answerGrade = textFieldVal
         			else:
         				# else if  question type is 1(Marks) then store textfield value in answerScore
-        				ansObj.answerScore = textFieldVal
-        			ansObj.lastmodifiedBy = user	# set last modified by and user1 to logged in user 
-        			ansObj.user1 = user
+        				answerScore = textFieldVal
+				ansObj = Answer(question=question, student=studentObj, doubleEntry=1, status=status, answerGrade=answerGrade, answerScore=answerScore, lastmodifiedBy=user, user1=user)
+				
         			ansObj.save()
 	        
 	return "Data Saved"
