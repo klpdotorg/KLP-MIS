@@ -27,10 +27,11 @@ for gender in Sex:
 	genders=(gender,gender)
 	Gender.append(genders)
 
-alphaList = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
+
 Alpha_list = []
-for typ in alphaList:
-	typs=(typ,typ)
+for typ in range(ord('a'), ord('z')+1):
+        alph = chr(typ).upper()
+	typs=(alph,alph)
 	Alpha_list.append(typs)
 
 

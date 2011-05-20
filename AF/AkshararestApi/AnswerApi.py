@@ -56,11 +56,21 @@ class KLP_ChangeAns(Resource):
         			elif question.questionType == 2:
         				# else question type is 2(Grade) then change status to none and store textfield value in answerGrade
         				ansObj.status = None
-        				ansObj.answerGrade = textFieldVal
+        				ansGrade = textFieldVal
+        				try:
+        					ansGrade = textFieldVal.upper()
+        				except:
+        					pass
+        				ansObj.answerGrade = ansGrade
+        				
         			else:
         				# else question type is 1(Marks) then change status to none and store textfield value in answerScore
         				ansObj.status = None	
-        				ansObj.answerScore = textFieldVal
+        				ansScore = '%.2f' %(float(ansObj.answerScore))
+        				textScore = '%.2f' %(float(textFieldVal))
+        				if ansScore != textScore:
+        					ansObj.answerScore = textFieldVal
+        					
         			if ansObj.doubleEntry == 1 and ansObj.user1 == user:
         				# if the doubleEntry value for answer is 1(only first user enter data) and user1 is same as logged in user change lastmodifiedBy to current user
 					ansObj.lastmodifiedBy = user
@@ -83,6 +93,10 @@ class KLP_ChangeAns(Resource):
 				elif question.questionType == 2:
 					# else if  question type is 2(Grade) then store textfield value in answerGrade
         				answerGrade = textFieldVal
+        				try:
+        					answerGrade = textFieldVal.upper()
+        				except:
+        					pass
         			else:
         				# else if  question type is 1(Marks) then store textfield value in answerScore
         				answerScore = textFieldVal
