@@ -165,7 +165,7 @@ def KLP_Users_list(request):
 		# get all active(1) users list other than staff and super user order by username
 		user_list = User.objects.filter(is_active=1, is_staff=0, is_superuser=0).order_by("username")
 		# render show users form with users list
-		return render_to_response('viewtemplates/show_users_form.html',{'user_list':user_list, 'user':user, 'title':'KLP Users', 'legend':'Karnataka Learning Partnership', 'entry':"Add"})     
+		return render_to_response('viewtemplates/show_users_form.html',{'user_list':user_list, 'user':user, 'title':'KLP Users', 'legend':'Karnataka Learning Partnership', 'entry':"Add"}, context_instance=RequestContext(request))     
 	else:
 		# if user is not logged in redirect to login page
 		return HttpResponseRedirect('/login/')
@@ -188,7 +188,7 @@ def KLP_User_Delete(request, user_id):
 		userObj.is_active = 0  # deactivate user
 		userObj.set_password(randomStr) # replace password with random string
 		userObj.save()  # save user object
-		return render_to_response('viewtemplates/userAction_done.html',{'user':request.user,'selUser':userObj,'message':'User Deletion Successful', 'legend':'Karnataka Learning Partnership', 'entry':"Add"})       
+		return render_to_response('viewtemplates/userAction_done.html',{'user':request.user,'selUser':userObj,'message':'User Deletion Successful', 'legend':'Karnataka Learning Partnership', 'entry':"Add"}, context_instance=RequestContext(request))       
 	else:
 		# if user is not logged in redirect to login page
 		return HttpResponseRedirect('/login/')

@@ -16,6 +16,7 @@ from django_restapi.responder import *
 from django_restapi.receiver import *
 from AkshararestApi.BoundaryApi import ChoiceEntry
 from django.utils import simplejson
+from django.template import loader, RequestContext
 
 from schools.signals import check_user_perm
 from schools.receivers import KLP_user_Perm
@@ -128,7 +129,7 @@ def KLP_Institution_Boundary(request, boundary_id, permissionType, assessment_id
 				respDict['institution_list'] = Institution.objects.filter(id__in=map_institutions_list, boundary = boundaryObj, active=2).distinct()
 			respDict['assessmentId'] = assessment_id
 			
-		return render_to_response('viewtemplates/institution_list.html', respDict)
+		return render_to_response('viewtemplates/institution_list.html', respDict, context_instance=RequestContext(request))
 	else:
 		return HttpResponse('Insufficient Priviliges!')	    
 

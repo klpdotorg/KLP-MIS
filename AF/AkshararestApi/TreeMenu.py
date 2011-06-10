@@ -95,7 +95,7 @@ def TreeClass(request):
 		
 	else:
 		# if data is not true query for all active programmes.
-		query = Programme.objects.filter(active=2, programme_institution_category=boundaryType).extra(select={'lower_name':'lower(name)'}).order_by("lower_name")
+		query = Programme.objects.filter(active=2, programme_institution_category=boundaryType).extra(select={'lower_name':'lower(name)'}).order_by("startDate", "endDate", "lower_name")
 		typ = 'programme'
      else:
      	# typ is not source

@@ -37,7 +37,7 @@
       		    <td>
       		        <table>
       		            <tr>
-      		                <td class="rightprofile"><label class="KLP_required">{% if extra_context|displayValue:'categoryType' == '1'%}Anganwadi{% else %}Institution{% endif %} Category</label></td>
+      		                <td class="rightprofile"><label class="KLP_required">{% if extra_context|displayValue:'categoryType' == '1'%}Institution{% else %}Anganwadi{% endif %} Category</label></td>
       		                <td class="leftprofile">
       		                    {% render_field entryForm.name 'tabindex=1' %}
       		                    <!-- Category Name Field -->
@@ -52,7 +52,7 @@
       		            </tr>
       		            <tr>
       					    <td class="rightprofile">
-                    		    <input type="submit" value="Add {% if extra_context|displayValue:'categoryType' == '1'%}Anganwadi{% else %}Institution{% endif %} Category" id="#sub_load" tabindex=2 />
+                    		    <input type="submit" value="Add {% if extra_context|displayValue:'categoryType' == '1'%}Institution{% else %}Anganwadi{% endif %} Category" id="#sub_load" tabindex=2 />
       				        </td>
       				    </tr>
       		        </table>

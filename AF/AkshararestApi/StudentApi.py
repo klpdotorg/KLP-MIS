@@ -79,18 +79,18 @@ def KLP_DeleteStudnet(request, id):
 		for stud_id in students_list:
 			# get Student Object to delete
 			obj = Student.objects.get(child__id=stud_id)  
-			try:				
-				obj.active = 0  # Change active state to 0
-				obj.save()
+			try:	
 				relObjects = Student_StudentGroupRelation.objects.filter(student = obj, academic=current_academic, active=2)
-				# get Sg relation objects
-				for relObj in relObjects:
-					relObj.active = 0  # Change relation objects active state to 0
-					relObj.save()
+				if relObjects.count() <= 1:
+					obj.active = 0
+					obj.save()
+				sgRelObj = Student_StudentGroupRelation.objects.get(student = obj, student_group__id=id, academic=current_academic, active=2)
+				sgRelObj.active = 0
+				sgRelObj.save()
 				
 			except:
 				count = count + 1
-				delFailed += '%s %s ,'(obj.child.firstName, obj.child.LastName)
+				delFailed += '%s %s ,'(obj.child.firstName, obj.child.lastName)
 				
 			
 	if count == 0:	 

@@ -22,6 +22,14 @@ def displayValue(dictionary, key):
     except:
         pass     
 
+@register.filter(name='dictValue')
+def dictValue(dictionary, key):
+    try:
+        return dictionary[key]
+    except:
+        return ''
+
+
 # This filter is used to display key value from dictionary by adding '_u' to key.
 @register.filter(name='assesmentUpdation')        
 def assesmentUpdation(dictionary, key):

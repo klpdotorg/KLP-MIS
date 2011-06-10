@@ -32,7 +32,7 @@
    <tbody>
     <tr>
     	<!-- Header row -->
-	<th class="tot-border3">First Name</th> <th class="tot-border3">Last Name</th> <th class="tot-border3"> DOB</th> <th class="tot-border3">Mother Tongue</th><th class="tot-border3">Gender</th> <th class="tot-border3">Relations</th> {% if studentgroup.group_type|lower == 'class' %}<th class="tot-border4">Select <span style="cursor:pointer;color:#1569C7;" onclick="checkAll()">All</span>&nbsp;/&nbsp;<span style="cursor:pointer;color:#1569C7;" onclick="unCheckAll()">None</span> </th> {% endif %}
+	<th class="tot-border3">First Name</th> <th class="tot-border3">Last Name</th> <th class="tot-border3"> DOB</th> <th class="tot-border3">Mother Tongue</th><th class="tot-border3">Gender</th> <th class="tot-border3">Relations</th> <th class="tot-border4">Select <span style="cursor:pointer;color:#1569C7;" onclick="checkAll()">All</span>&nbsp;/&nbsp;<span style="cursor:pointer;color:#1569C7;" onclick="unCheckAll()">None</span> </th> 
     </tr>
     {% for child in students_list %}
     {% with child.student_set.all|first as student %}
@@ -44,11 +44,10 @@
 	<td class="tot-border1">{{child.mt}}</td>
 	<td class="tot-border1">{{child.gender}}</td> 
         <td class="tot-border1">{% for relation in child.getRelations %}{{relation.relation_type}}: {{relation.first_name}}<br />{% endfor %}</td> 
-	{% if studentgroup.group_type|lower == 'class' %}
-		<td class="tot-border2">
+	<td class="tot-border2">
 			<input type="checkbox" value = "{{child.id}}" name="students"/>
-		</td>
-	{% endif %}
+	</td>
+	
     </tr>
     {% endwith %}
     {% endfor %}
@@ -91,7 +90,7 @@
 			<span><input id="student_Map" type="submit" disabled="true" value="Map"/></span>
 </div>
 
-<div style="padding:20px 0px;text-align:center;{% if studentgroup.group_type|lower == 'center' %}display:none;{% endif %}">
+<div style="padding:20px 0px;text-align:center;">
 	<div class="detailHead">
 			<span class="hedText">Edit</span><span class="hedText" style="padding-left:40px;">Delete</span>
 	</div>
@@ -129,17 +128,18 @@ $(document).ready(function(){
 	    		$('#mapstudents').serialize(),
 			function(data) {
 				alert(data);
+				$.ajax({
+					url: '/studentgroup/'+{{studentgroup.id}}+'/view/',
+					success: function(data) {
+						$("#dyncData").html(data);
+						NFInit();
+						tb_init('a.thickbox, area.thickbox, input.thickbox');
+					}
+		
+				});
 			}
 	    	);
-	    	$.ajax({
-			url: '/studentgroup/'+{{studentgroup.id}}+'/view/',
-			success: function(data) {
-				$("#dyncData").html(data);
-				NFInit();
-				tb_init('a.thickbox, area.thickbox, input.thickbox');
-			}
-		
-		});
+	    	
 	}
     	
     });

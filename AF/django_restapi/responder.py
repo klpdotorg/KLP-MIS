@@ -371,7 +371,7 @@ class TemplateResponder(object):
 						return HttpResponse(simplejson.dumps(mapStudenStr), content_type='application/json; charset=utf-8')
 				# Show detail about newly create Object		
 				template_name = '%s/%s_detail.html' % (self.template_dir, queryset.model._meta.module_name)
-                		response = render_to_response(template_name, respDict)
+                		response = render_to_response(template_name, respDict, context_instance=RequestContext(request))
                 		return response
                 	elif buttonType == 'save and continue':
                 		# If buttonType is save and continue show edit form for the object
@@ -379,7 +379,7 @@ class TemplateResponder(object):
                 		ResourceForm = modelformset_factory(queryset.model, extra=0)
                 		form = ResourceForm(queryset=queryset.model.objects.filter(pk=obj.id))
                 		template_name = '%s/%s_form.html' % ('edittemplates', elem._meta.module_name)
-        			return render_to_response(template_name, {'form':form, 'update':True, self.template_object_name:elem, 'extra_context':self.extra_context})
+        			return render_to_response(template_name, {'form':form, 'update':True, self.template_object_name:elem, 'extra_context':self.extra_context}, context_instance=RequestContext(request))
 			elif buttonType == 'save and add another':
 				# # If buttonType is save and add another show new entry form
 				self.extra_context['prevousId'] = obj.id
@@ -398,8 +398,16 @@ class TemplateResponder(object):
 			form = 	ResourceForm(request.POST)
 			if not RelationValid:
 				form.errors[0]['first_name']=['Any of these fields is required.']
+			if form_class == Child_Form:
+				self.extra_context['form-0-motherfirstname']=request.POST.get('form-0-motherfirstname')
+				self.extra_context['form-0-mothermiddlename']=request.POST.get('form-0-mothermiddlename')
+				self.extra_context['form-0-motherlastname']=request.POST.get('form-0-motherlastname')
+				self.extra_context['form-0-fatherfirstname']=request.POST.get('form-0-fatherfirstname')
+				self.extra_context['form-0-fathermiddlename']=request.POST.get('form-0-fathermiddlename')
+				self.extra_context['form-0-fatherlastname']=request.POST.get('form-0-fatherlastname')
+				self.extra_context['form-0-otherId']=request.POST.get('form-0-otherId')	
 			template_name = '%s/%s_form.html' % (self.template_dir, queryset.model._meta.module_name)
-			response = render_to_response(template_name, {'form':form,'extra_context':self.extra_context })
+			response = render_to_response(template_name, {'form':form,'extra_context':self.extra_context }, context_instance=RequestContext(request))
 			return response
 		
 	else:
@@ -408,7 +416,7 @@ class TemplateResponder(object):
 	
 	# Show the form
 	template_name = '%s/%s_form.html' % (self.template_dir, queryset.model._meta.module_name)
-	return render_to_response(template_name, {'form':form,'extra_context':self.extra_context })
+	return render_to_response(template_name, {'form':form,'extra_context':self.extra_context }, context_instance=RequestContext(request))
 
     def update_form(self, request, pk, queryset, form_class):
         """ Render edit form for single entry."""
@@ -425,6 +433,7 @@ class TemplateResponder(object):
 		# If request method is post, post data for object
 		form = ResourceForm(request.POST, queryset=queryset.model.objects.filter(pk=pk), )
 		Valid=form.is_valid()  # Validate form
+		print request.POST, Valid
 		RelationValid=True
 		# Check if current model is child then pass ChildTrue to True else false
 		ChildTrue=queryset.model._meta.module_name=='child' and True or False
@@ -501,7 +510,7 @@ class TemplateResponder(object):
 					template_name = '%s/%s_detail.html' % ('edittemplates', elem._meta.module_name)
 				else:
 					template_name = '%s/%s_detail.html' % ('viewtemplates', elem._meta.module_name)
-                		response = render_to_response(template_name, respDict)
+                		response = render_to_response(template_name, respDict, context_instance=RequestContext(request))
                 		return response	
                 	elif  buttonType == 'save and continue':
                 		# If buttonType is save and continue show edit form for the object
@@ -514,7 +523,7 @@ class TemplateResponder(object):
                 		ResourceForm = modelformset_factory(queryset.model, form=form_class,)
                 		form = ResourceForm(queryset=queryset.model.objects.none())
                 		template_name = '%s/%s_form.html' % ('viewtemplates', elem._meta.module_name)
-				response = render_to_response(template_name, {'form':form,'extra_context':self.extra_context })
+				response = render_to_response(template_name, {'form':form,'extra_context':self.extra_context }, context_instance=RequestContext(request))
 				return response
                 			
 			
@@ -523,8 +532,16 @@ class TemplateResponder(object):
 			form = 	ResourceForm(request.POST)
 			if not RelationValid:
 				form.errors[0]['first_name']=['Any of these fields is required.']
+			if form_class == Child_Form:
+				self.extra_context['form-0-motherfirstname']=request.POST.get('form-0-motherfirstname')
+				self.extra_context['form-0-mothermiddlename']=request.POST.get('form-0-mothermiddlename')
+				self.extra_context['form-0-motherlastname']=request.POST.get('form-0-motherlastname')
+				self.extra_context['form-0-fatherfirstname']=request.POST.get('form-0-fatherfirstname')
+				self.extra_context['form-0-fathermiddlename']=request.POST.get('form-0-fathermiddlename')
+				self.extra_context['form-0-fatherlastname']=request.POST.get('form-0-fatherlastname')
+				self.extra_context['form-0-otherId']=request.POST.get('form-0-otherId')		
 			template_name = '%s/%s_form.html' % (self.template_dir, elem._meta.module_name)
-			return render_to_response(template_name, {'form':form, 'update':True, self.template_object_name:elem, 'extra_context':self.extra_context})
+			return render_to_response(template_name, {'form':form, 'update':True, self.template_object_name:elem, 'extra_context':self.extra_context}, context_instance=RequestContext(request))
 			
 	else:
 		# If request method is not post get form for the model based on pk
@@ -533,4 +550,4 @@ class TemplateResponder(object):
 	# Show the form
         template_name = '%s/%s_form.html' % (self.template_dir, elem._meta.module_name)        
         return render_to_response(template_name, 
-                {'form':form, 'update':True, self.template_object_name:elem, 'extra_context':self.extra_context})
+                {'form':form, 'update':True, self.template_object_name:elem, 'extra_context':self.extra_context}, context_instance=RequestContext(request))

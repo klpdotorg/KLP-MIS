@@ -940,6 +940,7 @@ $.extend($.validator, {
 				var data = {};
 				data['validateField'] = element.name;
 				data['validateValue'] = value;
+				data['csrfmiddlewaretoken']=$("input[name=csrfmiddlewaretoken]:first").val();
 				$.ajax($.extend(true, {
 					type: "POST",
 					url: param,

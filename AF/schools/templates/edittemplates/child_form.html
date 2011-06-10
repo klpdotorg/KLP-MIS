@@ -59,7 +59,7 @@
 					{% render_field entryForm.uid 'tabindex=1' %}
 				    </td>
 				    <td align="center">
-					<input type="text" name="form-0-otherId" id="id_form-0-otherId" value="" tabindex=1 size="3"/>
+					<input type="text" name="form-0-otherId" id="id_form-0-otherId" value="{% if extra_context|dictValue:'form-0-otherId' %}{{extra_context|dictValue:'form-0-otherId'}}{% else %}{{child.getStudent.otherStudentId}}{% endif %}" tabindex=1 size="3"/>
 				    </td>
 				    <td align="center" style="min-width:200px;max-width:200px">
 					{% render_field entryForm.dob 'tabindex=1' %}
@@ -69,31 +69,31 @@
 				    </td>
 				    <td align="center">
 					{% render_field entryForm.mt 'tabindex=1' %}
-					<input type="hidden" name="form-0-child" id="id_child" size="15" value=""/>
+					<input type="hidden" name="form-0-child" id="id_child" size="15" value="{% if extra_context|dictValue:'form-0-otherId' %}{{extra_context|dictValue:'form-0-otherId'}} {% else %} {{child.getStudent.otherStudentId}} {% endif %}"/>
 					<input type="hidden" name="form-0-boundary" id="id_boundary" size="15" value="{{extra_context|displayValue:'referKey'}}"/>
 					<input type="hidden" name="form-0-active" id="id_active" size="15" value="2"/>
 					<input type="hidden" name="ModelName" id = "model" value="{{extra_context|displayValue:'modelName'}}" />
 				    </td>
 				    <td align="center">&nbsp;</td>
 				    <td align="center">
-					<input type="text" name = "form-0-motherfirstname" id="id_form-0-motherfirstname" value="{{child.getMother.first_name}}" tabindex='1' size=8/>
+					<input type="text" name = "form-0-motherfirstname" id="id_form-0-motherfirstname" value="{% if extra_context|dictValue:'form-0-motherfirstname' %}{{extra_context|dictValue:'form-0-motherfirstname'}}{% else %}{{child.getMother.first_name}}{% endif %}" tabindex='1' size=8/>
 				    </td>
 				    <td align="center">
-					<input type="text" name = "form-0-mothermiddlename" id="id_form-0-mothermiddlename" value="{{child.getMother.middle_name}}" tabindex='1' size=8/>
+					<input type="text" name = "form-0-mothermiddlename" id="id_form-0-mothermiddlename" value="{% if extra_context|dictValue:'form-0-mothermiddlename' %}{{extra_context|dictValue:'form-0-mothermiddlename'}}{% else %}{{child.getMother.middle_name}}{% endif %}" tabindex='1' size=8/>
 				    </td>
 				    <td align="center">
-					<input type="text" name = "form-0-motherlastname" id="id_form-0-motherlastname" value="{{child.getMother.last_name}}" tabindex='1' size=8/>
+					<input type="text" name = "form-0-motherlastname" id="id_form-0-motherlastname" value="{% if extra_context|dictValue:'form-0-motherlastname' %}{{extra_context|dictValue:'form-0-motherlastname'}}{% else %}{{child.getMother.last_name}}{% endif %}" tabindex='1' size=8/>
 				    </td>
 				    <td align="center">
-					<input type="text" name = "form-0-fatherfirstname" id="id_form-0-fatherfirstname" value="{{child.getFather.first_name}}" tabindex='1' size=8/>
+					<input type="text" name = "form-0-fatherfirstname" id="id_form-0-fatherfirstname" value="{% if extra_context|dictValue:'form-0-fatherfirstname' %}{{extra_context|dictValue:'form-0-fatherfirstname'}}{% else %}{{child.getFather.first_name}}{% endif %}" tabindex='1' size=8/>
 					
 				    </td>
 				    <td align="center">
-					<input type="text" name = "form-0-fathermiddlename" id="id_form-0-fathermiddlename" value="{{child.getFather.middle_name}}" tabindex='1' size=8/>
+					<input type="text" name = "form-0-fathermiddlename" id="id_form-0-fathermiddlename" value="{% if extra_context|dictValue:'form-0-fathermiddlename' %}{{extra_context|dictValue:'form-0-fathermiddlename'}}{% else %}{{child.getFather.middle_name}}{% endif %}" tabindex='1' size=8/>
 					
 				    </td>
 				    <td align="center">
-					<input type="text" name = "form-0-fatherlastname" id="id_form-0-fatherlastname" value="{{child.getFather.last_name}}" tabindex='1' size=8/>
+					<input type="text" name = "form-0-fatherlastname" id="id_form-0-fatherlastname" value="{% if extra_context|dictValue:'form-0-fatherlastname' %}{{extra_context|dictValue:'form-0-fatherlastname'}}{% else %}{{child.getFather.last_name}}{% endif %}" tabindex='1' size=8/>
 					
 				    </td>
 				    <td align="center">

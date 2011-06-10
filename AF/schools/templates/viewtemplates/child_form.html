@@ -59,7 +59,7 @@
 					{% render_field entryForm.uid 'tabindex=1' %}
 				    </td>
 				    <td align="center">
-					<input type="text" name="form-0-otherId" id="id_form-0-otherId" value="" tabindex=1 size="3"/>
+					<input type="text" name="form-0-otherId" id="id_form-0-otherId" value="{{extra_context|dictValue:'form-0-otherId'}}" tabindex=1 size="3"/>
 				    </td>
 				    <td align="center" style="min-width:200px;max-width:200px">
 					{% render_field entryForm.dob 'tabindex=1' %}
@@ -76,24 +76,24 @@
 				    </td>
 				    <td align="center">&nbsp;</td>
 				    <td align="center">
-					<input type="text" name = "form-0-motherfirstname" id="id_form-0-motherfirstname" tabindex='1' size=8/>
+					<input type="text" name = "form-0-motherfirstname" id="id_form-0-motherfirstname" tabindex='1' size=8 value="{{extra_context|dictValue:'form-0-motherfirstname'}}" />
 				    </td>
 				    <td align="center">
-					<input type="text" name = "form-0-mothermiddlename" id="id_form-0-mothermiddlename" tabindex='1' size=8/>
+					<input type="text" name = "form-0-mothermiddlename" id="id_form-0-mothermiddlename" tabindex='1' size=8 value="{{extra_context|dictValue:'form-0-mothermiddlename'}}" />
 				    </td>
 				    <td align="center">
-					<input type="text" name = "form-0-motherlastname" id="id_form-0-motherlastname" tabindex='1' size=8/>
+					<input type="text" name = "form-0-motherlastname" id="id_form-0-motherlastname" tabindex='1' size=8 value="{{extra_context|dictValue:'form-0-motherlastname'}}" />
 				    </td>
 				    <td align="center">
-					<input type="text" name = "form-0-fatherfirstname" id="id_form-0-fatherfirstname" tabindex='1' size=8/>
+					<input type="text" name = "form-0-fatherfirstname" id="id_form-0-fatherfirstname" tabindex='1' size=8 value="{{extra_context|dictValue:'form-0-fatherfirstname'}}" />
 					
 				    </td>
 				    <td align="center">
-					<input type="text" name = "form-0-fathermiddlename" id="id_form-0-fathermiddlename" tabindex='1' size=8/>
+					<input type="text" name = "form-0-fathermiddlename" id="id_form-0-fathermiddlename" tabindex='1' size=8 value="{{extra_context|dictValue:'form-0-fathermiddlename'}}" />
 					
 				    </td>
 				    <td align="center">
-					<input type="text" name = "form-0-fatherlastname" id="id_form-0-fatherlastname" tabindex='1' size=8/>
+					<input type="text" name = "form-0-fatherlastname" id="id_form-0-fatherlastname" tabindex='1' size=8 value="{{extra_context|dictValue:'form-0-fatherlastname'}}" />
 					
 				    </td>
 				    <td align="center">

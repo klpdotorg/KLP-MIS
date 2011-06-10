@@ -3,28 +3,28 @@
 		{% if boundary.boundary_type.boundary_type|lower == 'anganwadi' %}
 			{% if boundary.boundary_category.boundary_category|lower == 'district' %}
 				<!-- If boundary type is anganwadi and boundary category is district show Add Project button -->
-				<a class="KLP_Button" id="{{boundary.id}}_add" onclick="return KLP_Boundary_Add(this);" href="/boundary/creator/" boundaryCategory="14">Add Project</a>
+				<a class="KLP_Button" id="{{boundary.id}}_add" onclick="return KLP_Boundary_Add(this);" href="/boundary/creator/" name="addBoundary" boundaryCategory="14">Add Project</a>
 			{% else %}
 				{% if boundary.boundary_category.boundary_category|lower == 'project' %}
 					<!-- If boundary type is anganwadi and boundary category is project show Add Circle button -->
-					<a class="KLP_Button" id="{{boundary.id}}_add" onclick="return KLP_Boundary_Add(this);" href="/boundary/creator/" boundaryCategory="15">Add Circle</a>
+					<a class="KLP_Button" id="{{boundary.id}}_add" onclick="return KLP_Boundary_Add(this);" href="/boundary/creator/" name="addBoundary" boundaryCategory="15">Add Circle</a>
 				{% else %}
 					<!-- If boundary type is anganwadi and boundary category is circle show Add Anganwadi button -->
-					<a class="KLP_Button" onclick="return KLP_View(this);" href="/boundary/{{boundary.id}}/institution/creator/" >Add Anganwadi</a>
+					<a class="KLP_Button" onclick="return KLP_View(this);" href="/boundary/{{boundary.id}}/institution/creator/" name="addAnganwadi">Add Anganwadi</a>
 					
 				{% endif %}
 			{% endif %}
 		{% else %}
 			{% if boundary.boundary_category.boundary_category|lower == 'district' %}
 				<!-- If boundary type is primary and boundary category is district show Add Block button -->
-				<a class="KLP_Button" id="{{boundary.id}}_add" onclick="return KLP_Boundary_Add(this);" href="/boundary/creator/" boundaryCategory="10">Add Block</a>
+				<a class="KLP_Button" id="{{boundary.id}}_add" onclick="return KLP_Boundary_Add(this);" href="/boundary/creator/" name="addBoundary" boundaryCategory="10">Add Block</a>
 			{% else %}
 				{% if boundary.boundary_category.boundary_category|lower == 'block' %}
 					<!-- If boundary type is primary and boundary category is block show Add Cluster button -->
-					<a class="KLP_Button"  id="{{boundary.id}}_add" onclick="return KLP_Boundary_Add(this);" href="/boundary/creator/" boundaryCategory="11">Add Cluster</a>
+					<a class="KLP_Button"  id="{{boundary.id}}_add" onclick="return KLP_Boundary_Add(this);" href="/boundary/creator/" name="addBoundary" boundaryCategory="11">Add Cluster</a>
 				{% else %}
 					<!-- If boundary type is primary and boundary category is cluster show Add Institution button -->
-					<a class="KLP_Button"   onclick="return KLP_View(this);" href="/boundary/{{boundary.id}}/institution/creator/" >Add Institution</a>
+					<a class="KLP_Button"   onclick="return KLP_View(this);" href="/boundary/{{boundary.id}}/institution/creator/" name="addInstituion" >Add Institution</a>
 					
 				{% endif %}
 			{% endif %}

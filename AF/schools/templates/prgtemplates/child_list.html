@@ -72,7 +72,7 @@
 	     				<tr class="KLP_txt_cen">
 						<td class="KLP_Ans_Fix">
 							<div class="KLP_Fix_Div">
-								<form name="student_{{i}}" id="id_Student_{{i}}" class="validForm" onsubmit="return false;">
+								<form name="student_{{i}}" id="id_Student_{{i}}" class="validForm" onsubmit="return false;">{% csrf_token %}
 									<input type="hidden" name="student_groupId" value="{{studentgroup_id}}" />
 									<input type="hidden" name="programId" value="{{filter_id}}"/>
 									<input type="hidden" name="assessmentId" value="{{assessment_id}}"/>

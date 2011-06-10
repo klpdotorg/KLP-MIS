@@ -361,6 +361,7 @@ register_model(StudentGroup)  # Register model for to store information in fullh
 class Academic_Year(models.Model):
 	''' Its stores the academic years information'''
 	name = models.CharField(max_length = 20, unique= True)
+	active = models.IntegerField(blank = True, null = True,default=2)
 	
 	def __unicode__(self):
 		return self.name
@@ -368,18 +369,11 @@ register_model(Academic_Year)  # Register model for to store information in full
 
 def current_academic():
     ''' To select current academic year'''
-    now = datetime.date.today()
-    currentYear = int(now.strftime('%Y'))
-    currentMont = int(now.strftime('%m'))
-    if currentMont>=1 and currentMont<=5:
-        academic = '%s-%s' %(currentYear-1, currentYear)
-    else:
-        academic = '%s-%s' %(currentYear, currentYear+1)
     try:
-        academicObj = Academic_Year.objects.get(name=academic)
-        return academicObj
-    except Academic_Year.DoesNotExist:
-        return 1
+    	academicObj = Academic_Year.objects.get(active=2) 
+    	return academicObj
+    except:
+    	return 1
 
 class Staff(models.Model):
 	'''This Class stores the Institution Worker(Staff) Information'''
@@ -491,7 +485,7 @@ class Programme(models.Model):
 	active = models.IntegerField(blank = True, null = True,default=2)
 
 	class Meta: 
-		ordering = ["name"]
+		ordering = ["startDate", "endDate", "name"]
 
 	def __unicode__(self):
 		return "%s (%s-%s)"%(self.name, self.startDate.strftime("%Y"), self.endDate.strftime("%Y"))

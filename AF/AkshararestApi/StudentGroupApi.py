@@ -111,7 +111,11 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 		student = Student.objects.filter(child=child, active=2).defer("child")
 		studId = student[0].id
 		# get Child and student information to show in grid.
-		chDic = {'studId':studId, 'Gender':child.gender, 'dob':child.dob.strftime("%d-%m-%Y"), 'firstName':child.firstName, 'lastName':child.lastName}
+		if child.dob:
+			dOfB = child.dob.strftime("%d-%m-%Y")
+		else:
+			dOfB = ''
+		chDic = {'studId':studId, 'Gender':child.gender, 'dob':dOfB, 'firstName':child.firstName, 'lastName':child.lastName}
 		# get relations
 		try:			
 			relObj = Relations.objects.filter(child=child, relation_type="Father").only("first_name")
@@ -233,9 +237,16 @@ def MapStudents(request,id):
 		academic =  Academic_Year.objects.get(pk = current_academic().id)
 		# Create Relation between Student and center
 		for student in student_id:
-			student = Student.objects.get(pk = student)
+			childObj = Child.objects.get(pk = student)
+			student = Student.objects.get(child = childObj)
 			param={'id':None,'student':student,'student_group':studentgroup,'academic':academic,'active':2}
-			stdgrp_rels = Student_StudentGroupRelation.objects.get_or_create(**param)
+			try:
+				sgRelObj = Student_StudentGroupRelation.objects.get(student=student, student_group=studentgroup, academic=academic)
+				sgRelObj.active=2
+				sgRelObj.save()
+			except:
+				stdgrp_rels = Student_StudentGroupRelation(**param)
+				stdgrp_rels.save()
 			count = count+1
 	return HttpResponseRedirect('/studentgroup/'+str(id)+'/view/?count='+str(count))
 
