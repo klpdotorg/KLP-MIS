@@ -70,7 +70,7 @@ class KLP_Get_Programms(Resource):
     def read(self,request,type_id):     
          try:     
             # Query for active programmes based on category
-            programme_list = Programme.objects.filter(programme_institution_category=type_id, active=2).order_by("startDate", "endDate", "name").only("id", "name")
+            programme_list = Programme.objects.filter(programme_institution_category=type_id, active=2).order_by("-startDate", "-endDate", "name").only("id", "name")
             respStr = ''
             for programme in programme_list:
                 respStr += '%s$$%s&&' %(programme.id, programme)    

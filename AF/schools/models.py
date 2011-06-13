@@ -485,7 +485,7 @@ class Programme(models.Model):
 	active = models.IntegerField(blank = True, null = True,default=2)
 
 	class Meta: 
-		ordering = ["startDate", "endDate", "name"]
+		ordering = ["-startDate", "-endDate", "name"]
 
 	def __unicode__(self):
 		return "%s (%s-%s)"%(self.name, self.startDate.strftime("%Y"), self.endDate.strftime("%Y"))
