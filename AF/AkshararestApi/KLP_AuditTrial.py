@@ -10,7 +10,6 @@ from django_restapi.responder import *
 from django_restapi.receiver import *
 from schools.models import *
 
-from schools.signals import check_user_perm
 from schools.receivers import KLP_user_Perm
 from fullhistory.models import FullHistory
 from django.db.models import Q
@@ -21,8 +20,7 @@ def KLP_audit(request):
     """ This method is used to show audit trail report for the users using fullhistory """
     user = request.user     # get logged in user
     # check user permissions to access audit trial report
-    check_user_perm.send(sender=None, user=user, model='Audit', operation=None)
-    check_user_perm.connect(KLP_user_Perm)
+    KLP_user_Perm(request.user, "Audit", None)
     # get all active(1) user to show in drop down.
     userList = User.objects.filter(is_active=1)
     respDict = {'userList':userList, 'title':'Karanataka Learning Partnership'}

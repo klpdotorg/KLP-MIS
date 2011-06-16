@@ -15,7 +15,6 @@ from django_restapi.receiver import *
 from AkshararestApi.BoundaryApi import ChoiceEntry
 import datetime
 
-from schools.signals import check_user_perm
 from schools.receivers import KLP_user_Perm
 
 class KLP_Assessment(Collection):    
@@ -35,8 +34,7 @@ def KLP_Assessment_View(request, assessment_id):
 def KLP_Assessment_Create(request, referKey):
 	""" To Create New Assessment programme/assessment/(?P<referKey>\d+)/creator/"""
 	# Checking user Permissions for Assessment add
-	check_user_perm.send(sender=None, user=request.user, model='Assessment', operation='Add')
-        check_user_perm.connect(KLP_user_Perm)
+	KLP_user_Perm(request.user, "Assessment", "Add")
         # Get Current date for to pass for calendar
 	now = datetime.date.today()
 	buttonType = request.POST.get('form-buttonType')
@@ -53,8 +51,7 @@ def KLP_Assessment_Create(request, referKey):
 def KLP_Assessment_Update(request, assessment_id):
 	""" To update Selected Boundary assessment/(?P<assessment_id>\d+)/update/"""
 	# Checking user Permissions for Assessment add
-	check_user_perm.send(sender=None, user=request.user, model='Assessment', operation='Update')
-        check_user_perm.connect(KLP_user_Perm)
+        KLP_user_Perm(request.user, "Assessment", "Update")
         # Get Current date for to pass for calendar
 	now = datetime.date.today()
 	buttonType = request.POST.get('form-buttonType')

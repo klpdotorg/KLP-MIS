@@ -15,7 +15,6 @@ from django_restapi.receiver import *
 from AkshararestApi.BoundaryApi import ChoiceEntry
 import datetime
 
-from schools.signals import check_user_perm
 from schools.receivers import KLP_user_Perm
 
 class KLP_Programme(Collection):    
@@ -33,8 +32,7 @@ def KLP_Programme_View(request, programme_id):
 def KLP_Programme_Create(request):
 	""" To Create New Programme programme/creator/"""
 	# Checking user Permissions for programme add
-	check_user_perm.send(sender=None, user=request.user, model='Programme', operation='Add')
-        check_user_perm.connect(KLP_user_Perm)
+	KLP_user_Perm(request.user, "Programme", "Add")
         # Get Current date for to pass for calendar
 	now = datetime.date.today()
 	buttonType = request.POST.get('form-buttonType')
@@ -50,8 +48,7 @@ def KLP_Programme_Create(request):
 def KLP_Programme_Update(request, programme_id):
 	""" To update Selected Programme programme/(?P<programme_id>\d+)/update/"""
 	# Checking user Permissions for programme update
-	check_user_perm.send(sender=None, user=request.user, model='Programme', operation='Update')
-        check_user_perm.connect(KLP_user_Perm)
+        KLP_user_Perm(request.user, "Programme", "Update")
         # Get Current date for to pass for calendar
 	now = datetime.date.today()
 	buttonType = request.POST.get('form-buttonType')

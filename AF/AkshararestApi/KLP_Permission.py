@@ -21,14 +21,12 @@ from django.contrib.auth.models import User
 from django.utils import simplejson
 from django.db.models import Q	
 
-from schools.signals import check_user_perm
 from schools.receivers import KLP_user_Perm
 
 def KLP_Assign_Permissions(request):
 	""" This method is used to assign permissions"""
 	""" Check logged in user permissions to assign permissions"""
-	check_user_perm.send(sender=None, user=request.user, model='Users', operation=None)
-        check_user_perm.connect(KLP_user_Perm)
+	KLP_user_Perm(request.user, "Users", None)
 	respDict = {}
 	# get selected users list to assign permissions
 	deUserList = request.POST.getlist('assignToUser')
@@ -160,8 +158,7 @@ def KLP_Users_list(request):
 	user = request.user
 	if user.id:
 		# check logged in user permissions, to get user list
-		check_user_perm.send(sender=None, user=user, model='Users', operation=None)
-		check_user_perm.connect(KLP_user_Perm)
+		KLP_user_Perm(request.user, "Users", None)
 		# get all active(1) users list other than staff and super user order by username
 		user_list = User.objects.filter(is_active=1, is_staff=0, is_superuser=0).order_by("username")
 		# render show users form with users list
@@ -176,8 +173,7 @@ def KLP_User_Delete(request, user_id):
 	user = request.user
 	if user.id:
 		# check logged in user permissions to delete user
-		check_user_perm.send(sender=None, user=user, model='Users', operation=None)
-		check_user_perm.connect(KLP_user_Perm)
+		KLP_user_Perm(request.user, "Users", None)
 		import random
 		import string
 		rangeNum = 8
@@ -199,8 +195,7 @@ def KLP_User_Permissions(request, user_id):
 	user = request.user
 	if user.id:
 		# check logged in user permissions 
-		check_user_perm.send(sender=None, user=user, model='Users', operation=None)
-		check_user_perm.connect(KLP_user_Perm)
+		KLP_user_Perm(request.user, "Users", None)
 		# get user object 
 		userObj = User.objects.get(pk=user_id)
 		# get all boundary types
@@ -259,8 +254,7 @@ def KLP_Show_User_Permissions(request, boundary_id, user_id):
 def KLP_Revoke_Permissions(request, permissionType):
 	""" This method is used to revoke user permissions"""
 	# check logged in user permissions
-	check_user_perm.send(sender=None, user=request.user, model='Users', operation=None)
-	check_user_perm.connect(KLP_user_Perm)
+	KLP_user_Perm(request.user, "Users", None)
 	# get user id to revoke permissions
 	user_id = request.POST.get('userId')
 	opStatus = "success"
@@ -290,8 +284,7 @@ def KLP_Revoke_Permissions(request, permissionType):
 def KLP_ReAssign_Permissions(request, permissionType):
 	""" This method is used to reassign permissions to user"""
 	# check logged in user permissions
-	check_user_perm.send(sender=None, user=request.user, model='Users', operation=None)
-	check_user_perm.connect(KLP_user_Perm)
+	KLP_user_Perm(request.user, "Users", None)
 	#get selected users list
 	userList = request.POST.getlist('userId')
 	permissions = ['Acess']

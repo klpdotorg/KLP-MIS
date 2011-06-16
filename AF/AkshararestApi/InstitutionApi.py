@@ -18,7 +18,6 @@ from AkshararestApi.BoundaryApi import ChoiceEntry
 from django.utils import simplejson
 from django.template import loader, RequestContext
 
-from schools.signals import check_user_perm
 from schools.receivers import KLP_user_Perm
 
 class KLP_Institution(Collection):    
@@ -32,8 +31,7 @@ class KLP_Institution(Collection):
 def KLP_Institution_Create(request, referKey):
 	""" To Create New Institution boundary/(?P<referKey>\d+)/institution/creator/"""
 	# Checking user Permissions
-	check_user_perm.send(sender=None, user=request.user, model='Institution', operation='Add')
-        check_user_perm.connect(KLP_user_Perm)
+	KLP_user_Perm(request.user, "Institution", "Add")
         # Get Button Type
 	buttonType = request.POST.get('form-buttonType')
 	selCategoryTyp = request.POST.get('form-0-cat')
@@ -65,8 +63,7 @@ def KLP_Institution_View(request, institution_id):
 def KLP_Institution_Update(request, institution_id):
 	""" To update Selected Institution institution/(?P<institution_id>\d+)/update/"""
 	# Checking user Permissions
-	check_user_perm.send(sender=None, user=request.user, model='Institution', operation='Update')
-        check_user_perm.connect(KLP_user_Perm)
+        KLP_user_Perm(request.user, "Institution", "Update")
 	buttonType = request.POST.get('form-buttonType')
 	referKey = request.POST.get('form-0-boundary')
 	selCategoryTyp = request.POST.get('form-0-cat')
@@ -89,8 +86,7 @@ def KLP_Institution_Boundary(request, boundary_id, permissionType, assessment_id
 	""" To List Institutions Under Boundary to Assign Permissions to the User """
 	user = request.user # get logged in user
 	# Checking user Permissions
-	check_user_perm.send(sender=None, user=request.user, model='Users', operation=None)
-        check_user_perm.connect(KLP_user_Perm)
+	KLP_user_Perm(request.user, "Users", None)
 	klp_UserGroups = user.groups.all() # Get all user groups
 	klp_GroupsList = ['%s' %(usergroup.name) for usergroup in klp_UserGroups]
 	if user.is_superuser or 'AdminGroup' in klp_GroupsList:

@@ -13,7 +13,6 @@ from django_restapi.model_resource import Collection, Entry
 from django_restapi.responder import *
 from django_restapi.receiver import *
 
-from schools.signals import check_user_perm
 from schools.receivers import KLP_user_Perm
 
 class KLP_Create_Node(Resource):    
@@ -34,8 +33,7 @@ class KLP_Delete(Resource):
     def read(self,request,model_name, referKey):
         modelDict = {'boundary':Boundary, 'institution':Institution, 'programme':Programme, 'assessment':Assessment, 'question':Question, 'studentgroup':StudentGroup, 'student':Student, 'staff':Staff, 'class':StudentGroup, 'center':StudentGroup}
         # Checking user Permissions
-        check_user_perm.send(sender=None, user=request.user, model=modelDict[model_name.lower()], operation='Delete')
-        check_user_perm.connect(KLP_user_Perm)
+        KLP_user_Perm(request.user, modelDict[model_name.lower()]._meta.module_name, "Delete")
         # Get Object based on id and model to delete
         obj = modelDict[model_name.lower()].objects.get(pk=referKey)
 	if model_name == 'student':

@@ -17,7 +17,6 @@ from django_restapi.receiver import *
 from AkshararestApi.BoundaryApi import ChoiceEntry
 from django.contrib.contenttypes.models import ContentType
 
-from schools.signals import check_user_perm
 from schools.receivers import KLP_user_Perm
 
 class KLP_StudentGroup(Collection):
@@ -29,8 +28,7 @@ class KLP_StudentGroup(Collection):
 def KLP_StudentGroup_Create(request, referKey):
 	""" To Create New StudentGroup boundary/(?P<bounday>\d+)/schools/(?P<school>\d+)/class/creator/"""
 	#Checking user Permissions for SG add
-	check_user_perm.send(sender=None, user=request.user, model='StudentGroup', operation='Add')
-        check_user_perm.connect(KLP_user_Perm)
+        KLP_user_Perm(request.user, "StudentGroup", "Add")
 	buttonType = request.POST.get('form-buttonType')
 	instObj = Institution.objects.get(id = referKey)
 	group_typ = request.GET.get("group_typ") or request.POST.get("group_typ")
@@ -66,8 +64,7 @@ def KLP_StudentGroup_View(request, studentgroup_id):
 def KLP_StudentGroup_Update(request, studentgroup_id):
 	""" To update Selected School school/(?P<school_id>\d+)/update/"""
 	#Checking user Permissions for SG update
-	check_user_perm.send(sender=None, user=request.user, model='StudentGroup', operation='Update')
-        check_user_perm.connect(KLP_user_Perm)
+        KLP_user_Perm(request.user, "StudentGroup", "Update")
 	buttonType = request.POST.get('form-buttonType')
 	ParentKey = request.POST.get('form-0-institution')
 	group_typ = request.GET.get("group_typ") or request.POST.get("group_typ")

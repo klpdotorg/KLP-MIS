@@ -7,25 +7,39 @@ from object_permissions import register
 from fullhistory import register_model
 # Table Structure For Klp
 register_model(User)
-class Institution_Category(models.Model):
-	'''This Class stores the Institution Category Information'''
-	name = models.CharField(max_length = 50)
-	categoryType = models.IntegerField()
-	def __unicode__(self):
-		return "%s"%self.name
-register_model(Institution_Category)
 
-Institution_Genders=['boys','girls','co-ed']
-Institution_Gender = []
-for school in Institution_Genders:
-	type_school=(school,school)
-	Institution_Gender.append(type_school)
+active_status = [(0, 'Deleted'),
+                 (1, 'Inactive'),
+                 (2, 'Active'),
+                 (3, 'Promoted'),
+                 (4, 'Promotion Failed'),
+                 (5, 'Passed Out'),
+                 (6, 'Detained'),
+                 (7, 'Completed')
+                ]
 
-Sex = ['male','female']
-Gender = []
-for gender in Sex:
-	genders=(gender,gender)
-	Gender.append(genders)
+Institution_Gender = [('boys', 'boys'),
+		      ('girls', 'girls'),
+		      ('co-ed', 'co-ed')
+		     ]
+		     
+Gender = [('male', 'male'),
+	  ('female', 'female')
+         ]
+         
+Group_Type=[("Class", "Class"),
+	    ("Center", "Center")
+           ]
+
+QuestionType = [(1, 'Marks'), 
+                (2, 'Grade')
+               ]
+
+
+Relation_Type = [('Mother', 'Mother'), 
+                 ('Father', 'Father'), 
+                 ('Siblings', 'Siblings')
+                ]
 
 
 Alpha_list = []
@@ -35,26 +49,14 @@ for typ in range(ord('a'), ord('z')+1):
 	Alpha_list.append(typs)
 
 
-goups = ["Class", "Center"]
-Group_Type=[]
-for gTyp in goups:
-	typs = (gTyp, gTyp)
-	Group_Type.append(typs)
+class Institution_Category(models.Model):
+	'''This Class stores the Institution Category Information'''
+	name = models.CharField(max_length = 50)
+	categoryType = models.IntegerField()
+	def __unicode__(self):
+		return "%s"%self.name
+register_model(Institution_Category)
 
-
-
-quesType = ['Marks','Grade']
-QuestionType = []
-for indx,qType in enumerate(quesType):
-    typs = (indx+1,qType)
-    QuestionType.append(typs)
-
-
-rel_type = ['Mother','Father','Siblings']
-Relation_Type = []
-for Rtype in rel_type:
-	reltyps = (Rtype,Rtype)
-	Relation_Type.append(reltyps)
 
 class Moi_Type(models.Model):
 	'''This Class stores the Mother Toungue (Languages) Information'''

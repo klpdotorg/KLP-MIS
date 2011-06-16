@@ -1,14 +1,11 @@
-""" This file containd the receivers definations. Once Signal get call the respective receiver will get execute """
+""" This file containd the methods  and receiver methods to check the user permissions and to assign permission on new institution creation"""
 
 
-def KLP_obj_Perm(sender, **kwargs):
-	""" This receiver method is used to check user object level permissions """
+def KLP_obj_Perm(userObj, instObj, permission, assessmentObj):
+	""" This method is used to check user object level permissions """
 	""" Get user, instance(Instituion), assessment objects to check permissions"""
         from schools.models import UserAssessmentPermissions
-	userObj = kwargs['user']
-	instObj =  kwargs['instance']
-	permission = kwargs['permission']
-	assessmentObj = kwargs['Assessment']
+	
 	# Check user is logged in or not if logged in, check user is active user or not
 	if (userObj.id is not None or userObj.is_active):
 		# If true check user has permissions to access intitution and assessment object
@@ -23,12 +20,9 @@ def KLP_obj_Perm(sender, **kwargs):
 		# If user is not super user and he is not in staff and user doesn't has permission with intitution object raise Insufficient Previliges exception
 		raise Exception("Insufficient Previliges")
 		
-def KLP_user_Perm(sender, **kwargs):
-	""" This receiver method is used to check user operational permissions based on model """
+def KLP_user_Perm(userObj, modelName, operation):
+	""" This method is used to check user operational permissions based on model """
 	""" Get User, model name and operation(Add/update/delete) to check permissions"""
-	userObj = kwargs['user']
-	modelName = kwargs['model']
-	operation = kwargs['operation']
 	# get user groups 
 	klp_UserGroups = userObj.groups.all()
 	user_GroupsList = ['%s' %(str(usergroup.name)) for usergroup in klp_UserGroups]
@@ -47,11 +41,11 @@ def KLP_user_Perm(sender, **kwargs):
 				raise Exception("Insufficient Previliges")
 		elif 'Data Entry Executive' in user_GroupsList:
 			# if user in Data Entry Executive group allow to access 'Institution', 'Staff', 'StudentGroup', 'Student' and 'Answer' models
-			if modelName not in ['Institution', 'Staff', 'StudentGroup', 'Student', 'Answer']:
+			if modelName.lower() not in ['institution', 'staff', 'studentgroup', 'student', 'answer']:
 				raise Exception("Insufficient Previliges")
 		elif 'Data Entry Operator' in user_GroupsList:
 			# if user in Data Entry Operator group allow to access 'Student' and 'Answer' models
-			if modelName not in ['Student', 'Answer']:
+			if modelName.lower() not in ['student', 'answer']:
 				raise Exception("Insufficient Previliges")
 		else:
 			# if user not in any of the group and not staff and not super user then raise Insufficient Previliges exception

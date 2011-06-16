@@ -17,7 +17,6 @@ from django_restapi.receiver import *
 from AkshararestApi.BoundaryApi import ChoiceEntry
 from django.contrib.contenttypes.models import ContentType
 
-from schools.signals import check_user_perm
 from schools.receivers import KLP_user_Perm
 
 class KLP_Staff(Collection):
@@ -36,8 +35,7 @@ def KLP_Staff_View(request, staff_id):
 def KLP_Staff_Create(request, referKey):
 	""" To Create New Staff institution/(?P<referKey>\d+)/staff/creator/"""
 	# Checking user Permissions for Staff creation
-	check_user_perm.send(sender=None, user=request.user, model='Staff', operation='Add')
-        check_user_perm.connect(KLP_user_Perm)
+        KLP_user_Perm(request.user, "Staff", "Add")
 	buttonType = request.POST.get('form-buttonType')
 	url = '/institution/%s/staff/creator/' %(referKey)
 	extra_dict={'buttonType':buttonType, 'referKey':referKey, 'url':url}
@@ -79,8 +77,7 @@ def KLP_staff_list(request, institution_id):
 def KLP_Staff_Update(request, staff_id):
 	""" To update Selected staff staff/(?P<staff_id>\d+)/update/"""
 	# Checking user Permissions for Staff update
-	check_user_perm.send(sender=None, user=request.user, model='Staff', operation='Update')
-        check_user_perm.connect(KLP_user_Perm)
+        KLP_user_Perm(request.user, "Staff", "Update")
 	buttonType = request.POST.get('form-buttonType')
 	referKey = request.POST.get('form-0-boundary')
 	staff = Staff.objects.get(pk=staff_id)

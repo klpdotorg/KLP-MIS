@@ -18,7 +18,6 @@ from django_restapi.receiver import *
 from AkshararestApi.BoundaryApi import ChoiceEntry
 from django.contrib.contenttypes.models import ContentType
 
-from schools.signals import check_user_perm
 from schools.receivers import KLP_user_Perm
 
 class KLP_Student(Collection):    
@@ -30,8 +29,7 @@ class KLP_Student(Collection):
 def KLP_Student_Create(request, studentgroup_id, counter=0):
 	""" To Create New Student boundary/(?P<bounday>\d+)/schools/(?P<school>\d+)/class/creator/"""
 	# Checking user Permissions for Student add
-	check_user_perm.send(sender=None, user=request.user, model='Student', operation='Add')
-        check_user_perm.connect(KLP_user_Perm)
+        KLP_user_Perm(request.user, "Student", "Add")
 	buttonType = request.POST.get('form-buttonType')
 	model = StudentGroup.objects.get(id=studentgroup_id)
 	mapStudent = request.GET.get('map_Student') or request.POST.get('mapStudent') or 0
@@ -61,8 +59,7 @@ def KLP_Student_View(request, student_id):
 def KLP_Student_Update(request, student_id, counter=0):
 	""" To update Selected student student/(?P<student_id>\d+)/update/"""
 	# Checking user Permissions for Student update
-	check_user_perm.send(sender=None, user=request.user, model='Student', operation='Update')
-        check_user_perm.connect(KLP_user_Perm)
+        KLP_user_Perm(request.user, "Student", "Update")
 	buttonType = request.POST.get('form-buttonType')
 	KLP_Edit_Student =KLP_Student(queryset = Child.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'child',extra_context={'buttonType':buttonType,'modelName':"student", 'counter':counter} ), receiver = XMLReceiver(),)
 	response = KLP_Edit_Student.responder.update_form(request, pk=student_id, form_class=Child_Form)

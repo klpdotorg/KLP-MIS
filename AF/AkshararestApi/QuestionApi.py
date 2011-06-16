@@ -14,7 +14,6 @@ from django_restapi.responder import *
 from django_restapi.receiver import *
 from AkshararestApi.BoundaryApi import ChoiceEntry
 
-from schools.signals import check_user_perm
 from schools.receivers import KLP_user_Perm
 
 class KLP_Question(Collection):    
@@ -35,8 +34,7 @@ def KLP_Question_View(request, question_id):
 def KLP_Question_Create(request, referKey):
 	""" To Create New Question assessment/question/(?P<referKey>\d+)/creator/"""
 	# Checking user Permissions for Question add
-	check_user_perm.send(sender=None, user=request.user, model='Question', operation='Add')
-        check_user_perm.connect(KLP_user_Perm)
+	KLP_user_Perm(request.user, "Question", "Add")
 	buttonType = request.POST.get('form-buttonType') # Get Button Type
 	# get number of questions under assessments for question order
 	order = Question.objects.filter(assessment__id=referKey).count()+1
@@ -47,9 +45,8 @@ def KLP_Question_Create(request, referKey):
         
 def KLP_Question_Update(request, question_id):
 	""" To update Selected Question question/(?P<question_id>\d+)/update/"""
-	# Checking user Permissions for Question add
-	check_user_perm.send(sender=None, user=request.user, model='Question', operation='Update')
-        check_user_perm.connect(KLP_user_Perm)
+	# Checking user Permissions for Question update
+        KLP_user_Perm(request.user, "Question", "Update")
         # Get Button Type
 	buttonType = request.POST.get('form-buttonType')
 	referKey = request.POST.get('form-0-assessment')

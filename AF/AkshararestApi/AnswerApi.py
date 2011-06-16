@@ -13,7 +13,6 @@ from schools.forms import *
 from schools.models import *
 from django_restapi.authentication import *
 
-from schools.signals import check_perm
 from schools.receivers import KLP_obj_Perm
          
 def KLP_DataEnry(request):
@@ -34,8 +33,7 @@ class KLP_ChangeAns(Resource):
         assessmentObj = Assessment.objects.filter(pk=assessmentId).defer("programme")[0]  # get assessment Object based on id
         instObj = Institution.objects.filter(pk=student_groupObj["institution"]).defer("boundary")[0]  # get Institution Object based on id
         #Checking user permission based on institution and assessment
-        check_perm.send(sender=None, user=user, instance=instObj, Assessment=assessmentObj, permission='Acess')
-        check_perm.connect(KLP_obj_Perm)
+        KLP_obj_Perm(user, instObj, assessmentObj, "Acess")
         for question in Questions_list:
         	textField = 'student_%s_%s' %(student, question.id)        	
         	textFieldVal = request.POST.get(textField)  # get each text field values

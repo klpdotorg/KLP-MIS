@@ -18,7 +18,6 @@ from django_restapi.receiver import *
 from django.forms.models import modelformset_factory
 from django.forms.formsets import formset_factory
 
-from schools.signals import check_user_perm
 from schools.receivers import KLP_user_Perm
 
 
@@ -44,8 +43,7 @@ def KLP_Boundary_View(request, boundary_id, boundarytype_id):
 def KLP_Boundary_Create(request):
 	""" To Create New Boundary boundary/creator/"""
 	# Checking user Permissions
-	check_user_perm.send(sender=None, user=request.user, model='Boundary', operation='Add')
-        check_user_perm.connect(KLP_user_Perm)
+	KLP_user_Perm(request.user, "Boundary", "Add")
 	buttonType = request.POST.get('form-buttonType')
         KLP_Create_Boundary =KLP_Boundary(queryset = Boundary.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'boundary', extra_context={'buttonType':buttonType}), receiver = XMLReceiver(),)
         
@@ -56,8 +54,7 @@ def KLP_Boundary_Create(request):
 def KLP_Boundary_Update(request, boundary_id):
 	""" To update Selected Boundary boundary/(?P<boundary_id>\d+)/update/"""
 	# Checking user Permissions
-	check_user_perm.send(sender=None, user=request.user, model='Boundary', operation='Update')
-        check_user_perm.connect(KLP_user_Perm)
+        KLP_user_Perm(request.user, "Boundary", "Update")
 	buttonType = request.POST.get('form-buttonType')
 	referKey = request.POST.get('form-0-boundary')
 	KLP_Edit_Boundary =KLP_Boundary(queryset = Boundary.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'boundary', extra_context={'buttonType':buttonType, 'referKey':referKey}), receiver = XMLReceiver(),)
