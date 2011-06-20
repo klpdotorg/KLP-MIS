@@ -131,18 +131,20 @@ class Command(BaseCommand):
 				    			answers =  asmDict[asmId]
 				    			if  answers:
 								
-				    				crEntries = FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, object_id__in=answers, action='C').count()
+				    				crEntriesData = FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, object_id__in=answers, action='C')
+				    				crEntries = crEntriesData.count()
 				    				if crEntries == 0:
 				    					inCrEntries = 0
 				    				else:
-				    					inCrEntries = FullHistory.objects.filter((Q(_data__icontains='answer') | Q(_data__icontains='status')) & Q(_data__icontains='user2'), action_time__range=(sTime, eTime), object_id__in=answers, action='U').exclude(request__user_pk=userId,).count()
+				    					crEntriesLis = list(crEntriesData.values_list("object_id", flat=True))
+				    					inCrEntries = FullHistory.objects.filter((Q(_data__icontains='answer') | Q(_data__icontains='status')) & Q(_data__icontains='user2'), action_time__range=(sTime, eTime), object_id__in=crEntriesLis, action='U').exclude(request__user_pk=userId,).count()
 				    					
 				    					crEntries = crEntries - inCrEntries
 				    				
 				    				
-				    				vEntries = FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, object_id__in=answers, action='U', _data__icontains='user2').count()
+				    				vEntries = FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, object_id__in=answers, action='U', _data__icontains='user2').exclude(Q(_data__icontains='id') | Q(_data__icontains='question') | Q(_data__icontains='student') ).count()
 				    				
-				    				rEntries = FullHistory.objects.filter((Q(_data__icontains='answer') | Q(_data__icontains='status')) & Q(_data__icontains='user2'), action_time__range=(sTime, eTime), request__user_pk=userId, object_id__in=answers, action='U').count() 
+				    				rEntries = FullHistory.objects.filter((Q(_data__icontains='answer') | Q(_data__icontains='status')) & Q(_data__icontains='user2'), action_time__range=(sTime, eTime), request__user_pk=userId, object_id__in=answers, action='U').exclude(Q(_data__icontains='id') | Q(_data__icontains='question') | Q(_data__icontains='student') ).count() 
 				    				
 				    				
 				    				vEntries = vEntries - rEntries

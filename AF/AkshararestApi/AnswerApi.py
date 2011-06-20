@@ -33,7 +33,7 @@ class KLP_ChangeAns(Resource):
         assessmentObj = Assessment.objects.filter(pk=assessmentId).defer("programme")[0]  # get assessment Object based on id
         instObj = Institution.objects.filter(pk=student_groupObj["institution"]).defer("boundary")[0]  # get Institution Object based on id
         #Checking user permission based on institution and assessment
-        KLP_obj_Perm(user, instObj, assessmentObj, "Acess")
+        KLP_obj_Perm(user, instObj, "Acess", assessmentObj)
         for question in Questions_list:
         	textField = 'student_%s_%s' %(student, question.id)        	
         	textFieldVal = request.POST.get(textField)  # get each text field values
