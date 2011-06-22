@@ -60,6 +60,18 @@
 		                        			$( "#id_form-0-endDate" ).datepick({defaultDate: new Date("{{extra_context|displayValue:'endDate'}} {{extra_context|displayValue:'endMonth'}} {{extra_context|displayValue:'endYear'}}"), dateFormat: 'dd-mm-yyyy'});
 	                    				</script>
       						</tr>
+      						
+      						<tr>
+      				    			<td class="rightprofile"><label>Double Entry</label></td>
+      							<td class="leftprofile">
+                            					{% render_field entryForm.doubleEntry 'tabindex=4' %}
+                        				</td>
+                        				<td>
+                                    				{% for error in entryForm.doubleEntry.errors %}
+	                                				<span class="editErr">{{ error }}</span>
+	                                			{% endfor %}
+                                    			</td>
+      						</tr> 
       										
       						<tr>      				    
       			        			<td class="leftprofile">

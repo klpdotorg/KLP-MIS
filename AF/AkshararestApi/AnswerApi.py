@@ -31,6 +31,11 @@ class KLP_ChangeAns(Resource):
         Questions_list = Question.objects.filter(assessment__id=assessmentId).defer("assessment")  # get questions under assessment
         student_groupObj = StudentGroup.objects.filter(pk = student_groupId).values("institution")[0]  # get SG Object based on id
         assessmentObj = Assessment.objects.filter(pk=assessmentId).defer("programme")[0]  # get assessment Object based on id
+        dobleEntReq = assessmentObj.doubleEntry
+        if dobleEntReq:
+        	dE = 1
+        else:
+        	dE = 2
         instObj = Institution.objects.filter(pk=student_groupObj["institution"]).defer("boundary")[0]  # get Institution Object based on id
         #Checking user permission based on institution and assessment
         KLP_obj_Perm(user, instObj, "Acess", assessmentObj)
@@ -98,7 +103,7 @@ class KLP_ChangeAns(Resource):
         			else:
         				# else if  question type is 1(Marks) then store textfield value in answerScore
         				answerScore = textFieldVal
-				ansObj = Answer(question=question, student=studentObj, doubleEntry=1, status=status, answerGrade=answerGrade, answerScore=answerScore, lastmodifiedBy=user, user1=user)
+				ansObj = Answer(question=question, student=studentObj, doubleEntry=dE, status=status, answerGrade=answerGrade, answerScore=answerScore, lastmodifiedBy=user, user1=user)
 				
         			ansObj.save()
 	        

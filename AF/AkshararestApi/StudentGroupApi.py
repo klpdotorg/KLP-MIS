@@ -82,6 +82,8 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 	url = "/studentgroup/%s/programme/%s/assessment/%s/view/" %(studentgroup_id, programme_id, assessment_id)
 	# Query Childs based on studentgroup relation
 	students = Student_StudentGroupRelation.objects.select_related("student").filter(student_group__id = studentgroup_id, academic=current_academic, active=2).values_list('student__child', flat=True).distinct()
+	asmObj = Assessment.objects.filter(pk=assessment_id).only("doubleEntry")[0]
+	doublEntryRequire = asmObj.doubleEntry
 	grupObj = StudentGroup.objects.filter(pk = studentgroup_id).only("group_type")
 	childs_list = Child.objects.filter(id__in=students).extra(select={'lower_firstname':'lower(trim("firstName"))' }).order_by('lower_firstname').defer("mt")
 	question_list = Question.objects.filter(assessment__id=assessment_id, active=2).defer("assessment")
@@ -210,7 +212,10 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 				ansDict=dict(dataDict)
 				ansDict['iBox'] = True
 				ansDict['ansVal'] = ''
+				if not doublEntryRequire:
+					ansDict['sE'] = True
 				qDict[stId] = ansDict
+				
 			
 			
 				

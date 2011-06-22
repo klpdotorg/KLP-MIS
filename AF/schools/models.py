@@ -41,7 +41,6 @@ Relation_Type = [('Mother', 'Mother'),
                  ('Siblings', 'Siblings')
                 ]
 
-
 Alpha_list = []
 for typ in range(ord('a'), ord('z')+1):
         alph = chr(typ).upper()
@@ -521,6 +520,7 @@ class Assessment(models.Model):
     startDate = models.DateField(max_length = 20, default=datetime.date.today)
     endDate = models.DateField(max_length = 20, default=default_end_date)
     query = models.CharField(max_length = 500,blank = True, null = True)
+    doubleEntry = models.BooleanField(default=True)
     active = models.IntegerField(blank = True, null = True,default=2)
     
     class Meta: 
@@ -571,7 +571,6 @@ class Question(models.Model):
     scoreMax = models.DecimalField(max_digits=5, decimal_places=2, blank = True, null = True)
     grade = models.CharField(max_length = 100,blank = True, null = True)
     order = models.IntegerField()
-    doubleEntry = models.BooleanField(default=True)
     active = models.IntegerField(blank = True, null = True,default=2)
     
     class Meta: 

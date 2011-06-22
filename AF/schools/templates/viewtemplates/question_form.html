@@ -6,7 +6,6 @@
 	<input type="hidden" name="url" value="/assessment/question/{{extra_context|displayValue:'referKey'}}/creator/" id="url" />   
 	<input type="hidden" name="form-buttonType" id="id_form-buttonType" value="save" />
 	<input type="hidden" name="form-0-active" id="id_form-0-active" value="2"/>
-	<input type="hidden" name="form-0-doubleEntry" id="id_form-0-doubleEntry" value="True"/>
 	<input type="hidden" name="form-0-required" id="id_form-0-required" value="True"/>
 	<input type="hidden" name="form-0-assessment" id="id_form-0-assessment" value="{{extra_context|displayValue:'referKey'}}"/>
 	<input type="hidden" id="question_id" size="15" value="{{extra_context|displayValue:'prevousId'}}" / >
@@ -74,7 +73,6 @@
       				    			<td class="rightprofile"><label class="KLP_required">Grade</label></td>
       							<td class="leftprofile">
                             					{% render_field entryForm.grade 'tabindex=3' %}
-                            					<input type="hidden" name="form-0-order" value="{{extra_context|displayValue:'order'}}"/>
                             					<!-- Question grade Field -->
                         				</td>
                         				<td>
@@ -85,7 +83,7 @@
                                     			</td>
       						</tr> 
       						<tr id="gradeTyp">
-      				    			<td class="rightprofile"><label class="KLP_required">Order</label></td>
+      				    			<td class="rightprofile"><label class="KLP_required">Question Order</label></td>
       							<td class="leftprofile">
                             					<input type="text" name="form-0-order" value="{{extra_context|displayValue:'order'}}" tabindex=4/>
                             					<!-- Question order Field -->
@@ -97,6 +95,7 @@
 	                                			{% endfor %}
                                     			</td>
       						</tr> 
+      						
       						<tr><td> &nbsp;</td></tr>
                     				<tr><td> &nbsp;</td></tr>
                     				<tr><td> &nbsp;</td></tr>
