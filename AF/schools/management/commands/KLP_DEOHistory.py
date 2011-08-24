@@ -17,10 +17,11 @@ class Command(BaseCommand):
                         endDate = args[1]
                         fileName = args[2]
 			contentList = ['boundary', 'institution', 'student', 'staff']
-                        if fileName and startDate and endDate:
+                        if fileName and startDate and endDate:  # If startdate, enddate and fileName passed procced else raise am error
                                 try:
                                 	strDate = startDate.split("/")
                                 	enDate = endDate.split("/")
+                                	# Get all active assessments for the active programme
     					assessments = Assessment.objects.select_related("programme").filter(programme__active=2, active=2).distinct().only("id", "name")
     					# get current working directory.
 					cwd = os.getcwd()
@@ -33,19 +34,20 @@ class Command(BaseCommand):
 					historyFile = csv.writer(open(genFile, 'wb'))
 					# Write header
 					headerList = ['Sl.No', 'User', 'pre_boundary_created', 'pre_boundary_mod', 'pre_boundary_del', 'primary_boundary_created', 'primary_boundary_mod', 'primary_boundary_del', 'pre_sch_created', 'pre_sch_mod', 'pre_sch_del', 'primary_sch_created', 'primary_sch_mod', 'primary_sch_del', 'pre_stud_created', 'pre_stud_mod', 'pre_stud_del', 'primary_stud_created', 'primary_stud_mod', 'primary_stud_del', 'pre_teacher_created', 'pre_teacher_mod', 'pre_teacher_del', 'primary_teacher_created', 'primary_teacher_mod', 'primary_teacher_del']
-					asmDict, asmList ={}, []
-					users = User.objects.filter(is_active=1).order_by("username").only("id", "username")
-					userIds = users.values_list("id", flat=True)
+					asmDict, asmList ={}, []					
+					users = User.objects.filter(is_active=1).order_by("username").only("id", "username")  # Querying all active userid, usernames and sorting by username
+					userIds = users.values_list("id", flat=True)   # getting only userids from queryset
 					sDate = datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0]))
 					eDate = datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0]))
 					sTime = datetime.datetime(int(strDate[2]), int(strDate[1]), int(strDate[0]), 00, 00, 00)
 					eTime = datetime.datetime(int(enDate[2]), int(enDate[1]), int(enDate[0]), 23, 59, 00)
 					for assessment in assessments:
-						
-						answers = Answer.objects.filter(Q(user1__id__in=userIds) | Q(user2__id__in=userIds), lastModifiedDate__range=(sDate, eDate), question__assessment=assessment).values_list("id", flat=True).distinct()
-						if answers:
+						# Querying created/modified answer id of the assessment in the date span
+						answers = Answer.objects.filter(Q(user1__id__in=userIds) | Q(user2__id__in=userIds), lastModifiedDate__range=(sDate, eDate), question__assessment=assessment).values_list("id", flat=True).distinct()						
+						if answers:   # if answers are created/modified in given date span adding header and passing answer ids to dictionary
 							assessmentId = assessment.id
 							asmList.append(assessmentId)
+							# Adding header
 							asmName = "%s-%s" %(assessment.programme.name, assessment.name)
 							headerList.append(asmName+' Num Of correct Entries')
 							headerList.append(asmName+' Num Of incorrect Entries')
@@ -54,9 +56,8 @@ class Command(BaseCommand):
 							nList = [i for i in answers]
 							nList.append(0)
 							asmDict[assessmentId] = nList
-					historyFile.writerow(headerList)
-					count = 0
-										
+					historyFile.writerow(headerList)  # writting header to the file
+					count = 0					
     					for user in User.objects.filter(groups__name__in=['Data Entry Executive', 'Data Entry Operator'], is_active=1).order_by("username"):
 						count +=1
 						userId = user.id
@@ -71,7 +72,7 @@ class Command(BaseCommand):
 				    			preList, primaryList= [0], [0]
 				    			contObj = ContentType.objects.get(app_label='schools', name=content)
 				    			contId = contObj.id
-				    			if content == 'boundary':
+				    			if content == 'boundary':  # Checking is content is boundary
 				    				preBoundaryList, primaryBoundaryList = [], []
 				    				BoundaryList = Institution.objects.filter(id__in=preSchList).values_list("boundary", flat=True).distinct()
 				    				preBoundaryList.extend(list(BoundaryList))
@@ -92,15 +93,15 @@ class Command(BaseCommand):
 				    				primaryBoundaryList.extend(list(BoundaryList))
 				    				preList = ['%s' %i for i in preBoundaryList]
 				    				primaryList = ['%s' %i for i in primaryBoundaryList]
-				    			elif content == 'institution':
+				    			elif content == 'institution':   # Checking is content is institution
 				    				preList = ['%s' %i for i in preSchList]
 				    				primaryList = ['%s' %i for i in primarySchList]
-				    			elif content == 'staff':
+				    			elif content == 'staff':         # Checking is content is staff
 				    				preStaffList = Staff.objects.filter(institution__id__in=preSchList, institution__boundary__boundary_type__id=2).values_list("id", flat=True)
 				    				primaryStaffList = Staff.objects.filter(institution__id__in=primarySchList, institution__boundary__boundary_type__id=1).values_list("id", flat=True)
 				    				preList = ['%s' %i for i in preStaffList]
 				    				primaryList = ['%s' %i for i in primaryStaffList]
-				    			elif content == 'student':
+				    			elif content == 'student':       # Checking is content is student
 				    				preSGList = StudentGroup.objects.filter(institution__id__in=preSchList, institution__boundary__boundary_type__id=2).values_list("id", flat=True)
 				    				primarySGList =  StudentGroup.objects.filter(institution__id__in=primarySchList, institution__boundary__boundary_type__id=1).values_list("id", flat=True)
 				    				preStList = Student_StudentGroupRelation.objects.filter(student_group__id__in=preSGList).values_list("student",  flat=True)
