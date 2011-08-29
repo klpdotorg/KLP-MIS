@@ -65,90 +65,90 @@ class Command(BaseCommand):
 				    		
 				    		rawQuerySet = Institution.objects.raw(""" SELECT "id","obj_id" FROM "public"."object_permissions_institution_perms" WHERE "user_id" = '%s' AND "Acess" = 't' """ %(userId))
 				    		inst_list=[permObj.obj_id for permObj in rawQuerySet]		    		
-						# get the content objects(instituion, staff, student)
-						preSchList = Institution.objects.filter(id__in=inst_list, boundary__boundary_type__id=2).values_list("id", flat=True)
-						primarySchList = Institution.objects.filter(id__in=inst_list, boundary__boundary_type__id=1).values_list("id", flat=True)
+
+						preSchList = Institution.objects.filter(id__in=inst_list, boundary__boundary_type__id=2).values_list("id", flat=True) #Querying for Pre schools
+						primarySchList = Institution.objects.filter(id__in=inst_list, boundary__boundary_type__id=1).values_list("id", flat=True)  # Querying for primary schools
 				    		for content in contentList:
 				    			preList, primaryList= [0], [0]
-				    			contObj = ContentType.objects.get(app_label='schools', name=content)
-				    			contId = contObj.id
+				    			contObj = ContentType.objects.get(app_label='schools', name=content)  # get schools content object
+				    			contId = contObj.id  # get schools content object id
 				    			if content == 'boundary':  # Checking is content is boundary
 				    				preBoundaryList, primaryBoundaryList = [], []
-				    				BoundaryList = Institution.objects.filter(id__in=preSchList).values_list("boundary", flat=True).distinct()
-				    				preBoundaryList.extend(list(BoundaryList))
+				    				BoundaryList = Institution.objects.filter(id__in=preSchList).values_list("boundary", flat=True).distinct()  # querying circle level boubndaries using pre schools
+				    				preBoundaryList.extend(list(BoundaryList)) # appending circle level boubndaries to list
 				    				
-				    				BoundaryList = Boundary.objects.filter(id__in=preBoundaryList, boundary_type__id=2).values_list("parent", flat=True).distinct()
-				    				preBoundaryList.extend(list(BoundaryList))
-				    				BoundaryList = Boundary.objects.filter(id__in=preBoundaryList, boundary_type__id=2).values_list("parent", flat=True).distinct()
-				    				preBoundaryList.extend(list(BoundaryList))   				
+				    				BoundaryList = Boundary.objects.filter(id__in=preBoundaryList, boundary_type__id=2).values_list("parent", flat=True).distinct()  # querying project level boubndaries using pre schools
+				    				preBoundaryList.extend(list(BoundaryList)) # appending project level boubndaries to list
+				    				BoundaryList = Boundary.objects.filter(id__in=preBoundaryList, boundary_type__id=2).values_list("parent", flat=True).distinct()  # querying district level boubndaries using pre schools
+				    				preBoundaryList.extend(list(BoundaryList )) # appending district level boubndaries to list				
 				    				
 				    				
-				    				BoundaryList = Institution.objects.filter(id__in=primarySchList).values_list("boundary", flat=True).distinct()
+				    				BoundaryList = Institution.objects.filter(id__in=primarySchList).values_list("boundary", flat=True).distinct()  # querying cluster level boubndaries using primary schools
 				    				
-				    				primaryBoundaryList.extend(list(BoundaryList))
-				    				BoundaryList = Boundary.objects.filter(id__in=primaryBoundaryList, boundary_type__id=2).values_list("parent", flat=True).distinct()
-				    				primaryBoundaryList.extend(list(BoundaryList))
+				    				primaryBoundaryList.extend(list(BoundaryList))  # appending cluster level boubndaries to list
+				    				BoundaryList = Boundary.objects.filter(id__in=primaryBoundaryList, boundary_type__id=2).values_list("parent", flat=True).distinct()  # querying block level boubndaries using primary schools
+				    				primaryBoundaryList.extend(list(BoundaryList))  # appending block level boubndaries to list
 				    				
-				    				BoundaryList = Boundary.objects.filter(id__in=primaryBoundaryList, boundary_type__id=2).values_list("parent", flat=True).distinct()   				
-				    				primaryBoundaryList.extend(list(BoundaryList))
+				    				BoundaryList = Boundary.objects.filter(id__in=primaryBoundaryList, boundary_type__id=2).values_list("parent", flat=True).distinct()  # querying district level boubndaries using primary schools				
+				    				primaryBoundaryList.extend(list(BoundaryList))  # appending district level boubndaries to list
 				    				preList = ['%s' %i for i in preBoundaryList]
 				    				primaryList = ['%s' %i for i in primaryBoundaryList]
 				    			elif content == 'institution':   # Checking is content is institution
 				    				preList = ['%s' %i for i in preSchList]
 				    				primaryList = ['%s' %i for i in primarySchList]
 				    			elif content == 'staff':         # Checking is content is staff
-				    				preStaffList = Staff.objects.filter(institution__id__in=preSchList, institution__boundary__boundary_type__id=2).values_list("id", flat=True)
-				    				primaryStaffList = Staff.objects.filter(institution__id__in=primarySchList, institution__boundary__boundary_type__id=1).values_list("id", flat=True)
+				    				preStaffList = Staff.objects.filter(institution__id__in=preSchList, institution__boundary__boundary_type__id=2).values_list("id", flat=True)  # querying for pre school staff
+				    				primaryStaffList = Staff.objects.filter(institution__id__in=primarySchList, institution__boundary__boundary_type__id=1).values_list("id", flat=True)  # querying for primary school staff
 				    				preList = ['%s' %i for i in preStaffList]
 				    				primaryList = ['%s' %i for i in primaryStaffList]
 				    			elif content == 'student':       # Checking is content is student
-				    				preSGList = StudentGroup.objects.filter(institution__id__in=preSchList, institution__boundary__boundary_type__id=2).values_list("id", flat=True)
-				    				primarySGList =  StudentGroup.objects.filter(institution__id__in=primarySchList, institution__boundary__boundary_type__id=1).values_list("id", flat=True)
-				    				preStList = Student_StudentGroupRelation.objects.filter(student_group__id__in=preSGList).values_list("student",  flat=True)
-				    				primaryStList = Student_StudentGroupRelation.objects.filter(student_group__id__in=primarySGList).values_list("student",  flat=True)
+				    				preSGList = StudentGroup.objects.filter(institution__id__in=preSchList, institution__boundary__boundary_type__id=2).values_list("id", flat=True)  # querying for pre school student groups
+				    				primarySGList =  StudentGroup.objects.filter(institution__id__in=primarySchList, institution__boundary__boundary_type__id=1).values_list("id", flat=True)  # querying for primary school student groups
+				    				preStList = Student_StudentGroupRelation.objects.filter(student_group__id__in=preSGList).values_list("student",  flat=True)  # querying for pre school students
+				    				primaryStList = Student_StudentGroupRelation.objects.filter(student_group__id__in=primarySGList).values_list("student",  flat=True)  # querying for primary school students
 				    				preList = ['%s' %i for i in preStList]
 				    				primaryList = ['%s' %i for i in primaryStList]
 				    			
 				    			
 				    			preList.append(0)
 				    			primaryList.append(0)
-				    			# get all boundary/instituion/staff/student creates/Edited/Deleted by user.
 				    			
-				    			#print sTime, eTime, userId, contId, len(preList), len(primaryList)
 				    			
-				    		        dataList.append(FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, content_type__id=contId, object_id__in=preList, action='C').count())
-				    			dataList.append(FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, content_type__id=contId, object_id__in=preList, action='U').exclude(_data__icontains='active').count())
+				    		        dataList.append(FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, content_type__id=contId, object_id__in=preList, action='C').count())  # querying for number of pre school/boundaries/staffs/students created by user in time span
+				    			dataList.append(FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, content_type__id=contId, object_id__in=preList, action='U').exclude(_data__icontains='active').count())  # querying for number of pre schools/boundaries/staffs/students updated by user in time span
 				    			
-				    			dataList.append(FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, content_type__id=contId, object_id__in=preList, action='U', _data__icontains='active').count())
+				    			dataList.append(FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, content_type__id=contId, object_id__in=preList, action='U', _data__icontains='active').count())  # querying for number of pre schools/boundaries/staffs/students deleted by user in time span
 				    			
-				    			dataList.append(FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, content_type__id=contId, object_id__in=primaryList, action='C').count())
-				    			dataList.append(FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, content_type__id=contId, object_id__in=primaryList, action='U').exclude(_data__icontains='active').count())
+				    			dataList.append(FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, content_type__id=contId, object_id__in=primaryList, action='C').count())  # querying for number of primary school/boundaries/staffs/students created by user in time span
+				    			dataList.append(FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, content_type__id=contId, object_id__in=primaryList, action='U').exclude(_data__icontains='active').count())  # querying for number of pre schools/boundaries/staffs/students updated by user in time span
 				    			
-				    			dataList.append(FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, content_type__id=contId, object_id__in=primaryList, action='U', _data__icontains='active').count())
+				    			dataList.append(FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, content_type__id=contId, object_id__in=primaryList, action='U', _data__icontains='active').count())  # querying for number of pre schools/boundaries/staffs/students deleted by user in time span
 				    			
-				    			#dataList.extend([0, 0, 0, 0, 0, 0])
 				    			
 				    		for asmId in asmList:
-				    			answers =  asmDict[asmId]
-				    			if  answers:
+				    			# repeating assessments list
+				    			answers =  asmDict[asmId]  # getting answers for the assessments
+				    			if  answers:  # in answers created appending to report
 								
-				    				crEntriesData = FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, object_id__in=answers, action='C')
-				    				crEntries = crEntriesData.count()
+				    				crEntriesData = FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, object_id__in=answers, action='C')  # querying for answers created by user
+				    				crEntries = crEntriesData.count()  # getting correct entries count
 				    				if crEntries == 0:
+				    					# if correct entries count is 0 assigning incorrect entries to 0
 				    					inCrEntries = 0
 				    				else:
+				    					# if correct entries is grater than 0 querying for incorrect entries
 				    					crEntriesLis = list(crEntriesData.values_list("object_id", flat=True))
-				    					inCrEntries = FullHistory.objects.filter((Q(_data__icontains='answer') | Q(_data__icontains='status')) & Q(_data__icontains='user2'), action_time__range=(sTime, eTime), object_id__in=crEntriesLis, action='U').exclude(request__user_pk=userId,).count()
+				    					inCrEntries = FullHistory.objects.filter((Q(_data__icontains='answer') | Q(_data__icontains='status')) & Q(_data__icontains='user2'), action_time__range=(sTime, eTime), object_id__in=crEntriesLis, action='U').exclude(request__user_pk=userId,).count()  
 				    					
-				    					crEntries = crEntries - inCrEntries
+				    					crEntries = crEntries - inCrEntries   # subtracting incorrect entries from correct entries
 				    				
 				    				
-				    				vEntries = FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, object_id__in=answers, action='U', _data__icontains='user2').exclude(Q(_data__icontains='id') | Q(_data__icontains='question') | Q(_data__icontains='student') ).count()
+				    				vEntries = FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, object_id__in=answers, action='U', _data__icontains='user2').exclude(Q(_data__icontains='id') | Q(_data__icontains='question') | Q(_data__icontains='student') ).count()   # querying for verified entries count
 				    				
-				    				rEntries = FullHistory.objects.filter((Q(_data__icontains='answer') | Q(_data__icontains='status')) & Q(_data__icontains='user2'), action_time__range=(sTime, eTime), request__user_pk=userId, object_id__in=answers, action='U').exclude(Q(_data__icontains='id') | Q(_data__icontains='question') | Q(_data__icontains='student') ).count() 
+				    				rEntries = FullHistory.objects.filter((Q(_data__icontains='answer') | Q(_data__icontains='status')) & Q(_data__icontains='user2'), action_time__range=(sTime, eTime), request__user_pk=userId, object_id__in=answers, action='U').exclude(Q(_data__icontains='id') | Q(_data__icontains='question') | Q(_data__icontains='student') ).count()   # querying for rectified entries count
 				    				
 				    				
-				    				vEntries = vEntries - rEntries
+				    				vEntries = vEntries - rEntries   # subtracting rectified entries count from verified entries
 				    				
 				    				dataList.append(crEntries)
 								dataList.append(inCrEntries)
