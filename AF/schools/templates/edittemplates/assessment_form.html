@@ -1,6 +1,6 @@
 {% load template_tags %}
 <div class="detailHead">
-    <span class="hedText">Assessment Form</span>
+    <span class="hedText">Assessment Form: {{schoolName}}</span>
 </div>
 <form action="." method="POST" enctype="multipart/form-data" class="niceform" id="assessmentForm" name="assessmentForm" onsubmit="return false;">{% csrf_token %}
 	<input type="hidden" name="form-buttonType" id="id_form-buttonType" value="save" />

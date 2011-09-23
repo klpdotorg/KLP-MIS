@@ -321,6 +321,9 @@ class StudentGroup(models.Model):
 	def getChild(self):
 		return False
 
+		
+	def getSchoolIdentity(self)
+	    return '%s: %s' %(self.institution__id, self.institution__name)
 
 	def getModuleName(self):
 		return 'studentgroup'

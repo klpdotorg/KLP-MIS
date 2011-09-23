@@ -83,12 +83,16 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 	user = request.user  #get logged in user
 	url = "/studentgroup/%s/programme/%s/assessment/%s/view/" %(studentgroup_id, programme_id, assessment_id)
 	# Query Childs based on studentgroup relation
+	
 	students = Student_StudentGroupRelation.objects.select_related("student").filter(student_group__id = studentgroup_id, academic=current_academic, active=2).values_list('student__child', flat=True).distinct()
 	grupObj = StudentGroup.objects.filter(pk = studentgroup_id).only("group_type")
+	schoolIdentity =grupObj.getSchoolIdentity()
 	childs_list = Child.objects.filter(id__in=students).extra(select={'lower_firstname':'lower(trim("firstName"))' }).order_by('lower_firstname').defer("mt")
 	question_list = Question.objects.filter(assessment__id=assessment_id, active=2).defer("assessment")
 	studIdList, qNamesList, qIdList, chList, rDict, childDict, counter=[], [], [], [], {}, {}, 0
 	paginator = Paginator(childs_list, 20)
+	
+	
 	
 	page = request.GET.get('page')  #get page to show result
 	try:
@@ -217,7 +221,7 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 			
 				
 	
-	val=Collection(childs_list, permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'prgtemplates', template_object_name = 'childs', paginate_by=20, extra_context={'filter_id':programme_id, 'assessment_id':assessment_id, 'user':user, 'studentgroup_id':studentgroup_id, 'question_list':question_list,  'group_typ':grupObj[0].group_type, 'url':url, 'studIdList':studIdList, 'rDict':rDict, 'qNamesList':qNamesList, 'chList':chList, 'childDict':childDict, 'rDict':rDict, 'qIdList':qIdList}), entry_class = ChoiceEntry, )
+	val=Collection(childs_list, permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'prgtemplates', template_object_name = 'childs', paginate_by=20, extra_context={'filter_id':programme_id, 'assessment_id':assessment_id, 'user':user, 'studentgroup_id':studentgroup_id, 'question_list':question_list,  'group_typ':grupObj[0].group_type, 'url':url, 'studIdList':studIdList, 'rDict':rDict, 'qNamesList':qNamesList, 'chList':chList, 'childDict':childDict, 'rDict':rDict, 'qIdList':qIdList,'schoolIdentity':schoolIdentity}), entry_class = ChoiceEntry, )
 	return HttpResponse(val(request))
 	
 
