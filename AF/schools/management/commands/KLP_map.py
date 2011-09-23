@@ -23,6 +23,7 @@ class Command(BaseCommand):
 					assessment_list = Assessment.objects.filter(programme=prgObj, active=2).values_list("id", flat=True).distinct()
 					inst_list = []
 					for sg in sgList:
+					    if sg: 
 						sgObj = StudentGroup.objects.get(id=sg)           # get student group object
 						inst_list.append(sgObj.institution.id)
 						# mapping assesment and student group
@@ -67,6 +68,7 @@ class Command(BaseCommand):
 									try:
 										asmPermObj = UserAssessmentPermissions.objects.get(user=user, assessment = assessmentObj, instituion = instObj)
 										asmPermObj.access = 1
+										asmPermObj.save()
 									except UserAssessmentPermissions.DoesNotExist:
 										asmPermObj = UserAssessmentPermissions(user=user, assessment = assessmentObj, instituion = instObj, access = 1)
 										asmPermObj.save()

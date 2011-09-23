@@ -32,7 +32,8 @@ def KLP_StudentGroup_Create(request, referKey):
 	buttonType = request.POST.get('form-buttonType')
 	instObj = Institution.objects.get(id = referKey)
 	group_typ = request.GET.get("group_typ") or request.POST.get("group_typ")
-        KLP_Create_StudentGroup = KLP_StudentGroup(queryset = StudentGroup.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'studentgroup', extra_context={'buttonType':buttonType, 'ParentKey':referKey, 'group_typ':group_typ, 'sch_typ':instObj.boundary.boundary_category.boundary_category}), receiver = XMLReceiver(),)
+        #before StudentGroup.objects.all()
+        KLP_Create_StudentGroup = KLP_StudentGroup(queryset = StudentGroup.objects.filter(pk=0), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'studentgroup', extra_context={'buttonType':buttonType, 'ParentKey':referKey, 'group_typ':group_typ, 'sch_typ':instObj.boundary.boundary_category.boundary_category}), receiver = XMLReceiver(),)
         response = KLP_Create_StudentGroup.responder.create_form(request,form_class=StudentGroup_Form)
         return HttpResponse(response)
 	
@@ -70,7 +71,8 @@ def KLP_StudentGroup_Update(request, studentgroup_id):
 	group_typ = request.GET.get("group_typ") or request.POST.get("group_typ")
 	sgObj = StudentGroup.objects.get(pk=studentgroup_id)
 	sch_typ = request.GET.get("sch_typ") or sgObj.institution.boundary.boundary_category
-	KLP_Edit_StudentGroup =KLP_StudentGroup(queryset = StudentGroup.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'studentgroup', extra_context={'buttonType':buttonType,'ParentKey':ParentKey, 'group_typ':group_typ, 'sch_typ':sch_typ}), receiver = XMLReceiver(),)
+        #before StudentGroup.objects.all()
+	KLP_Edit_StudentGroup =KLP_StudentGroup(queryset = StudentGroup.objects.filter(pk=0), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'studentgroup', extra_context={'buttonType':buttonType,'ParentKey':ParentKey, 'group_typ':group_typ, 'sch_typ':sch_typ}), receiver = XMLReceiver(),)
 	response = KLP_Edit_StudentGroup.responder.update_form(request, pk=studentgroup_id, form_class=StudentGroup_Form)
 	return HttpResponse(response)	
 
@@ -82,8 +84,6 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 	url = "/studentgroup/%s/programme/%s/assessment/%s/view/" %(studentgroup_id, programme_id, assessment_id)
 	# Query Childs based on studentgroup relation
 	students = Student_StudentGroupRelation.objects.select_related("student").filter(student_group__id = studentgroup_id, academic=current_academic, active=2).values_list('student__child', flat=True).distinct()
-	asmObj = Assessment.objects.filter(pk=assessment_id).only("doubleEntry")[0]
-	doublEntryRequire = asmObj.doubleEntry
 	grupObj = StudentGroup.objects.filter(pk = studentgroup_id).only("group_type")
 	childs_list = Child.objects.filter(id__in=students).extra(select={'lower_firstname':'lower(trim("firstName"))' }).order_by('lower_firstname').defer("mt")
 	question_list = Question.objects.filter(assessment__id=assessment_id, active=2).defer("assessment")
@@ -212,10 +212,7 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 				ansDict=dict(dataDict)
 				ansDict['iBox'] = True
 				ansDict['ansVal'] = ''
-				if not doublEntryRequire:
-					ansDict['sE'] = True
 				qDict[stId] = ansDict
-				
 			
 			
 				

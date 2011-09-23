@@ -31,7 +31,7 @@ class KLP_Institution(Collection):
 def KLP_Institution_Create(request, referKey):
 	""" To Create New Institution boundary/(?P<referKey>\d+)/institution/creator/"""
 	# Checking user Permissions
-	KLP_user_Perm(request.user, "Institution", "Add")
+        KLP_user_Perm(request.user, "Institution", "Add")
         # Get Button Type
 	buttonType = request.POST.get('form-buttonType')
 	selCategoryTyp = request.POST.get('form-0-cat')
@@ -47,7 +47,8 @@ def KLP_Institution_Create(request, referKey):
 		categoryType = 2
 	# Query for Institution Category based on  categoryType
 	categoryList = Institution_Category.objects.filter(categoryType = categoryType)
-        KLP_Create_Institution = KLP_Institution(queryset = Institution.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'institution', extra_context={'buttonType':buttonType, 'referKey':referKey, 'institutionType':institutionType, 'categoryList':categoryList, 'selCategoryTyp':selCategoryTyp}), receiver = XMLReceiver(),)
+        #before Institution.objects.all()
+        KLP_Create_Institution = KLP_Institution(queryset = Institution.objects.filter(pk=0), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'institution', extra_context={'buttonType':buttonType, 'referKey':referKey, 'institutionType':institutionType, 'categoryList':categoryList, 'selCategoryTyp':selCategoryTyp}), receiver = XMLReceiver(),)
         response = KLP_Create_Institution.responder.create_form(request,form_class=Institution_Form)
         
         return HttpResponse(response)
@@ -56,7 +57,8 @@ def KLP_Institution_Create(request, referKey):
 def KLP_Institution_View(request, institution_id):
 	""" To View Selected Institution institution/(?P<institution_id>\d+)/view/?$"""
 	kwrg = {'is_entry':True}
-	resp=KLP_Institution(queryset = Institution.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'institution',),)(request, institution_id, **kwrg)
+        #before Institution.objects.all()
+	resp=KLP_Institution(queryset = Institution.objects.filter(pk=0), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'institution',),)(request, institution_id, **kwrg)
         return HttpResponse(resp) 	
 
 
@@ -76,7 +78,8 @@ def KLP_Institution_Update(request, institution_id):
 		institutionType = 'Anganwadi'
 		categoryType = 2
 	categoryList = Institution_Category.objects.filter(categoryType = categoryType)
-	KLP_Edit_Institution =KLP_Institution(queryset = Institution.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'institution', extra_context={'buttonType':buttonType, 'referKey':referKey, 'institutionType':institutionType, 'categoryList':categoryList, 'selCategoryTyp':selCategoryTyp}), receiver = XMLReceiver(),)
+        #before Institution.objects.all()
+	KLP_Edit_Institution =KLP_Institution(queryset = Institution.objects.filter(pk=0), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'institution', extra_context={'buttonType':buttonType, 'referKey':referKey, 'institutionType':institutionType, 'categoryList':categoryList, 'selCategoryTyp':selCategoryTyp}), receiver = XMLReceiver(),)
 	response = KLP_Edit_Institution.responder.update_form(request, pk=institution_id, form_class=Institution_Form)
 	
 	return HttpResponse(response)	
@@ -86,7 +89,7 @@ def KLP_Institution_Boundary(request, boundary_id, permissionType, assessment_id
 	""" To List Institutions Under Boundary to Assign Permissions to the User """
 	user = request.user # get logged in user
 	# Checking user Permissions
-	KLP_user_Perm(request.user, "Users", None)
+        KLP_user_Perm(request.user, "Users", None)
 	klp_UserGroups = user.groups.all() # Get all user groups
 	klp_GroupsList = ['%s' %(usergroup.name) for usergroup in klp_UserGroups]
 	if user.is_superuser or 'AdminGroup' in klp_GroupsList:

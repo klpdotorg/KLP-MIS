@@ -27,7 +27,8 @@ class KLP_Assessment(Collection):
 def KLP_Assessment_View(request, assessment_id):
 	""" To View Selected Assessment assessment/(?P<assessment_id>\d+)/view/"""
 	kwrg = {'is_entry':True}
-	resp=KLP_Assessment(queryset = Assessment.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'assessment',),)(request, assessment_id, **kwrg)
+        #before Assessment.objects.all()
+	resp=KLP_Assessment(queryset = Assessment.objects.filter(pk=0), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'assessment',),)(request, assessment_id, **kwrg)
         return HttpResponse(resp)       
         
         
@@ -42,7 +43,8 @@ def KLP_Assessment_Create(request, referKey):
 	endYear = int(now.strftime('%Y'))
 	if currentMont>4:
 		endYear = endYear + 1 
-        KLP_Create_Assessment = KLP_Assessment(queryset = Assessment.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'assessment', extra_context={'buttonType':buttonType, 'referKey':referKey, 'endDate':30, 'endYear':endYear, 'endMonth':'APRIL'}), receiver = XMLReceiver(),)
+        #before Assessment.objects.all()
+        KLP_Create_Assessment = KLP_Assessment(queryset = Assessment.objects.filter(pk=0), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'assessment', extra_context={'buttonType':buttonType, 'referKey':referKey, 'endDate':30, 'endYear':endYear, 'endMonth':'APRIL'}), receiver = XMLReceiver(),)
         response = KLP_Create_Assessment.responder.create_form(request,form_class=Assessment_Form)
         			
         return HttpResponse(response)  
@@ -50,8 +52,8 @@ def KLP_Assessment_Create(request, referKey):
         
 def KLP_Assessment_Update(request, assessment_id):
 	""" To update Selected Boundary assessment/(?P<assessment_id>\d+)/update/"""
-	# Checking user Permissions for Assessment add
-        KLP_user_Perm(request.user, "Assessment", "Update")
+	# Checking user Permissions for Assessment Update
+	KLP_user_Perm(request.user, "Assessment", "Update")
         # Get Current date for to pass for calendar
 	now = datetime.date.today()
 	buttonType = request.POST.get('form-buttonType')
@@ -60,7 +62,8 @@ def KLP_Assessment_Update(request, assessment_id):
 	endYear = int(now.strftime('%Y'))
 	if currentMont>4:
 		endYear = endYear + 1
-	KLP_Edit_Assessment =KLP_Assessment(queryset = Assessment.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'assessment', extra_context={'buttonType':buttonType, 'referKey':referKey, 'endDate':30, 'endYear':endYear, 'endMonth':'APRIL'}), receiver = XMLReceiver(),)
+        #before Assessment.objects.all()
+	KLP_Edit_Assessment =KLP_Assessment(queryset = Assessment.objects.filter(pk=0), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'assessment', extra_context={'buttonType':buttonType, 'referKey':referKey, 'endDate':30, 'endYear':endYear, 'endMonth':'APRIL'}), receiver = XMLReceiver(),)
 	response = KLP_Edit_Assessment.responder.update_form(request, pk=assessment_id, form_class=Assessment_Form)
 	
 	return HttpResponse(response)                

@@ -16,9 +16,9 @@ class BoundaryTypeView(Collection):
     def get_entry(self,boundary_type_id):        
         boundary_type = Boundary_Type.objects.all(id=boundary_type_id)          
         return ChoiceEntry(self, boundary_type)   
-
+#before Boundary_Type.objects.all()
 template_boundary_type_view =  BoundaryTypeView(
-    queryset = Boundary_Type.objects.all(),
+    queryset = Boundary_Type.objects.filter(pk=0),
     permitted_methods = ('GET', 'POST'),    
     responder = TemplateResponder(
         template_dir = 'viewtemplates',

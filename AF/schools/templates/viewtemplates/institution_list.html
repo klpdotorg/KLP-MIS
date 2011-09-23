@@ -12,7 +12,7 @@
 			  
 		{% endif %} Under {{boundary.name}}
 	</span>
-	<form name="klp_PermissionForm" id="id_klp_PermissionForm" onsubmit="return false;" class="niceform">
+	<form name="klp_PermissionForm" id="id_klp_PermissionForm" onsubmit="return false;" class="niceform">{% csrf_token %}
 		<input type="hidden" name="permissionType" value="{{permissionType}}" />
 		<input type="hidden" name="assessmentId" value="{{assessmentId}}" />
 		<input type="hidden" name="bound_cat" id="id_BoundCat" value="{{bound_cat}}" />

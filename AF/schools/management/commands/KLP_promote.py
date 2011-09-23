@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from schools.models import *
-import django, datetime, os, csv
-from django.db.models import Q 
+import datetime
 
 class Command(BaseCommand):
     #args = '<inst_id inst_id ...>'
@@ -22,19 +21,8 @@ class Command(BaseCommand):
 		nextAcademicObj = Academic_Year(name = nextAcademic)		   
 		nextAcademicObj.save()
 	''' Fiter For Active Primary School Institutions''' 
-	cwd = os.getcwd()
-	path = "%s/logFiles/" %(cwd)
-        if not os.path.exists(path):
-        	# if dir not exists creates directory with name logfiles in cwd.
-                os.makedirs(path)
-        # create csv file with the name passed.    
-        fileName = "promotion %s" %(datetime.date.today().strftime("%d-%m-%Y"))    
-	genFile = "%s/%s.csv" %(path, fileName)
-	logFile = csv.writer(open(genFile, 'wb'))
-	
-	logFile.writerow(["student_id", "studentgroup", "Instituion", "Boundaries"])
-	
-    	institutions = Institution.objects.filter(boundary__boundary_type__id=2, active=2)
+    	institutions = Institution.objects.filter(cat__categoryType=1, active=2)   
+    	
     	for inst in institutions:
     		''' Filter For Active StudentGroups Of type Class '''
     		studentGroups = StudentGroup.objects.filter(institution=inst, active=2, group_type="Class").order_by("name").reverse()
@@ -44,25 +32,63 @@ class Command(BaseCommand):
     			sg_stRealtions = Student_StudentGroupRelation.objects.filter(student_group=sg, academic=currentAcademicObj, active=2)
     			for sg_st in sg_stRealtions:
     				studentObj = sg_st.student
-    				groupName = sg.name
+    				sg_st.active = 3
+    				sg_st.save()
+				groupName = sg.name
 				nxtGroup = int(groupName) + 1
 				groupSec = sg.section
-				try:
-					'''Checks For Next Class With Section of type class. If it There map with student for next academic else pass'''
-					nextSg = StudentGroup.objects.get(institution = inst, name=nxtGroup, section=groupSec, active=2, group_type="Class")
-					nxt_Sg_relation = Student_StudentGroupRelation(Q(active=2) | Q(active=4), student_group=nextSg, student=studentObj, academic=nextAcademicObj)
-					nxt_Sg_relation.save()
-					sg_st.active = 3 # student promoted 
-					sg_st.save()								
-				except StudentGroup.DoesNotExist:
-					studentObj.active = 4 # student promotion fail
-					bName = "%s,%s,%s" %(sg.institution.boundary, sg.institution.boundary.parent, sg.institution.boundary.parent.parent)
-					logFile.writerow([studentObj.id, sg.name, sg.institution.name, bName])
-														
+							
+				if groupSec == 'A':
+					''' If Section Is 'A' do Following'''
+					try:
+						'''Checks For Next Class With Section of type class. If it There map with student for next academic else pass'''
+						nextSg = StudentGroup.objects.get(institution = inst, name=nxtGroup, section=groupSec, active=2, group_type="Class")
+						nxt_Sg_relation = Student_StudentGroupRelation(student_group=nextSg, student=studentObj, academic=nextAcademicObj , active=2)
+						nxt_Sg_relation.save()
+								
+							
+					except StudentGroup.DoesNotExist:
+						pass
+				else:
+					''' If Section Is Not 'A' do Following'''
+					try:
+						'''Checks For Next Class With Section of type class. If it There map with student for next academic '''
+						nextSg = StudentGroup.objects.get(institution = inst, name=nxtGroup, section=groupSec, active=2, group_type="Class")
+						nxt_Sg_relation = Student_StudentGroupRelation(student_group=nextSg, student=studentObj, academic=nextAcademicObj , active=2)
+						nxt_Sg_relation.save()
+					except StudentGroup.DoesNotExist:
+						''' Else Checks Same Class With Section A. If it finds Checks for deactivated Class With particular Section.'''
+						nextSg_A = StudentGroup.objects.get(institution = inst, name=nxtGroup, section='A', active=2, group_type="Class")
+						if nextSg_A:
+							try:
+								''' If Deactivated Class found, activate the class and map the student'''
+								deActiveObj = StudentGroup.objects.get(institution = inst, name=nxtGroup, section=groupSec, active=0, group_type="Class")
+								deActiveObj.active = 2
+								nxt_Sg_relation = Student_StudentGroupRelation(student_group=deActiveObj, student=studentObj, academic=nextAcademicObj , active=2)
+								nxt_Sg_relation.save()
+							except StudentGroup.DoesNotExist:
+								''' If Deactivated Class not found, create new class and map the student'''
+								newSgObj = StudentGroup(institution = inst, name=nxtGroup, section=groupSec, active=2, group_type="Class")
+								newSgObj.save()
+								nxt_Sg_relation = Student_StudentGroupRelation(student_group=newSgObj, student=studentObj, academic=nextAcademicObj , active=2)
+								nxt_Sg_relation.save()
+						else:
+							pass
+				currentSgList = StudentGroup.objects.filter(institution = inst, name=groupName, active=2, group_type="Class")
+				nxtSgList = StudentGroup.objects.filter(institution = inst, name=nxtGroup, active=2, group_type="Class")
+				''' If next Class has more Sections than current Class, then deactivate particular sections'''
+				if len(currentSgList) < len(nxtSgList):
+					for nxtSg in nxtSgList:
+						try:									
+							currentSg = StudentGroup.objects.get(institution = inst, name=groupName, section=nxtSg.section, active=2, group_type="Class")
+						except StudentGroup.DoesNotExist:
+							nxtSg.active = 0
+							nxtSg.save()
+										
 									
     							
     				
-    	self.stdout.write('Students Are Promoted and Failed Students data stored in logged File...\n')
+    	self.stdout.write('Students Are Promoted ...\n')
 
 
 

@@ -20,7 +20,8 @@ def KLP_Institution_Category_Create(request):
 	""" To Create new institution category institution-category/creator/"""
 	buttonType = request.POST.get('form-buttonType')
 	categoryType = request.GET.get('categoryType')
-	KLP_Institution_Category_Create = KLP_Institution_Category(queryset = Institution_Category.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'InstitutionCategory',extra_context={'buttonType':buttonType, 'categoryType':categoryType}), receiver = XMLReceiver(),)
+        #before Institution_Category.objects.all()
+	KLP_Institution_Category_Create = KLP_Institution_Category(queryset = Institution_Category.objects.filter(pk=0), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'InstitutionCategory',extra_context={'buttonType':buttonType, 'categoryType':categoryType}), receiver = XMLReceiver(),)
 	response = KLP_Institution_Category_Create.responder.create_form(request,form_class=Institution_Category_Form)
 	
 	return HttpResponse(response)

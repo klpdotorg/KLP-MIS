@@ -278,7 +278,7 @@ var KLP_validateScript=function(formId){
        				
        			});
        			if (DeFlag == true && count == txtFields.length){ 
-       			    errLength = $('label.error:visible').length
+       			    errLength = $(form).children().find('label.error:visible').length
        			    if (errLength == 0){
 			   		KLP_post_script(form,formName)
 			    }

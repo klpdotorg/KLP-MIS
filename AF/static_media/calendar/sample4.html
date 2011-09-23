@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+	<title>Tigra Calendar Sample #4 - Creating Dynamically</title>
+
+	<!-- link calendar files  -->
+	<script language="JavaScript" src="calendar_us.js"></script>
+	<link rel="stylesheet" href="calendar.css">
+
+	</head>
+<body>
+
+<form name="testform">
+	<div id="container">
+	</div>
+	<input type="Button" onclick="f_createContent()" value="Create" />
+	<input type="Button" onclick="f_removeContent()" value="Delete" />
+	
+
+	<script language="JavaScript">
+		var N_CALNUM = 1;
+		function f_createContent() {
+			var e_div = f_getElement('container');
+			e_div.innerHTML += N_CALNUM
+				+ '. <input type="text" name="testinput' + N_CALNUM + '" value="" />'
+				+ '<img title="Open Calendar" class="tcalIcon" onclick="A_TCALS[\'myCalID' + N_CALNUM + '\'].f_toggle()" id="tcalico_myCalID' + N_CALNUM + '" src="img/cal.gif"/><br />';
+
+			new tcal ({
+				// form name
+				'formname': 'testform',
+				// input name
+				'controlname': 'testinput' + N_CALNUM,
+				// set unique ID to identify the elements
+				'id': 'myCalID' + N_CALNUM
+			});
+			
+			N_CALNUM++;
+		}
+		function f_removeContent() {
+			var e_div = f_getElement('container');
+			e_div.innerHTML = '';
+			window.A_TCALS = null;
+			window.A_TCALSIDX = null;
+			N_CALNUM = 1;
+		}
+	</script>
+
+	</form>
+
+</body>
+</html>

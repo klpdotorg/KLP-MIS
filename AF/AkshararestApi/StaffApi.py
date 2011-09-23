@@ -29,7 +29,8 @@ class KLP_Staff(Collection):
 def KLP_Staff_View(request, staff_id):
 	""" To View Selected staff staff/(?P<staff_id>\d+)/view/$"""
 	kwrg = {'is_entry':True}
-	resp=KLP_Boundary(queryset = Staff.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'staff',))(request, staff_id, **kwrg)
+        #before Staff.objects.all()
+	resp=KLP_Boundary(queryset = Staff.objects.filter(pk=0), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'staff',))(request, staff_id, **kwrg)
         return HttpResponse(resp)          
         
 def KLP_Staff_Create(request, referKey):
@@ -51,7 +52,8 @@ def KLP_Staff_Create(request, referKey):
 		extra_dict['institutionType'] = 'Institution'
 		Staff_Types = Staff_Type.objects.filter(categoryType=1)
 	extra_dict['Staff_Types'] = Staff_Types	
-        KLP_Create_Staff =KLP_Staff(queryset = Staff.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'staff', extra_context=extra_dict), receiver = XMLReceiver(),)
+        #before Staff.objects.all()
+        KLP_Create_Staff =KLP_Staff(queryset = Staff.objects.filter(pk=0), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'staff', extra_context=extra_dict), receiver = XMLReceiver(),)
         
 	response = KLP_Create_Staff.responder.create_form(request,form_class=Staff_Form)
 	return HttpResponse(response)  
@@ -91,7 +93,8 @@ def KLP_Staff_Update(request, staff_id):
 		# if the boundary category is not circle get Institution staff types.
 		institutionType = 'Institution'
 		Staff_Types = Staff_Type.objects.filter(categoryType=1)
-	KLP_Edit_Staff =KLP_Staff(queryset = Staff.objects.all(), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'staff', extra_context={'buttonType':buttonType, 'referKey':referKey, 'stgrps':stgrps, 'institutionType':institutionType, 'Staff_Types':Staff_Types}), receiver = XMLReceiver(),)
+        #before Staff.objects.all()
+	KLP_Edit_Staff =KLP_Staff(queryset = Staff.objects.filter(pk=0), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'staff', extra_context={'buttonType':buttonType, 'referKey':referKey, 'stgrps':stgrps, 'institutionType':institutionType, 'Staff_Types':Staff_Types}), receiver = XMLReceiver(),)
 	response = KLP_Edit_Staff.responder.update_form(request, pk=staff_id, form_class=Staff_Form)
 	return HttpResponse(response)		
 			      

@@ -13,6 +13,8 @@ ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
     ('Sree', 'sree@mahiti.org'),
     ('RamaKrishna', 'ramakrishna.marouthu@mahiti.org'),
+    ('Shivangi','shivangi@klp.org.in'),
+    ('Megha','megha@klp.org.in'),
 )
 
 MANAGERS = ADMINS
@@ -25,9 +27,9 @@ SESSION_SAVE_EVERY_REQUEST = True
 DATABASES = {
     'default': {
         'ENGINE': 'postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'klpnew',                      # Or path to database file if using sqlite3.
-        'USER': 'aksharadb',                      # Not used with sqlite3.
-        'PASSWORD': 'RObu15tFTG',                  # Not used with sqlite3.
+        'NAME': 'klp',                      # Or path to database file if using sqlite3.
+        'USER': 'klpdb',                      # Not used with sqlite3.
+        'PASSWORD': 'cHOrpRm9Ws',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
@@ -92,7 +94,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'fullhistory.fullhistory.FullHistoryMiddleware',
     'schools.middleware.QueryLogMiddleware', 
 )
