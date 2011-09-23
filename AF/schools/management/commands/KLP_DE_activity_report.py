@@ -187,8 +187,10 @@ class Command(BaseCommand):
                                 primary_teacher_deleted =  validFullHistoryRecords.filter(request__user_pk=user.id, content_type__id=contentTypeIds['staff'], object_id__in=primarySchoolTeachers, action='U', _data__contains="'active': [2,").count()     
                 
                 
-                        answersUpdatedByUser = validFullHistoryRecords.filter(request__user_pk=user.id, content_type__id=contentTypeIds['answer']).only('object_id').values_list('object_id',flat=True)
-                        
+                        answersUpdatedByUserStr = validFullHistoryRecords.filter(request__user_pk=user.id, content_type__id=contentTypeIds['answer']).only('object_id').values_list('object_id',flat=True)
+                        answersUpdatedByUser = []
+                        for item in answersUpdatedByUserStr:
+                            answersUpdatedByUser.append(int(item))
                         
                         ################################ Objects of type Answer
                         #  C+ request__user_pk=user.id  =>Content created by user
@@ -199,7 +201,10 @@ class Command(BaseCommand):
                         
                         if answersUpdatedByUser:
                             for assessmentId in assessmentsInvolvedInReport:
-                                answersUpdatedForGivenAssessment = Answer.objects.filter(question__in=Question.objects.filter(assessment__id=assessmentId), id__in=answersUpdatedByUser).only('id').values_list('id',flat=True)
+                                answersUpdatedForGivenAssessmentInt = Answer.objects.filter(question__in=Question.objects.filter(assessment__id=assessmentId), id__in=answersUpdatedByUser).only('id').values_list('id',flat=True)
+                                answersUpdatedForGivenAssessment =[]
+                                for item in answersUpdatedForGivenAssessmentInt:
+                                    answersUpdatedForGivenAssessment.append(str(item))
                                 answer_entered = validFullHistoryRecords.filter(request__user_pk=user.id, content_type__id=contentTypeIds['answer'], object_id__in=answersUpdatedForGivenAssessment, action='C').count() #Hom many answers i created...
                                 assessmentsModified[str(assessmentId)+'_entered']=   answer_entered
                                 
