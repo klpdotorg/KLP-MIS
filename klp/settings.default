@@ -11,26 +11,22 @@ IGNORABLE_404_ENDS = ('.css','.html', 'favicon.ico',)
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
-    ('Sree', 'sree@mahiti.org'),
-    ('RamaKrishna', 'ramakrishna.marouthu@mahiti.org'),
-    ('Shivangi','shivangi@klp.org.in'),
-    ('Megha','megha@klp.org.in'),
 )
 
 MANAGERS = ADMINS
 
 TESTING = 0
 REPORTMAIL_SENDER="KLP TEAM <dev@klp.org.in>"
-REPORTMAIL_RECEIVER=["dev@klp.org.in","pushparanij@mahiti.org","megha@klp.org.in"]
+REPORTMAIL_RECEIVER=[]
 SESSION_COOKIE_AGE = 3600
 SESSION_SAVE_EVERY_REQUEST = True
 
 DATABASES = {
     'default': {
         'ENGINE': 'postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'klptest',                      # Or path to database file if using sqlite3.
-        'USER': 'klpdb',                      # Not used with sqlite3.
-        'PASSWORD': 'cHOrpRm9Ws',                  # Not used with sqlite3.
+        'NAME': 'database-name',                      # Or path to database file if using sqlite3.
+        'USER': 'database-username',                      # Not used with sqlite3.
+        'PASSWORD': 'database-password',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
         
