@@ -57,10 +57,14 @@
         			{% endfor %}
         		</table>
         	</div>
+        {% else %}
+                    <span   class="tot-border3" style="color:red;font-size:15px"> No records are found </span>   
         {% endif %}
+
     	<script>
-    		$("#id_startDate").datepick({dateFormat: 'dd-mm-yyyy'});
+$("#id_startDate").datepick({dateFormat: 'dd-mm-yyyy'});
 	        $("#id_endDate" ).datepick({dateFormat: 'dd-mm-yyyy'});
+			
 	                    				</script>    	
     </form>
   </div>

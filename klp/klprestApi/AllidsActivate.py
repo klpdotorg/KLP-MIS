@@ -7,19 +7,19 @@ Institution Api is used
 4) To list boundaries/institutions while assign permissions
 """
 from django.conf.urls.defaults import *
-from django.http import HttpResponse
+from django.http import HttpResponse,HttpResponseRedirect
 from django.shortcuts import render_to_response
 
 from schools.models import *
 from schools.forms import *
 
-
+from django.contrib.auth.models import User
 
 from django.utils import simplejson
 from django.template import loader, RequestContext
 
 from django.core.mail import send_mail
-from klp.settings import *
+from production.settings import *
 from django.views.decorators.csrf import csrf_exempt
 #from django.conf import settings
 
@@ -27,10 +27,15 @@ def KLP_act_form(request):
 	''' To show the admin form for activate the records '''
 	# get logged in user
 	user = request.user
-	respDict = {'title':'Karnataka Learning Partnership ', 'user':user}
-	# render admin console template
-	respTemplate = render_to_response("viewtemplates/AllidsActivate_html.html", respDict)
-	return HttpResponse(respTemplate)
+        if user.is_anonymous():
+            return HttpResponseRedirect('/login/') 
+             
+        else:
+                
+                respDict = {'title':'Karnataka Learning Partnership ', 'user':user}
+                respTemplate = render_to_response("viewtemplates/AllidsActivate_html.html", respDict)
+         	# render admin console template
+        	return HttpResponse(respTemplate)
 @csrf_exempt
 def KLP_Activation(request):
 	""" To actiave the records>"""
@@ -38,8 +43,10 @@ def KLP_Activation(request):
         #KLP_user_Perm(request.user, "Institution", "Add")
         # Get Button Type
 	isExecute=True
-	selCategoryTyp = request.POST.get('form-klp-modelname')[0]
-	selCategoryids = request.POST.get('form-klp-allids')
+           
+	selCategoryTyp = request.POST.get('form-production-modelname')
+	selCategoryids = request.POST.get('form-production-allids')
+        print selCategoryTyp,selCategoryids  
 	if  selCategoryids=="":
 	   isExecute=False
 	   resStr="Please give atleast on id"
@@ -54,10 +61,12 @@ def KLP_Activation(request):
            allids=[]
            for k in allids1:
                          allids.append(int(k))    
-           modelDict = {1:Boundary, 2:Institution, 4:Programme, 5:Assessment, 6:Question, 3:StudentGroup,  7:Staff, 3:StudentGroup, }
+           modelDict = {1:Boundary, 2:Institution, 4:Programme, 5:Assessment, 6:Question, 3:StudentGroup,  7:Staff, 8:Student }
            obj=obj1=modelDict[model_name1].objects.filter(id__in=allids,active=2)
+      
            flag=len(obj1)!=0  
            obj3=modelDict[model_name1].objects.filter(id__in=allids)
+           print obj3
            if len(obj3)==0 or len(obj3)!=len(allids):
                   idslist3=obj3.values_list('id')                  
                   idlist4=[]

@@ -93,7 +93,7 @@
 		   
 		$("#filtProg").change(function(){
 			/* On programme value change get all related assessments under programme*/
-			$.ajax({                    
+	         {% if assessmentpermission%}		$.ajax({                    
 		        	url: '/filter/programme/'+$('#filtProg option:selected').val()+'/assessments/',
 		        	success: function(data) {
 					if (data != 'fail'){
@@ -108,10 +108,27 @@
 					KLP_ChangeFilter();
 		            	}
 		    	});
+                         {%endif%}
+                      {% if not assessmentpermission%}
+                         asmVal='None'; //$("#filtAsmnt").val();
+                        if (asmVal){
+                                treeUrl = '/tree/?home={{home}}&filter='+$("#filtProg").val()+'&secFilter='+asmVal+'&boundTyp='+$("#boundary_type").val()+'&permission='+$("#id_perm_assign").val()+'&assesspermission='+$("#id_assess_perm_assign").val();
+                                $("#treeStruc").html('<ul id="treeBlk" class="filetree treeview-famfamfam"></ul>');
+                                KLP_TreeBLK(treeUrl);
+                        }
+                        else{
+                                KLP_ChangeFilter();
+                        }
+
+                                  
+
+
+                     {%endif%}
 		});
+                              //$("#filtAsmnt")
          		$("#filtAsmnt").change(function(){
 			/* On Assessment value change Call Tree Menu*/
-			var asmVal = $("#filtAsmnt").val();
+			asmVal=$("#filtAsmnt").val();
 			if (asmVal){
 				treeUrl = '/tree/?home={{home}}&filter='+$("#filtProg").val()+'&secFilter='+asmVal+'&boundTyp='+$("#boundary_type").val()+'&permission='+$("#id_perm_assign").val()+'&assesspermission='+$("#id_assess_perm_assign").val();
 				$("#treeStruc").html('<ul id="treeBlk" class="filetree treeview-famfamfam"></ul>');
@@ -125,7 +142,6 @@
 		    
 		    
 	});
-
 </script>
 
 <div id="container">
@@ -177,9 +193,9 @@
 	                    		{% endfor %}
 	                	</select>
 	                	<!-- Drop Down shows Assessments -->
-	                	<select id="filtAsmnt" name="filtAsmnt">
+	                {% if assessmentpermission%}	<select id="filtAsmnt" name="filtAsmnt"> 
 	                    		<option value="None">--</option>
-	                	</select>
+	                	</select>{%endif%}
 	        	</span>
 	        </div> 
            

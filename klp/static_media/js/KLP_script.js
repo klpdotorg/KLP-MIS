@@ -88,10 +88,16 @@ var KLP_Del = function(referKey,type, msgText){
                 $.ajax({                    
                 	url: '/delete/'+type+'/'+referKey+'/',
                 	success: function(data) {
+                          if(data=='Deleted'){
 				nodeId.remove();
 				$("#dyncData").html("");
 				$("#klp_MsgTxt").html(" Sucessfully deleted "+msgType+'  '+msgText);
 				$("#successMsgHead").show();
+                                 }
+                           else{
+                                   $('#klp_fail_MsgTxt').html(data);
+                                  $('#failureMsgHead').show();
+                         }
                     }
                 });
         }

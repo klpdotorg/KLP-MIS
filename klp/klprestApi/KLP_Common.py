@@ -36,14 +36,22 @@ class KLP_Delete(Resource):
         KLP_user_Perm(request.user, modelDict[model_name1.lower()]._meta.module_name, "Delete")
         # Get Object based on id and model to delete
         obj = modelDict[model_name1.lower()].objects.get(pk=referKey)
-	if model_name1.lower() == 'student':
+        if model_name1.lower()=='boundary':
+           flag=obj.getChild(obj.boundary_type)
+        else:
+                 flag=obj.getChild()  
+	"""if model_name1.lower() == 'student':
 		Student_StudentGroupRelation.objects.filter(student__id = referKey).update(active=0)
         if model_name1.lower() in [ 'class','center']:
                          Staff_StudentGroupRelation.objects.filter(student_group__id = referKey).update(active=0)
-
-        obj.active=0 # Change active to 0(object is deleted)
-        obj.save() # Save Data
-        return HttpResponse('Deleted')
+        """
+        if flag:
+                    message=model_name1.lower() +" has child objects.So can not delete it.First delete the child object,then try to delete it"
+        else:     
+          obj.active=0 # Change active to 0(object is deleted)
+          obj.save() # Save Data
+          message="Deleted"
+        return HttpResponse(message)
         
 
 urlpatterns = patterns('',

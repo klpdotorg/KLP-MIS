@@ -9,7 +9,7 @@ from django_restapi.responder import *
 from django_restapi.receiver import *
 from klprestApi.BoundaryApi import ChoiceEntry
 from django.contrib.contenttypes.models import ContentType
-from klp.schools.models import current_academic
+from production.schools.models import current_academic
 
 class KLP_Child(Collection):    
     """To Create New Child boundary/(?P<bounday>\d+)/Child/creator/"""

@@ -1,11 +1,12 @@
 from django.core.management.base import BaseCommand, CommandError
 from schools.models import *
 import django, datetime, os, csv
-from klprestApi.TreeMenu import KLP_assignedInstitutions
+from AkshararestApi.TreeMenu import KLP_assignedInstitutions
 import datetime
 from django.db import transaction
 class Command(BaseCommand):
 	''' Command To map assessments with student group and to assign permissions to users automatically. And then it list out the user permissions.''' 
+        @transaction.autocommit 
 	def handle(self, *args, **options):
 		try:
 			# Reads the arguments from command line.
@@ -29,21 +30,18 @@ class Command(BaseCommand):
 					prgObj = assessmentObj.programme
 					assessment_list = Assessment.objects.filter(programme=prgObj, active=2).values_list("id", flat=True).distinct()
 					inst_list = []
-                                        print assessment_list   
 					for sg in sgList:
 					    if sg: 
-                                                #print sg
-                                                transaction.commit()     
-						sgObj = StudentGroup.objects.filter(id=int(sg))[0]           # get student group object
+						sgObj = StudentGroup.objects.get(id=sg)           # get student group object
 						inst_list.append(sgObj.institution.id)
 						# mapping assesment and student group
 						mapObj = Assessment_StudentGroup_Association(assessment = assessmentObj, student_group=sgObj, active=2)
 						
-					        try:	
+						try:
 							mapObj.save()
-							self.stdout.write('%s - Assessment and StudentGroup - %s%s (%s)  are Mapped ...\n'%(assessmentObj.name, sgObj.name, sgObj.section,sgObj.institution.id))
+							self.stdout.write('%s - Assessment and StudentGroup - %s%s are Mapped ...\n'%(assessmentObj.name, sgObj.name, sgObj.section))
 						except: #except django.db.utils.IntegrityError:
-							self.stdout.write('%s - Assessment and StudentGroup - %s%s (%s) Already Mapped ...\n'%(assessmentObj.name, sgObj.name, sgObj.section,sgObj.institution.id))
+							self.stdout.write('%s - Assessment and StudentGroup - %s%s Already Mapped ...\n'%(assessmentObj.name, sgObj.name, sgObj.section))
                                         
 					# get users to assign permissions		
 					users_List =  User.objects.filter(groups__name__in=['Data Entry Executive', 'Data Entry Operator'], is_active=1)
@@ -59,19 +57,18 @@ class Command(BaseCommand):
 					  asmPermFile = 	csv.writer(open(asmPermCsv, 'wb'))
 					  instPermFile.writerow(['User', 'Institutions', 'Boundaries'])
 					  asmPermFile.writerow(['User', 'Institutions', 'Boundaries', 'Assessment', 'Programme'])
-                                        transaction.commit()
                                         self.stdout.write('Total No of User %s \n' %(  len(users_List)))
                                         userNo=1
+                                        self.stdout.write('Total No Of Institution for Assessment %s \n ' %(len(inst_list)))                                        
 					for user in users_List:
                                                 # get institutions assigned to user to generate report and to verify user permission.
                                                 self.stdout.write("\n%s .Now performing %s ," % ( str(userNo),user.username))
+                                                print user.username
                                                 perm_instList = KLP_assignedInstitutions(user.id)
-                                                sellist=[]
-                                                for k in inst_list:
-                                                                 if k in perm_instList:
-                                                                         sellist.append(k)
-                                                InsObjs=Institution.objects.filter(id__in=sellist)
-                                                self.stdout.write(" Total Institution %s :%s" %( len(InsObjs),','.join(str(v.id) for v in InsObjs)))    
+                                                perm_instSet=list(set(inst_list).intersection(set(perm_instList)))
+                                                InsObjs=Institution.objects.filter(id__in=perm_instSet)
+                                                TotalInst=InsObjs.values_list("id", flat=True).distinct()
+                                                self.stdout.write(" Total Institution %s is assigned to %s" %( len(TotalInst),user.username))    
 						asmPerm = []
                                                  
                                                 userNo+=1
@@ -108,17 +105,11 @@ class Command(BaseCommand):
                                                                 instPermFile.writerow(instPermData)
                                          
 						    if lenTrue==lenAsm or lenTrue== lenAsm-1: 							
+
                                                                         asmPermObj = UserAssessmentPermissions.objects.get_or_create(user=user, assessment = assessmentObj, instituion = instObj)                                                              
                                                                        
                                                                         asmPermObj[0].access=1
-                                                                        try:
-                                                                      
-                                                                               asmPermObj[0].save()  
-                                                                        except IntegrityError:
-                      																										                                        transaction.rollback()
-                                                                        else:
-                                                                                                                    transaction.commit()
-
+                                                                        asmPermObj[0].save()  
                                                 if reportflag:
 							# To generate Assessment permission report.
 							asmPermObjs = UserAssessmentPermissions.objects.filter(user=user, access = 1)

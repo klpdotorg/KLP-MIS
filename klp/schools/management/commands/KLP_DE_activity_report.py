@@ -34,7 +34,6 @@ class Command(BaseCommand):
                     eDate = datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0]))
                     sTime = datetime.datetime(int(strDate[2]), int(strDate[1]), int(strDate[0]), 00, 00, 00)
                     eTime = datetime.datetime(int(enDate[2]), int(enDate[1]), int(enDate[0]), 23, 59, 00)
-                    
                     # get current working directory.
                     cwd = os.getcwd()
                     path = "%s/logFiles/" %(cwd)
@@ -71,6 +70,7 @@ class Command(BaseCommand):
                     historyFile.writerow(headerList)
                     
                     for slNo,user in enumerate(users):
+                        print "====[%s]:%s"%(datetime.datetime.now().isoformat(),user.username)
                         pre_boundary_created = 0
                         pre_boundary_modified = 0
                         pre_boundary_deleted = 0
@@ -149,16 +149,16 @@ class Command(BaseCommand):
                         studentsUpdatedByUserStrList = validFullHistoryRecords.filter(request__user_pk=user.id, content_type__id=contentTypeIds['student']).only('object_id').values_list('object_id',flat=True)
                         
                         studentsUpdatedByUser =[int(item) for item in studentsUpdatedByUserStrList]
-                            
+                        #pdb.set_trace()
                         if studentsUpdatedByUser:
-                            preSchoolStudents = [str(student) for student in Student_StudentGroupRelation.objects.filter(student__id__in=studentsUpdatedByUser, student_group__group_type__iexact='Centre').only('student_id').values_list('student_id',flat=True)]
+                            preSchoolStudents = [str(student) for student in Student_StudentGroupRelation.objects.filter(student__id__in=studentsUpdatedByUser, student_group__institution__boundary__boundary_type__id=2).only('student_id').values_list('student_id',flat=True)]
                             if preSchoolStudents:
                                 preSchoolStudents = ['%s' %i for i in preSchoolStudents]
                                 pre_stud_created = validFullHistoryRecords.filter(request__user_pk=user.id, content_type__id=contentTypeIds['student'], object_id__in=preSchoolStudents, action='C').count()
                                 pre_stud_modified = validFullHistoryRecords.filter(request__user_pk=user.id, content_type__id=contentTypeIds['student'], object_id__in=preSchoolStudents, action='U').exclude(_data__contains='"active": [2,').count()
                                 pre_stud_deleted = validFullHistoryRecords.filter(request__user_pk=user.id, content_type__id=contentTypeIds['student'],  object_id__in=preSchoolStudents, action='U',_data__contains='"active": [2,').count()
                             
-                            primarySchoolStudents = [str(student) for student in Student_StudentGroupRelation.objects.filter(student__id__in=studentsUpdatedByUser, student_group__group_type__iexact='Class').only('student_id').values_list('student_id',flat=True)]
+                            primarySchoolStudents = [str(student) for student in Student_StudentGroupRelation.objects.filter(student__id__in=studentsUpdatedByUser, student_group__institution__boundary__boundary_type__id=1).only('student_id').values_list('student_id',flat=True)]
                             if primarySchoolStudents:
                                 primarySchoolStudents = ['%s' %i for i in primarySchoolStudents]
                                 primary_stud_created = validFullHistoryRecords.filter(request__user_pk=user.id, content_type__id=contentTypeIds['student'],  object_id__in=primarySchoolStudents, action='C').count()
@@ -176,7 +176,7 @@ class Command(BaseCommand):
                                 pre_teacher_modified = validFullHistoryRecords.filter(request__user_pk=user.id, content_type__id=contentTypeIds['staff'], object_id__in=preSchoolTeachers, action='U').exclude(_data__contains="'active': [2,").count()
                                 pre_teacher_deleted = validFullHistoryRecords.filter(request__user_pk=user.id, content_type__id=contentTypeIds['staff'],  object_id__in=preSchoolTeachers, action='U',_data__contains="'active': [2,").count()
                             
-                            primarySchoolTeachers = [str(teacher) for teacher in Staff.objects.filter(id__in=studentsUpdatedByUser, institution__boundary__boundary_type__id=2)]
+                            primarySchoolTeachers = [str(teacher) for teacher in Staff.objects.filter(id__in=studentsUpdatedByUser, institution__boundary__boundary_type__id=1)]
                             if primarySchoolTeachers:
                                 primary_teacher_created = validFullHistoryRecords.filter(request__user_pk=user.id, content_type__id=contentTypeIds['staff'],  object_id__in=primarySchoolTeachers, action='C').count()
                                 primary_teacher_modified =  validFullHistoryRecords.filter(request__user_pk=user.id, content_type__id=contentTypeIds['staff'], object_id__in=primarySchoolTeachers, action='U').exclude(_data__contains="'active': [2,").count()
@@ -195,6 +195,8 @@ class Command(BaseCommand):
                         
                         if answersUpdatedByUser:
                             for assessmentId in assessmentsInvolvedInReport:
+                                assObj = Assessment.objects.get(id=assessmentId)
+                                print "=========[%s]:prog:[%s]:assessment:[%s]:%s"%(datetime.datetime.now().isoformat(),assObj.programme.name,assObj.id,assObj.name)
                                 answersUpdatedForGivenAssessmentInt = Answer.objects.filter(question__in=Question.objects.filter(assessment__id=assessmentId), id__in=answersUpdatedByUser).distinct().only('id').values_list('id',flat=True)
                                 answersUpdatedForGivenAssessment =[ str(item) for item in answersUpdatedForGivenAssessmentInt ]
                                 answer_entered = validFullHistoryRecords.filter(request__user_pk=user.id, content_type__id=contentTypeIds['answer'], object_id__in=answersUpdatedForGivenAssessment, action='C').count() #Hom many answers i created...
@@ -205,7 +207,8 @@ class Command(BaseCommand):
                                 
                                 
                                 answer_verified = validFullHistoryRecords.filter(request__user_pk=user.id, content_type__id=contentTypeIds['answer'], object_id__in=answersUpdatedForGivenAssessment, action='U' ).exclude(object_id__in=answerEnteredIds, _data__icontains='answer').count()#how many others records I verified by double entry
-                                answer_verified = validFullHistoryRecords.filter(request__user_pk=user.id, content_type__id=contentTypeIds['answer'], object_id__in=answersUpdatedForGivenAssessment, action='U' ).exclude(object_id__in=answerEnteredIds, _data__icontains='answer').count()#how many others records I verified by double entry
+                                if assObj.doubleEntry:
+                                    answer_verified = validFullHistoryRecords.filter(request__user_pk=user.id, content_type__id=contentTypeIds['answer'], object_id__in=answersUpdatedForGivenAssessment, action='U' ).exclude(object_id__in=answerEnteredIds, _data__icontains='answer').count()#how many others records I verified by double entry
                                 assessmentsModified[str(assessmentId)+'_verified']=   answer_verified
                                 
                                 

@@ -298,7 +298,7 @@ class TemplateResponder(object):
 			# Check for realtion names if names are not there validation fail
 			if not (request.POST.get('form-0-fatherfirstname','') or request.POST.get('form-0-motherfirstname','')):
 				RelationValid=False
-				#IValid=False
+				IValid=False
 	  	print ChildTrue		
 		if form_class == Institution_Form:
 			# If Institution Check for address information save data
@@ -307,34 +307,10 @@ class TemplateResponder(object):
 				addressObj.save()
                                 new_data['form-0-inst_address'] = addressObj.id
 				IValid = True		
-                        else:
-                                        IValid=False
                 form = ResourceForm(new_data) # post data to form
                 Valid=form.is_valid()  # Validate form
-                qvalid=True
-                """        
-                if modelname==='question':
-                                        qtype=request.POST.get('form-0-questionType')
-                                        if qtype==2:
-                                                      grade=request.POST.get('form-0-grade')
-                                                      gradespl= grade.split(',')               
-                                                      if (gradespl)<1:
-                                                                       qvalid=False
-                                                      else:
-                                                                                     
-                                                                 try:
-                                                                   int(gradespl[0])
-                                                                 except:
-                                                                                          
-                                                                     if len(gradespl[0])!=1 and len(gradespl[0])!=1:
-                                                                                              qvalid=False
-
-
-
-
-                        
-                """                                                               
-	  	if Valid and IValid and qvalid: #and RelationValid:
+                
+	  	if Valid and IValid:
 	  		# If From is valid then save data
 	  		if form_class == Institution_Form:
 				#new_data = request.POST.copy()
@@ -343,18 +319,15 @@ class TemplateResponder(object):
 	  			# pass address id to the institution to save data
 				#form = ResourceForm(new_data)
                                 if 1:
-				      obj = form.save()[0]  # save data				
+				        obj = form.save()[0]  # save data				
+					boundaryObj = Boundary.objects.get(pk=request.POST.get('form-0-boundary'))
+					request.user.set_perms(['Acess'], obj)
+					if boundaryObj.boundary_category.boundary_category.lower() == 'circle' and boundaryObj.boundary_type.boundary_type.lower() in ['anganwadi','preschool']:
+						# if boundary category is circle and boundary type is anganwadi create a class with name Anganwadi Class
+						newClass = StudentGroup(name="Anganwadi Class", active=2, institution_id=obj.id,group_type='Class')
+						newClass.save()
                                 else:
-                                    
-                                           addressObj.delete()
-                                print "OBK"
-				boundaryObj = Boundary.objects.get(pk=request.POST.get('form-0-boundary'))
-                                userob=User.objects.filter(id=request.user.id)[0]      
-				userob.set_perms(['Acess'], obj)
-				if boundaryObj.boundary_category.boundary_category.lower() == 'circle' and boundaryObj.boundary_type.boundary_type.lower() =='anganwadi':
-					# if boundary category is circle and boundary type is anganwadi create a class with name Anganwadi Class
-					newClass = StudentGroup(name="Anganwadi Class", active=2, institution_id=obj.id,group_type='Class')
-					newClass.save()
+					addressObj.delete()
 			elif form_class == Staff_Form:
 				# If Staff save data for staff and create relation with SG
 				obj = form.save()[0]
@@ -590,12 +563,8 @@ class TemplateResponder(object):
 					if clas not in mapClasIds:
 						# if newly assigned class not in already assigned class create relation ship with SG.
 						clasObj = StudentGroup.objects.get(pk=clas)
-                                                sobj=Staff_StudentGroupRelation.objects.filter(staff__id = pk, student_group = clasObj, academic=current_academic())
-                                                if sobj:
-                                                          sobj.update(active=2)
-                                                else:                                     
-						   staff_StudentGroup = Staff_StudentGroupRelation(staff = elem, student_group = clasObj, academic=current_academic(), active=2)
-					       	   staff_StudentGroup.save()			
+						staff_StudentGroup = Staff_StudentGroupRelation(staff = elem, student_group = clasObj, academic=current_academic(), active=2)
+						staff_StudentGroup.save()			
 
 			buttonType = str(self.extra_context['buttonType']) # get button type
 			self.extra_context['showsuccess']=True # make showsuccess is True

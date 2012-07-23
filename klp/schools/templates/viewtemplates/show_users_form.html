@@ -24,14 +24,14 @@ color:#0000FF;
                         {% if indvUser.is_active %}
                             <tr>
                                 <td style="color:#000 !important;">{{indvUser}}</td>
-                                <td><span onclick="calldelete({{indvUser.id}},'delete')"> Delete </span></td>
+                                <td><span onclick="calldelete({{indvUser.id}},'delete')" style="cursor:pointer"> Delete </span></td>
                                 <td><a href="/user/{{indvUser.id}}/permissions"> Show Permissions </a></td>
                             </tr>
                   
                                           {% else %}
                             <tr>
                                 <td style="color:#000 !important;">{{indvUser}}</td>
-                                <td><span onclick="calldelete({{indvUser.id}},'activateuser')"> Activate </span></td>
+                                <td><span onclick="calldelete({{indvUser.id}},'activateuser')" style="cursor:pointer"> Activate </span></td>
                                 <td><!--a href="/user/{{indvUser.id}}/permissions"> Show Permissions </a--></td>
                             </tr>
                        

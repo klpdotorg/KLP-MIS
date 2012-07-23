@@ -71,8 +71,8 @@ def KLP_Assign_Permissions(request):
 			respDict['isSuccess'] = False
 		else:
                         #bound_list=','.join(str(v1) for v1 in bound_list if v1 > 0)
-                        Popen(["/home/akshara/akshara/bin/python" ,"/home/akshara/akshara/klp/manage.py","KLP_assignPermissions",str(inst_list),str(deUserList),str(permissions),str(permissionType),str(assessmentId),str(assessmentPerm),bound_cat,bound_list,request.user.username])
-                        #call(["/home/klp/klp/bin/python" ,"/home/klp/klp/klp/manage.py","KLP_assignPermissions",str(inst_list),str(deUserList),str(permissions),str(permissionType),str(assessmentId),str(assessmentPerm),bound_cat,bound_list])
+                        Popen(["python" ,"/home/klp/production/manage.py","KLP_assignPermissions",str(inst_list),str(deUserList),str(permissions),str(permissionType),str(assessmentId),str(assessmentPerm),bound_cat,bound_list,request.user.username])
+                        #call(["/home/c2staging/c2staging/bin/python" ,"/home/c2staging/c2staging/c2staging/manage.py","KLP_assignPermissions",str(inst_list),str(deUserList),str(permissions),str(permissionType),str(assessmentId),str(assessmentPerm),bound_cat,bound_list])
                         respDict['respMsg'] = message #'Assigned Permissions successfully for %s Institutions' %(count)
                         respDict['isSuccess'] = True
 
@@ -91,7 +91,7 @@ def KLP_Assign_Permissions(request):
 			# call assignPermission method to assign permissions
                         inst_list=','.join(str(v1) for v1 in inst_list if v1 > 0)
                         print "FDFDF",bound_cat,bound_list,"HREEEEEEE"
-                        Popen(["/home/akshara/akshara/bin/python" ,"/home/akshara/akshara/klp/manage.py","KLP_assignPermissions",str(inst_list),str(deUserList),str(permissions),str(permissionType),str(assessmentId),str(assessmentPerm),bound_cat,str(bound_list).strip(),request.user.username])
+                        Popen(["python" ,"/home/klp/production/manage.py","KLP_assignPermissions",str(inst_list),str(deUserList),str(permissions),str(permissionType),str(assessmentId),str(assessmentPerm),bound_cat,str(bound_list).strip(),request.user.username])
 			respDict['respMsg'] = message #'Assigned Permissions successfully for  %s Institutions' %(count)
 			respDict['isSuccess'] = True
                         #Tosendmailteam(inst_list,deUserList,permissions,permissionType,assessmentId,assessmentPerm)
@@ -102,7 +102,7 @@ def assignPermission(inst_list, deUserList, permissions, permissionType, assessm
 	assignedAsmIds = []
         print inst_list,"SSSSSSSSSSs" 
         assignedInsIds=[]
-        if assignedInIds:
+        if assessmentId:
             assessmentObjsel = Assessment.objects.get(id=assessmentId)
 	for inst_id in inst_list:
 		# get Institution object using id
@@ -114,7 +114,7 @@ def assignPermission(inst_list, deUserList, permissions, permissionType, assessm
               
                    deUser=int(deUser)
 		   userObj = User.objects.get(id=deUser)
-                   if assessmentPerm:
+                   if assessmentPerm!=None and assessmentPerm!='None': 
                      uobj=UserAssessmentPermissions.objects.filter(user=userObj,  instituion= instObj,assessment=assessmentObjsel) 
                      if uobj:
                                uflag=True
@@ -122,14 +122,14 @@ def assignPermission(inst_list, deUserList, permissions, permissionType, assessm
                                            uflag=False
                    else:
                                         uflag=True           
-                   assiignedInsIds.append(uflag)                    
+                                       
                    if uflag:  
                         print userObj,permissionType   
                         assignedInsIds.append(inst_id)
 			if permissionType == 'permissions':
 				# if permission type is permissions set institution level permissions for the user
 				userObj.set_perms(permissions, instObj)
-				if assessmentPerm:
+			        if assessmentPerm!=None and assessmentPerm!='None':	
 					# if assessmentPerm is true assign assessment also to the user.
 					sg_list = StudentGroup.objects.filter(institution__id=inst_id).values_list('id', flat=True).distinct()
                                         print sg_list[:10],inst_id

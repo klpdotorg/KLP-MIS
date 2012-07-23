@@ -78,7 +78,7 @@ class Command(BaseCommand):
 				    				
 				    				BoundaryList = Boundary.objects.filter(id__in=preBoundaryList, boundary_type__id=2).values_list("parent", flat=True).distinct()
 				    				preBoundaryList.extend(list(BoundaryList))
-				    				BoundaryList = Boundary.objects.filter(id__in=preBoundaryList, boundary_type__id=2).values_list("parent", flat=True).distinct()
+				    				BoundaryList = Boundary.objects.filter(id__in=preBoundaryList, boundary_type__id=1).values_list("parent", flat=True).distinct()
 				    				preBoundaryList.extend(list(BoundaryList))   				
 				    				
 				    				

@@ -87,6 +87,7 @@ class Institution_address(models.Model):
 	pincode = models.CharField(max_length = 100, blank=True, null=True)
 	landmark = models.CharField(max_length = 1000, blank=True, null=True, help_text="Can be comma separated")
 	instidentification = models.CharField(max_length = 1000, blank=True, null=True, help_text="Can be comma separated")
+	instidentification2 = models.CharField(max_length = 1000, blank=True, null=True, help_text="Can be comma separated")
 	routeInformation = models.CharField(max_length = 500, blank=True, null=True, help_text="Can be comma separated")		
 register_model(Institution_address)  # Register model for to store information in fullhistory
 
@@ -347,13 +348,14 @@ class StudentGroup(models.Model):
 		return '<a href="/studentgroup/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s %s"> <img src="/static_media/tree-images/reicons/studentgroup_%s.gif" title="%s" /> <span id="studentgroup_%s_text">%s %s</span> </a>' %(self.id, groupName, sec, self.group_type, self.group_type, self.id, groupName, sec)
 		
 	def getStudentProgrammeUrl(self, filter_id, secfilter_id):
+            assname=Assessment.objects.filter(id=secfilter_id).values_list('name',flat=True)[0]
 	    groupName = self.name
 	    if groupName == '0':
 	    	groupName = 'Anganwadi Class'
 	    sec = self.section
 	    if sec == None:
 	    	sec = ''	
-	    return '<a href="/studentgroup/%s/programme/%s/assessment/%s/view" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s %s"> <img src="/static_media/tree-images/reicons/studentgroup_%s.gif" title="%s" /> &nbsp; <span id="studentgroup_%s_text">%s %s</span> </a>' %(self.id, filter_id, secfilter_id, groupName, sec, self.group_type, self.group_type, self.id,  groupName, sec)
+	    return '<a href="/studentgroup/%s/programme/%s/assessment/%s/view" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s %s"> <img src="/static_media/tree-images/reicons/studentgroup_%s.gif" title="%s" /> &nbsp; <span id="studentgroup_%s_text">%s %s</span> <span style="color:green;font-size:12px">%s</span></a>' %(self.id, filter_id, secfilter_id, groupName, sec, self.group_type, self.group_type, self.id,  groupName, sec,assname)
 
 	def get_view_url(self):
 		return '/studentgroup/%s/view/' %(self.id)

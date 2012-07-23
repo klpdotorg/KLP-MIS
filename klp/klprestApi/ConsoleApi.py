@@ -15,7 +15,7 @@ from django.template import RequestContext
 import psycopg2
 from django.utils import simplejson
 from django.views.decorators.csrf import csrf_exempt
-from klp.settings import *
+from production.settings import *
 
 from django.db import transaction
 def KLP_Admin_Console(request):
@@ -30,8 +30,8 @@ def KLP_Admin_Console(request):
 def KLP_Run_Query(request):  
     ''' To run SQl Queries Entered by admin'''
     # get query to perform 
-    adminQuery = request.POST.get('form-klp-query')
-    #connection = sqlite.connect('/home/klp/klp/klp.db')
+    adminQuery = request.POST.get('form-production-query')
+    #connection = sqlite.connect('/home/c2staging/c2staging/c2staging.db')
     # Establish connection with postgresql by passing dbname, user name and password.
     d=DATABASES['default']
     datebase=d['NAME']

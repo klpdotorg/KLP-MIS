@@ -25,7 +25,8 @@ class QueryLogMiddleware:
             print
             for query, count in queries.items():
 			#if count > 1:
-                	print "%s x %s" % (count, query)
+                	#print "%s x %s" % (count, query)
+                        pass     
             print "------------------------------------------------------"
             print "Total Queries:     %s" % len(queries)
             print "Duplicate Queries: %s" % duplicates
