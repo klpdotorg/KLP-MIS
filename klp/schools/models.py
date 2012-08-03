@@ -384,7 +384,7 @@ def current_academic():
     now = datetime.date.today()
     currentYear = int(now.strftime('%Y'))
     currentMont = int(now.strftime('%m'))
-    if currentMont>=1 and currentMont<=7:
+    if currentMont>=1 and currentMont<=8:
         academic = '%s-%s' %(currentYear-1, currentYear)
     else:
         academic = '%s-%s' %(currentYear, currentYear+1)
