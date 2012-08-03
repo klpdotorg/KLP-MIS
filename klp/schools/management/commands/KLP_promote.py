@@ -22,10 +22,9 @@ class Command(BaseCommand):
 		    nextAcademicObj=nextAcademicObj if not type(nextAcademicObj) is tuple else  nextAcademicObj[0]
 		    ''' Fiter For Active Primary School Institutions'''
 		    if args:
-		         #36327
-		         institutions = Institution.objects.filter(id=args[0)
+		         institutions = Institution.objects.filter(id=args[0])
 		    else:
-		      institutions = Institution.objects.filter(cat__categoryType=1, active=2) 
+		         institutions = Institution.objects.filter(cat__categoryType=1, active=2) 
 		    for inst in institutions:
 			    ''' Filter For Active StudentGroups Of type Class '''
 			    studentGroups = StudentGroup.objects.filter(institution=inst, active=2, group_type="Class").order_by("name").reverse()
