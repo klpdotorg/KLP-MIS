@@ -175,5 +175,5 @@ In any new environment as SUDO USER, run the following commands<br/>
 
 
 ## Bringing up the Application
-Now you should be having a django app rendered at http://\<server_ip\>/<br/>
+Now you should be having a django app rendered at http://my.domain.org/<br/>
 
