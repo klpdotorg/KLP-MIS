@@ -10,7 +10,7 @@
   * Get all children in Karnataka on this database within the next 3-5 years in a phased manner.
   * Give other NGOs the ability to input data pertaining to their programmes as a layer of information
     on the KLP site. For example, Agastya International and Akshaya Patra both serve the same 
-    constituency as Akshara does - if they have access to child databases, then we avoid duplication 
+    constituency as klp does - if they have access to child databases, then we avoid duplication 
     of efforts and they can use the data for their own interventions and share it on the KLP site.
   * Prepare constituency-wise reports for every elected representative - Members of Parliament, 
     Members of the Legislative Assembly ; Corporators and Panchayat members. This will enable these 
@@ -47,7 +47,7 @@
   challenging task as it requires technology as well as some robust, yet simple processes around the 
   technology.
 
-  Since 2006, the Akshara Foundation has become increasingly experienced on how best to perform the 
+  Since 2006, the klp Foundation has become increasingly experienced on how best to perform the 
   task laid out above. We are now in a position to design an MIS platform that is sufficiently generic 
   to be used in other organisations in the education sector and perhaps even other sectors. 
 
@@ -68,51 +68,51 @@
   `[sudouser@server:~]$ sudo apt-get install libpcre++-dev git gitosis libxml2-dev libssl-dev`<br/>
   `[sudouser@server:~]$ sudo easy_install -U pip`<br/>
   `[sudouser@server:~]$ sudo pip install -U virtualenv`<br/>
-  `[sudouser@server:~]$ sudo adduser aksharademo`<br/>
-  `[sudouser@server:~]$ su - aksharademo`<br/>
+  `[sudouser@server:~]$ sudo adduser klpdemo`<br/>
+  `[sudouser@server:~]$ su - klpdemo`<br/>
 
 ## Database related installation
 In any new environment as SUDO USER, run the following commands<br/>
-  `[sudouser@server:~]apt-get install postgresql-server-dev-8.4 libpq-dev`<br/>
+  `[sudouser@server:~]$ apt-get install postgresql-server-dev-8.4 libpq-dev`<br/>
 
 ##  Set up a Virtual Python environment
-  `[aksharademo@server:~]$ virtualenv --no-site-packages akshara`<br/>
-  `[aksharademo@server:~]$ cd akshara`<br/>
-  `[aksharademo@server:~]$ . bin/activate`<br/>
-  Note that the prompt changes after activating to %(akshara)aksharademo%><br/> 
+  `[klpdemo@server:~]$ virtualenv --no-site-packages klpsite `<br/>
+  `[klpdemo@server:~]$ cd klpsite`<br/>
+  `[klpdemo@server:~]$ . bin/activate`<br/>
+  Note that the prompt changes after activating to %(klpsite)klpdemo%><br/> 
   Install all required dependencies at this prompt.<br/>
-  `[(akshara)aksharademo@server:~]$ pip install PIL`<br/>
-  `[(akshara)aksharademo@server:~]$ pip install Django==1.2.5`<br/>
+  `[(klpsite)klpdemo@server:~]$ pip install PIL`<br/>
+  `[(klpsite)klpdemo@server:~]$ pip install Django==1.2.5`<br/>
 
 ## Database related installation
-  `[(akshara)aksharademo@server:~]$ pip install psycopg2`<br/>
+  `[(klpsite)klpdemo@server:~]$ pip install psycopg2`<br/>
 
 ##  Set up Django and WSGI
-  At the prompt %(akshara)aksharademo%>, run the following commands while in the ~/akshara directory
+  At the prompt %(klpsite)klpdemo%>, run the following commands while in the ~/klp directory
   If you are a collaborator on this private repository, clone the Git Repo into your home folder on the
   installation box at the prompt %home/miscollabrator%>.<br/>
-  `[miscollaborator@server:~]$ git clone git@github.com:gkjohn/Akshara-MIS.git`<br/>
-  Now copy the checkout folder at the prompt  %(akshara)aksharademo%/home/akshara> <br/>
-  `[(akshara)aksharademo@server:~]$ cp -r /home/miscollaborator/Akshara/Akshara-MIS/AF Akshara`<br/>
-  `[(akshara)aksharademo@server:~]$ cd ~/akshara/Akshara`<br/>
-  `[(akshara)aksharademo@server:~]$ vi Akshara.wsgi`<br/>
+  `[miscollaborator@server:~]$ git clone git://github.com/klpdotorg/KLP-MIS.git`<br/>
+  Now copy the checkout folder at the prompt  %(klpsite)klpdemo%/home/klp> <br/>
+  `[(klpsite)klpdemo@server:~]$ cp -r /home/miscollaborator/KLP-MIS/klp ~/klpsite/`<br/>
+  `[(klpsite)klpdemo@server:~]$ cd ~/klpsite/klp`<br/>
+  `[(klpsite)klpdemo@server:~]$ vi klp.wsgi`<br/>
   The content of this file should be:<br/>
   > import sys<br/>
   > sys.stdout = sys.\_\_stdout\_\_<br/>
   > sys.stderr = sys.\_\_stderr\_\_<br/>
-  > sys.path.append('/home/aksharademo/akshara/lib/python2.6/site-packages')<br/>
-  > sys.path.append('/home/aksharademo/akshara/lib/python2.6/lib-dynload')<br/>
-  > sys.path.append('/home/aksharademo/akshara/lib/python2.6')<br/>
-  > sys.path.append('/home/aksharademo/akshara')<br/>
+  > sys.path.append('/home/klpdemo/klpsite/klp/lib/python2.6/site-packages')<br/>
+  > sys.path.append('/home/klpdemo/klpsite/klp/lib/python2.6/lib-dynload')<br/>
+  > sys.path.append('/home/klpdemo/klpsite/klp/lib/python2.6')<br/>
+  > sys.path.append('/home/klpdemo/klp')<br/>
   > import os<br/>
-  > os.environ['DJANGO_SETTINGS_MODULE'] = 'Akshara.settings'<br/>
+  > os.environ['DJANGO_SETTINGS_MODULE'] = 'klp.settings'<br/>
   > import django.core.handlers.wsgi<br/>
   > application = django.core.handlers.wsgi.WSGIHandler()<br/>
 
 ## Configuration in settings.py
   The content of settings.py file in should carry Postgres DB details:<br/>
-  `[(akshara)aksharademo@server:~]$ cd ~/akshara/Akshara`<br/>
-  `[(akshara)aksharademo@server:~]$ vi settings.py`<br/>
+  `[(klpsite)klpdemo@server:~]$ cd ~/klp/`<br/>
+  `[(klpsite)klpdemo@server:~]$ vi settings.py`<br/>
   > DATABASES = {<br/>
   >  'default': {<br/>
   >      'ENGINE': 'postgresql_psycopg2'<br/>
@@ -124,39 +124,39 @@ In any new environment as SUDO USER, run the following commands<br/>
   >}<br/>
   Additionally make sure the directory path to the Django installation is correctly indicated, for eg in the line: <br/>
   > TEMPLATE_DIRS = (<br/>
-  >  '/home/aksharademo/akshara/Akshara/schools/templates/',<br/>
+  >  '/home/klpdemo/klpsite/klp/schools/templates/',<br/>
   >)<br/>
 
 
 ##  Set up Nginx and uWSGI
-  `[(akshara)aksharademo@server:~]$ mkdir programs`<br/>
-  `[(akshara)aksharademo@server:~]$ cd programs`<br/>
-  `[(akshara)aksharademo@server:~]$ wget http://nginx.org/download/nginx-0.8.53.tar.gz`<br/>
-  `[(akshara)aksharademo@server:~]$ wget http://nginx-init-ubuntu.googlecode.com/files/nginx-init-ubuntu_v2.0.0-RC2.tar.bz2`<br/>
-  `[(akshara)aksharademo@server:~]$ wget http://projects.unbit.it/downloads/uwsgi-0.9.6.5.tar.gz`<br/>
-  `[(akshara)aksharademo@server:~]$ tar xvf nginx-0.8.53.tar.gz`<br/>
-  `[(akshara)aksharademo@server:~]$ tar xvf uwsgi-0.9.6.5.tar.gz`<br/>
-  `[(akshara)aksharademo@server:~]$ mkdir ~/nginx`<br/>
-  `[(akshara)aksharademo@server:~]$ cd nginx-0.8.53`<br/>
-  `[(akshara)aksharademo@server:~]$ ./configure --without-http_uwsgi_module --add-module=../uwsgi-0.9.6.5/nginx/ --prefix=/home/aksharademo/nginx`<br/>
+  `[(klpsite)klpdemo@server:~]$ mkdir programs`<br/>
+  `[(klpsite)klpdemo@server:~]$ cd programs`<br/>
+  `[(klpsite)klpdemo@server:~]$ wget http://nginx.org/download/nginx-0.8.53.tar.gz`<br/>
+  `[(klpsite)klpdemo@server:~]$ wget http://nginx-init-ubuntu.googlecode.com/files/nginx-init-ubuntu_v2.0.0-RC2.tar.bz2`<br/>
+  `[(klpsite)klpdemo@server:~]$ wget http://projects.unbit.it/downloads/uwsgi-0.9.6.5.tar.gz`<br/>
+  `[(klpsite)klpdemo@server:~]$ tar xvf nginx-0.8.53.tar.gz`<br/>
+  `[(klpsite)klpdemo@server:~]$ tar xvf uwsgi-0.9.6.5.tar.gz`<br/>
+  `[(klpsite)klpdemo@server:~]$ mkdir ~/nginx`<br/>
+  `[(klpsite)klpdemo@server:~]$ cd nginx-0.8.53`<br/>
+  `[(klpsite)klpdemo@server:~]$ ./configure --without-http_uwsgi_module --add-module=../uwsgi-0.9.6.5/nginx/ --prefix=/home/klpdemo/nginx`<br/>
 
 Disable unbuilt uWSGI(thats old) and includes latest uwsgi package<br/>
-  `[(akshara)aksharademo@server:~]$ make`<br/>
-  `[(akshara)aksharademo@server:~]$ make install`<br/>
-  `[(akshara)aksharademo@server:~]$ cd ../uwsgi-0.9.6.5`<br/>
-  `[(akshara)aksharademo@server:~]$ make -f Makefile`<br/>
-  `[(akshara)aksharademo@server:~]$ cp uwsgi ~/akshara/bin/`<br/>
-  `[(akshara)aksharademo@server:~]$ cp uwsgi_params ~/nginx/`<br/>
-  `[(akshara)aksharademo@server:~]$ cd ~/nginx`<br/>
-  `[(akshara)aksharademo@server:~]$ mkdir vhost`<br/>
-  `[(akshara)aksharademo@server:~]$ vi ~/nginx/conf/nginx.conf`<br/>
+  `[(klpsite)klpdemo@server:~]$ make`<br/>
+  `[(klpsite)klpdemo@server:~]$ make install`<br/>
+  `[(klpsite)klpdemo@server:~]$ cd ../uwsgi-0.9.6.5`<br/>
+  `[(klpsite)klpdemo@server:~]$ make -f Makefile`<br/>
+  `[(klpsite)klpdemo@server:~]$ cp uwsgi ~/klp/bin/`<br/>
+  `[(klpsite)klpdemo@server:~]$ cp uwsgi_params ~/nginx/`<br/>
+  `[(klpsite)klpdemo@server:~]$ cd ~/nginx`<br/>
+  `[(klpsite)klpdemo@server:~]$ mkdir vhost`<br/>
+  `[(klpsite)klpdemo@server:~]$ vi ~/nginx/conf/nginx.conf`<br/>
 
 The content of this file should include vhost in the http context and
 make sure you comment out default 'location /' context in here <br/>
   > include vhost/*.conf;<br/>
 
 Also change the content of the django.conf
-  `[(akshara)aksharademo@server:~] vi nginx/vhost/django.conf`<br/>
+  `[(klpsite)klpdemo@server:~] vi nginx/vhost/django.conf`<br/>
 Add the django virtualhost config (Assuming 192.168.2.2 is the system ip)<br/>
   > upstream django {<br/>
   > ip_hash;<br/>
@@ -165,9 +165,9 @@ Add the django virtualhost config (Assuming 192.168.2.2 is the system ip)<br/>
   > }<br/>
   > server {<br/>
   > listen 80;<br/>
-  > server_name  akshara.mahiti.org;<br/>
+  > server_name  klp.mahiti.org;<br/>
   > location /static_media/ {<br/>
-  >   alias /home/aksharademo/akshara/Akshara/static_media/;<br/>
+  >   alias /home/klpdemo/klpsite/klp/static_media/;<br/>
   > }<br/>
   > location / {<br/>
   > uwsgi_pass  django;<br/>
@@ -176,8 +176,8 @@ Add the django virtualhost config (Assuming 192.168.2.2 is the system ip)<br/>
   > }<br/>
   > }<br/>
 
-  `[(akshara)aksharademo@server:~]$ cd ~/akshara/Akshara`<br/>
-  `[(akshara)aksharademo@server:~]$ uwsgi -s 192.168.2.2:8010 -M --wsgi-file Akshara.wsgi`<br/>
+  `[(klpsite)klpdemo@server:~]$ cd ~/klpsite/klp`<br/>
+  `[(klpsite)klpdemo@server:~]$ uwsgi -s 192.168.2.2:8010 -M --wsgi-file klp.wsgi`<br/>
 Check if uwsgi runs without errors. Ctrl-C to exit.<br/>
 
 ##  Setup Supervisor
@@ -186,22 +186,22 @@ As ROOT user set up Supervisor:<br/>
   `[root@server:~]$ echo_supervisord_conf > ~/etc/supervisord.conf`<br/>
   `[root@server:~]$ vi ~/etc/supervisord.conf`<br/>
 
-Change supervisor sock and logs path to /home/aksharademo/akshara/logs<br/>
+Change supervisor sock and logs path to /home/klpdemo/klpsite/klp/logs<br/>
 And add control for uwsgi <br/>
   > [group:klp-ems]<br/>
   > programs=uwsgi,nginx<br/>
   > [program:uwsgi]<br/>
-  > command=/home/aksharademo/akshara/bin/uwsgi --socket 192.168.2.2:8010 --processes 5 --master --wsgi-file Akshara.wsgi<br/>
-  > directory=/home/aksharademo/akshara/Akshara<br/>
-  > user=aksharademo<br/>
+  > command=/home/klpdemo/klpsite/klp/bin/uwsgi --socket 192.168.2.2:8010 --processes 5 --master --wsgi-file klp.wsgi<br/>
+  > directory=/home/klpdemo/klpsite/klp/<br/>
+  > user=klpdemo<br/>
   > autostart=true<br/>
   > autorestart=true<br/>
-  > stdout_logfile=/home/aksharademo/akshara/logs/uwsgi.log<br/>
+  > stdout_logfile=/home/klpdemo/klpsite/klp/logs/uwsgi.log<br/>
   > redirect_stderr=true<br/>
   > stopsignal=QUIT<br/>
   > [program:nginx]<br/>
-  > command=/home/aksharademo/nginx/sbin/nginx -c /home/aksharademo/nginx/conf/nginx.conf -g "daemon off;"<br/>
-  > directory=/home/aksharademo/<br/>
+  > command=/home/klpdemo/nginx/sbin/nginx -c /home/klpdemo/nginx/conf/nginx.conf -g "daemon off;"<br/>
+  > directory=/home/klpdemo/<br/>
   > user= root<br/>
   > autostart=true<br/>
   > autorestart=true<br/>
@@ -222,7 +222,7 @@ Repeat this to correct the path of supervisorctl too.<br/>
 Specify the full path at line 75 for supervisorctl.<br/>
 Add a group for controlling ems:<br/>
   `[root@server:~]$ groupadd emsadmin`<br/>
-  `[root@server:~]$ usermod -a -G emsadmin aksharademo`<br/>
+  `[root@server:~]$ usermod -a -G emsadmin klpdemo`<br/>
   `[root@server:~]$ chgrp emsadmin /etc/supervisord.conf`<br/>
   `[root@server:~]$ chmod 660 /etc/supervisord.conf`<br/>
   `[root@server:~]$ vi /etc/supervisord.conf`<br/>
@@ -235,11 +235,11 @@ Make sure the sock permssion is changed in the config as<br/>
 
 Check if supervisor functions fine:<br/>
   `[root@server:~]$ /etc/init.d/supervisord restart`<br/>
-  `[root@server:~]$ su - aksharademo`<br/>
+  `[root@server:~]$ su - klpdemo`<br/>
 
-  `[aksharademo@server:~]$ supervisorctl start klp-ems:uwsgi`<br/>
-  `[aksharademo@server:~]$ supervisorctl start klp-ems:nginx`<br/>
-  `[aksharademo@server:~]$ supervisorctl status`<br/>
+  `[klpdemo@server:~]$ supervisorctl start klp-ems:uwsgi`<br/>
+  `[klpdemo@server:~]$ supervisorctl start klp-ems:nginx`<br/>
+  `[klpdemo@server:~]$ supervisorctl status`<br/>
 Check for:<br/>
 klp-ems:nginx                    RUNNING    pid 26046, uptime 0:13:19<br/>
 klp-ems:uwsgi                    RUNNING    pid 26036, uptime 0:13:52<br/>
