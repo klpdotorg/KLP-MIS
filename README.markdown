@@ -92,29 +92,29 @@ In any new environment as SUDO USER, run the following commands<br/>
   Now you have to setup the Virtualhost entry<br/>
   `[sudouser@server:~]$ sudo vi /etc/apache2/sites-available/klp`<br/>
   `[sudouser@server:~]$ sudo a2ensite klp`<br/>
-  >  \<VirtualHost \<server-ip\>:80\>
-  >      ServerName my.domain.org
-  >        ErrorLog /var/log/apache2/error.klp.log
-  >         # Possible values include: debug, info, notice, warn, error, crit,
-  >         # alert, emerg.
+  >  \<VirtualHost \<server-ip\>:80\><br/>
+  >      ServerName my.domain.org<br/>
+  >        ErrorLog /var/log/apache2/error.klp.log<br/>
+  >         # Possible values include: debug, info, notice, warn, error, crit,<br/>
+  >         # alert, emerg.<br/>
   >         LogLevel info
-  >         CustomLog /var/log/apache2/access.klp.log combined
-  >  DocumentRoot /home/klpdemo/klp/
+  >         CustomLog /var/log/apache2/access.klp.log combined<br/>
+  >  DocumentRoot /home/klpdemo/klp/<br/>
   >
-  >  Alias /admin_media /usr/local/lib/python2.6/dist-packages/django/contrib/admin/media/
-  >  \<Location /admin_media\>
-  >     Order allow,deny
-  >     Options Indexes
-  >     Allow from all
-  >     IndexOptions FancyIndexing
+  >  Alias /admin_media /usr/local/lib/python2.6/dist-packages/django/contrib/admin/media/<br/>
+  >  \<Location /admin_media\><br/>
+  >     Order allow,deny<br/>
+  >     Options Indexes<br/>
+  >     Allow from all<br/>
+  >     IndexOptions FancyIndexing<br/>
   >  \</Location\>
   >
-  >  Alias /static_media /home/klpdemo/klp/static_media
-  >  \<Location /static_media\>
-  >     Order allow,deny
-  >     Options Indexes
-  >     Allow from all
-  >     IndexOptions FancyIndexing
+  >  Alias /static_media /home/klpdemo/klp/static_media<br/>
+  >  \<Location /static_media\><br/>
+  >     Order allow,deny<br/>
+  >     Options Indexes<br/>
+  >     Allow from all<br/>
+  >     IndexOptions FancyIndexing<br/>
   >  \</Location\>
   >
   >  WSGIScriptAlias / /home/klpdemo/klp/klp.wsgi
@@ -125,14 +125,14 @@ In any new environment as SUDO USER, run the following commands<br/>
   >
   >  WSGIProcessGroup klp
   >
-  >  \<Directory /home/klpdemo/klp\>
-  >    Options +ExecCGI
-  >    Allow from all
+  >  \<Directory /home/klpdemo/klp\><br/>
+  >    Options +ExecCGI<br/>
+  >    Allow from all<br/>
   >  \</Directory\>
   >
   >  \</Virtualhost\>
 
-  After the install is finished successfully, Restart Apache server once.<br/>
+  After the setup is finished successfully, Restart Apache server once.<br/>
   `[sudouser@server:~]$ sudo service apache2 restart`<br/>
 
 ##  Set up Django and WSGI
