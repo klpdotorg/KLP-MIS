@@ -91,7 +91,6 @@ In any new environment as SUDO USER, run the following commands<br/>
   By default, there is no need to change anything here. You can just keep typing 'Enter'.<br/>
   Now you have to setup the Virtualhost entry<br/>
   `[sudouser@server:~]$ sudo vi /etc/apache2/sites-available/klp`<br/>
-  `[sudouser@server:~]$ sudo a2ensite klp`<br/>
   >  \<VirtualHost \<server-ip\>:80\><br/>
   >      ServerName my.domain.org<br/>
   >        ErrorLog /var/log/apache2/error.klp.log<br/>
@@ -130,7 +129,10 @@ In any new environment as SUDO USER, run the following commands<br/>
   >    Allow from all<br/>
   >  \</Directory\>
   >
-  >  \</Virtualhost\>
+  >  \</Virtualhost\><br/>
+
+  Then Enable the virtualhost<br/>
+  `[sudouser@server:~]$ sudo a2ensite klp`<br/>
 
   After the setup is finished successfully, Restart Apache server once.<br/>
   `[sudouser@server:~]$ sudo service apache2 restart`<br/>
