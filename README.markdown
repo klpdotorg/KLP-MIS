@@ -92,45 +92,45 @@ In any new environment as SUDO USER, run the following commands<br/>
   Now you have to setup the Virtualhost entry<br/>
   `[sudouser@server:~]$ sudo vi /etc/apache2/sites-available/klp`<br/>
   `[sudouser@server:~]$ sudo a2ensite klp`<br/>
-  \<VirtualHost \<server-ip\>:80\>
-      ServerName my.domain.org
-        ErrorLog /var/log/apache2/error.klp.log
-         # Possible values include: debug, info, notice, warn, error, crit,
-         # alert, emerg.
-         LogLevel info
-         CustomLog /var/log/apache2/access.klp.log combined
-  DocumentRoot /home/klpdemo/klp/
-
-  Alias /admin_media /usr/local/lib/python2.6/dist-packages/django/contrib/admin/media/
-  \<Location /admin_media\>
-     Order allow,deny
-     Options Indexes
-     Allow from all
-     IndexOptions FancyIndexing
-  \</Location\>
-
-  Alias /static_media /home/klpdemo/klp/static_media
-  \<Location /static_media\>
-     Order allow,deny
-     Options Indexes
-     Allow from all
-     IndexOptions FancyIndexing
-  \</Location\>
-
-  WSGIScriptAlias / /home/klpdemo/klp/klp.wsgi
-
-  WSGIApplicationGroup %{GLOBAL}
-
-  WSGIDaemonProcess klp user=klpdemo group=klpdemo processes=1 threads=16 inactivity-timeout=150
-
-  WSGIProcessGroup klp
-
-  \<Directory /home/klpdemo/klp\>
-    Options +ExecCGI
-    Allow from all
-  \</Directory\>
-
-\</Virtualhost\>
+  >  \<VirtualHost \<server-ip\>:80\>
+  >      ServerName my.domain.org
+  >        ErrorLog /var/log/apache2/error.klp.log
+  >         # Possible values include: debug, info, notice, warn, error, crit,
+  >         # alert, emerg.
+  >         LogLevel info
+  >         CustomLog /var/log/apache2/access.klp.log combined
+  >  DocumentRoot /home/klpdemo/klp/
+  >
+  >  Alias /admin_media /usr/local/lib/python2.6/dist-packages/django/contrib/admin/media/
+  >  \<Location /admin_media\>
+  >     Order allow,deny
+  >     Options Indexes
+  >     Allow from all
+  >     IndexOptions FancyIndexing
+  >  \</Location\>
+  >
+  >  Alias /static_media /home/klpdemo/klp/static_media
+  >  \<Location /static_media\>
+  >     Order allow,deny
+  >     Options Indexes
+  >     Allow from all
+  >     IndexOptions FancyIndexing
+  >  \</Location\>
+  >
+  >  WSGIScriptAlias / /home/klpdemo/klp/klp.wsgi
+  >
+  >  WSGIApplicationGroup %{GLOBAL}
+  >
+  >  WSGIDaemonProcess klp user=klpdemo group=klpdemo processes=1 threads=16 inactivity-timeout=150
+  >
+  >  WSGIProcessGroup klp
+  >
+  >  \<Directory /home/klpdemo/klp\>
+  >    Options +ExecCGI
+  >    Allow from all
+  >  \</Directory\>
+  >
+  >  \</Virtualhost\>
 
   After the install is finished successfully, Restart Apache server once.<br/>
   `[sudouser@server:~]$ sudo service apache2 restart`<br/>
