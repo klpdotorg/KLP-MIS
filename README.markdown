@@ -1,4 +1,4 @@
-# An Introduction to KLP 
+# An Introduction to KLP 3.0 
 
   The [Karnataka Learning Partnership](http://www.klp.org.in) (KLP) aims to be a partnership of NGOs across 
   Karnataka with these objectives:
@@ -10,7 +10,7 @@
   * Get all children in Karnataka on this database within the next 3-5 years in a phased manner.
   * Give other NGOs the ability to input data pertaining to their programmes as a layer of information
     on the KLP site. For example, Agastya International and Akshaya Patra both serve the same 
-    constituency as Akshara does - if they have access to child databases, then we avoid duplication 
+    constituency as klp does - if they have access to child databases, then we avoid duplication 
     of efforts and they can use the data for their own interventions and share it on the KLP site.
   * Prepare constituency-wise reports for every elected representative - Members of Parliament, 
     Members of the Legislative Assembly ; Corporators and Panchayat members. This will enable these 
@@ -47,7 +47,7 @@
   challenging task as it requires technology as well as some robust, yet simple processes around the 
   technology.
 
-  Since 2006, the Akshara Foundation has become increasingly experienced on how best to perform the 
+  Since 2006, the klp Foundation has become increasingly experienced on how best to perform the 
   task laid out above. We are now in a position to design an MIS platform that is sufficiently generic 
   to be used in other organisations in the education sector and perhaps even other sectors. 
 
@@ -62,57 +62,105 @@
   * Assessments
 
 
-# Set up of the Development Environment
+# Set up the Development Environment
   In any new environment as SUDO USER, run the following commands<br/>
-  `[sudouser@server:~]$ sudo apt-get install python-setuptools python-dev build-essential`<br/>
+  `[sudouser@server:~]$ sudo apt-get install python-setuptools python-dev build-essential checkinstall`<br/>
   `[sudouser@server:~]$ sudo apt-get install libpcre++-dev git gitosis libxml2-dev libssl-dev`<br/>
   `[sudouser@server:~]$ sudo easy_install -U pip`<br/>
-  `[sudouser@server:~]$ sudo pip install -U virtualenv`<br/>
-  `[sudouser@server:~]$ sudo adduser aksharademo`<br/>
-  `[sudouser@server:~]$ su - aksharademo`<br/>
+  `[sudouser@server:~]$ sudo adduser klpdemo`<br/>
 
 ## Database related installation
 In any new environment as SUDO USER, run the following commands<br/>
-  `[sudouser@server:~]apt-get install postgresql-server-dev-8.4 libpq-dev`<br/>
+  `[sudouser@server:~]$ sudo apt-get install postgresql-server-dev-8.4 libpq-dev`<br/>
+  `[sudouser@server:~]$ sudo pip install psycopg2`<br/>
 
-##  Set up a Virtual Python environment
-  `[aksharademo@server:~]$ virtualenv --no-site-packages akshara`<br/>
-  `[aksharademo@server:~]$ cd akshara`<br/>
-  `[aksharademo@server:~]$ . bin/activate`<br/>
-  Note that the prompt changes after activating to %(akshara)aksharademo%><br/> 
-  Install all required dependencies at this prompt.<br/>
-  `[(akshara)aksharademo@server:~]$ pip install PIL`<br/>
-  `[(akshara)aksharademo@server:~]$ pip install Django`<br/>
+##  Set up Python environment
+  `[sudouser@server:~]$ sudo pip install PIL`<br/>
+  `[sudouser@server:~]$ sudo pip install Django==1.2.5`<br/>
 
-## Database related installation
-  `[(akshara)aksharademo@server:~]$ pip install psycopg2`<br/>
+##  Set up Apache and mod-wsgi
+  Install Apache Worker MPM, which is recommended as it processes requests using threads.(Will produce results faster)<br/>
+  `[sudouser@server:~]$ sudo apt-get install apache2 apache2-mpm-worker apache2-threaded-dev`<br/>
+  Download the latest stable tar files of mod-wsgi from http://code.google.com/p/modwsgi/downloads/ <br/>
+  Extract the tar file and cd into the directory.<br/>
+  Compile and install<br/>
+  `[sudouser@server:~ mod-wsgi-ver]$ ./configure`<br/>
+  `[sudouser@server:~ mod-wsgi-ver]$ make`<br/>
+  `[sudouser@server:~ mod-wsgi-ver]$ sudo checkinstall`
+  Follow the prompts in checkinstall.<br/>
+  By default, there is no need to change anything here. You can just keep typing 'Enter'.<br/>
+  Now you have to setup the Virtualhost entry<br/>
+  `[sudouser@server:~]$ sudo vi /etc/apache2/sites-available/klp`<br/>
+  >  \<VirtualHost \<server-ip\>:80\><br/>
+  >      ServerName my.domain.org<br/>
+  >        ErrorLog /var/log/apache2/error.klp.log<br/>
+  >         # Possible values include: debug, info, notice, warn, error, crit,<br/>
+  >         # alert, emerg.<br/>
+  >         LogLevel info
+  >         CustomLog /var/log/apache2/access.klp.log combined<br/>
+  >  DocumentRoot /home/klpdemo/klp/<br/>
+  >
+  >  Alias /admin_media /usr/local/lib/python2.6/dist-packages/django/contrib/admin/media/<br/>
+  >  \<Location /admin_media\><br/>
+  >     Order allow,deny<br/>
+  >     Options Indexes<br/>
+  >     Allow from all<br/>
+  >     IndexOptions FancyIndexing<br/>
+  >  \</Location\>
+  >
+  >  Alias /static_media /home/klpdemo/klp/static_media<br/>
+  >  \<Location /static_media\><br/>
+  >     Order allow,deny<br/>
+  >     Options Indexes<br/>
+  >     Allow from all<br/>
+  >     IndexOptions FancyIndexing<br/>
+  >  \</Location\>
+  >
+  >  WSGIScriptAlias / /home/klpdemo/klp/klp.wsgi
+  >
+  >  WSGIApplicationGroup %{GLOBAL}
+  >
+  >  WSGIDaemonProcess klp user=klpdemo group=klpdemo processes=1 threads=16 inactivity-timeout=150
+  >
+  >  WSGIProcessGroup klp
+  >
+  >  \<Directory /home/klpdemo/klp\><br/>
+  >    Options +ExecCGI<br/>
+  >    Allow from all<br/>
+  >  \</Directory\>
+  >
+  >  \</Virtualhost\><br/>
+
+  Then Enable the virtualhost<br/>
+  `[sudouser@server:~]$ sudo a2ensite klp`<br/>
+
+  After the setup is finished successfully, Restart Apache server once.<br/>
+  `[sudouser@server:~]$ sudo service apache2 restart`<br/>
 
 ##  Set up Django and WSGI
-  At the prompt %(akshara)aksharademo%>, run the following commands while in the ~/akshara directory
+  At the prompt %klpdemo% >, run the following commands while in the ~/klp directory
   If you are a collaborator on this private repository, clone the Git Repo into your home folder on the
-  installation box at the prompt %home/miscollabrator%>.<br/>
-  `[miscollaborator@server:~]$ git clone git@github.com:gkjohn/Akshara-MIS.git`<br/>
-  Now copy the checkout folder at the prompt  %(akshara)aksharademo%/home/akshara> <br/>
-  `[(akshara)aksharademo@server:~]$ cp -r /home/miscollaborator/Akshara/Akshara-MIS/AF Akshara`<br/>
-  `[(akshara)aksharademo@server:~]$ cd ~/akshara/Akshara`<br/>
-  `[(akshara)aksharademo@server:~]$ vi Akshara.wsgi`<br/>
+  installation box at the prompt %home/miscollabrator% >.<br/>
+  `[miscollaborator@server:~]$ git clone git://github.com/klpdotorg/KLP-MIS.git`<br/>
+  Now copy the checkout folder at the prompt  %klpdemo% /home/klp> <br/>
+  `[sudouser@server:~]$ su - klpdemo`<br/>
+  `[klpdemo@server:~]$ cp -r /home/miscollaborator/KLP-MIS/klp ~`<br/>
+  `[klpdemo@server:~]$ cd ~/klp`<br/>
+  `[klpdemo@server:~]$ vi klp.wsgi`<br/>
   The content of this file should be:<br/>
   > import sys<br/>
   > sys.stdout = sys.\_\_stdout\_\_<br/>
   > sys.stderr = sys.\_\_stderr\_\_<br/>
-  > sys.path.append('/home/aksharademo/akshara/lib/python2.6/site-packages')<br/>
-  > sys.path.append('/home/aksharademo/akshara/lib/python2.6/lib-dynload')<br/>
-  > sys.path.append('/home/aksharademo/akshara/lib/python2.6')<br/>
-  > sys.path.append('/home/aksharademo/akshara')<br/>
+  > sys.path.append('/home/klpdemo/klp')<br/>
   > import os<br/>
-  > os.environ['DJANGO_SETTINGS_MODULE'] = 'Akshara.settings'<br/>
+  > os.environ['DJANGO_SETTINGS_MODULE'] = 'klp.settings'<br/>
   > import django.core.handlers.wsgi<br/>
   > application = django.core.handlers.wsgi.WSGIHandler()<br/>
 
 ## Configuration in settings.py
   The content of settings.py file in should carry Postgres DB details:<br/>
-  `[(akshara)aksharademo@server:~]$ cd ~/akshara/Akshara`<br/>
-  `[(akshara)aksharademo@server:~]$ vi settings.py`<br/>
+  `[klpdemo@server:~]$ cd ~/klp`<br/>
+  `[klpdemo@server:~]$ vi settings.py`<br/>
   > DATABASES = {<br/>
   >  'default': {<br/>
   >      'ENGINE': 'postgresql_psycopg2'<br/>
@@ -124,126 +172,10 @@ In any new environment as SUDO USER, run the following commands<br/>
   >}<br/>
   Additionally make sure the directory path to the Django installation is correctly indicated, for eg in the line: <br/>
   > TEMPLATE_DIRS = (<br/>
-  >  '/home/aksharademo/akshara/Akshara/schools/templates/',<br/>
+  >  '/home/klpdemo/klp/schools/templates/',<br/>
   >)<br/>
 
 
-##  Set up Nginx and uWSGI
-  `[(akshara)aksharademo@server:~]$ mkdir programs`<br/>
-  `[(akshara)aksharademo@server:~]$ cd programs`<br/>
-  `[(akshara)aksharademo@server:~]$ wget http://nginx.org/download/nginx-0.8.53.tar.gz`<br/>
-  `[(akshara)aksharademo@server:~]$ wget http://nginx-init-ubuntu.googlecode.com/files/nginx-init-ubuntu_v2.0.0-RC2.tar.bz2`<br/>
-  `[(akshara)aksharademo@server:~]$ wget http://projects.unbit.it/downloads/uwsgi-0.9.6.5.tar.gz`<br/>
-  `[(akshara)aksharademo@server:~]$ tar xvf nginx-0.8.53.tar.gz`<br/>
-  `[(akshara)aksharademo@server:~]$ tar xvf uwsgi-0.9.6.5.tar.gz`<br/>
-  `[(akshara)aksharademo@server:~]$ mkdir ~/nginx`<br/>
-  `[(akshara)aksharademo@server:~]$ cd nginx-0.8.53`<br/>
-  `[(akshara)aksharademo@server:~]$ ./configure --without-http_uwsgi_module --add-module=../uwsgi-0.9.6.5/nginx/ --prefix=/home/aksharademo/nginx`<br/>
-
-Disable unbuilt uWSGI(thats old) and includes latest uwsgi package<br/>
-  `[(akshara)aksharademo@server:~]$ make`<br/>
-  `[(akshara)aksharademo@server:~]$ make install`<br/>
-  `[(akshara)aksharademo@server:~]$ cd ../uwsgi-0.9.6.5`<br/>
-  `[(akshara)aksharademo@server:~]$ make -f Makefile`<br/>
-  `[(akshara)aksharademo@server:~]$ cp uwsgi ~/akshara/bin/`<br/>
-  `[(akshara)aksharademo@server:~]$ cp uwsgi_params ~/nginx/`<br/>
-  `[(akshara)aksharademo@server:~]$ cd ~/nginx`<br/>
-  `[(akshara)aksharademo@server:~]$ mkdir vhost`<br/>
-  `[(akshara)aksharademo@server:~]$ vi ~/nginx/conf/nginx.conf`<br/>
-
-The content of this file should include vhost in the http context and
-make sure you comment out default 'location /' context in here <br/>
-  > include vhost/*.conf;<br/>
-
-Also change the content of the django.conf
-  `[(akshara)aksharademo@server:~] vi nginx/vhost/django.conf`<br/>
-Add the django virtualhost config (Assuming 192.168.2.2 is the system ip)<br/>
-  > upstream django {<br/>
-  > ip_hash;<br/>
-  > server 192.168.2.2:8010;<br/>
-  > comment out:#server unix:sock/uwsgi.sock;<br/>
-  > }<br/>
-  > server {<br/>
-  > listen 80;<br/>
-  > server_name  akshara.mahiti.org;<br/>
-  > location /static_media/ {<br/>
-  >   alias /home/aksharademo/akshara/Akshara/static_media/;<br/>
-  > }<br/>
-  > location / {<br/>
-  > uwsgi_pass  django;<br/>
-  > comment out:#uwsgi_param UWSGI_SCRIPT mcms.pac;<br/>
-  > include   uwsgi_params;<br/>
-  > }<br/>
-  > }<br/>
-
-  `[(akshara)aksharademo@server:~]$ cd ~/akshara/Akshara`<br/>
-  `[(akshara)aksharademo@server:~]$ uwsgi -s 192.168.2.2:8010 -M --wsgi-file Akshara.wsgi`<br/>
-Check if uwsgi runs without errors. Ctrl-C to exit.<br/>
-
-##  Setup Supervisor
-As ROOT user set up Supervisor:<br/>
-  `[root@server:~]$ pip install supervisor`<br/>
-  `[root@server:~]$ echo_supervisord_conf > ~/etc/supervisord.conf`<br/>
-  `[root@server:~]$ vi ~/etc/supervisord.conf`<br/>
-
-Change supervisor sock and logs path to /home/aksharademo/akshara/logs<br/>
-And add control for uwsgi <br/>
-  > [group:klp-ems]<br/>
-  > programs=uwsgi,nginx<br/>
-  > [program:uwsgi]<br/>
-  > command=/home/aksharademo/akshara/bin/uwsgi --socket 192.168.2.2:8010 --processes 5 --master --wsgi-file Akshara.wsgi<br/>
-  > directory=/home/aksharademo/akshara/Akshara<br/>
-  > user=aksharademo<br/>
-  > autostart=true<br/>
-  > autorestart=true<br/>
-  > stdout_logfile=/home/aksharademo/akshara/logs/uwsgi.log<br/>
-  > redirect_stderr=true<br/>
-  > stopsignal=QUIT<br/>
-  > [program:nginx]<br/>
-  > command=/home/aksharademo/nginx/sbin/nginx -c /home/aksharademo/nginx/conf/nginx.conf -g "daemon off;"<br/>
-  > directory=/home/aksharademo/<br/>
-  > user= root<br/>
-  > autostart=true<br/>
-  > autorestart=true<br/>
-  > stopsignal=QUIT<br/>
-
-Download the init-script for supervisor to /etc/init.d/<br/>
-  `[root@server:~]$ cd /etc/init.d`<br/>
-  `[root@server:~]$ wget -O supervisord http://svn.supervisord.org/initscripts/debian-norrgard`<br/>
-  `root@server:~]$ chmod +x supervisord`<br/>
-
-small changes in the script<br/>
-check where the supervisord binary(command program) is installed<br/>
-  `[root@server:~]$ which supervisord`<br/>
-In some cases maybe /usr/local/bin/supervisord or /usr/bin or /usr/sbin<br/>
-  `[root@server:~]$ vi /etc/init.d/supervisord`<br/>
-Put the right path for supervisor in line 25 of the script.<br/>
-Repeat this to correct the path of supervisorctl too.<br/>
-Specify the full path at line 75 for supervisorctl.<br/>
-Add a group for controlling ems:<br/>
-  `[root@server:~]$ groupadd emsadmin`<br/>
-  `[root@server:~]$ usermod -a -G emsadmin aksharademo`<br/>
-  `[root@server:~]$ chgrp emsadmin /etc/supervisord.conf`<br/>
-  `[root@server:~]$ chmod 660 /etc/supervisord.conf`<br/>
-  `[root@server:~]$ vi /etc/supervisord.conf`<br/>
-
-Make sure the sock permssion is changed in the config as<br/>
-  > [unix_http_server]<br/>
-  > file=/tmp/supervisor.sock<br/>
-  > chmod=0760<br/>  
-  > chown=root:emsadmin<br/>
-
-Check if supervisor functions fine:<br/>
-  `[root@server:~]$ /etc/init.d/supervisord restart`<br/>
-  `[root@server:~]$ su - aksharademo`<br/>
-
-  `[aksharademo@server:~]$ supervisorctl start klp-ems:uwsgi`<br/>
-  `[aksharademo@server:~]$ supervisorctl start klp-ems:nginx`<br/>
-  `[aksharademo@server:~]$ supervisorctl status`<br/>
-Check for:<br/>
-klp-ems:nginx                    RUNNING    pid 26046, uptime 0:13:19<br/>
-klp-ems:uwsgi                    RUNNING    pid 26036, uptime 0:13:52<br/>
-
 ## Bringing up the Application
-Now you should be having a django app rendered at http://<server_ip>:80/home/<br/>
+Now you should be having a django app rendered at http://my.domain.org/<br/>
 
