@@ -29,17 +29,17 @@
     	<label>Question Type</label>
     </div>
     <div class="bng-cl"> <!-- Shows Question type if type is 1 question type is Marks else grade -->
-    	<span>{% if question.questionType == 1 %}Marks{%else%}Grade{%endif%}</span>
+    	<span>{% if question.question_type == 1 %}Marks{%else%}Grade{%endif%}</span>
     </div>
 </div>
 <!-- If Quetion type is 1 show score min and score max -->
-{% if question.questionType == 1 %}
+{% if question.question_type == 1 %}
 	<div class="boundDetail">    
     		<div class="cl-txtbx">
     			<label>ScoreMin</label>
     		</div>
    		<div class="bng-cl">
-   			<span>{{question.scoreMin}}</span>
+   			<span>{{question.score_min}}</span>
    		</div>
 	</div>
 
@@ -48,12 +48,12 @@
     			<label>ScoreMax</label>
     		</div>
    		<div class="bng-cl">
-   			<span>{{question.scoreMax}}</span>
+   			<span>{{question.score_max}}</span>
    		</div>
 	</div>
 {% endif %}
 <!-- If Quetion type is 2 show question grades -->
-{% if question.questionType == 2 %}
+{% if question.question_type == 2 %}
 	<div class="boundDetail">    
     		<div class="cl-txtbx">
     			<label>Grades</label>

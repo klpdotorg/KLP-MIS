@@ -9,7 +9,9 @@
 	<span class="KLP_Sub">
 		<span class="KLP_SpanButton"  onclick="KLP_Del('{{assessment.id}}', 'assessment', '{{assessment.name}}')">Delete</span>
 	</span>
-	
+	<span class="KLP_Sub">
+                <a class="KLP_Button"  href="/assessment/{{assessment.id}}/copy/" onclick="return KLP_View(this);">Copy</a>
+        </span>
 </div>
 
 
@@ -44,7 +46,7 @@
     	<label>Start Date</label>
     </div>
     <div class="bng-cl">
-    	<span>{% if assessment.startDate %}{{assessment.startDate|date:'d-m-Y'}}{% endif %}</span>  <!-- Display Start Date -->
+    	<span>{% if assessment.start_date %}{{assessment.start_date|date:'d-m-Y'}}{% endif %}</span>  <!-- Display Start Date -->
     </div>
 </div>
 <div class="boundDetail">
@@ -52,7 +54,7 @@
     	<label>End Date</label>
     </div>
     <div class="bng-cl">
-    	<span>{% if assessment.endDate %}{{assessment.endDate|date:'d-m-Y'}}{% endif %}</span>   <!-- Display End Date -->
+    	<span>{% if assessment.end_date %}{{assessment.end_date|date:'d-m-Y'}}{% endif %}</span>   <!-- Display End Date -->
     </div>
 </div>
 
@@ -70,6 +72,14 @@
         <label>Double Entry</label>
     </div>
     <div class="bng-cl">
-        <span>{{assessment.doubleEntry}}</span>   <!-- Display End Date -->
+        <span>{{assessment.douple_entry}}</span>   <!-- Display End Date -->
+    </div>
+</div>
+<div class="boundDetail">
+    <div class="cl-txtbx">
+        <label>Active Status</label>
+    </div>
+    <div class="bng-cl">
+        <span>{% if assessment.active == 2 %} Active {% else  %} InActive {% endif%}</span>   <!-- Display ACtive -->
     </div>
 </div>

@@ -176,6 +176,7 @@ class TemplateResponder(object):
                  template_object_name='object', mimetype=None):
         self.template_dir = template_dir
         self.paginate_by = paginate_by
+        print extra_context
         self.template_loader = template_loader
         if not extra_context:
             extra_context = {}
@@ -183,6 +184,7 @@ class TemplateResponder(object):
             if callable(value):
                 extra_context[key] = value()
         self.extra_context = extra_context
+        print 'eeeee',self.extra_context,extra_context,'EEEEEEEEEEEEEEEEEEEEEe'
         self.allow_empty = allow_empty
         self.context_processors = context_processors
         self.template_object_name = template_object_name
@@ -242,6 +244,7 @@ class TemplateResponder(object):
         for obj in object_list:
             self._hide_unexposed_fields(obj, self.expose_fields)
         c.update(self.extra_context)        
+        print self.extra_context,'in resp'
         t = self.template_loader.get_template(template_name)
         return HttpResponse(t.render(c), mimetype=self.mimetype)
 
@@ -298,7 +301,7 @@ class TemplateResponder(object):
 			# Check for realtion names if names are not there validation fail
 			if not (request.POST.get('form-0-fatherfirstname','') or request.POST.get('form-0-motherfirstname','')):
 				RelationValid=False
-				IValid=False
+				#IValid=False
 	  	print ChildTrue		
 		if form_class == Institution_Form:
 			# If Institution Check for address information save data
@@ -307,10 +310,34 @@ class TemplateResponder(object):
 				addressObj.save()
                                 new_data['form-0-inst_address'] = addressObj.id
 				IValid = True		
+                        else:
+                                        IValid=False
                 form = ResourceForm(new_data) # post data to form
                 Valid=form.is_valid()  # Validate form
-                
-	  	if Valid and IValid:
+                qvalid=True
+                """        
+                if modelname==='question':
+                                        qtype=request.POST.get('form-0-question_type')
+                                        if qtype==2:
+                                                      grade=request.POST.get('form-0-grade')
+                                                      gradespl= grade.split(',')               
+                                                      if (gradespl)<1:
+                                                                       qvalid=False
+                                                      else:
+                                                                                     
+                                                                 try:
+                                                                   int(gradespl[0])
+                                                                 except:
+                                                                                          
+                                                                     if len(gradespl[0])!=1 and len(gradespl[0])!=1:
+                                                                                              qvalid=False
+
+
+
+
+                        
+                """                                                               
+	  	if Valid and IValid and qvalid: #and RelationValid:
 	  		# If From is valid then save data
 	  		if form_class == Institution_Form:
 				#new_data = request.POST.copy()
@@ -319,15 +346,20 @@ class TemplateResponder(object):
 	  			# pass address id to the institution to save data
 				#form = ResourceForm(new_data)
                                 if 1:
-				        obj = form.save()[0]  # save data				
-					boundaryObj = Boundary.objects.get(pk=request.POST.get('form-0-boundary'))
-					request.user.set_perms(['Acess'], obj)
-					if boundaryObj.boundary_category.boundary_category.lower() == 'circle' and boundaryObj.boundary_type.boundary_type.lower() in ['anganwadi','preschool']:
-						# if boundary category is circle and boundary type is anganwadi create a class with name Anganwadi Class
-						newClass = StudentGroup(name="Anganwadi Class", active=2, institution_id=obj.id,group_type='Class')
-						newClass.save()
+				      obj = form.save()[0]  # save data				
                                 else:
-					addressObj.delete()
+                                    
+                                           addressObj.delete()
+                                print "OBK"
+				boundaryObj = Boundary.objects.get(pk=request.POST.get('form-0-boundary'))
+                                userob=User.objects.filter(id=request.user.id)[0]      
+				userob.set_perms(['Acess'], obj)
+                                print boundaryObj.boundary_category.boundary_category.lower(),boundaryObj.boundary_type.boundary_type.lower()
+				if boundaryObj.boundary_category.boundary_category.lower() == 'circle' and boundaryObj.boundary_type.boundary_type.lower() in ['anganwadi','preschool']:
+					# if boundary category is circle and boundary type is anganwadi create a class with name Anganwadi Class
+                                        print 'inside IF'
+					newClass = StudentGroup(name="Anganwadi Class", active=2, institution_id=obj.id,group_type='Class')
+					newClass.save()
 			elif form_class == Staff_Form:
 				# If Staff save data for staff and create relation with SG
 				obj = form.save()[0]
@@ -345,14 +377,14 @@ class TemplateResponder(object):
                                  obj=StudentGroup(group_type=grouptype,active=active,institution_id=instutionid,section=section,name=name)
                                  obj.save()
                         elif modulename=='child':
-                                 firstname=request.POST.get('form-0-firstName')
-                                 middlename=request.POST.get('form-0-middleName')
-                                 lastname=request.POST.get('form-0-lastName') 
+                                 firstname=request.POST.get('form-0-first_name')
+                                 middlename=request.POST.get('form-0-middle_name')
+                                 lastname=request.POST.get('form-0-last_name') 
                                  uid=request.POST.get('form-0-uid')
                                  mt=request.POST.get('form-0-mt')
                                  gender=request.POST.get('form-0-gender')
                                  dob=datetime.date(int(request.POST.get('form-0-dob_year')),int(request.POST.get('form-0-dob_month')),int(request.POST.get('form-0-dob_day')))
-                                 obj=Child(firstName=firstname,lastName=lastname,middleName=middlename,uid=uid,mt_id=mt,gender=gender,dob=dob)
+                                 obj=Child(first_name=firstname,last_name=lastname,middle_name=middlename,uid=uid,mt_id=mt,gender=gender,dob=dob)
                                  obj.save()
 
 	  		else:
@@ -382,7 +414,7 @@ class TemplateResponder(object):
 				    	# if current model is Chils and ModelName is Student
 					respDict['student'] = True
 					# Create Student Object With as foreign key
-					student = Student(child=obj, otherStudentId=request.POST.get('form-0-otherId'), active=2)
+					student = Student(child=obj, other_student_Id=request.POST.get('form-0-otherId'), active=2)
 					student.save()
 					# Create relation ship with SG for current academic year.
 					std_stdgrp_relation = Student_StudentGroupRelation(student=student,student_group=self.extra_context['studentgroup'],academic=current_academic(),active=2)
@@ -393,12 +425,12 @@ class TemplateResponder(object):
 						questions_list = Question.objects.filter(assessment = assessmentObj, active=2)
 						entryStr = '''<tr class='KLP_txt_cen'><td><form onsubmit='return false;' id='id_Student_%s' name='student_%s' class="validForm"><div style="display: none;"><input type="hidden" value="%s" name="csrfmiddlewaretoken"></div><input type='hidden' value='%s' name='programId'><input type='hidden' value='%s' name='assessmentId'><input type='hidden' value='%s' name='student'><input type='hidden' value='%s' name='student_groupId'><table><tbody><tr>''' %(student.id, student.id, request.META.get("CSRF_COOKIE", None), assessmentObj.programme.id, self.extra_context['assessment_id'], student.id, self.extra_context['studentgroup_id'])
 						for question in questions_list:
-							if question.questionType == 1:
-								entryStr = entryStr + '''<td class='KLP_td_height'><span style="color:#736F6E;">%s</span><br/><input type='text' class='required digits' size='3' value='' id='id_student_%s_%s' name='student_%s_%s' tabindex='1' min="%s" max="%s"></td>''' %(question.order, student.id, question.id, student.id, question.id, question.scoreMin, question.scoreMax)
+							if question.question_type == 1:
+								entryStr = entryStr + '''<td class='KLP_td_height'><span style="color:#736F6E;">%s</span><br/><input type='text' class='required digits' size='3' value='' id='id_student_%s_%s' name='student_%s_%s' tabindex='1' min="%s" max="%s"></td>''' %(question.order, student.id, question.id, student.id, question.id, question.score_min, question.score_max)
 							else:
 								entryStr = entryStr + '''<td class='KLP_td_height'><span style="color:#736F6E;">%s</span><br/><input type='text' class='required' size='3' value='' id='id_student_%s_%s' name='student_%s_%s' tabindex='1' isinGrades="%s"></td>''' %(question.order, student.id, question.id, student.id, question.id, question.grade)
 						entryStr = entryStr + '''<td class='KLP_td_height'> <input type='submit' value='submit' formname='id_Student_%s' url='/answer/data/entry/' tabindex='1'><script>$().ready(function() {KLP_validateScript("id_Student_%s");});</script></td></tr></tbody></table></form></td></tr>''' %(student.id, student.id)
-						detailStr = '''<tr class='KLP_txt_cen'><td><table><tr><td class='KLP_td_width'>%s</td><td class='KLP_td_width'><span class='blue' title='Father: %s, Mother: %s, Gender: %s, MT: %s, DOB: %s'>%s&nbsp;%s</span><span class='KLP_Form_status' id='id_Student_%s_status'>Form Status</span></td></tr></table></td></tr>''' %(student.id, request.POST['form-0-fatherfirstname'], request.POST['form-0-motherfirstname'], student.child.gender, student.child.mt, student.child.dob.strftime("%d-%m-%Y"), student.child.firstName, student.child.lastName, student.id)
+						detailStr = '''<tr class='KLP_txt_cen'><td><table><tr><td class='KLP_td_width'>%s</td><td class='KLP_td_width'><span class='blue' title='Father: %s, Mother: %s, Gender: %s, MT: %s, DOB: %s'>%s&nbsp;%s</span><span class='KLP_Form_status' id='id_Student_%s_status'>Form Status</span></td></tr></table></td></tr>''' %(student.id, request.POST['form-0-fatherfirstname'], request.POST['form-0-motherfirstname'], student.child.gender, student.child.mt, student.child.dob.strftime("%d-%m-%Y"), student.child.first_name, student.child.last_name, student.id)
 						mapStudenStr = {'detailStr':detailStr, 'ansEntryStr':entryStr}
 						return HttpResponse(simplejson.dumps(mapStudenStr), content_type='application/json; charset=utf-8')
 				# Show detail about newly create Object		
@@ -525,7 +557,7 @@ class TemplateResponder(object):
 			if modelName=='child':
 				# If model name is child update student data and relations data
 				studObj = obj.getStudent()
-				studObj.otherStudentId = request.POST.get('form-0-otherId')
+				studObj.other_student_Id = request.POST.get('form-0-otherId')
 				studObj.save()
 				relation = {'form-0-motherfirstname':'Mother','form-0-fatherfirstname':'Father'}
 				names = {'Mother-MiddleName':'form-0-mothermiddlename','Mother-LastName':'form-0-motherlastname','Father-MiddleName':'form-0-fathermiddlename', 'Father-LastName':'form-0-fatherlastname'}
@@ -563,8 +595,12 @@ class TemplateResponder(object):
 					if clas not in mapClasIds:
 						# if newly assigned class not in already assigned class create relation ship with SG.
 						clasObj = StudentGroup.objects.get(pk=clas)
-						staff_StudentGroup = Staff_StudentGroupRelation(staff = elem, student_group = clasObj, academic=current_academic(), active=2)
-						staff_StudentGroup.save()			
+                                                sobj=Staff_StudentGroupRelation.objects.filter(staff__id = pk, student_group = clasObj, academic=current_academic())
+                                                if sobj:
+                                                          sobj.update(active=2)
+                                                else:                                     
+						   staff_StudentGroup = Staff_StudentGroupRelation(staff = elem, student_group = clasObj, academic=current_academic(), active=2)
+					       	   staff_StudentGroup.save()			
 
 			buttonType = str(self.extra_context['buttonType']) # get button type
 			self.extra_context['showsuccess']=True # make showsuccess is True

@@ -48,12 +48,12 @@
     </tr>
     {% for student in students_list %}
     <tr id = "student_{{student.id}}">
-	<td>{{student.name.firstName}}</td> <td>{{student.name.lastName}}</td> <td>{{student.name.dob}}</td> <td>{{student.name.gender}}</td> <td>{{student.name.relations.mother}}</td> <td>{{student.name.relations.father}}</td> <td>{{student.name.mt}}</td> <td>{{student.academic}}</td> 
+	<td>{{student.name.first_name}}</td> <td>{{student.name.last_name}}</td> <td>{{student.name.dob}}</td> <td>{{student.name.gender}}</td> <td>{{student.name.relations.mother}}</td> <td>{{student.name.relations.father}}</td> <td>{{student.name.mt}}</td> <td>{{student.academic}}</td> 
 
 	<td>
 		<a href="/student/{{student.id}}/update/?keepThis=true&TB_iframe=true&height=400&width=800" title="Edit Student" title="Edit Student" class="thickbox"><img title="Edit" src="/static_media/images/pagebuilder_edit.gif"></a>
 
-		<span style="color:blue;cursor:pointer"  onclick="KLP_Del('{{student.id}}', 'student', '{{student.name.firstName}}')"><img width="11" title="Delete" src="/static_media/images/PageRow_delete.gif" title="Delete"></span>
+		<span style="color:blue;cursor:pointer"  onclick="KLP_Del('{{student.id}}', 'student', '{{student.name.first_name}}')"><img width="11" title="Delete" src="/static_media/images/PageRow_delete.gif" title="Delete"></span>
 	</td>
     </tr>
     {% endfor %}

@@ -13,14 +13,14 @@ class Command(BaseCommand):
         def handle(self, *args, **options):
                 try:
                 	# read start date, end date and filename
-                        startDate = args[0]
-                        endDate = args[1]
+                        start_date = args[0]
+                        end_date = args[1]
                         fileName = args[2]
 			contentList = ['boundary', 'institution', 'student', 'staff']
-                        if fileName and startDate and endDate:
+                        if fileName and start_date and end_date:
                                 try:
-                                	strDate = startDate.split("/")
-                                	enDate = endDate.split("/")
+                                	strDate = start_date.split("/")
+                                	enDate = end_date.split("/")
     					assessments = Assessment.objects.select_related("programme").filter(programme__active=2, active=2).distinct().only("id", "name")
     					# get current working directory.
 					cwd = os.getcwd()
@@ -42,7 +42,7 @@ class Command(BaseCommand):
 					eTime = datetime.datetime(int(enDate[2]), int(enDate[1]), int(enDate[0]), 23, 59, 00)
 					for assessment in assessments:
 						
-						answers = Answer.objects.filter(Q(user1__id__in=userIds) | Q(user2__id__in=userIds), lastModifiedDate__range=(sDate, eDate), question__assessment=assessment).values_list("id", flat=True).distinct()
+						answers = Answer.objects.filter(Q(user1__id__in=userIds) | Q(user2__id__in=userIds), last_modified_date__range=(sDate, eDate), question__assessment=assessment).values_list("id", flat=True).distinct()
 						if answers:
 							assessmentId = assessment.id
 							asmList.append(assessmentId)

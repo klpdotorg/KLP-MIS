@@ -92,7 +92,7 @@ def KLP_DeleteStudnet(request, id):
 				
 			except:
 				count = count + 1
-				delFailed += '%s %s ,'(obj.child.firstName, obj.child.lastName)
+				delFailed += '%s %s ,'(obj.child.first_name, obj.child.last_name)
 				
 			
 	if count == 0:	 

@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.core.mail import send_mail
-
+from klp.settings import PROJECT_NAME,PROJECT_ROOT
 from django.conf import settings
 
 from schools.models import *
@@ -15,7 +15,6 @@ class Command(BaseCommand):
 	def handle(self, *args, **options):
                 print args,"options ",options                
 	        if 1:	
-
 			# Reads the arguments from command line.
                         print "INNTER TRY" 
                         inst_list= args[0] #options["inst_list"]
@@ -37,8 +36,13 @@ class Command(BaseCommand):
                         if inst_list and bound_cat in ['cluster','circle']:
                             inst_list=inst_list.split(',')
                             inst_listall=inst_list 
-                            asmIdList = assignPermission(inst_list, deUserList, permissions, permissionType, assessmentId, assessmentPerm)  
+                            #asmIdList = assignPermission(inst_list, deUserList, permissions, permissionType, assessmentId, assessmentPerm)  
                         else:
+                                  if bound_cat== 'district':
+                                       inst_listall=Institution.objects.filter(boundary__parent__id__in= bound_list, active=2).values_list('id', flat=True).distinct()
+                                  elif bound_cat in [ 'block', 'project']:
+                                                  inst_listall = Institution.objects.filter(boundary__id__in= bound_list, active=2).values_list('id', flat=True).distinct()
+                                  '''   
                                   for bound in bound_list:
                                      bound=int(bound)
                                      print bound
@@ -48,27 +52,66 @@ class Command(BaseCommand):
                                      elif bound_cat in [ 'block', 'project']:
                                                   inst_list = Institution.objects.filter(boundary__id = bound, active=2).values_list('id', flat=True).distinct()
 		              	     inst_listall.extend(inst_list)   
-                                  asmIdList = assignPermission(inst_listall, deUserList, permissions, permissionType, assessmentId, assessmentPerm)
-                        self.SendingMail(asmIdList,deUserList,permissions,permissionType,assessmentId,assessmentPerm,bound_list,username)
+                                  '''
+                        asmIdList,allassignIds,dic=assignPermission(inst_listall, deUserList, permissions, permissionType, assessmentId, assessmentPerm)
+                        self.SendingMail(asmIdList,deUserList,permissions,permissionType,allassignIds,assessmentPerm,bound_list,username,dic)
                         print "Successfully Assigned"
 		if 0:
 			raise CommandError('Pass First Parameter as Boundary Ids List file and Second Parameter as User Ids List \n')
 	           		
-	def SendingMail(self,inst_list,deUserList,permissions,permissionType,assessmentId,assessmentPerm,bound_list,username):
+	def SendingMail(self,inst_list,deUserList,permissions,permissionType,assessmentId,assessmentPerm,bound_list,username,dic):
                         inst_list=list(set(inst_list))     
+                        detailmessage='The following is the Assignment data for the current action only:\n'
+                        for k in dic:
+ 
+                           detailmessage+='User name :%s (%d) \n \n '%( k[0],k[1])
+                           assIds=dic[k][0]
+                           for assId in assIds:
+                                 assName=Assessment.objects.filter(id=assId)[0].name
+                                 detailmessage +=' \t \t Permissions were already assigned to the following institutions for assessment %s :\n \n' % (str(assId)+'-'+assName)
+                                 if assIds[assId][0]:
+                                   allreadylist=str(assIds[assId][0])
+                                   detailmessage +='\t \t \t No of Institution : '+str(len(assIds[assId][0]))+': \n\n  \t \t \t '+allreadylist[1:len(allreadylist)-1]+' .\n\n'
+                                 else:
+                                                  detailmessage +=' \t \t \t None . \n\n'
+                                 detailmessage +=' \t \t Permissions were newly assigned to the following institutions for assessment %s :\n \n ' % (str(assId)+'-'+assName)
+                                 if assIds[assId][1]:
+                                    newlylist=str(assIds[assId][1])
+                                    detailmessage +='\t \t \t No of Institution : '+str(len(assIds[assId][1]))+': \n\n  \t \t \t '+newlylist[1:len(newlylist)-1]+'\n\n'
+                                 else:
+                                    detailmessage +=' \t \t \t None . \n\n'
+                           if not assIds:
+                                    detailmessage +='\t \t Assessment assigned to the user: None \n\n'
+                           if  dic[k][1] or  dic[k][2]:
+                           	detailmessage +=' \t \t Permissions were newly assigned to the following institutions \n\n'
+                           	if dic[k][1]:   
+                                	  allreadylist=str(dic[k][1])
+                                  	  detailmessage +='\t \t \t No of Institution : '+str(len(dic[k][1]))+': \n\n  \t \t \t '+allreadylist[1:len(allreadylist)-1]+' .\n\n'
+                           	else:
+                                             detailmessage +=' \t \t \t None . \n\n'
+                           	detailmessage +=' \t \t Permissions were already assigned to the following institutions\n\n '
+                           	if dic[k][2]:
+                              		newlylist=str(dic[k][2])
+                              		detailmessage +='\t \t \t No of Institution : '+str(len(dic[k][2]))+': \n\n  \t \t \t '+newlylist[1:len(newlylist)-1]+' .\n\n'
+                           	else:
+                                	detailmessage +=' \t \t \t None . \n\n'
                         inst_liststr=', '.join(str(x) for x in inst_list)
                         boundarystr=''
                         if bound_list!=['']: #print bound_list,"boundarylist"
                           boundarylist=Boundary.objects.filter(id__in=bound_list)   
                            
                           if bound_list:
-                            boundarystr="Assigned Permissions in "
+                            boundarystr="Assigned Permissions in \n"
                             for k in boundarylist:
                                          
                                   boundarystr+=k.name+"----->"+k.boundary_category.boundary_category+",\n"
                         sender=settings.REPORTMAIL_SENDER
                         receiver=settings.REPORTMAIL_RECEIVER
-                        subject="Assigned Permissions for Institutions and Assessments by %s" % (username)
-                        fullmsg="%s \n Institutions List (%s): %s \n User List : %s \n Permissions : %s \n Permission Type :%s \n Assessment Id List : %s \n Assessment Permissions : %s " %(boundarystr,str(len(inst_list)),inst_liststr,deUserList,permissions,permissionType,assessmentId,assessmentPerm)
+                        subject="Assigned Permissions for Institutions and Assessments by %s from %s server" % (username,PROJECT_NAME)
+                        permissionTypetext='Assign Permissions' if permissionType=='permissions' else 'Assessment Permissions'
+                        assessmentPermtext= 'True' if assessmentPerm not in ['None',None,''] else 'False'
+                        fullmsg="%s \n %s  \n User List : %s  \n Admin Action :%s \n Assessment Id List : %s \n Assign Assessment checked : %s " %(boundarystr,detailmessage,deUserList,permissionTypetext,assessmentId,assessmentPermtext)
+                        
+                          
                         send_mail(subject, fullmsg, sender,receiver)
 

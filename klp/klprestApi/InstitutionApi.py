@@ -17,7 +17,7 @@ from django_restapi.receiver import *
 from klprestApi.BoundaryApi import ChoiceEntry
 from django.utils import simplejson
 from django.template import loader, RequestContext
-
+from klprestApi.TreeMenu import *
 from schools.receivers import KLP_user_Perm
 
 class KLP_Institution(Collection):    
@@ -40,13 +40,13 @@ def KLP_Institution_Create(request, referKey):
 	# get parent boundary object for institution.
 	boundaryObj = Boundary.objects.get(pk=referKey)
 	institutionType = 'Institution'
-	categoryType = 1
+	category_type = 1
 	if boundaryObj.boundary_category.boundary_category.lower() == 'circle':
-		# if boundary category is circle then institutionType is Anganwadi and  categoryType is 2 else institutionType is Institution and  categoryType is 1 
+		# if boundary category is circle then institutionType is Anganwadi and  category_type is 2 else institutionType is Institution and  category_type is 1 
 		institutionType = 'Anganwadi'
-		categoryType = 2
-	# Query for Institution Category based on  categoryType
-	categoryList = Institution_Category.objects.filter(categoryType = categoryType)
+		category_type = 2
+	# Query for Institution Category based on  category_type
+	categoryList = Institution_Category.objects.filter(category_type = category_type)
         #before Institution.objects.all()
         KLP_Create_Institution = KLP_Institution(queryset = Institution.objects.filter(pk=0), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'institution', extra_context={'buttonType':buttonType, 'referKey':referKey, 'institutionType':institutionType, 'categoryList':categoryList, 'selCategoryTyp':selCategoryTyp}), receiver = XMLReceiver(),)
         response = KLP_Create_Institution.responder.create_form(request,form_class=Institution_Form)
@@ -73,11 +73,11 @@ def KLP_Institution_Update(request, institution_id):
 		selCategoryTyp = int(selCategoryTyp)
 	institutionObj = Institution.objects.get(id=institution_id)
 	institutionType = 'Institution'
-	categoryType = 1
+	category_type = 1
 	if institutionObj.boundary.boundary_category.boundary_category == 'Circle':
 		institutionType = 'Anganwadi'
-		categoryType = 2
-	categoryList = Institution_Category.objects.filter(categoryType = categoryType)
+		category_type = 2
+	categoryList = Institution_Category.objects.filter(category_type = category_type)
         #before Institution.objects.all()
 	KLP_Edit_Institution =KLP_Institution(queryset = Institution.objects.filter(pk=institution_id), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'institution', extra_context={'buttonType':buttonType, 'referKey':referKey, 'institutionType':institutionType, 'categoryList':categoryList, 'selCategoryTyp':selCategoryTyp}), receiver = XMLReceiver(),)
 	response = KLP_Edit_Institution.responder.update_form(request, pk=institution_id, form_class=Institution_Form)
@@ -113,9 +113,9 @@ def KLP_Institution_Boundary(request, boundary_id, permissionType, assessment_id
 		else:
 			# If permissionType is not permissions 
 			# Get All active(2) Mapped Sg's
-			studentgroup_list = Assessment_StudentGroup_Association.objects.filter(assessment__id=assessment_id, active=2).values_list('student_group', flat=True).distinct()
+			#studentgroup_list = Assessment_StudentGroup_Association.objects.filter(assessment__id=assessment_id, active=2).values_list('student_group', flat=True).distinct()
 			# Get Institutions based Sg's
-			map_institutions_list = StudentGroup.objects.filter(id__in=studentgroup_list, active=2).values_list('institution__id', flat=True).distinct()
+			map_institutions_list = getAssInst([assessment_id]) #StudentGroup.objects.filter(id__in=studentgroup_list, active=2).values_list('institution__id', flat=True).distinct()
 			if bound_cat == 'district':
 				# if bound_cat is district query block or project level  boundaries
 				boundary_list = Boundary.objects.filter(institution__pk__in=map_institutions_list, active=2, parent__parent=boundaryObj).values_list('parent__id', flat=True).distinct()

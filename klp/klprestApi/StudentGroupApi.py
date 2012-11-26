@@ -58,7 +58,7 @@ def KLP_StudentGroup_View(request, studentgroup_id):
 	# Query Child onjects
 	child_list = Student_StudentGroupRelation.objects.filter(student_group__id = studentgroup_id, academic=current_academic, active=2, student__active=2).values_list('student__child', flat=True)
 	
-	students = Child.objects.filter(id__in=child_list).extra(select={'lower_firstname':'lower(trim("firstName"))', 'lower_midname':'lower(trim("middleName"))', 'lower_lastname':'lower(trim("lastName"))' }).order_by('lower_firstname', 'lower_midname', 'lower_lastname')
+	students = Child.objects.filter(id__in=child_list).extra(select={'lower_firstname':'lower(trim("first_name"))', 'lower_midname':'lower(trim("middle_name"))', 'lower_lastname':'lower(trim("last_name"))' }).order_by('lower_firstname', 'lower_midname', 'lower_lastname')
 	resp=Collection(students, permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'students',paginate_by = 20,extra_context={'studgrpParent':studgrpParent,'studentgroup':studentgroup,'url':url, 'students':students,'Norecords':Norecords, 'studentGroups':studentGroups,'count':count}),)
         return HttpResponse(resp(request))
 
@@ -83,11 +83,21 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 	user = request.user  #get logged in user
 	url = "/studentgroup/%s/programme/%s/assessment/%s/view/" %(studentgroup_id, programme_id, assessment_id)
 	# Query Childs based on studentgroup relation
-	students = Student_StudentGroupRelation.objects.select_related("student").filter(student_group__id = studentgroup_id, academic=current_academic, active=2).values_list('student__child', flat=True).distinct()
-	grupObj = StudentGroup.objects.filter(pk = studentgroup_id).only("group_type")
-	childs_list = Child.objects.filter(id__in=students).extra(select={'lower_firstname':'lower(trim("firstName"))' }).order_by('lower_firstname').defer("mt")
-	question_list = Question.objects.filter(assessment__id=assessment_id, active=2).defer("assessment")
-	studIdList, qNamesList, qIdList, chList, rDict, childDict, counter=[], [], [], [], {}, {}, 0
+        AssObj=Assessment.objects.get(id=assessment_id)
+        if AssObj.typ ==3:
+        	students = Student_StudentGroupRelation.objects.select_related("student").filter(student_group__id = studentgroup_id, academic=current_academic, active=2).values_list('student__child', flat=True).distinct()
+	        grupObj = StudentGroup.objects.filter(pk = studentgroup_id).only("group_type")[0].group_type
+         	childs_list = Child.objects.filter(id__in=students).extra(select={'lower_firstname':'lower(trim("first_name"))' }).order_by('lower_firstname').defer("mt")
+        elif AssObj.typ ==2:
+                                         childs_list=StudentGroup.objects.filter(pk = studentgroup_id)
+                                         grupObj =childs_list.only("group_type")[0].group_type
+        else:
+                                  childs_list=Institution.objects.filter(id=studentgroup_id)
+                                  grupObj=''
+        question_list = Question.objects.filter(assessment__id=assessment_id, active=2).defer("assessment")
+       
+                     
+        studIdList, qNamesList, qIdList, chList, rDict, childDict, counter=[], [], [], [], {}, {}, 0
 	paginator = Paginator(childs_list, 20)
 	
 	page = request.GET.get('page')  #get page to show result
@@ -107,29 +117,38 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 		chId = child.id
 		chList.append(chId)
 		# Query for active student using child object
-		student = Student.objects.filter(child=child, active=2).defer("child")
-		studId = student[0].id
-		# get Child and student information to show in grid.
-		if child.dob:
-			dOfB = child.dob.strftime("%d-%m-%Y")
-		else:
-			dOfB = ''
-		chDic = {'studId':studId, 'Gender':child.gender, 'dob':dOfB, 'firstName':child.firstName, 'lastName':child.lastName}
-		# get relations
-		try:			
-			relObj = Relations.objects.filter(child=child, relation_type="Father").only("first_name")
-			chDic['fName'] = relObj[0].first_name
-		except:
-			chDic['fName'] = ''
+             	if AssObj.typ ==3:
+                                     student = Student.objects.filter(child=child, active=2).defer("child")
+	                             studId = student[0].id
+                                     # get Child and student information to show in grid.
+              	                     if child.dob:
+                                			dOfB = child.dob.strftime("%d-%m-%Y")
+		                     else:
+                          			dOfB = ''
+		                     chDic = {'studId':studId, 'Gender':child.gender, 'dob':dOfB, 'first_name':child.first_name, 'last_name':child.last_name}
+                                     # get relations
+			             try:			
+                                   			relObj = Relations.objects.filter(child=child, relation_type="Father").only("first_name")
+                                        		chDic['fName'] = relObj[0].first_name
+                                     except:
+                               			chDic['fName'] = ''
 		
-		try:
-			relObj = Relations.objects.filter(child=child, relation_type="Mother").only("first_name")
-			chDic['mName'] = relObj[0].first_name
-		except:
-			chDic['mName'] = ''
+                                     try:
+                       			relObj = Relations.objects.filter(child=child, relation_type="Mother").only("first_name")
+		                 	chDic['mName'] = relObj[0].first_name
+                                     except:
+                      			chDic['mName'] = ''
 			
-		studIdList.append(studId)
-		childDict[chId] = chDic
+                                     studIdList.append(int(studId))
+		                     childDict[chId] = chDic
+                elif AssObj.typ==2:
+                                                           chDic={'instId':studentgroup_id,'name':child.name+" "+child.section}
+                                                           studIdList.append(int(studentgroup_id))
+                                                           childDict[chId] = chDic
+                else:
+                                           chDic={'instId':studentgroup_id,'name':child.name}
+                                           studIdList.append(int(studentgroup_id))
+                                           childDict[chId] = chDic
 	rDict, ansStudList={}, []
 	counter = counter +1 
 	
@@ -139,28 +158,30 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 		qId = ques.id
 		qIdList.append(qId)
 		dataDict={'qId':qId, 'qOrder':ques.order}
-		qType = ques.questionType
+		qType = ques.question_type
 		dataDict['qType'] = qType		
-                AdoubleEntry=ques.assessment.doubleEntry
+                Adouple_entry=ques.assessment.douple_entry
 		if qType == 2:
 			# if quetion type is 2(marks) get grades to do validation while data entry
 			ansIn =  ques.grade
 			dataDict['ansIn'] = ansIn
 		else:
 			# else get minmum and maximum score to do validation while data entry
-			dataDict['scMin'] = ques.scoreMin
-			dataDict['scMax'] = ques.scoreMax
+			dataDict['scMin'] = ques.score_min
+			dataDict['scMax'] = ques.score_max
 		qDict={}	
 		# Query For Answers based on question id and studens
-		ansList = Answer.objects.select_related("user1").filter(question=ques, student__id__in = studIdList).defer("question").values()
+                print studIdList,'IIIIIIIIIIIIIIIIIII'
+		ansList = Answer.objects.select_related("user1").filter(question=ques, object_id__in = studIdList).defer("question").values()
+                print dataDict,studIdList,qId
 		if ansList:
 			for ansObj in ansList:
 				# If answers is there get answer Information
 				ansDict=dict(dataDict)
-				dEntry = ansObj['doubleEntry']
+				dEntry = ansObj['douple_entry']
 			
 				firstUser = ansObj['user1_id']
-				studentId = ansObj['student_id']
+				studentId = ansObj['object_id']
 				ansStudList.append(studentId)
 				if dEntry == 2:
 					# if dEntry is 2 (doubleentry is finished) then dont show input box
@@ -168,7 +189,7 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 				else:
 					# else show input box
 					ansDict['iBox'] = True
-                                if dEntry == 2 and AdoubleEntry ==False and firstUser==user.id:
+                                if dEntry == 2 and Adouple_entry ==False and firstUser==user.id:
                                         # if dEntry is 2 and assesment double entry is false and first user is matched with logged in user then input box will show (refer ticket 322)x
                                         ansDict['iBox'] =True
  
@@ -181,16 +202,16 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 		    			ansVal = 'UK'
 		    		elif qType == 2:
 		    			# if question type is 2(grade) then show answer grade
-		    			ansVal = ansObj['answerGrade']
+		    			ansVal = ansObj['answer_grade']
 		    		else:
 		    			# else show answer score
-		    			ansVal = ansObj['answerScore']
+		    			ansVal = ansObj['answer_score']
 				ansDict['ansVal']=ansVal								
 				ansDict['shVal'] = False	  
 				if firstUser != user.id and dEntry ==1:
 					# if dEntry is 1, (first entry finished doubleentry is not finished) and logged in user is not match with first user who enter data, then make dE attribute true to do validation while doubleentry
 					ansDict['dE'] = True
-				elif firstUser == user.id and dEntry ==1 or (dEntry == 2 and AdoubleEntry ==False and firstUser==user.id):
+				elif firstUser == user.id and dEntry ==1 or (dEntry == 2 and Adouple_entry ==False and firstUser==user.id):
 					# if dEntry is 1, (first entry finished doubleentry is not finished) and logged in user is match with first user who enter data, then make shVal attribute true to show answer value in input box.
 					ansDict['shVal'] = True
 				
@@ -198,20 +219,22 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 				
 		
 		rDict[qId] = qDict	
+        print rDict,'rDict'
 	noAnsList = list(set(studIdList).difference(set(ansStudList)))
+        print studIdList,ansStudList
 	if noAnsList:
 		# If No Answers Found get only Question Information to show empty text box.
 		for ques in question_list:
 			qId = ques.id
 			dataDict={'qId':qId, 'qOrder':ques.order}
-			qType = ques.questionType
+			qType = ques.question_type
 			dataDict['qType'] = qType
 			if qType == 2:
 				ansIn =  ques.grade
 				dataDict['ansIn'] = ansIn
 			else:
-				dataDict['scMin'] = ques.scoreMin
-				dataDict['scMax'] = ques.scoreMax
+				dataDict['scMin'] = ques.score_min
+				dataDict['scMax'] = ques.score_max
 			qDict=rDict[qId]
 			for stId in noAnsList:
 				ansDict=dict(dataDict)
@@ -221,8 +244,8 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 			
 			
 				
-	
-	val=Collection(childs_list, permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'prgtemplates', template_object_name = 'childs', paginate_by=20, extra_context={'filter_id':programme_id, 'assessment_id':assessment_id, 'user':user, 'studentgroup_id':studentgroup_id, 'question_list':question_list,  'group_typ':grupObj[0].group_type, 'url':url, 'studIdList':studIdList, 'rDict':rDict, 'qNamesList':qNamesList, 'chList':chList, 'childDict':childDict, 'rDict':rDict, 'qIdList':qIdList}), entry_class = ChoiceEntry, )
+        print 'fsdfsdfs',rDict,'ggggggggggggggggggggggggg'
+	val=Collection(childs_list, permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'prgtemplates', template_object_name = 'childs', paginate_by=20, extra_context={'filter_id':programme_id, 'assessment_id':assessment_id, 'user':user, 'studentgroup_id':studentgroup_id, 'question_list':question_list,  'group_typ':grupObj, 'url':url, 'studIdList':studIdList,  'qNamesList':qNamesList, 'chList':chList, 'childDict':childDict, 'rDict':rDict, 'qIdList':qIdList}), entry_class = ChoiceEntry, )
 	return HttpResponse(val(request))
 	
 

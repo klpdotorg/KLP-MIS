@@ -42,7 +42,7 @@ def KLP_Programme_Create(request):
 	if currentMont>4:
 		endYear = endYear + 1 
         #before Programme.objects.all()
-        KLP_Create_Programme = KLP_Programme(queryset = Programme.objects.filter(pk=0), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'programme', extra_context={'buttonType':buttonType, 'endDate':30, 'endYear':endYear, 'endMonth':'APRIL'}), receiver = XMLReceiver(),)
+        KLP_Create_Programme = KLP_Programme(queryset = Programme.objects.filter(pk=0), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'programme', extra_context={'buttonType':buttonType, 'end_date':30, 'endYear':endYear, 'endMonth':'APRIL'}), receiver = XMLReceiver(),)
         response = KLP_Create_Programme.responder.create_form(request,form_class=Programme_Form)
         					
         return HttpResponse(response)  
@@ -59,7 +59,7 @@ def KLP_Programme_Update(request, programme_id):
 	if currentMont>4:
 		endYear = endYear + 1
         #before Programme.objects.all()
-	KLP_Edit_Programme =KLP_Programme(queryset = Programme.objects.filter(pk=programme_id), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'programme', extra_context={'buttonType':buttonType, 'endDate':30, 'endYear':endYear, 'endMonth':'APRIL'}), receiver = XMLReceiver(),)
+	KLP_Edit_Programme =KLP_Programme(queryset = Programme.objects.filter(pk=programme_id), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'programme', extra_context={'buttonType':buttonType, 'end_date':30, 'endYear':endYear, 'endMonth':'APRIL'}), receiver = XMLReceiver(),)
 	response = KLP_Edit_Programme.responder.update_form(request, pk=programme_id, form_class=Programme_Form)
 	
 	return HttpResponse(response)              
@@ -70,7 +70,7 @@ class KLP_Get_Programms(Resource):
     def read(self,request,type_id):     
          try:     
             # Query for active programmes based on category
-            programme_list = Programme.objects.filter(programme_institution_category=type_id, active=2).order_by("-startDate", "-endDate", "name").only("id", "name")
+            programme_list = Programme.objects.filter(programme_institution_category=type_id, active=2).order_by("-start_date", "-end_date", "name").only("id", "name")
             respStr = ''
             for programme in programme_list:
                 respStr += '%s$$%s&&' %(programme.id, programme)    

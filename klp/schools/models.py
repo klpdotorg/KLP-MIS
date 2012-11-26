@@ -57,7 +57,7 @@ for typ in range(ord('a'), ord('z')+1):
 class Institution_Category(models.Model):
 	'''This Class stores the Institution Category Information'''
 	name = models.CharField(max_length = 50)
-	categoryType = models.IntegerField()
+	category_type = models.IntegerField()
 	def __unicode__(self):
 		return "%s"%self.name
 register_model(Institution_Category)
@@ -110,11 +110,11 @@ register_model(Boundary_Type)  # Register model for to store information in full
 
 class Staff_Type(models.Model):
 	'''This Class stores information about Staff Type'''
-	staffType = models.CharField(max_length = 100)
-	categoryType = models.IntegerField()
+	staff_type = models.CharField(max_length = 100)
+	category_type = models.IntegerField()
 	
 	def __unicode__(self):
-		return "%s" %(self.staffType)
+		return "%s" %(self.staff_type)
 register_model(Staff_Type)  # Register model for to store information in fullhistory
 		
 class Staff_Qualifications(models.Model):
@@ -205,8 +205,8 @@ class Institution(models.Model):
 	def __unicode__(self):
 		return "%s"%(self.name)
 
-	def get_all_cat(self, categoryType):
-		return Institution_Category.objects.all(categoryType = categoryType)
+	def get_all_cat(self, category_type):
+		return Institution_Category.objects.all(category_type = category_type)
 
 	def getChild(self):
 		if StudentGroup.objects.filter(institution__id = self.id,active=2).count():
@@ -250,7 +250,11 @@ class Institution(models.Model):
 			retStr = retStr + "</ul>"
 		return retStr
 
+        def getStudentProgrammeUrl(self, filter_id, secfilter_id):
+            assname=Assessment.objects.filter(id=secfilter_id).values_list('name',flat=True)[0]
+            InstName = self.name
 
+            return '<a href="/studentgroup/%s/programme/%s/assessment/%s/view" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="/static_media/tree-images/reicons/institution.gif" title="%s" /> &nbsp; <span id="institution_%s_text">%s </span> <span style="color:green;font-size:12px">%s</span></a>' %(self.id, filter_id, secfilter_id,  InstName, InstName, self.id,  InstName,assname)
 register(['Acess'], Institution) # Register model for Object permissions
 register_model(Institution)  # Register model for to store information in fullhistory
 
@@ -258,22 +262,29 @@ from django.db.models.signals import post_save, pre_save
 from schools.receivers import KLP_NewInst_Permission
 # Call KLP_NewInst_Permission method on Institution save
 post_save.connect(KLP_NewInst_Permission, sender=Institution) 
+class TaggedItem(models.Model):
+    tag = models.SlugField()
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
 
+    def __unicode__(self):
+        return self.tag
 class Child(models.Model):
 	''' This class stores the personnel information of the childrens'''
-	firstName = models.CharField(max_length = 50)
-	middleName = models.CharField(max_length = 50,blank=True,null=True)
-	lastName = models.CharField(max_length = 50,blank=True,null=True)
+	first_name = models.CharField(max_length = 50)
+	middle_name = models.CharField(max_length = 50,blank=True,null=True)
+	last_name = models.CharField(max_length = 50,blank=True,null=True)
 	uid = models.CharField(max_length = 100,blank=True,null=True)
 	dob = models.DateField(max_length = 20)
 	gender = models.CharField(max_length=10,choices=Gender,default="male")
 	mt =  models.ForeignKey(Moi_Type,default="kannada")
 
 	class Meta: 
-		ordering = ["firstName", "middleName", "lastName"]
+		ordering = ["first_name", "middle_name", "last_name"]
 
 	def __unicode__(self):
-		return "%s"%(self.firstName)
+		return "%s"%(self.first_name)
 
 	def getRelations(self):
 		return Relations.objects.filter(child__id=self.id)
@@ -348,14 +359,23 @@ class StudentGroup(models.Model):
 		return '<a href="/studentgroup/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s %s"> <img src="/static_media/tree-images/reicons/studentgroup_%s.gif" title="%s" /> <span id="studentgroup_%s_text">%s %s</span> </a>' %(self.id, groupName, sec, self.group_type, self.group_type, self.id, groupName, sec)
 		
 	def getStudentProgrammeUrl(self, filter_id, secfilter_id):
-            assname=Assessment.objects.filter(id=secfilter_id).values_list('name',flat=True)[0]
-	    groupName = self.name
-	    if groupName == '0':
-	    	groupName = 'Anganwadi Class'
-	    sec = self.section
-	    if sec == None:
-	    	sec = ''	
-	    return '<a href="/studentgroup/%s/programme/%s/assessment/%s/view" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s %s"> <img src="/static_media/tree-images/reicons/studentgroup_%s.gif" title="%s" /> &nbsp; <span id="studentgroup_%s_text">%s %s</span> <span style="color:green;font-size:12px">%s</span></a>' %(self.id, filter_id, secfilter_id, groupName, sec, self.group_type, self.group_type, self.id,  groupName, sec,assname)
+            assname1=Assessment.objects.filter(id=secfilter_id)
+            assname=assname1.values_list('name',flat=True)[0]
+            groupName = self.name
+            if groupName == '0':
+                groupName = 'Anganwadi Class'
+            sec = self.section
+            if sec == None:
+                sec = ''   
+            if assname1[0].typ in [2,3]: 
+               objid=self.id
+               assicon='studentgroup_%s' % (self.group_type)
+               displayname=groupName+' '+ sec
+            else:
+                          objid=self.institution.id
+                          assicon='institution'                
+                          displayname=self.institution.name
+	    return '<a href="/studentgroup/%s/programme/%s/assessment/%s/view" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s %s"> <img src="/static_media/tree-images/reicons/%s.gif" title="%s" /> &nbsp; <span id="studentgroup_%s_text">%s </span> <span style="color:green;font-size:12px">%s</span></a>' %(objid, filter_id, secfilter_id, groupName, sec, assicon, self.group_type, objid, displayname,assname)
 
 	def get_view_url(self):
 		return '/studentgroup/%s/view/' %(self.id)
@@ -382,12 +402,12 @@ register_model(Academic_Year)  # Register model for to store information in full
 def current_academic():
     ''' To select current academic year'''
     now = datetime.date.today()
-    currentYear = int(now.strftime('%Y'))
+    current_year = int(now.strftime('%Y'))
     currentMont = int(now.strftime('%m'))
-    if currentMont>=1 and currentMont<=8:
-        academic = '%s-%s' %(currentYear-1, currentYear)
+    if currentMont>=1 and currentMont<=7:
+        academic = '%s-%s' %(current_year-1, current_year)
     else:
-        academic = '%s-%s' %(currentYear, currentYear+1)
+        academic = '%s-%s' %(current_year, current_year+1)
     try:
         academicObj = Academic_Year.objects.get(name=academic)
         return academicObj
@@ -397,9 +417,9 @@ def current_academic():
 class Staff(models.Model):
 	'''This Class stores the Institution Worker(Staff) Information'''
 	institution = models.ForeignKey(Institution, blank = True, null = True)
-	firstName = models.CharField(max_length = 50)
-	middleName = models.CharField(max_length = 50,blank=True,null=True)
-	lastName = models.CharField(max_length = 50,blank=True,null=True)
+	first_name = models.CharField(max_length = 50)
+	middle_name = models.CharField(max_length = 50,blank=True,null=True)
+	last_name = models.CharField(max_length = 50,blank=True,null=True)
 	uid = models.CharField(max_length = 100,blank=True,null=True)
 	doj = models.DateField(max_length = 20,blank=True,null=True)
 	gender = models.CharField(max_length=10,choices=Gender, default="female")
@@ -410,10 +430,10 @@ class Staff(models.Model):
 	active = models.IntegerField(blank = True, null = True,default=2)
 
 	class Meta: 
-		ordering = ["firstName", "middleName", "lastName"]
+		ordering = ["first_name", "middle_name", "last_name"]
 
 	def __unicode__(self):
-		return "%s %s %s"%(self.firstName, self.middleName, self.lastName)
+		return "%s %s %s"%(self.first_name, self.middle_name, self.last_name)
 		
 	def getAssigendClasses(self):
 		return 	StudentGroup.objects.filter(staff_studentgrouprelation__staff__id = self.id, staff_studentgrouprelation__active=2)
@@ -422,14 +442,14 @@ register_model(Staff)  # Register model for to store information in fullhistory
 class Student(models.Model):
 	''' This class gives information regarding the students class , academic year and personnel details'''
 	child = models.ForeignKey(Child)
-	otherStudentId = models.CharField(max_length = 100,blank = True, null = True)
+	other_student_Id = models.CharField(max_length = 100,blank = True, null = True)
 	active = models.IntegerField(blank = True, null = True,default=2)
 
 	class Meta:
-		ordering = ["child__firstName"]
+		ordering = ["child__first_name"]
 	
 	def GetName(self):
-		return self.child.firstName
+		return self.child.first_name
 
 	def __unicode__(self):
 		return "%s"%(self.child)
@@ -485,12 +505,12 @@ register_model(Staff_StudentGroupRelation)		# Register model for to store inform
 def default_end_date():
     ''' To select academic year end date'''
     now = datetime.date.today()
-    currentYear = int(now.strftime('%Y'))
+    current_year = int(now.strftime('%Y'))
     currentMont = int(now.strftime('%m'))
     if currentMont>5:
-        academic_end_date = datetime.date(currentYear+1, 5, 30)
+        academic_end_date = datetime.date(current_year+1, 5, 30)
     else:
-        academic_end_date = datetime.date(currentYear, 5, 30)
+        academic_end_date = datetime.date(current_year, 5, 30)
     return academic_end_date
 
 
@@ -498,16 +518,16 @@ class Programme(models.Model):
 	""" This class Stores information about Programme """
 	name = models.CharField(max_length = 100)
 	description = models.CharField(max_length = 500,blank = True, null = True)
-	startDate = models.DateField(max_length = 20, default=datetime.date.today)
-	endDate = models.DateField(max_length = 20, default=default_end_date)
+	start_date = models.DateField(max_length = 20, default=datetime.date.today)
+	end_date = models.DateField(max_length = 20, default=default_end_date)
 	programme_institution_category = models.ForeignKey(Boundary_Type,blank=True,null=True)
 	active = models.IntegerField(blank = True, null = True,default=2)
 
 	class Meta: 
-		ordering = ["-startDate", "-endDate", "name"]
+		ordering = ["-start_date", "-end_date", "name"]
 
 	def __unicode__(self):
-		return "%s (%s-%s)"%(self.name, self.startDate.strftime("%Y"), self.endDate.strftime("%Y"))
+		return "%s (%s-%s)"%(self.name, self.start_date.strftime("%Y"), self.end_date.strftime("%Y"))
 
 	def get_view_url(self):
 		return '/programme/%s/view/' %self.id
@@ -516,7 +536,7 @@ class Programme(models.Model):
 		return '/programme/%s/update/' %(self.id)
 
 	def getChild(self):
-		if Assessment.objects.filter(programme__id=self.id ,active=2).count():
+		if Assessment.objects.filter(programme__id=self.id ,active__in= [1,2]).count():
 			return True
 		else:
 			return False
@@ -525,27 +545,27 @@ class Programme(models.Model):
 		return 'programme'
 
 	def getViewUrl(self):
-		return '<a href="/programme/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s (%s-%s)"> <img src="/static_media/tree-images/reicons/programme.gif" title="Programme" /> &nbsp; <span id="programme_%s_text">%s (%s-%s)</span> </a>' %(self.id, self.name, self.startDate.strftime("%Y"), self.endDate.strftime("%Y"), self.id, self.name, self.startDate.strftime("%Y"), self.endDate.strftime("%Y"))
+		return '<a href="/programme/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s (%s-%s)"> <img src="/static_media/tree-images/reicons/programme.gif" title="Programme" /> &nbsp; <span id="programme_%s_text">%s (%s-%s)</span> </a>' %(self.id, self.name, self.start_date.strftime("%Y"), self.end_date.strftime("%Y"), self.id, self.name, self.start_date.strftime("%Y"), self.end_date.strftime("%Y"))
 
 	def CreateNewFolder(self):
-		return '<span><a href="/programme/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s (%s-%s)"> <img src="/static_media/tree-images/reicons/programme.gif" title="Programme" /> &nbsp; <span id="programme_%s_text">%s (%s-%s)</span></a></span>' %(self.id,self.name, self.startDate.strftime("%Y"), self.endDate.strftime("%Y"), self.id, self.name, self.startDate.strftime("%Y"), self.endDate.strftime("%Y"))	
+		return '<span><a href="/programme/%s/view/" onclick="return KLP_View(this)" class="KLP_treetxt" title="%s (%s-%s)"> <img src="/static_media/tree-images/reicons/programme.gif" title="Programme" /> &nbsp; <span id="programme_%s_text">%s (%s-%s)</span></a></span>' %(self.id,self.name, self.start_date.strftime("%Y"), self.end_date.strftime("%Y"), self.id, self.name, self.start_date.strftime("%Y"), self.end_date.strftime("%Y"))	
 register_model(Programme)   # Register model for to store information in fullhistory
 
 class Assessment(models.Model):
     """ This class stores information about Assessment """
     programme = models.ForeignKey(Programme)
     name =  models.CharField(max_length = 100)   
-    startDate = models.DateField(max_length = 20, default=datetime.date.today)
-    endDate = models.DateField(max_length = 20, default=default_end_date)
+    start_date = models.DateField(max_length = 20, default=datetime.date.today)
+    end_date = models.DateField(max_length = 20, default=default_end_date)
     query = models.CharField(max_length = 500,blank = True, null = True)
     active = models.IntegerField(blank=True, null=True, default=2)
     typ = models.IntegerField(choices=Assessment_type,default=3)
-    doubleEntry = models.BooleanField("Requires double entry",default=True) 
+    douple_entry = models.BooleanField("Requires double entry",default=True) 
     
 
     class Meta: 
 		unique_together = (('programme', 'name'),)
-		ordering = ["startDate"]
+		ordering = ["start_date"]
 
     def __unicode__(self):
         return "%s"%(self.name)
@@ -581,17 +601,34 @@ class Assessment_StudentGroup_Association(models.Model):
 	class Meta: 
 		unique_together = (('assessment', 'student_group'),) 
 register_model(Assessment_StudentGroup_Association)  # Register model for to store information in fullhistory
+class Assessment_Class_Association(models.Model):
+	'''This Class stores the Assessment and Student Group Association Information'''
+	assessment = models.ForeignKey(Assessment)
+	student_group = models.ForeignKey(StudentGroup)	
+	active = models.IntegerField(blank = True, null = True,default=2)
+	
+	class Meta: 
+		unique_together = (('assessment', 'student_group'),) 
+register_model(Assessment_Class_Association)  # Register model for to store information in fullhistory
 
+class Assessment_Institution_Association(models.Model):
+	'''This Class stores the Assessment and Student Group Association Information'''
+	assessment = models.ForeignKey(Assessment)
+	institution = models.ForeignKey(Institution)	
+	active = models.IntegerField(blank = True, null = True,default=2)
+	
+	class Meta: 
+		unique_together = (('assessment', 'institution'),) 
 class Question(models.Model):
     """ This class stores Assessment detail information """
     assessment = models.ForeignKey(Assessment)
     name = models.CharField(max_length = 200)
-    questionType = models.IntegerField(choices=QuestionType,default=1)
-    scoreMin = models.DecimalField(max_digits=5, decimal_places=2, blank = True, null = True)
-    scoreMax = models.DecimalField(max_digits=5, decimal_places=2, blank = True, null = True)
+    question_type = models.IntegerField(choices=QuestionType,default=1)
+    score_min = models.DecimalField(max_digits=5, decimal_places=2, blank = True, null = True)
+    score_max = models.DecimalField(max_digits=5, decimal_places=2, blank = True, null = True)
     grade = models.CharField(max_length = 100,blank = True, null = True)
     order = models.IntegerField()
-    doubleEntry = models.BooleanField(default=True)
+    douple_entry = models.BooleanField(default=True)
     active = models.IntegerField(blank = True, null = True,default=2)
     
     class Meta: 
@@ -633,20 +670,43 @@ register_model(Question)  # Register model for to store information in fullhisto
 class Answer(models.Model):
     """ This class stores information about student marks and grade """
     question  = models.ForeignKey(Question)
-    student = models.ForeignKey(Student)
-    answerScore = models.DecimalField(max_digits=5, decimal_places=2, blank = True, null = True)
-    answerGrade = models.CharField(max_length = 30, blank = True, null = True)
-    doubleEntry = models.IntegerField(blank = True, null = True,default=0)
+    #student = models.IntegerField(blank = True, null = True,default=0) # models.ForeignKey(Student)
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    answer_score = models.DecimalField(max_digits=5, decimal_places=2, blank = True, null = True)
+    answer_grade = models.CharField(max_length = 30, blank = True, null = True)
+    douple_entry = models.IntegerField(blank = True, null = True,default=0)
     status = models.IntegerField(blank = True, null = True,)
     user1 = models.ForeignKey(User, blank = True, null = True, related_name = 'user1')
     user2 = models.ForeignKey(User, blank = True, null = True, related_name = 'user2')
-    creationDate = models.DateField(default=datetime.date.today, blank = True, null = True)
-    lastModifiedDate = models.DateField(default=datetime.date.today, blank = True, null = True)
-    lastmodifiedBy = models.ForeignKey(User, blank = True, null = True, related_name = 'lastmodifiedBy')
+    creation_date = models.DateField(default=datetime.date.today, blank = True, null = True)
+    last_modified_date = models.DateField(default=datetime.date.today, blank = True, null = True)
+    last_modified_by = models.ForeignKey(User, blank = True, null = True, related_name = 'last_modified_by')
     
     class Meta: 
-		unique_together = (('question', 'student'),)
+		unique_together = (('question', 'object_id'),)
 register_model(Answer)   # Register model for to store information in fullhistory
+class Answernew(models.Model):
+    """ This class stores information about student marks and grade """
+    question  = models.ForeignKey(Question)
+    student = models.ForeignKey(Student)
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    answer_score = models.DecimalField(max_digits=5, decimal_places=2, blank = True, null = True)
+    answer_grade = models.CharField(max_length = 30, blank = True, null = True)
+    douple_entry = models.IntegerField(blank = True, null = True,default=0)
+    status = models.IntegerField(blank = True, null = True,)
+    user1 = models.ForeignKey(User, blank = True, null = True, related_name = 'user1new')
+    user2 = models.ForeignKey(User, blank = True, null = True, related_name = 'user2new')
+    creation_date = models.DateField(default=datetime.date.today, blank = True, null = True)
+    last_modified_date = models.DateField(default=datetime.date.today, blank = True, null = True)
+    last_modified_by = models.ForeignKey(User, blank = True, null = True, related_name = 'last_modified_bynew')
+
+    class Meta:
+                unique_together = (('question', 'object_id','content_type'),)
+register_model(Answernew)   # Register model for to store information in fullhistory
 
 class UserAssessmentPermissions(models.Model):
 	""" This class stores information about user, instituion and assessment permissions"""

@@ -47,19 +47,19 @@
 				<tr>
 				    <!-- render all fields for child -->
 				    <td align="center">
-					{% render_field entryForm.firstName 'tabindex=1' %}
+					{% render_field entryForm.first_name 'tabindex=1' %}
 				    </td>
 				    <td align="center">
-					{% render_field entryForm.middleName 'tabindex=1' %}
+					{% render_field entryForm.middle_name 'tabindex=1' %}
 				    </td>
 				    <td align="center">
-					{% render_field entryForm.lastName 'tabindex=1' %}
+					{% render_field entryForm.last_name 'tabindex=1' %}
 				    </td>
 				    <td align="center">
 					{% render_field entryForm.uid 'tabindex=1' %}
 				    </td>
 				    <td align="center">
-					<input type="text" name="form-0-otherId" id="id_form-0-otherId" value="{% if extra_context|dictValue:'form-0-otherId' %}{{extra_context|dictValue:'form-0-otherId'}}{% else %}{{child.getStudent.otherStudentId}}{% endif %}" tabindex=1 size="3"/>
+					<input type="text" name="form-0-otherId" id="id_form-0-otherId" value="{% if extra_context|dictValue:'form-0-otherId' %}{{extra_context|dictValue:'form-0-otherId'}}{% else %}{{child.getStudent.other_student_Id}}{% endif %}" tabindex=1 size="3"/>
 				    </td>
 				    <td align="center" style="min-width:200px;max-width:200px">
 					{% render_field entryForm.dob 'tabindex=1' %}
@@ -69,7 +69,7 @@
 				    </td>
 				    <td align="center">
 					{% render_field entryForm.mt 'tabindex=1' %}
-					<input type="hidden" name="form-0-child" id="id_child" size="15" value="{% if extra_context|dictValue:'form-0-otherId' %}{{extra_context|dictValue:'form-0-otherId'}} {% else %} {{child.getStudent.otherStudentId}} {% endif %}"/>
+					<input type="hidden" name="form-0-child" id="id_child" size="15" value="{% if extra_context|dictValue:'form-0-otherId' %}{{extra_context|dictValue:'form-0-otherId'}} {% else %} {{child.getStudent.other_student_Id}} {% endif %}"/>
 					<input type="hidden" name="form-0-boundary" id="id_boundary" size="15" value="{{extra_context|displayValue:'referKey'}}"/>
 					<input type="hidden" name="form-0-active" id="id_active" size="15" value="2"/>
 					<input type="hidden" name="ModelName" id = "model" value="{{extra_context|displayValue:'modelName'}}" />
@@ -105,18 +105,18 @@
 				<tr>
 				   <!-- Show error msgs if field id not valid -->
 				   <td align="center">
-                                    	{% for error in entryForm.firstName.errors %}
+                                    	{% for error in entryForm.first_name.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
                                     </td>
 				    <td align="center">
-                                    	{% for error in entryForm.middleName.errors %}
+                                    	{% for error in entryForm.middle_name.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
                                     </td>
 				    
 				    <td align="center">
-                                    	{% for error in entryForm.lastName.errors %}
+                                    	{% for error in entryForm.last_name.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
                                     </td>

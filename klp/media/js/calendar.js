@@ -113,44 +113,44 @@ function Calendar(div_id, callback) {
     this.div_id = div_id;
     this.callback = callback;
     this.today = new Date();
-    this.currentMonth = this.today.getMonth() + 1;
-    this.currentYear = this.today.getFullYear();
+    this.current_month = this.today.getMonth() + 1;
+    this.current_year = this.today.getFullYear();
 }
 Calendar.prototype = {
     drawCurrent: function() {
-        CalendarNamespace.draw(this.currentMonth, this.currentYear, this.div_id, this.callback);
+        CalendarNamespace.draw(this.current_month, this.current_year, this.div_id, this.callback);
     },
     drawDate: function(month, year) {
-        this.currentMonth = month;
-        this.currentYear = year;
+        this.current_month = month;
+        this.current_year = year;
         this.drawCurrent();
     },
     drawPreviousMonth: function() {
-        if (this.currentMonth == 1) {
-            this.currentMonth = 12;
-            this.currentYear--;
+        if (this.current_month == 1) {
+            this.current_month = 12;
+            this.current_year--;
         }
         else {
-            this.currentMonth--;
+            this.current_month--;
         }
         this.drawCurrent();
     },
     drawNextMonth: function() {
-        if (this.currentMonth == 12) {
-            this.currentMonth = 1;
-            this.currentYear++;
+        if (this.current_month == 12) {
+            this.current_month = 1;
+            this.current_year++;
         }
         else {
-            this.currentMonth++;
+            this.current_month++;
         }
         this.drawCurrent();
     },
     drawPreviousYear: function() {
-        this.currentYear--;
+        this.current_year--;
         this.drawCurrent();
     },
     drawNextYear: function() {
-        this.currentYear++;
+        this.current_year++;
         this.drawCurrent();
     }
 }

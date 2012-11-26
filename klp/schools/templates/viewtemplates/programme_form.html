@@ -36,12 +36,12 @@
       						<tr>
       					    		<td class="rightprofile"><label class="KLP_required">Start Date</label></td>
       							<td class="leftprofile">
-                            					{% render_field entryForm.startDate 'tabindex=3' %}
+                            					{% render_field entryForm.start_date 'tabindex=3' %}
                             					<!-- Programme start date Field -->
                         				</td> 
                         				<td>
                         					<!-- If startdate has errors show errors -->
-                                    				{% for error in entryForm.startDate.errors %}
+                                    				{% for error in entryForm.start_date.errors %}
 	                                				<span class="editErr">{{ error }}</span>
 	                                			{% endfor %}
                                     			</td> 
@@ -49,19 +49,19 @@
       						<tr>
       					    		<td class="rightprofile"><label class="KLP_required">End Date</label></td>
       							<td class="leftprofile">
-                            					{% render_field entryForm.endDate 'tabindex=4' %}
+                            					{% render_field entryForm.end_date 'tabindex=4' %}
                             					<!-- Programme end date Field -->
                         				</td>   
                         				<td>
                         					<!-- If enddate has errors show errors -->
-                                    				{% for error in entryForm.endDate.errors %}
+                                    				{% for error in entryForm.end_date.errors %}
 	                                				<span class="editErr">{{ error }}</span>
 	                                			{% endfor %}
                                     			</td>                      
 	                    				<script>
 	                    					/* To Show Calendar on focus on date fields */
-	                        				$("#id_form-0-startDate").datepick({dateFormat: 'dd-mm-yyyy'});
-	                        				$( "#id_form-0-endDate" ).datepick({defaultDate: new Date("{{extra_context|displayValue:'endDate'}} {{extra_context|displayValue:'endMonth'}} {{extra_context|displayValue:'endYear'}}"), dateFormat: 'dd-mm-yyyy'});
+	                        				$("#id_form-0-start_date").datepick({dateFormat: 'dd-mm-yyyy'});
+	                        				$( "#id_form-0-end_date" ).datepick({defaultDate: new Date("{{extra_context|displayValue:'end_date'}} {{extra_context|displayValue:'endMonth'}} {{extra_context|displayValue:'endYear'}}"), dateFormat: 'dd-mm-yyyy'});
 	                    				</script>
       						</tr>     			
       						

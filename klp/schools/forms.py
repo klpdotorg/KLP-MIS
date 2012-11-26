@@ -96,57 +96,57 @@ class Staff_Form(ModelForm):
 	model = Staff	
 
 class Programme_Form(ModelForm):
-    startDate = forms.DateField( widget=forms.DateInput(format='%d-%m-%Y'),initial = datetime.date.today, input_formats=['%d-%m-%Y', '%d-%m-%y'])
-    endDate = forms.DateField( widget=forms.DateInput(format='%d-%m-%Y'),initial = default_end_date, input_formats=['%d-%m-%Y', '%d-%m-%y'])
+    start_date = forms.DateField( widget=forms.DateInput(format='%d-%m-%Y'),initial = datetime.date.today, input_formats=['%d-%m-%Y', '%d-%m-%y'])
+    end_date = forms.DateField( widget=forms.DateInput(format='%d-%m-%Y'),initial = default_end_date, input_formats=['%d-%m-%Y', '%d-%m-%y'])
     active = forms.IntegerField(initial=2, widget=forms.HiddenInput)
     
     class Meta:
         model = Programme
     
 class Assessment_Form(ModelForm):
-    startDate = forms.DateField( widget=forms.DateInput(format='%d-%m-%Y'),initial = datetime.date.today, input_formats=['%d-%m-%Y', '%d-%m-%y'])
-    endDate = forms.DateField( widget=forms.DateInput(format='%d-%m-%Y'),initial = default_end_date, input_formats=['%d-%m-%Y', '%d-%m-%y'])	
+    start_date = forms.DateField( widget=forms.DateInput(format='%d-%m-%Y'),initial = datetime.date.today, input_formats=['%d-%m-%Y', '%d-%m-%y'])
+    end_date = forms.DateField( widget=forms.DateInput(format='%d-%m-%Y'),initial = default_end_date, input_formats=['%d-%m-%Y', '%d-%m-%y'])	
     active = forms.IntegerField(initial=2, widget=forms.HiddenInput)       
     #typ = forms.IntegerField(initial=3, widget=forms.HiddenInput)    
-    #doubleEntry = forms.BooleanField(initial=True, widget=forms.HiddenInput)
+    #douple_entry = forms.BooleanField(initial=True, widget=forms.HiddenInput)
     class Meta:
         model = Assessment
     
 class Question_Form(ModelForm):
-    questionType = forms.ChoiceField(choices=QuestionType,)	
-    scoreMin = forms.DecimalField(max_digits=5, decimal_places=2, required=False)
-    scoreMax = forms.DecimalField(max_digits=5, decimal_places=2, required=False)
+    question_type = forms.ChoiceField(choices=QuestionType,)	
+    score_min = forms.DecimalField(max_digits=5, decimal_places=2, required=False)
+    score_max = forms.DecimalField(max_digits=5, decimal_places=2, required=False)
     grade = forms.CharField(required=False)
     active = forms.IntegerField(initial=2, widget=forms.HiddenInput) 
     
-    def clean_scoreMin(self):
-        questionType = self.cleaned_data['questionType']
-        scoreMin = self.cleaned_data.get('scoreMin', '')
-        if questionType  == '1':
-        	if not scoreMin and scoreMin !=0:
+    def clean_score_min(self):
+        question_type = self.cleaned_data['question_type']
+        score_min = self.cleaned_data.get('score_min', '')
+        if question_type  == '1':
+        	if not score_min and score_min !=0:
             		raise forms.ValidationError("This field is required.")
             	else:
-            		scoreMax = self.cleaned_data.get('scoreMax', '')
-            		if scoreMin > scoreMax:
+            		score_max = self.cleaned_data.get('score_max', '')
+            		if score_min > score_max:
             			raise forms.ValidationError("Score Min Should be Less than Score Min.")
-        return scoreMin
+        return score_min
         
-    def clean_scoreMax(self):
-        questionType = self.cleaned_data['questionType']
-        scoreMax = self.cleaned_data.get('scoreMax', '')
-        if questionType  == '1':
-        	if not scoreMax and scoreMax !=0:
+    def clean_score_max(self):
+        question_type = self.cleaned_data['question_type']
+        score_max = self.cleaned_data.get('score_max', '')
+        if question_type  == '1':
+        	if not score_max and score_max !=0:
             		raise forms.ValidationError("This field is required.")
             	else:
-            		scoreMin = self.cleaned_data.get('scoreMin', '')
-            		if scoreMin > scoreMax:
+            		score_min = self.cleaned_data.get('score_min', '')
+            		if score_min > score_max:
             			raise forms.ValidationError("Score Max Should be Grater than Score Min.")
-        return scoreMax
+        return score_max
     
     def clean_grade(self):
-        questionType = self.cleaned_data['questionType']
+        question_type = self.cleaned_data['question_type']
         grade = self.cleaned_data.get('grade', '')
-        if questionType  == '2':
+        if question_type  == '2':
         	if not grade:
             		raise forms.ValidationError("This field is required.")
             	

@@ -33,11 +33,15 @@ class KLP_Delete(Resource):
     def read(self,request,model_name1, referKey):
         modelDict = {'boundary':Boundary, 'institution':Institution, 'programme':Programme, 'assessment':Assessment, 'question':Question, 'studentgroup':StudentGroup, 'student':Student, 'staff':Staff, 'class':StudentGroup, 'center':StudentGroup}
         # Checking user Permissions
-        KLP_user_Perm(request.user, modelDict[model_name1.lower()]._meta.module_name, "Delete")
-        # Get Object based on id and model to delete
+        KLP_user_Perm(request.user, modelDict[model_name1.lower()]._meta.module_name, "Delete")        # Get Object based on id and model to delete
         obj = modelDict[model_name1.lower()].objects.get(pk=referKey)
         if model_name1.lower()=='boundary':
            flag=obj.getChild(obj.boundary_type)
+        elif model_name1.lower() in [ 'class','center','studentgroup']:
+            if Student_StudentGroupRelation.objects.filter(student_group__id=referKey,active=2,academic=current_academic()).count():
+                                      flag=True
+            else:
+                               flag=False
         else:
                  flag=obj.getChild()  
 	"""if model_name1.lower() == 'student':

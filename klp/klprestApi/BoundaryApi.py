@@ -28,15 +28,16 @@ class KLP_Boundary(Collection):
     """To get Selected Boundary """
     def get_entry(self, boundary_id): 
     	# Query For selected boundary based on boundary_id
-        boundary = Boundary.objects.get(id=int(boundary_id))
+        boundary = Boundary.objects.filter(id=int(boundary_id)).defer('boundary')[0]
         return ChoiceEntry(self, boundary)     
   
 
 def KLP_Boundary_View(request, boundary_id, boundarytype_id):
 	""" To View Selected Boundary boundary/(?P<boundary_id>\d+)/(?P<boundarytype_id>\d+)/view/$"""
 	kwrg = {'is_entry':True}
-	boundaryTypObj = Boundary_Type.objects.get(pk = boundarytype_id)
-	resp=KLP_Boundary(queryset = Boundary.objects.filter(pk=boundary_id), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'boundary', extra_context={'boundary_type':boundaryTypObj.boundary_type}),)(request, boundary_id, **kwrg)
+	boundaryTypObjquery = Boundary_Type.objects.filter(pk = boundarytype_id)
+        boundaryTypObj=boundaryTypObjquery[0]
+	resp=KLP_Boundary(queryset = Boundary.objects.filter(pk=boundary_id).defer('boundary'),permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'boundary', extra_context={'boundary_type':boundaryTypObj.boundary_type}),)(request, boundary_id, **kwrg)
         return HttpResponse(resp)  
 
 
@@ -57,7 +58,7 @@ def KLP_Boundary_Update(request, boundary_id):
         KLP_user_Perm(request.user, "Boundary", "Update")
 	buttonType = request.POST.get('form-buttonType')
 	referKey = request.POST.get('form-0-boundary')
-	KLP_Edit_Boundary =KLP_Boundary(queryset = Boundary.objects.filter(pk=boundary_id), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'boundary', extra_context={'buttonType':buttonType, 'referKey':referKey}), receiver = XMLReceiver(),)
+	KLP_Edit_Boundary =KLP_Boundary(queryset = Boundary.objects.filter(pk=boundary_id).defer('boundary'), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'boundary', extra_context={'buttonType':buttonType, 'referKey':referKey}), receiver = XMLReceiver(),)
         
 	response = KLP_Edit_Boundary.responder.update_form(request, pk=boundary_id, form_class=Boundary_Form)
 	

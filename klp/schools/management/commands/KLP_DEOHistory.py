@@ -11,16 +11,16 @@ import django, datetime, os, csv
 class Command(BaseCommand):
 	''' Command To generate Data Entry Operators History in csv format.'''
         def handle(self, *args, **options):
-                try:
+                if 1:
                 	# read start date, end date and filename
-                        startDate = args[0]
-                        endDate = args[1]
+                        start_date = args[0]
+                        end_date = args[1]
                         fileName = args[2]
 			contentList = ['boundary', 'institution', 'student', 'staff']
-                        if fileName and startDate and endDate:
+                        if fileName and start_date and end_date:
                                 try:
-                                	strDate = startDate.split("/")
-                                	enDate = endDate.split("/")
+                                	strDate = start_date.split("/")
+                                	enDate = end_date.split("/")
     					assessments = Assessment.objects.select_related("programme").filter(programme__active=2, active=2).distinct().only("id", "name")
     					# get current working directory.
 					cwd = os.getcwd()
@@ -30,19 +30,20 @@ class Command(BaseCommand):
                                                 os.makedirs(path)
                                         # create csv file with the name passed.        
 					genFile = "%s/%s.csv" %(path, fileName)
-					historyFile = csv.writer(open(genFile, 'wb'))
+					historyFile2 = csv.writer(open(genFile, 'wb'))
 					# Write header
 					headerList = ['Sl.No', 'User', 'pre_boundary_created', 'pre_boundary_mod', 'pre_boundary_del', 'primary_boundary_created', 'primary_boundary_mod', 'primary_boundary_del', 'pre_sch_created', 'pre_sch_mod', 'pre_sch_del', 'primary_sch_created', 'primary_sch_mod', 'primary_sch_del', 'pre_stud_created', 'pre_stud_mod', 'pre_stud_del', 'primary_stud_created', 'primary_stud_mod', 'primary_stud_del', 'pre_teacher_created', 'pre_teacher_mod', 'pre_teacher_del', 'primary_teacher_created', 'primary_teacher_mod', 'primary_teacher_del']
 					asmDict, asmList ={}, []
-					users = User.objects.filter(is_active=1).order_by("username").only("id", "username")
+					users = User.objects.filter(is_active=1) #.filter(username__iexact="nalini").order_by("username").only("id", "username")
 					userIds = users.values_list("id", flat=True)
 					sDate = datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0]))
 					eDate = datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0]))
 					sTime = datetime.datetime(int(strDate[2]), int(strDate[1]), int(strDate[0]), 00, 00, 00)
 					eTime = datetime.datetime(int(enDate[2]), int(enDate[1]), int(enDate[0]), 23, 59, 00)
+                                        print sTime,eTime
 					for assessment in assessments:
 						
-						answers = Answer.objects.filter(Q(user1__id__in=userIds) | Q(user2__id__in=userIds), lastModifiedDate__range=(sDate, eDate), question__assessment=assessment).values_list("id", flat=True).distinct()
+						answers = Answer.objects.filter(Q(user1__id__in=userIds) | Q(user2__id__in=userIds), last_modified_date__range=(sDate, eDate), question__assessment=assessment).values_list("id", flat=True).distinct()
 						if answers:
 							assessmentId = assessment.id
 							asmList.append(assessmentId)
@@ -54,20 +55,28 @@ class Command(BaseCommand):
 							nList = [i for i in answers]
 							nList.append(0)
 							asmDict[assessmentId] = nList
-					historyFile.writerow(headerList)
+					historyFile2.writerow(headerList)
+                                        #historyFile2.close()
 					count = 0
-										
+					#print User.objects.filter(groups__name__in=['Data Entry Executive', 'Data Entry Operator'], is_active=1).order_by("username").values_list('id',flat=True)					
     					for user in User.objects.filter(groups__name__in=['Data Entry Executive', 'Data Entry Operator'], is_active=1).order_by("username"):
-						count +=1
-						userId = user.id
+                                          if user.id :
+                                                print count,'********************************************',user.id
+					        count +=1
+					        userId = user.id
+                                              
 				    		dataList = [count, user.username]
 				    		
-				    		rawQuerySet = Institution.objects.raw(""" SELECT "id","obj_id" FROM "public"."object_permissions_institution_perms" WHERE "user_id" = '%s' AND "Acess" = 't' """ %(userId))
+				    		rawQuerySet = Institution.objects.raw(""" SELECT "id","obj_id" FROM "public"."object_permissions_institution_perms" WHERE "user_id" = '%s' AND "Acess" = 1 """ %(userId))
 				    		inst_list=[permObj.obj_id for permObj in rawQuerySet]		    		
 						# get the content objects(instituion, staff, student)
 						preSchList = Institution.objects.filter(id__in=inst_list, boundary__boundary_type__id=2).values_list("id", flat=True)
 						primarySchList = Institution.objects.filter(id__in=inst_list, boundary__boundary_type__id=1).values_list("id", flat=True)
-				    		for content in contentList:
+                                                
+                                                #preSchList=map(int,preSchList)
+                                                #primarySchList=map(int,primarySchList)
+				    	 	for content in contentList:
+                                                        #print content      
 				    			preList, primaryList= [0], [0]
 				    			contObj = ContentType.objects.get(app_label='schools', name=content)
 				    			contId = contObj.id
@@ -75,8 +84,9 @@ class Command(BaseCommand):
 				    				preBoundaryList, primaryBoundaryList = [], []
 				    				BoundaryList = Institution.objects.filter(id__in=preSchList).values_list("boundary", flat=True).distinct()
 				    				preBoundaryList.extend(list(BoundaryList))
-				    				
+				    				#print preBoundaryList,'LLLLLLLLLLLLLLLLLLLLLLLl'
 				    				BoundaryList = Boundary.objects.filter(id__in=preBoundaryList, boundary_type__id=2).values_list("parent", flat=True).distinct()
+                                                               
 				    				preBoundaryList.extend(list(BoundaryList))
 				    				BoundaryList = Boundary.objects.filter(id__in=preBoundaryList, boundary_type__id=1).values_list("parent", flat=True).distinct()
 				    				preBoundaryList.extend(list(BoundaryList))   				
@@ -90,53 +100,75 @@ class Command(BaseCommand):
 				    				
 				    				BoundaryList = Boundary.objects.filter(id__in=primaryBoundaryList, boundary_type__id=2).values_list("parent", flat=True).distinct()   				
 				    				primaryBoundaryList.extend(list(BoundaryList))
-				    				preList = ['%s' %i for i in preBoundaryList]
-				    				primaryList = ['%s' %i for i in primaryBoundaryList]
+				    				preList = preBoundaryList #['%s' %i for i in preBoundaryList]
+				    				primaryList =  primaryBoundaryList #['%s' %i for i in primaryBoundaryList]
+                                                                #print primaryList[:5]
 				    			elif content == 'institution':
-				    				preList = ['%s' %i for i in preSchList]
-				    				primaryList = ['%s' %i for i in primarySchList]
+				    				preList = preSchList # ['%s' %i for i in preSchList]
+				    				primaryList =primarySchList # ['%s' %i for i in primarySchList]
 				    			elif content == 'staff':
 				    				preStaffList = Staff.objects.filter(institution__id__in=preSchList, institution__boundary__boundary_type__id=2).values_list("id", flat=True)
 				    				primaryStaffList = Staff.objects.filter(institution__id__in=primarySchList, institution__boundary__boundary_type__id=1).values_list("id", flat=True)
-				    				preList = ['%s' %i for i in preStaffList]
-				    				primaryList = ['%s' %i for i in primaryStaffList]
+				    				#preList = map(int,preStaffList) #['%s' %i for i in preStaffList]
+				    				primaryList = primaryStaffList #['%s' %i for i in primaryStaffList]
+                                                                #print primaryList[:5]
 				    			elif content == 'student':
 				    				preSGList = StudentGroup.objects.filter(institution__id__in=preSchList, institution__boundary__boundary_type__id=2).values_list("id", flat=True)
+                                                                #print 1
+                                                                #preSGList=map(int,preSGList)
+                                                                #print 2
 				    				primarySGList =  StudentGroup.objects.filter(institution__id__in=primarySchList, institution__boundary__boundary_type__id=1).values_list("id", flat=True)
+                                                                #print 3
+                                                                #primarySGList=map(int,primarySGList)
+                                                                #print 4
 				    				preStList = Student_StudentGroupRelation.objects.filter(student_group__id__in=preSGList).values_list("student",  flat=True)
+                                                                #print 5
 				    				primaryStList = Student_StudentGroupRelation.objects.filter(student_group__id__in=primarySGList).values_list("student",  flat=True)
-				    				preList = ['%s' %i for i in preStList]
-				    				primaryList = ['%s' %i for i in primaryStList]
-				    			
-				    			
-				    			preList.append(0)
-				    			primaryList.append(0)
+                                                            
+                                                                #print 6
+				    				#preList = map(int,preStList) #['%s' % i for i in preStList]
+                                                                #print 7
+				    				#primaryList = map(int,primaryStList) #['%s' %i for i in primaryStList]
+				    			        #print primaryStList[:5]
+				    			        #print 8
+				    			#preList.append(0)
+				    			#primaryList.append(0)
+                                                        #print primaryList,'findal' 
 				    			# get all boundary/instituion/staff/student creates/Edited/Deleted by user.
 				    			
 				    			#print sTime, eTime, userId, contId, len(preList), len(primaryList)
-				    			
+				    			#print contId,eTime,sTime
+                                                        preList=map(int,preList)
 				    		        dataList.append(FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, content_type__id=contId, object_id__in=preList, action='C').count())
 				    			dataList.append(FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, content_type__id=contId, object_id__in=preList, action='U').exclude(_data__icontains='active').count())
 				    			
 				    			dataList.append(FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, content_type__id=contId, object_id__in=preList, action='U', _data__icontains='active').count())
-				    			
+				    		        primaryList=map(int,primaryList)
+                                                        #print 'afff'	
 				    			dataList.append(FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, content_type__id=contId, object_id__in=primaryList, action='C').count())
+                                                        #print '11'
 				    			dataList.append(FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, content_type__id=contId, object_id__in=primaryList, action='U').exclude(_data__icontains='active').count())
-				    			
+				    			#print '12'
+
 				    			dataList.append(FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, content_type__id=contId, object_id__in=primaryList, action='U', _data__icontains='active').count())
-				    			
+                                                        #print '13'
+				    		        #print dataList	
 				    			#dataList.extend([0, 0, 0, 0, 0, 0])
-				    			
+				    	        		
 				    		for asmId in asmList:
 				    			answers =  asmDict[asmId]
+                                                        #print answers,sTime,eTime
 				    			if  answers:
-								
+                                                                #print 'ans',answers[:5],asmId
+							        #answers=[int(k) for k in answers]	
 				    				crEntriesData = FullHistory.objects.filter(action_time__range=(sTime, eTime), request__user_pk=userId, object_id__in=answers, action='C')
 				    				crEntries = crEntriesData.count()
+                                                                #print 'crEntris'
 				    				if crEntries == 0:
 				    					inCrEntries = 0
 				    				else:
 				    					crEntriesLis = list(crEntriesData.values_list("object_id", flat=True))
+                                                                        #crEntriesLis=[int(k) for k in crEntriesLis ]
 				    					inCrEntries = FullHistory.objects.filter((Q(_data__icontains='answer') | Q(_data__icontains='status')) & Q(_data__icontains='user2'), action_time__range=(sTime, eTime), object_id__in=crEntriesLis, action='U').exclude(request__user_pk=userId,).count()
 				    					
 				    					crEntries = crEntries - inCrEntries
@@ -148,13 +180,16 @@ class Command(BaseCommand):
 				    				
 				    				
 				    				vEntries = vEntries - rEntries
-				    				
+				    				#print userId,crEntries,inCrEntries,vEntries,rEntries
 				    				dataList.append(crEntries)
 								dataList.append(inCrEntries)
 								dataList.append(vEntries)
 								dataList.append(rEntries)
 				    		# Written data into file.
-						historyFile.writerow(dataList)				    							    		
+                                                print dataList
+                                                historyFile2 = csv.writer(open(genFile, 'a'))
+						historyFile2.writerow(dataList)
+					#historyFile1.close()	
 					print "%s.csv file has been created in %s/logFiles directory" %(fileName, cwd)
                                 except IndexError:
                                 	# if arguments are not proper raises an command error.
@@ -166,7 +201,7 @@ class Command(BaseCommand):
                         	# if arguments are not passed raises an command error.
                         	raise CommandError('Pass Startdate, end date and filename.\n') 
 
-                except IndexError:
+                else :#xcept IndexError:
                 	# if arguments are not passed raises an command error.
                         raise CommandError('Pass Startdate, end date and filename.\n') 
 

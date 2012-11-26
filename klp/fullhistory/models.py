@@ -104,9 +104,11 @@ ACTIONS = (('C', 'Create'), ('U', 'Update'), ('D', 'Delete'))
 
 class FullHistory(models.Model):
     content_type = models.ForeignKey(ContentType)
-    object_id = models.IntegerField(db_index=True)
+    object_id = models.CharField(max_length=255)
     revision = models.PositiveIntegerField()
+
     content_object = generic.GenericForeignKey()
+    
     action_time = models.DateTimeField(auto_now_add=True)
     _data = models.TextField(db_column='data')
     request = models.ForeignKey(Request, null=True, blank=True)

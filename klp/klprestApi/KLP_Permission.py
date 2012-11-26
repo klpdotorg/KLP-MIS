@@ -25,7 +25,8 @@ from schools.receivers import KLP_user_Perm
 from django.conf import settings
 from subprocess import Popen
 from subprocess import call
-from klprestApi.TreeMenu import KLP_assignedInstitutions
+from klprestApi.TreeMenu import KLP_assignedInstitutions,getAssSG
+from klp.settings import PROJECT_NAME,PROJECT_ROOT,PYTHON_PATH
 def KLP_Assign_Permissions(request):
 	""" This method is used to assign permissions"""
 	""" Check logged in user permissions to assign permissions"""
@@ -55,11 +56,12 @@ def KLP_Assign_Permissions(request):
         bound_list=','.join(str(v1) for v1 in bound_list if v1 > 0)
         permissions=','.join(str(v1) for v1 in permissions if v1 > 0)
         deUserList=','.join(str(v1) for v1 in deUserList if v1 > 0)
+        print PROJECT_ROOT
 	if not deUserList:
 		# If no users selected respond back with error message (Select Atleast One User)
 		respDict['respMsg'] = 'Select Atleast One User'
 		respDict['isSuccess'] = False
-	elif not permissions:
+	elif not permissions :#and not assessmentPerm:
 		# if permissions not selected respond back with error message (Select Atleast One Permission)
 		respDict['respMsg'] = 'Select Atleast One Permission'
 		respDict['isSuccess'] = False
@@ -71,8 +73,8 @@ def KLP_Assign_Permissions(request):
 			respDict['isSuccess'] = False
 		else:
                         #bound_list=','.join(str(v1) for v1 in bound_list if v1 > 0)
-                        Popen(["python" ,"/home/klp/production/manage.py","KLP_assignPermissions",str(inst_list),str(deUserList),str(permissions),str(permissionType),str(assessmentId),str(assessmentPerm),bound_cat,bound_list,request.user.username])
-                        #call(["/home/c2staging/c2staging/bin/python" ,"/home/c2staging/c2staging/c2staging/manage.py","KLP_assignPermissions",str(inst_list),str(deUserList),str(permissions),str(permissionType),str(assessmentId),str(assessmentPerm),bound_cat,bound_list])
+                        Popen([PYTHON_PATH,PROJECT_ROOT+"/manage.py","KLP_assignPermissions",str(inst_list),str(deUserList),str(permissions),str(permissionType),str(assessmentId),str(assessmentPerm),bound_cat,bound_list,request.user.username])
+                        #call(["/home/klp/klp/bin/python" ,"/home/klp/klp/klp/manage.py","KLP_assignPermissionnssignPermissions",str(inst_list),str(deUserList),str(permissions),str(permissionType),str(assessmentId),str(assessmentPerm),bound_cat,bound_list])
                         respDict['respMsg'] = message #'Assigned Permissions successfully for %s Institutions' %(count)
                         respDict['isSuccess'] = True
 
@@ -91,7 +93,7 @@ def KLP_Assign_Permissions(request):
 			# call assignPermission method to assign permissions
                         inst_list=','.join(str(v1) for v1 in inst_list if v1 > 0)
                         print "FDFDF",bound_cat,bound_list,"HREEEEEEE"
-                        Popen(["python" ,"/home/klp/production/manage.py","KLP_assignPermissions",str(inst_list),str(deUserList),str(permissions),str(permissionType),str(assessmentId),str(assessmentPerm),bound_cat,str(bound_list).strip(),request.user.username])
+                        Popen(["python",PROJECT_ROOT+"/manage.py","KLP_assignPermissions",str(inst_list),str(deUserList),str(permissions),str(permissionType),str(assessmentId),str(assessmentPerm),bound_cat,str(bound_list).strip(),request.user.username])
 			respDict['respMsg'] = message #'Assigned Permissions successfully for  %s Institutions' %(count)
 			respDict['isSuccess'] = True
                         #Tosendmailteam(inst_list,deUserList,permissions,permissionType,assessmentId,assessmentPerm)
@@ -100,72 +102,148 @@ def KLP_Assign_Permissions(request):
     
 def assignPermission(inst_list, deUserList, permissions, permissionType, assessmentId=None, assessmentPerm=None):
 	assignedAsmIds = []
-        print inst_list,"SSSSSSSSSSs" 
+        print assessmentPerm, inst_list,PROJECT_ROOT,PROJECT_NAME,"SSSSSSSSSSsDDDDDDDDDDDDDDDDDd",permissionType 
         assignedInsIds=[]
+        allassignIds=[]
+        newlyassignInst=[]
         if assessmentId:
-            assessmentObjsel = Assessment.objects.get(id=assessmentId)
+                                # else assign assessment permissions to user.
+                                assessmentObj = Assessment.objects.get(pk=assessmentId)
+                                allassignIds.append(assessmentId)
+        dic={}
 	for inst_id in inst_list:
 		# get Institution object using id
                 inst_id=int(inst_id)
-         
+                addflag=False 
 		instObj = Institution.objects.get(pk=inst_id)
+                if assessmentId:
+                                            asmIds=[]
+                                            asmIds.append(assessmentId)
+                elif permissionType!='permissions' or assessmentPerm=='True':
+                   sg_list = StudentGroup.objects.filter(institution__id=inst_id,active=2).values_list('id', flat=True).distinct()
+                   print sg_list[:10],inst_id
+                   #print sg_list 
+                   #assignedInsIds.append(inst_id) 
+                   asmIdSG= Assessment_StudentGroup_Association.objects.filter(student_group__id__in= sg_list, active=2).values_list("assessment__id", flat=True).distinct()
+                   asmIdCl=Assessment_Class_Association.objects.filter(student_group__id__in= sg_list, active=2).values_list("assessment__id", flat=True).distinct()
+                   asmInt=Assessment_Institution_Association.objects.filter(institution__id=inst_id, active=2).values_list("assessment__id", flat=True).distinct()
+                   asmIds=list(set(asmIdSG)|set(asmIdCl)|set(asmInt))
+                else:
+                          asmIds=[]
+                assignedInsIds.append(inst_id)
 		for deUser in deUserList:
 		   # get user object
-              
+                     
                    deUser=int(deUser)
-		   userObj = User.objects.get(id=deUser)
-                   if assessmentPerm!=None and assessmentPerm!='None': 
-                     uobj=UserAssessmentPermissions.objects.filter(user=userObj,  instituion= instObj,assessment=assessmentObjsel) 
-                     if uobj:
-                               uflag=True
-                     else:
-                                           uflag=False
-                   else:
-                                        uflag=True           
-                                       
-                   if uflag:  
-                        print userObj,permissionType   
-                        assignedInsIds.append(inst_id)
-			if permissionType == 'permissions':
-				# if permission type is permissions set institution level permissions for the user
-				userObj.set_perms(permissions, instObj)
-			        if assessmentPerm!=None and assessmentPerm!='None':	
-					# if assessmentPerm is true assign assessment also to the user.
-					sg_list = StudentGroup.objects.filter(institution__id=inst_id).values_list('id', flat=True).distinct()
-                                        print sg_list[:10],inst_id
-                                        #print sg_list  
-					asmIds = Assessment_StudentGroup_Association.objects.filter(student_group__id__in= sg_list, active=2).values_list("assessment__id", flat=True).distinct()
-                                        print asmIds
+                   userObj=User.objects.get(id=deUser)
+                   alreadyssignInst=[]
+                   newlyassignInst=[]
+                   AssalreadyssignInst=[]
+                   AssnewlyassignInst=[]
+                   Assdic={}
+                   if 1:
+                        print userObj,permissionType  ,assessmentPerm 
+        		if permissionType == 'permissions':
+				 # if permission type is permissions set institution level permissions for the user
+                                 '''
+                                 if not userObj.has_any_perms(instObj, perms=permissions):
+				  userObj.set_perms(permissions, instObj)
+                                 '''
+                                 assCheck,sgInstList=assessmentPermisionCheck(userObj,instObj,[],permissions,'permissionType')
+                                 if assCheck:
+                                  alreadyssignInst.append(inst_id)
+                                 else:
+                                  newlyassignInst.append(inst_id)
+                             
+                                 print 'ALLLLL',userObj.has_any_perms(instObj, perms=permissions)
+		        if 1: #assessmentPerm not in ['None',None,'']:
+                                        print permissionType == 'assessmentpermissions','IIIII'
 					for asmId in asmIds:
+                                                permissionType == 'assessmentpermissions',instObj.id,'uuuuuuuuuuuu'
 						assessmentObj = Assessment.objects.get(id=asmId)
-						try:
+                                                '''if permissionType == 'assessmentpermissions':
+                                                  sgInstList=getAssSG([asmId],instObj.id)
+                                                  print sgInstList,'ASSESMENTPER'
+                                                  if sgInstList:
+                                                        if not userObj.has_any_perms(instObj, perms=permissions):
+                                                            userObj.set_perms(permissions, instObj)
+                                                            alreadyssignInst.append(inst_id)
+                                                        else:
+                                                '''
+                                                if permissionType != 'permissions':
+                                                   assCheck,sgInstList=assessmentPermisionCheck(userObj,instObj,asmId,permissions,permissionType)
+                                                   if assCheck:
+                                                       alreadyssignInst.append(inst_id)
+                                                   else:
+                                                    newlyassignInst.append(inst_id)
+                                                if (sgInstList and assessmentId ) or assessmentId in [None,'None','']:
+						 try:
                                                         
 							permObj = UserAssessmentPermissions.objects.get(user = userObj, instituion = instObj, assessment = assessmentObj)
+                                                        print 'PPPPPPPP'
 							permObj.access = True
-							permObj.save()							
-						except:
-                                                        print "EXT"
+							permObj.save()						
+                                                        AssalreadyssignInst.append(inst_id)	
+						 except:
+                                                        print 'new'
 							permObj = UserAssessmentPermissions(user = userObj, instituion = instObj, assessment = assessmentObj, access=True)
+                                                        AssnewlyassignInst.append(inst_id)
                                                         try: 
 							  permObj.save()
                                                         except:
                                                               pass 
-							
-					assignedAsmIds.extend(asmIds)
-			else:
-				# else assign assessment permissions to user.
-				assessmentObj = Assessment.objects.get(pk=assessmentId)
-				try:
+                                                Assdic[asmId]=[list(set(AssalreadyssignInst)),list(set(AssnewlyassignInst))]
+		                        if asmIds:
+                                                                      allassignIds=list(set(allassignIds)|set(asmIds))
+					#assignedAsmIds.extend(asmIds)
+                        '''      
+			if assessmentId:
+				 # else assign assessment permissions to user.
+                                 if permissionType != 'permissions':
+                                   assCheck=assessmentPermisionCheck(userObj,instObj,assessmentId,permissions,permissionType)
+                                   if assCheck:
+                                         alreadyssignInst.append(inst_id)
+                                   else:
+                                           newlyassignInst.append(inst_id)
+				 try:
 					permObj = UserAssessmentPermissions.objects.get(user = userObj, instituion = instObj, assessment = assessmentObj)
 					permObj.access = True
+                                        addFlag=True
 					permObj.save()
-				except :
+                                        AssalreadyssignInst.append(inst_id)
+				 except :
 					permObj = UserAssessmentPermissions(user = userObj, instituion = instObj, assessment = assessmentObj, access=True)
+                                        AssnewlyassignInst.append(inst_id)
 					permObj.save()
-	assignedAsmIds = list(set(assignedAsmIds))
-        print assignedAsmIds,"total"
-	return assignedInsIds
-
+                                 Assdic[assessmentId]=[list(set(AssalreadyssignInst)),list(set(AssnewlyassignInst))]
+                         '''
+                   if dic.has_key((userObj,deUser)):
+                              asdic=dic[(userObj,deUser)][0]
+                              for k in asdic:
+                                 if Assdic.has_key(k):
+                                        Assdic[k][0]=list(set(Assdic[k][0])|set(asdic[k][0]))
+                                        Assdic[k][1]=list(set(Assdic[k][1])|set(asdic[k][1]))
+                                 else:
+                                    Assdic[k]=asdic[k]
+                           
+                              alreadyssignInst=list(set(alreadyssignInst)|set(dic[(userObj,deUser)][1]))
+                              newlyassignInst=list(set(newlyassignInst)|set(dic[(userObj,deUser)][2]))
+                   dic[(userObj,deUser)]=[Assdic,alreadyssignInst,newlyassignInst]
+        #print newlyassignInst,'NEEEE',dic,alreadyssignInst
+	return assignedInsIds,allassignIds,dic
+def assessmentPermisionCheck(userObj,instObj,asmId,permissions,permissionType):
+   sgInstList=[]
+   if permissionType == 'assessmentpermissions':
+                                                  sgInstList=getAssSG([asmId],instObj.id)
+                                                  print sgInstList,'ASSESMENTPER',instObj.id,asmId
+   flag=0
+   if (sgInstList and permissionType == 'assessmentpermissions') or permissionType=='permissionType' or ( asmId and permissionType == 'assessmentpermissions'):
+     if not userObj.has_any_perms(instObj, perms=permissions):
+                                  userObj.set_perms(permissions, instObj)
+                                  flag=1
+     else:
+                                  flag=0
+   return flag,sgInstList
 def KLP_Users_list(request):
 	""" This method is used to list out active(1) users other than staff and super users"""
 	# get logged in user
@@ -324,7 +402,7 @@ def KLP_ReAssign_Permissions(request, permissionType):
 		if permissionType== 'permissions':
 			# if permissionsType is permissions assign instituions to user
 			inst_list = request.POST.getlist('unassignedInst') # get selected institution list
-			assignPermission(inst_list, userList, permissions, permissionType, None, True) # call assignPermission method to assign permission
+			a,b,c=assignPermission(inst_list, userList, permissions, permissionType, None, True) # call assignPermission method to assign permission
 		else:
 			# else assign assessments to user
 			asmList = request.POST.getlist('unassignedAsm') # get selected assesment and institution list
@@ -332,7 +410,7 @@ def KLP_ReAssign_Permissions(request, permissionType):
 				asm_list = asm.split("_")
 				inst_list = [asm_list[0]]
 				assessmentId = asm_list[1]
-				assignPermission(inst_list, userList, permissions, permissionType, assessmentId) # call assignPermission method to assign permission
+				a,b,c=assignPermission(inst_list, userList, permissions, permissionType, assessmentId) # call assignPermission method to assign permission
 	except:
 		opStatus = "fail"	
 	# if reassign permission fail return response as fail else return success.	

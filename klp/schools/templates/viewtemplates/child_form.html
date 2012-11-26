@@ -53,11 +53,11 @@
 				<tr>
 				    <!-- render all fields for child -->
 				    <td align="center">
-					{% render_field entryForm.firstName 'tabindex=1' %}
+					{% render_field entryForm.first_name 'tabindex=1' %}
 				    </td>
 				   
 				    <td align="center">
-					{% render_field entryForm.lastName 'tabindex=1' %}
+					{% render_field entryForm.last_name 'tabindex=1' %}
 				    </td>
 				   
 				   
@@ -90,7 +90,7 @@
 					{% render_field entryForm.uid 'tabindex=1' %}
 				    </td>
 				     <td align="center">
-					{% render_field entryForm.middleName 'tabindex=1' %}
+					{% render_field entryForm.middle_name 'tabindex=1' %}
 				    </td>
 				    <td align="center">
 					<input type="text" name = "form-0-mothermiddlename" id="id_form-0-mothermiddlename" tabindex='1' size=8 value="{{extra_context|dictValue:'form-0-mothermiddlename'}}" />
@@ -116,13 +116,13 @@
 				<tr>
 				   <!-- Show error msgs if field id not valid -->
 				   <td align="center">
-                                    	{% for error in entryForm.firstName.errors %}
+                                    	{% for error in entryForm.first_name.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
                                     </td>
 				    
 				    <td align="center">
-                                    	{% for error in entryForm.lastName.errors %}
+                                    	{% for error in entryForm.last_name.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
                                     </td>
@@ -157,7 +157,7 @@
                                     </td>
 
                                        <td align="center">
-                                        {% for error in entryForm.middleName.errors %}
+                                        {% for error in entryForm.middle_name.errors %}
                                                 <span class="editErr">{{ error }}</span>
                                         {% endfor %}
                                     </td>

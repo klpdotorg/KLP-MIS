@@ -64,13 +64,16 @@ class TreeSerializeResponder(object):
         response1= simplejson.loads(response)
         """ This is customised to generate list of dictionaries for tree structure"""
         response2=[]
+        print 'touch'
         for k in response1:
-		   
+		    
 		   modelName = k['model'].split('.')[-1]
                    childkey= modelName+'_'+str(k['pk'])
                    temval=self.CDict[childkey]
-                   childval=temval[0]
-                   if type(childval)()==[]:
+                   print temval,'ttttttttem;'
+                   if temval:
+                      childval=temval[0]
+                      if type(childval)()==[]:
                                childval=childval[0]
                                
                                for c in temval:
@@ -90,18 +93,18 @@ class TreeSerializeResponder(object):
                                      response2.append(copyk) 
                                      del copyk
                                response1=response2   
-                   else:                   
-                     if childval:
+                      else:                   
+                        if childval:
                           # if object has childval(has child objects) pass haschildren true
                           k['hasChildren']='true'
-                     k['id']=childkey
-		     names =  k['fields']
-		     # get names of object to show in tree structure
-                     try:
-                        titleval=names['name']
-		     except:
-			titleval = names['question']
-		     k['text'] = temval[1]
+                        k['id']=childkey
+		        names =  k['fields']
+		        # get names of object to show in tree structure
+                        try:
+                          titleval=names['name']
+		        except:
+			 titleval = names['question']
+		        k['text'] = temval[1]
 
 	
 

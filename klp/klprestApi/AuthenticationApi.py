@@ -35,7 +35,7 @@ def KLP_Login(request):
         	return HttpResponseRedirect('/home/')
         else:
         	# else redirect to respective paths defined in usrUrl dictionary based on group.
-        	userGroup = user.groups.all()[0].name
+        	userGroup = user.groups.all().defer('user','permissions')[0].name
         	return HttpResponseRedirect(usrUrl[userGroup])
       else:
         # disabled account

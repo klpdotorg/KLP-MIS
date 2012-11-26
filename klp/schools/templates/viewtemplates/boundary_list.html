@@ -3,14 +3,14 @@
         <div class="boundLink">{{boundary.name}}</div>
         <div class="boundLink">
             <span class="gallery clearfix">
-                <a href='/production/boundary/{{boundary.id}}/edit/?iframe=true&amp;width=500&amp;height=300' rel="prettyPhoto[iframe]">Edit</a>
+                <a href='/staging/boundary/{{boundary.id}}/edit/?iframe=true&amp;width=500&amp;height=300' rel="prettyPhoto[iframe]">Edit</a>
             </span>
         </div>
         <div class="boundLink">                                
             <span class="delConf" onclick="deleteConfiramtion('{{boundary.id}}')">Delete</span>
         </div>
         <div class="boundLink">
-            <a href='/production/boundary/{{boundary.id}}/view/'>View</a>
+            <a href='/staging/boundary/{{boundary.id}}/view/'>View</a>
         </div>
     </div>
 {% endfor %}                                           
