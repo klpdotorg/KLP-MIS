@@ -32,7 +32,7 @@
 		    								{% with childDict|displayValue:i as cDic %}
 										<td class="KLP_td_width">{{cDic|displayValue:'studId'}}</td>
 										<td class="KLP_td_width" style="min-width:108px;max-width:108px;">
-											<span class="blue" title="Father: {{cDic|displayValue:'fName'}}, Mother: {{cDic|displayValue:'mName'}}, Gender: {{cDic|displayValue:'Gender'}}, DOB: {{cDic|displayValue:'dob'}}">{{cDic|displayValue:'first_name'}} {{cDic|displayValue:'last_name'}}</span><span class="KLP_Form_status" id="id_Student_{{cDic|displayValue:'studId'}}_status">Form Status</span>
+											<span class="blue" title="Father: {{cDic|displayValue:'fName'}}, Mother: {{cDic|displayValue:'mName'}}, Gender: {{cDic|displayValue:'Gender'}}, DOB: {{cDic|displayValue:'dob'}}">{{cDic|displayValue:'firstName'}} {{cDic|displayValue:'lastName'}}</span><span class="KLP_Form_status" id="id_Student_{{cDic|displayValue:'studId'}}_status">Form Status</span>
 										
 										</td>
 										{% endwith%}

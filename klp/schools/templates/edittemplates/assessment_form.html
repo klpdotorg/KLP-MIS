@@ -33,12 +33,12 @@
       						<tr>
       				    			<td class="rightprofile"><label class="KLP_required">Start Date</label></td>
       							<td class="leftprofile">
-                            					{% render_field entryForm.start_date 'tabindex=2' %}
+                            					{% render_field entryForm.startDate 'tabindex=2' %}
                             					<!-- Start Date Field -->
                         				</td>
                         				<td>
                         					<!-- If Start Date field has errors show errors -->
-                                    				{% for error in entryForm.start_date.errors %}
+                                    				{% for error in entryForm.startDate.errors %}
 	                                				<span class="editErr">{{ error }}</span>
 	                                			{% endfor %}
                                     			</td> 
@@ -46,19 +46,19 @@
       						<tr>
       				    			<td class="rightprofile"><label class="KLP_required">End Date</label></td>
       							<td class="leftprofile">
-                            					{% render_field entryForm.end_date 'tabindex=3' %}
+                            					{% render_field entryForm.endDate 'tabindex=3' %}
                             					<!-- End Date Field -->
                         				</td>
                         				<td>
                         					<!-- If End Date field has errors show errors -->
-                                    				{% for error in entryForm.end_date.errors %}
+                                    				{% for error in entryForm.endDate.errors %}
 	                                				<span class="editErr">{{ error }}</span>
 	                                			{% endfor %}
                                     			</td> 
                         				<script>
                         					/* To Show Calendar on focus on date fields */
-                        					$( "#id_form-0-start_date" ).datepick({dateFormat: 'dd-mm-yyyy'});
-		                        			$( "#id_form-0-end_date" ).datepick({defaultDate: new Date("{{extra_context|displayValue:'end_date'}} {{extra_context|displayValue:'endMonth'}} {{extra_context|displayValue:'endYear'}}"), dateFormat: 'dd-mm-yyyy'});
+                        					$( "#id_form-0-startDate" ).datepick({dateFormat: 'dd-mm-yyyy'});
+		                        			$( "#id_form-0-endDate" ).datepick({defaultDate: new Date("{{extra_context|displayValue:'endDate'}} {{extra_context|displayValue:'endMonth'}} {{extra_context|displayValue:'endYear'}}"), dateFormat: 'dd-mm-yyyy'});
 	                    				</script>
       						</tr>
                                                 <tr >
@@ -72,18 +72,14 @@
                                                         <td class="rightprofile"><label class="KLP_required">Double Entry</label></td>
                                                         
                                                         <td class="leftprofile">
-                                                                {% render_field entryForm.douple_entry %}
+                                                                {% render_field entryForm.doubleEntry %}
                                                         </td>
                                                 </tr>
-       						<tr>      				    
-                                                            <td class="rightprofile"><label class="KLP_required">Active Status</label></td>
+
+      						<tr>      				    
       			        			<td class="leftprofile">
-      			            				<span  {% if 'AdminGroup' in usergroups or user.is_superuser %} syle="display:block"  {% else %} style="display:none" {% endif %}>
-                                                        <select id="id_form-0-active" name="form-0-active">
-                                                                   <!--option value="0" {% ifequal  entryForm.active.value 0  %} selcted="selected" {% endifequal %}>Deleted</option-->
-                                                                   <option value="1" {% ifequal  entryForm.active.value 1  %} selected="selected" {% endifequal %}>Inactive</option>
-                                                                   <option value="2" {% ifequal  entryForm.active.value 2  %} selected="selected" {% endifequal %}>Active</option>
-                                                              </select>       
+      			            				<span style="display:none">
+      			            					<input type="hidden" id="id_form-0-active" name="form-0-active" value="2">
       			            					{{entryForm.id}}
       			            				</span>
       			        			</td>

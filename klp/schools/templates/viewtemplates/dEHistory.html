@@ -14,8 +14,8 @@
 			<th> Select End Date </th>
 			<th> Submit </th>
 			<tr>
-				<td><input type="text" name="start_date" id="id_start_date" value="{{start_date}}"/></td>
-				<td><input type="text" name="end_date" id="id_end_date" value="{{end_date}}"/></td>
+				<td><input type="text" name="startDate" id="id_startDate" value="{{startDate}}"/></td>
+				<td><input type="text" name="endDate" id="id_endDate" value="{{endDate}}"/></td>
 				<td>
 					<input type="submit" value="GO" />
 				</td>
@@ -58,8 +58,8 @@
         	</div>
         {% endif %}
     	<script>
-    		$("#id_start_date").datepick({dateFormat: 'dd-mm-yyyy'});
-	        $("#id_end_date" ).datepick({dateFormat: 'dd-mm-yyyy'});
+    		$("#id_startDate").datepick({dateFormat: 'dd-mm-yyyy'});
+	        $("#id_endDate" ).datepick({dateFormat: 'dd-mm-yyyy'});
 	                    				</script>    	
     </form>
   </div>

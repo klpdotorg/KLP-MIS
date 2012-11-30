@@ -43,12 +43,12 @@
       					    <tr>
       				    		    <td class="rightprofile"><label class="KLP_required">Start Date</label></td>
       						    <td class="leftprofile">
-			    					{% render_field entryForm.start_date 'tabindex=3' %}
+			    					{% render_field entryForm.startDate 'tabindex=3' %}
 			    					<!-- Programme start date Field -->
                         			    </td>
                             			    <td>
                             			    	<!-- If startdate has errors show errors -->
-                                    		    	{% for error in entryForm.start_date.errors %}
+                                    		    	{% for error in entryForm.startDate.errors %}
 	                                			<span class="editErr">{{ error }}</span>
 	                                		{% endfor %}
                                     		    </td>
@@ -56,19 +56,19 @@
       					   <tr>
       				    		    <td class="rightprofile"><label class="KLP_required">End Date</label></td>
       						    <td class="leftprofile">
-								{% render_field entryForm.end_date 'tabindex=4' %}
+								{% render_field entryForm.endDate 'tabindex=4' %}
 								<!-- Programme end date Field -->
                         			    </td>  
                         			    <td>
                         			    	<!-- If enddate has errors show errors -->
-                                    		    	{% for error in entryForm.end_date.errors %}
+                                    		    	{% for error in entryForm.endDate.errors %}
 	                                			<span class="editErr">{{ error }}</span>
 	                                		{% endfor %}
                                     		    </td>                      
 	                    			    <script>
 	                    			    	/* To Show Calendar on focus on date fields */
-	                        			$("#id_form-0-start_date").datepick({dateFormat: 'dd-mm-yyyy'});
-	                        			$( "#id_form-0-end_date" ).datepick({defaultDate: new Date("{{extra_context|displayValue:'end_date'}} {{extra_context|displayValue:'endMonth'}} {{extra_context|displayValue:'endYear'}}"), dateFormat: 'dd-mm-yyyy'});
+	                        			$("#id_form-0-startDate").datepick({dateFormat: 'dd-mm-yyyy'});
+	                        			$( "#id_form-0-endDate" ).datepick({defaultDate: new Date("{{extra_context|displayValue:'endDate'}} {{extra_context|displayValue:'endMonth'}} {{extra_context|displayValue:'endYear'}}"), dateFormat: 'dd-mm-yyyy'});
 	                    			    </script>
       					   </tr>
       					   <tr>      				    
@@ -126,8 +126,8 @@ $(document).ready(function(){
    var KLP_form_submit = function(){
    	oldName = $('#id_old').val();  
    	newName = $('#id_form-0-name').val();
-   	start_date = $("#id_form-0-start_date").val();
-   	end_date = $("#id_form-0-end_date").val();
+   	startDate = $("#id_form-0-startDate").val();
+   	endDate = $("#id_form-0-endDate").val();
    	/* capture old name and new name to change values in node after editing*/
    	/* post data using post method */
    	$.post(
@@ -142,8 +142,8 @@ $(document).ready(function(){
                     if (successStatus == 'True'){
                         /* If It success show success msg and update node in tree */
                     	treeNode=$("#programme_{{programme.id}}").find("a:first");
-                    	stYear = start_date.split("-")[2]
-                    	enYear = end_date.split("-")[2]
+                    	stYear = startDate.split("-")[2]
+                    	enYear = endDate.split("-")[2]
                     	prgName = newName +"("+stYear+"-"+enYear+")"
                     	$(treeNode).attr("title", prgName);
                     	$("#programme_{{programme.id}}_text").html(prgName);

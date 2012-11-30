@@ -12,24 +12,24 @@ import pdb
 
 class Command(BaseCommand):
     ''' Command To generate Data Entry Operators History in csv format. 
-    Takes filename, start_date, end_date as input parameters.
+    Takes filename, startDate, endDate as input parameters.
     A csv file will be created as output in a subfolder called logfiles in current folder.'''
 
     def handle(self, *args, **options):
         if 1: #try:
             # read start date, end date and filename
-            start_date = args[0]
-            end_date = args[1]
+            startDate = args[0]
+            endDate = args[1]
             fileName = args[2]
             contentTypeIds = {}
             ## Create a dictionary of valid content types
             for modelType in ContentType.objects.filter(app_label='schools'):
                 contentTypeIds[modelType.model]=modelType.id
         
-            if fileName and start_date and end_date:
+            if fileName and startDate and endDate:
                 if 1: #try:
-                    strDate = start_date.split("/")
-                    enDate = end_date.split("/")
+                    strDate = startDate.split("/")
+                    enDate = endDate.split("/")
                     sDate = datetime.date(int(strDate[2]), int(strDate[1]), int(strDate[0]))
                     eDate = datetime.date(int(enDate[2]), int(enDate[1]), int(enDate[0]))
                     sTime = datetime.datetime(int(strDate[2]), int(strDate[1]), int(strDate[0]), 00, 00, 00)
@@ -229,7 +229,7 @@ class Command(BaseCommand):
                 else: #except IndexError: # if arguments are not proper raises an command error.
                     pass #raise CommandError('Date Should be in dd/mm/yyyy format.\n')
             else:
-                print "need parameters fileName, start_date and end_date - use dd/mm/yyyy "
+                print "need parameters fileName, startDate and endDate - use dd/mm/yyyy "
         else: #except:
-            print "need parameters fileName, start_date and end_date - use dd/mm/yyyy "
+            print "need parameters fileName, startDate and endDate - use dd/mm/yyyy "
             

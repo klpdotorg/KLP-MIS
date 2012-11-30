@@ -42,13 +42,13 @@
         		<tr>
                                     <td><label class="KLP_required">First Name:</label></td>
                                     <td>
-                                         {% render_field entryForm.first_name 'tabindex=1' %}
+                                         {% render_field entryForm.firstName 'tabindex=1' %}
                                          <!-- Staff First Name Field -->
                                     </td>
                                     <td>&nbsp;</td>
                                     <td>
                                     	<!-- If First Name field has errors show errors -->
-                                    	{% for error in entryForm.first_name.errors %}
+                                    	{% for error in entryForm.firstName.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
                                     </td>
@@ -56,13 +56,13 @@
                                 <tr>
 					<td><label>Middle Name:</label></td>
 					<td>
-                                        	{% render_field entryForm.middle_name 'tabindex=2' %}
+                                        	{% render_field entryForm.middleName 'tabindex=2' %}
                                         	<!-- Staff Middle Name Field -->
                                     	</td>
                                     	<td>&nbsp;</td>
                                     	<td>
                                     		<!-- If Middle Name field has errors show errors -->
-                                    		{% for error in entryForm.middle_name.errors %}
+                                    		{% for error in entryForm.middleName.errors %}
 	                                		<span class="editErr">{{ error }}</span>
 	                                	{% endfor %}
                                     	</td>
@@ -72,13 +72,13 @@
                                 <tr>
 					<td><label>Last Name:</label></td>
 					<td>
-                                        	{% render_field entryForm.last_name 'tabindex=3' %}
+                                        	{% render_field entryForm.lastName 'tabindex=3' %}
                                         	<!-- Staff Last Name Field -->
                                     	</td>
                                     	<td>&nbsp;</td>
                                     	<td>
                                     		<!-- If Last Name field has errors show errors -->
-                                    		{% for error in entryForm.last_name.errors %}
+                                    		{% for error in entryForm.lastName.errors %}
 	                                		<span class="editErr">{{ error }}</span>
 	                                	{% endfor %}
                                     	</td>
@@ -94,7 +94,7 @@
                                     	<td>&nbsp;</td>
                                     	<td>
                                     		<!-- If UID field has errors show errors -->
-                                    		{% for error in entryForm.middle_name.errors %}
+                                    		{% for error in entryForm.middleName.errors %}
 	                                		<span class="editErr">{{ error }}</span>
 	                                	{% endfor %}
                                     	</td>
@@ -152,8 +152,8 @@
 				    <td>
 				    	<!-- Staff type  Field -->
 					<select name="form-0-staff_type" id="id_form-0-staff_type" tabindex=9>						
-						{% for staff_type in extra_context|displayValue:'Staff_Types' %}
-							<option value="{{staff_type.id}}" {%if staff.staff_type == staff_type %}selected="selected"{% endif %}>{{staff_type.staff_type}}</option>
+						{% for staffType in extra_context|displayValue:'Staff_Types' %}
+							<option value="{{staffType.id}}" {%if staff.staff_type == staffType %}selected="selected"{% endif %}>{{staffType.staffType}}</option>
 						{% endfor %}
 					</select>
 					<input type="hidden" name="form-0-active" id="id_form-0-active" value="2" />

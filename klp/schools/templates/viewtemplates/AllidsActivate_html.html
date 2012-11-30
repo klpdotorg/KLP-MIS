@@ -31,41 +31,19 @@
 		<div class="klp_admin"> <a href="/home/"> << Back To Home </a> </div>
 		<div class="klp_admin">
 			<form name="klpQueryForm" id="id_klpQueryForm" onsubmit="return false;" class="niceform">
-                        <table><tr><td align="justify">
-                                                If you activate a Boundary then you may want to activate the Boundaries/Schools/Preschools? under it.<br/><br/>
-
-If you activate a School then you may want to activate the classes under it.<br/><br/>
-
-If you activate Classes then you may want to activate the teachers & students that belong to the classes.<br/>
-You may additionally want to activate the Class-Student associations, Class-Teacher associations and Class-Assessment associations for the current year.
-<br/><br/>
-
-If you activate a Student you may want to activate the Class-Student association for the current year.<br/><br/>
-
-If you activate a Teacher you may want to activate the Class-Teacher association for the current year.<br/><br/>
-
-If you activate a Programme then you may want to activate the Assessments associated with it.<br/><br/>
-
-If you activate a Assessment you may want to activate the Questions and also Class-Assessment association for the current year.<br/><br/>
-
-If any student is deactivated ,this script will also deactivate all associated with student_studentgrouprelation   </td></tr><tr><td style="vertical-align:top">
-			          <select name="form-staging-modelname" id="id_form-modelname">
-			          <option value="boundary">Boundary</option>
-			           <option value="institution">Institution</option>
-			           <option value="studentgroup">StudentGroup</option>
-                                  <option value="student">Student</option>
-			            <option value="programme">Programme</option>
-			           <option value="question">Question</option>
-			           <option value="assessment">Assessment</option>
-			            <option value="staff">Staff</option>
-			          </select> <select name="form-staging-action" id="id_form-action">
-                                  <option value=1>Deactive</option>
-                                   <option value=2>Active</option>
-                                   </select>
-				<span><textarea name="form-staging-allids" id="id_form-staging-allids" cols="80" rows="5"></textarea></span>
+			          <select name="form-production-modelname" id="id_form-modelname">
+			          <option value=1>Boundary</option>
+			           <option value=2>Institution</option>
+			           <option value=3>StudentGroup</option>
+			            <option value=4>Programme</option>
+			           <option value=5>Question</option>
+			           <option value=6>Assessment</option>
+			            <option value=7>Staff</option>
+			          </select>
+				<span><textarea name="form-production-allids" id="id_form-production-allids" cols="80" rows="5"></textarea></span>
 				<span class="klp_admin_note">Note: ids should be seperated by comma</span><br/>
-				<span class="klp_admin"><input type="submit" name="querySubmit" value="Active/Deactive" /></span>
-                      </td></tr></table>			</form>
+				<span class="klp_admin"><input type="submit" name="querySubmit" value="Activate" /></span>
+			</form>
 		</div>
 		<script>
 			 $(document).ready(function(){

@@ -88,10 +88,16 @@ var KLP_Del = function(referKey,type, msgText){
                 $.ajax({                    
                 	url: '/delete/'+type+'/'+referKey+'/',
                 	success: function(data) {
+                          if(data=='Deleted'){
 				nodeId.remove();
 				$("#dyncData").html("");
 				$("#klp_MsgTxt").html(" Sucessfully deleted "+msgType+'  '+msgText);
 				$("#successMsgHead").show();
+                                 }
+                           else{
+                                   $('#klp_fail_MsgTxt').html(data);
+                                  $('#failureMsgHead').show();
+                         }
                     }
                 });
         }
@@ -155,8 +161,6 @@ var KLP_Hide_Msg = function(){
 var KLP_Create_Node = function(thisObj,ObjValue){
 	currentId=thisObj;
 	ccid = currentId.attr('id');
-	ObjValues=ObjValue.split('_');
-	ObjValue=ObjValues[0];
         if (typeof ccid=='undefined' ){
         	currentId=$('#treeBlk');
                 ObjValue='boundary';
@@ -165,15 +169,9 @@ var KLP_Create_Node = function(thisObj,ObjValue){
         else{
         	ObjId = $('#'+ObjValue+'_id').val();
         }
-        syncflag=true;
-        if (ObjValues.length==2){
-        
-          syncflag=false;
-        }  
-	newChildId = ObjValue+'_'+$('#'+ObjValue+'_id').val();
+	newChildId = (ObjValue+'_'+$('#'+ObjValue+'_id').val());
 	$.ajax({
 		url: '/createnew/'+ObjValue+'/'+ObjId+'/',
-                        async:syncflag,
             	data: 'boundaryType='+$("#boundary_type").val(),
             	success: function(data) {
             		curentHtml=currentId.html();
@@ -203,10 +201,10 @@ var KLP_Create_Node = function(thisObj,ObjValue){
                        $("#"+curId).treeview({
                        		add: topbranch,
                        });
-                       if(ObjValues.length!=2){
+                       
                        var newNode = $('#'+newChildId).find("a:first");
 		       KLP_BredaCrumb(newNode);
-		       }
+		       
                        return false;
 		        
 		}

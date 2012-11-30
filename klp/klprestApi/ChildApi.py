@@ -9,7 +9,7 @@ from django_restapi.responder import *
 from django_restapi.receiver import *
 from klprestApi.BoundaryApi import ChoiceEntry
 from django.contrib.contenttypes.models import ContentType
-from staging.schools.models import current_academic
+from production.schools.models import current_academic
 
 class KLP_Child(Collection):    
     """To Create New Child boundary/(?P<bounday>\d+)/Child/creator/"""
@@ -66,10 +66,10 @@ def getStudentSearch(request, boundary, fieldName,searchtext):
          In json format api/json/ml/1'''
 	queryset = []
 	if fieldName=='firstname':
-		child_list = Child.objects.filter(first_name__startswith=searchtext, boundary__id = boundary).values_list('id',flat=True)
+		child_list = Child.objects.filter(firstName__startswith=searchtext, boundary__id = boundary).values_list('id',flat=True)
 
 	if fieldName=='lastname':
-		child_list = Child.objects.filter(last_name__startswith=searchtext, boundary__id = boundary).values_list('id',flat=True)
+		child_list = Child.objects.filter(lastName__startswith=searchtext, boundary__id = boundary).values_list('id',flat=True)
 
 	if fieldName=='dobyear':
 		child_list = Child.objects.filter(dob__year=searchtext, boundary__id = boundary).values_list('id',flat=True)
@@ -91,7 +91,7 @@ def getStudentSearch(request, boundary, fieldName,searchtext):
 		child_list = Child.objects.filter(relations__relation_type="Father",relations__name__startswith=searchtext, boundary__id = boundary).values_list('id',flat=True)
 
 	studentslist=Student.objects.exclude(child__id__in = child_list,school__isnull=True).values_list('child__id',flat=True)
-	queryset=Child.objects.filter(id__in = child_list, boundary__id = boundary).exclude(id__in = studentslist).order_by('first_name')
+	queryset=Child.objects.filter(id__in = child_list, boundary__id = boundary).exclude(id__in = studentslist).order_by('firstName')
 	return queryset
 
 def ChildrenList(request, boundary_id):
@@ -113,7 +113,7 @@ def ChildrenList(request, boundary_id):
 		queryset = getStudentSearch(request, boundary_id, fieldName,searchtext)
 	else:
 		studentslist=Student.objects.filter(school__isnull=False).values_list('child__id',flat=True)
-		queryset=Child.objects.exclude(id__in = studentslist, boundary__id = boundary_id).order_by('first_name')
+		queryset=Child.objects.exclude(id__in = studentslist, boundary__id = boundary_id).order_by('firstName')
 	boundary = Boundary.objects.get(pk = boundary_id)
 	val=Collection(queryset,
 	permitted_methods = ('GET', 'POST'),

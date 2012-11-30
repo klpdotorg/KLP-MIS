@@ -1,4 +1,4 @@
-# An Introduction to KLP 3.0 
+# An Introduction to KLP 
 
   The [Karnataka Learning Partnership](http://www.klp.org.in) (KLP) aims to be a partnership of NGOs across 
   Karnataka with these objectives:

@@ -12,12 +12,12 @@ class Command(BaseCommand):
 	''' Command To generate Data Entry Operators History in csv format.'''
         def handle(self, *args, **options):
                 now = datetime.date.today()
-		current_year = int(now.strftime('%Y'))
-		prvPrgList = Programme.objects.filter(active=2).exclude(Q(end_date__year=current_year) | Q(end_date__year=current_year+1))
+		currentYear = int(now.strftime('%Y'))
+		prvPrgList = Programme.objects.filter(active=2).exclude(Q(endDate__year=currentYear) | Q(endDate__year=currentYear+1))
 		for prvPrg in prvPrgList:
 			prvPrg.active = 7
 			prvPrg.save()
-		nxtPrgList = Programme.objects.filter(active=2).exclude(Q(end_date__year=current_year))	
+		nxtPrgList = Programme.objects.filter(active=2).exclude(Q(endDate__year=currentYear))	
 		for nxtPrg in nxtPrgList:
 			nxtPrg.active = 1
 			nxtPrg.save()

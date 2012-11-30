@@ -1,7 +1,7 @@
 {% load template_tags %}
 <tr id="student_{{child.id}}">
-	<td  class="tot-border1">{{child.first_name}}<input type="hidden" id="success_status" size="15" value="True" / ></td>
-	<td  class="tot-border1">{{child.last_name}}</td>
+	<td  class="tot-border1">{{child.firstName}}<input type="hidden" id="success_status" size="15" value="True" / ></td>
+	<td  class="tot-border1">{{child.lastName}}</td>
 	<td  class="tot-border1">{{child.dob|date:"d M Y"}}</td>
 	<td  class="tot-border1">{{child.mt}} </td>
 	<td  class="tot-border1">{{child.gender}}</td>

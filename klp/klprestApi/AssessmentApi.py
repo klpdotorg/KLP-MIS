@@ -14,9 +14,9 @@ from django_restapi.responder import *
 from django_restapi.receiver import *
 from klprestApi.BoundaryApi import ChoiceEntry
 import datetime
-from django.shortcuts import render_to_response
+
 from schools.receivers import KLP_user_Perm
-from django.views.decorators.csrf import csrf_exempt
+
 class KLP_Assessment(Collection):    
     def get_entry(self,assessment_id):        
     	# Query For Selected assessment based on assessment_id
@@ -45,7 +45,7 @@ def KLP_Assessment_Create(request, referKey):
 		endYear = endYear + 1 
         print referKey
         #before Assessment.objects.all()
-        KLP_Create_Assessment = KLP_Assessment(queryset = Assessment.objects.filter(pk=0), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'assessment', extra_context={'buttonType':buttonType, 'referKey':referKey, 'end_date':30, 'endYear':endYear, 'endMonth':'APRIL'}), receiver = XMLReceiver(),)
+        KLP_Create_Assessment = KLP_Assessment(queryset = Assessment.objects.filter(pk=0), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'assessment', extra_context={'buttonType':buttonType, 'referKey':referKey, 'endDate':30, 'endYear':endYear, 'endMonth':'APRIL'}), receiver = XMLReceiver(),)
         response = KLP_Create_Assessment.responder.create_form(request,form_class=Assessment_Form)
         print response  			
         return HttpResponse(response)  
@@ -64,7 +64,7 @@ def KLP_Assessment_Update(request, assessment_id):
 	if currentMont>4:
 		endYear = endYear + 1
         #before Assessment.objects.all()
-	KLP_Edit_Assessment =KLP_Assessment(queryset = Assessment.objects.filter(pk=assessment_id), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'assessment', extra_context={'buttonType':buttonType, 'referKey':referKey, 'end_date':30, 'endYear':endYear, 'endMonth':'APRIL'}), receiver = XMLReceiver(),)
+	KLP_Edit_Assessment =KLP_Assessment(queryset = Assessment.objects.filter(pk=assessment_id), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'assessment', extra_context={'buttonType':buttonType, 'referKey':referKey, 'endDate':30, 'endYear':endYear, 'endMonth':'APRIL'}), receiver = XMLReceiver(),)
 	response = KLP_Edit_Assessment.responder.update_form(request, pk=assessment_id, form_class=Assessment_Form)
 	
 	return HttpResponse(response)                
@@ -83,40 +83,12 @@ class KLP_Get_Assessments(Resource):
             return HttpResponse(respStr[0:len(respStr)-2])         
          except:
             return HttpResponse('fail')	          
-from schools.forms import Assessment_Form,Question_Form
-@csrf_exempt
-def KLP_copy_Assessments(request,assessment_id):
-    """To copy the assessment"""
-    Ass=Assessment.objects.filter(id=assessment_id)[0]
-    if request.POST:
-       try:
-          KLP_user_Perm(request.user, "Assessment", "Create")
-          Ass=Assessment.objects.filter(id=assessment_id).values()
-          Assdic=Ass[0]
-          del Assdic['id']
-          Assdic['programme']=Assdic['programme_id']
-          Assdic['name']=request.POST.get('newasssmentname','copy _of_')
-          newAssForm=Assessment_Form(Assdic)
-          newAss= newAssForm.save()
-          QuObjects=Question.objects.filter(assessment__id=assessment_id).values()
-          newquestionids=''
-          for QuObject in QuObjects:
-              del QuObject['id']
-              QuObject['assessment']=newAss.id
-              qq=Question_Form(QuObject)
-              qqObj=qq.save()
-              newquestionids+=str(qqObj.id)+','
-          print 'Succesfully Copied_'+str(newAss.id)+'_'+newquestionids    
-          return HttpResponse('Succesfully Copied_'+str(newAss.id)+'_'+newquestionids)
-       except:
-                     return HttpResponse('Duplicate Assessment .')
-    else:
-         return render_to_response('viewtemplates/assessment_copy_form.html',{'assessment':Ass})
-       
+
+
+
 urlpatterns = patterns('',             
    url(r'^assessment/(?P<assessment_id>\d+)/view/?$', KLP_Assessment_View),   
    url(r'^programme/assessment/(?P<referKey>\d+)/creator/?$', KLP_Assessment_Create),   
    url(r'^assessment/(?P<assessment_id>\d+)/update/?$', KLP_Assessment_Update), 
    url(r'^filter/programme/(?P<programme_id>\d+)/assessments/$', KLP_Get_Assessments(permitted_methods=('POST','GET'))),
-    url(r'^assessment/(?P<assessment_id>\d+)/copy/?$', KLP_copy_Assessments),
 )

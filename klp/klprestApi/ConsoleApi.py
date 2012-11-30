@@ -14,15 +14,10 @@ from django.template import RequestContext
 #from pysqlite2 import dbapi2 as sqlite
 import psycopg2
 from django.utils import simplejson
-from django.db.models import Max
 from django.views.decorators.csrf import csrf_exempt
-from klp.settings import *
-from fullhistory.models import *
-from django.contrib.contenttypes.models import *
+from production.settings import *
+
 from django.db import transaction
-#from django.db.models import get_app, get_models
-#app = get_app('schools')
-#objdic={'staff_studentgrouprelation':Staff_StudentGroupRelation, 'academic_year':Academic_Year, 'boundary_category':Boundary_Category, 'moi_type':Moi_Type, 'institution_category':Institution_Category, 'institution_management':Institution_Management, 'staff':Staff, 'student_studentgrouprelation':Student_StudentGroupRelation, 'assessment_institution_association':Assessment_Institution_Association, 'question':Question, 'relations':Relations, 'staff_type':Staff_Type, 'userassessmentpermissions':UserAssessmentPermissions, 'answer':Answer, 'boundary':Boundary, 'taggeditem':TaggedItem, 'assessment_studentgroup_association':Assessment_StudentGroup_Association, 'institution_address':Institution_address, 'student':Student, 'child':Child, 'assessment_class_association':Assessment_Class_Association, 'institution':Institution, 'assessment':Assessment, 'boundary_type':Boundary_Type, 'studentgroup':StudentGroup, 'staff_qualifications':Staff_Qualifications, 'answernew':Answernew, 'programme':Programme}
 def KLP_Admin_Console(request):
 	''' To show the admin Console to run SQl Queries '''
 	# get logged in user
@@ -35,8 +30,8 @@ def KLP_Admin_Console(request):
 def KLP_Run_Query(request):  
     ''' To run SQl Queries Entered by admin'''
     # get query to perform 
-    adminQuery = request.POST.get('form-staging-query')
-    #connection = sqlite.connect('/home/klp/klp/klp.db')
+    adminQuery = request.POST.get('form-production-query')
+    #connection = sqlite.connect('/home/c2staging/c2staging/c2staging.db')
     # Establish connection with postgresql by passing dbname, user name and password.
     d=DATABASES['default']
     datebase=d['NAME']
@@ -44,7 +39,6 @@ def KLP_Run_Query(request):
     password=d['PASSWORD']
     connection = psycopg2.connect(database=datebase, user=user, password=password)
     cursor = connection.cursor()
-    print 's'
     isExecute = False
     if adminQuery:
 	    try:
@@ -53,7 +47,6 @@ def KLP_Run_Query(request):
                 #                transaction.commit_unless_managed()
 	    	# If query executes fine return response as "Query Executed Sucessfully"
                 connection.commit()    
-                storeFullhistory(request)
 	    	respStr = "Query Executed Sucessfully ."
 	    	isExecute = True
 	    except:
@@ -67,75 +60,7 @@ def KLP_Run_Query(request):
     respDict = {"respStr":respStr, "isExecute":isExecute}
     return HttpResponse(simplejson.dumps(respDict), content_type='application/json; charset=utf-8')
       
-def storeFullhistory(requestparam):
-    username=requestparam.user
-    userid=requestparam.user.id
-    adminQuery = requestparam.POST.get('form-staging-query')
-    action=adminQuery[0].upper()
-    fullrequest=Request(user_name=username,user_pk=userid,request_path='/console/')
-    fullrequest.save()
-     
-    objid=0
-    data=adminQuery 
-    print action,data 
-    if 1:
-         if action=='I':
-                objname=adminQuery.split('schools_')[1].split('(')[0].strip()
-         else:
-            objname=adminQuery.split('schools_')[1].split(' ')[0]
-         print objname.capitalize()
-         try:
-            obj=ContentType.objects.filter(model=objname)[0]
-            
-            content_type_id=obj.id
-         except:
-            content_type_id=4
-         if 1:       
-           if action=='I':
-               objid=0 #objdic[objname].objects.all().aggregate(Max('id'))['id__max']
-               '''
-               for model in get_models(app):
-                     if model._meta.module_name==objname:
-                                  objid=model._meta.object_nameobjects.all().aggregate(Max('id'))['id']
-                                  break
-               '''
-           elif action in ['U','D']:
-              objid=adminQuery.split('where')[1].split('id=')
-              if objid:
-                objid=objid[1][:-1]
-         else:
-            objid=0
-         
-         
-    else:
-      obj=''
-    try: 
-      create_info=create_infos(requestparam,action) 
-    except:
-      create_info=data
-    try:
-      revision = len(FullHistory.objects.filter(content_type=objname, object_id=objid))
-    except:
-      revision=0
-    fh=FullHistory(revision=revision,action=action,content_type_id=content_type_id,object_id=objid,data=data,request=fullrequest,site_id=1,info=create_info)
-    fh.save() 
-    print action,fh.id
-    
-def create_infos(requestparam,action):
-        '''
-        Generates a summary description of this history entry
-        '''
-        print action
-        user_name = u'(System)'
-        if requestparam:
-            user_name = requestparam.user
-        print user_name
-        ret = {'I':u'%s Created',
-               'U':u'%s Updated',
-               'D':u'%s Deleted',}[action] % user_name
-       
-        print ret 
-        return ret
+
 urlpatterns = patterns('',             
    url(r'^console/?$', KLP_Admin_Console), 
    url(r'^run-query/?$', KLP_Run_Query),   

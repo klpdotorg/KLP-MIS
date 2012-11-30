@@ -1114,21 +1114,21 @@ $.extend($.validator, {
 		isinGrades: function(value, element, param) {
 			var paramList = new Array()
 			paramList = param.split(",")
-			//value2=value;
-			//value1=parseInt(value);
-			if (!isNaN(value))
-				ovalue=parseInt(value)
+			value2=value;
+			value1=parseInt(value);
+			if (!isNaN(value1))
+				ovalue=value1
 			else
-				ovalue=value.toLowerCase()
+				ovalue=value2.toLowerCase()
 			resp = false
 			for (i=0; i<paramList.length; i++){
 				param=paramList[i];
-				//param2=paramList[i];
-				//param1=parseInt(param);
-				if (!isNaN(param))
-					oparam=parseInt(param)
+				param2=paramList[i];
+				param1=parseInt(param);
+				if (!isNaN(param1))
+					oparam=param1
 				else
-					oparam=param.toLowerCase()
+					oparam=param2.toLowerCase()
 					
 				if (oparam ==ovalue || ovalue == 'ab' || ovalue == 'uk'){
 					resp = true

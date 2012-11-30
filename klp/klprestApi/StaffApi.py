@@ -46,11 +46,11 @@ def KLP_Staff_Create(request, referKey):
 	if institutionObj.boundary.boundary_category.boundary_category.lower() == 'circle':
 		# if the boundary category is circle get anganwadi staff types.
 		extra_dict['institutionType'] = 'Anganwadi'
-		Staff_Types = Staff_Type.objects.filter(category_type=2)
+		Staff_Types = Staff_Type.objects.filter(categoryType=2)
 	else:
 		# if the boundary category is not circle get Institution staff types.
 		extra_dict['institutionType'] = 'Institution'
-		Staff_Types = Staff_Type.objects.filter(category_type=1)
+		Staff_Types = Staff_Type.objects.filter(categoryType=1)
 	extra_dict['Staff_Types'] = Staff_Types	
         #before Staff.objects.all()
         KLP_Create_Staff =KLP_Staff(queryset = Staff.objects.filter(pk=0), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'staff', extra_context=extra_dict), receiver = XMLReceiver(),)
@@ -61,7 +61,7 @@ def KLP_Staff_Create(request, referKey):
 
 def KLP_staff_list(request, institution_id):
 	""" To view list of staff in school school/(?P<school_id>\d+)/staff/view/"""	
-	queryset = Staff.objects.filter(institution__id = institution_id, active=2).order_by('first_name')
+	queryset = Staff.objects.filter(institution__id = institution_id, active=2).order_by('firstName')
 	url = '/institution/%s/staff/view/' %(institution_id)
 	val= Collection(queryset,
 	permitted_methods = ('GET', 'POST'),
@@ -89,11 +89,11 @@ def KLP_Staff_Update(request, staff_id):
 	if institutionObj.boundary.boundary_category.boundary_category.lower() == 'circle':
 		# if the boundary category is circle get anganwadi staff types.
 		institutionType = 'Anganwadi'
-		Staff_Types = Staff_Type.objects.filter(category_type=2)
+		Staff_Types = Staff_Type.objects.filter(categoryType=2)
 	else:
 		# if the boundary category is not circle get Institution staff types.
 		institutionType = 'Institution'
-		Staff_Types = Staff_Type.objects.filter(category_type=1)
+		Staff_Types = Staff_Type.objects.filter(categoryType=1)
         #before Staff.objects.all()
 	KLP_Edit_Staff =KLP_Staff(queryset = querysetstaff, permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'staff', extra_context={'buttonType':buttonType, 'referKey':referKey, 'stgrps':stgrps, 'institutionType':institutionType, 'Staff_Types':Staff_Types}), receiver = XMLReceiver(),)
 	response = KLP_Edit_Staff.responder.update_form(request, pk=staff_id, form_class=Staff_Form)

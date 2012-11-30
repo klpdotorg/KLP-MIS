@@ -16,13 +16,13 @@ class Command(BaseCommand):
         	for ques in questions_list:
 		      order = 1                                        
 		      sMin, sMax, grade ='', '', ''
-		      if ques.question_type == 1:
-			 sMin = ques.score_min
-			 sMax = ques.score_max
-			 qObj = Question(assessment = asmObj, name = ques.name, question_type=ques.question_type, score_min= sMin, score_max=sMax, order = order, active=2) 
+		      if ques.questionType == 1:
+			 sMin = ques.scoreMin
+			 sMax = ques.scoreMax
+			 qObj = Question(assessment = asmObj, name = ques.name, questionType=ques.questionType, scoreMin= sMin, scoreMax=sMax, order = order, active=2) 
 			 qObj.save()
 		      else:
 			 grade = ques.grade
-		      	 qObj = Question(assessment = asmObj, name = ques.name, question_type=ques.question_type, grade=grade, order = order, active=2)
+		      	 qObj = Question(assessment = asmObj, name = ques.name, questionType=ques.questionType, grade=grade, order = order, active=2)
 		      	 qObj.save() 
 		      order = order + 1

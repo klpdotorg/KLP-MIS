@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from schools.models import *
 import django, datetime, os, csv
-from klprestApi.TreeMenu import KLP_assignedInstitutions
+from AkshararestApi.TreeMenu import KLP_assignedInstitutions
 import datetime
 from django.db import transaction
 class Command(BaseCommand):
@@ -19,58 +19,32 @@ class Command(BaseCommand):
 			# checks for arguments
                         starttime=procestime=datetime.datetime.now()
                         self.stdout.write('The mapping is started at %s\n' %(starttime))
-                        asstypedic={1:'Institution',2:'Student',2:'Student Group'}
 			if fileName and assessment_id:
 				try:
 					mapFile = open(fileName, 'r')  # open file to read data
 					studenGroups = mapFile.read().replace('\n', '')  # read data from file
 					mapFile.close()   	       # Close file after reading data
 					sgList = studenGroups.split(',')  #  splits student group ids by ,
-					assessmentObj = Assessment.objects.filter(id=assessment_id).defer('programme')[0]  # get assessment object.
+					assessmentObj = Assessment.objects.get(id=assessment_id)  # get assessment object.
 					# get assessment list under programme to assign permissions to user.
 					prgObj = assessmentObj.programme
-                                        Asstype=assessmentObj.typ              
-                                           
-					assessment_list = Assessment.objects.filter(programme=prgObj, active=2).defer('programme').values_list("id", flat=True).distinct()
+					assessment_list = Assessment.objects.filter(programme=prgObj, active=2).values_list("id", flat=True).distinct()
 					inst_list = []
 					for sg in sgList:
-                                            
 					    if sg: 
-                                                if assessmentObj.typ in [2,3]:            
-                                                   errormsg='%s student Group id does not exist ' % (sg)
-                                                   sgObj = StudentGroup.objects.filter(id=int(sg)).defer('institution')
-                                                   if sgObj:
-                                                                sgObj=sgObj[0]          # get student group object
-					                        inst_list.append(sgObj.institution.id)
-                                                else:
-                                                                               errormsg='%s Institution id does not exist ' % (sg)
-                                                                               sgObj=Institution.objects.filter(id=int(sg)).defer("boundary","cat","mgmt","inst_address")
-                                                                               if sgObj:
-                                                                                           sgObj=sgObj[0]             
-                                                                                           inst_list.append(int(sg))
-                                                if sgObj:
-                                                         if assessmentObj.typ==3:                   
-                                     				# mapping assesment and student group
-				                     		mapObj = Assessment_StudentGroup_Association(assessment = assessmentObj, student_group=sgObj, active=2)
-                                                                MappingStr='%s - Assessment and StudentGroup - %s%s ...\n'%(assessmentObj.name, sgObj.name, sgObj.section)
-						         elif assessmentObj.typ==2:
-                                                                # mapping assesment and student group
-                                                                mapObj = Assessment_Class_Association(assessment = assessmentObj, student_group=sgObj, active=2)
-                                                                MappingStr='%s - Assessment and StudentGroup - %s%s ...\n'%(assessmentObj.name, sgObj.name, sgObj.section)
-                                                         else:
-                                                                #mapping assement and Institution
-                                                                mapObj = Assessment_Institution_Association(assessment = assessmentObj, institution=sgObj, active=2)
-                                                                MappingStr='%s - Assessment and Institution %s ...\n'%(assessmentObj.name, sgObj.name)                           
-		         				 try:
-			            				mapObj.save()
-				              			self.stdout.write('%s are Mapped ...\n'%(MappingStr))
-					        	 except django.db.utils.IntegrityError:
-                                                               django.db.connection._rollback() 
-						               self.stdout.write('%s are Already Mapped ...\n'%(MappingStr))
-                                                else:
-                                                          self.stdout.write('\n %s ' % (errormsg))
+						sgObj = StudentGroup.objects.get(id=sg)           # get student group object
+						inst_list.append(sgObj.institution.id)
+						# mapping assesment and student group
+						mapObj = Assessment_StudentGroup_Association(assessment = assessmentObj, student_group=sgObj, active=2)
+						
+						try:
+							mapObj.save()
+							self.stdout.write('%s - Assessment and StudentGroup - %s%s are Mapped ...\n'%(assessmentObj.name, sgObj.name, sgObj.section))
+						except: #except django.db.utils.IntegrityError:
+							self.stdout.write('%s - Assessment and StudentGroup - %s%s Already Mapped ...\n'%(assessmentObj.name, sgObj.name, sgObj.section))
+                                        
 					# get users to assign permissions		
-					users_List =  User.objects.filter(groups__name__in=['Data Entry Executive', 'Data Entry Operator'], is_active=1).defer('groups')
+					users_List =  User.objects.filter(groups__name__in=['Data Entry Executive', 'Data Entry Operator'], is_active=1)
 					inst_list = list(set(inst_list))
                                         if reportflag:
 				     	  cwd = os.getcwd()
@@ -92,14 +66,14 @@ class Command(BaseCommand):
                                                 print user.username
                                                 perm_instList = KLP_assignedInstitutions(user.id)
                                                 perm_instSet=list(set(inst_list).intersection(set(perm_instList)))
-                                                InsObjs=Institution.objects.filter(id__in=perm_instSet).defer("boundary","cat","mgmt","inst_address")
+                                                InsObjs=Institution.objects.filter(id__in=perm_instSet)
                                                 TotalInst=InsObjs.values_list("id", flat=True).distinct()
                                                 self.stdout.write(" Total Institution %s is assigned to %s" %( len(TotalInst),user.username))    
 						asmPerm = []
                                                  
                                                 userNo+=1
 						# get user permissions in progr
-						permObjs = UserAssessmentPermissions.objects.filter(user=user, assessment__id__in=assessment_list, access=1).defer('user','assessment')
+						permObjs = UserAssessmentPermissions.objects.filter(user=user, assessment__id__in=assessment_list, access=1)
 						if len(permObjs) >= 1:
 									asmPerm.append(True)
 						lenTrue = asmPerm.count(True)
@@ -132,13 +106,13 @@ class Command(BaseCommand):
                                          
 						    if lenTrue==lenAsm or lenTrue== lenAsm-1: 							
 
-                                                                        asmPermObj = UserAssessmentPermissions.objects.get_or_create(user=user, assessment = assessmentObj, instituion = instObj).defer('user','assessment')
+                                                                        asmPermObj = UserAssessmentPermissions.objects.get_or_create(user=user, assessment = assessmentObj, instituion = instObj)                                                              
                                                                        
                                                                         asmPermObj[0].access=1
                                                                         asmPermObj[0].save()  
                                                 if reportflag:
 							# To generate Assessment permission report.
-							asmPermObjs = UserAssessmentPermissions.objects.filter(user=user, access = 1).defer('user','assessment')
+							asmPermObjs = UserAssessmentPermissions.objects.filter(user=user, access = 1)
 							objCounter = 0
 							for asmPermObj in asmPermObjs:
 								asmPermData = []
@@ -158,10 +132,10 @@ class Command(BaseCommand):
                                                 procestime=datetime.datetime.now() 
                                                 self.stdout.write("      Total time was taken for this user %s" %(str(lastprocestime)))
                                         self.stdout.write("\n Total time was taken for all the users %s \n" %(str(datetime.datetime.now()-starttime)))
-				except : #except IOError:
+				except IOError:
 					## If Arguments are not in proper order raises an command error
 					raise CommandError('Pass First Parameter is FileName and Second Parameter is Assessment Id\n')
 					
-		except:#except IndexError:
+		except IndexError:
 			# If Arguments are not passed raises an command error
 			raise CommandError('Pass FileName and Assessment Id\n')

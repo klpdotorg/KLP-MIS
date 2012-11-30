@@ -20,7 +20,7 @@ def KLP_addNewUser(request,template_name='viewtemplates/add_new_user.html', post
     if user.id is not None and (user.is_superuser or 'AdminGroup' in user_GroupsList):
     	# if use is login and user is super user or in admin group
         if post_change_redirect is None:
-            post_change_redirect = reverse('klprestApi.KLP_UserApi.KLP_addNewUser_done')
+            post_change_redirect = reverse('production.klprestApi.KLP_UserApi.KLP_addNewUser_done')
         if request.method == "POST":
             # Get Data From Form        
             form = UserCreationFormExtended(request.POST)
