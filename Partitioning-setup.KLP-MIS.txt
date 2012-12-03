@@ -1,0 +1,33 @@
+PostgreSQL supports basic table partitioning.
+Partitioning refers to splitting what is logically one large table into smaller physical pieces. Partitioning can provide several benefits:
+
+ * Query performance can be improved dramatically in certain situations, particularly when most of the heavily accessed rows of the table are in a single partition or a small number of partitions. The partitioning substitutes for leading columns of indexes, reducing index size and making it more likely that the heavily-used parts of the indexes fit in memory.
+
+ * When queries or updates access a large percentage of a single partition, performance can be improved by taking advantage of sequential scan of that partition instead of using an index and random access reads scattered across the whole table.
+
+ * Bulk loads and deletes can be accomplished by adding or removing partitions, if that requirement is planned into the partitioning design. ALTER TABLE is far faster than a bulk operation. It also entirely avoids the VACUUM overhead caused by a bulk DELETE.
+
+ * Seldom-used data can be migrated to cheaper and slower storage media.
+
+
+The following forms of partitioning can be implemented in PostgreSQL:
+
+* Range Partitioning
+
+    The table is partitioned into "ranges" defined by a key column or set of columns, with no overlap between the ranges of values assigned to different partitions. For example one might partition by date ranges, or by ranges of identifiers for particular business objects.
+
+* List Partitioning
+
+    The table is partitioned by explicitly listing which key values appear in each partition.
+
+
+
+In KLP-MIS, we are partitioning the following tables based on the mentioned columns:
+
+1. Answer	-	status
+2. Child	-	id(primary-key)
+3. Relation	-	Relation_type
+4. Student	-	active
+5. Student_StudentGroup	- active
+6. StudentGroup	-	active
+7. Fullhistory	-	id(primary-key)
