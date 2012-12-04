@@ -3,7 +3,8 @@ import unittest
 from django.test import TestCase
 from django.test.client import Client
 from django.core import urlresolvers
-from django.contrib.auth.models import User #this app requires auth, so we can do tests against it
+from django.contrib.auth.models import User #this app requires auth,
+#so we can do tests against it
 from django.contrib import admin
 
 from models import *
@@ -13,15 +14,17 @@ import fullhistory
 import django
 django1_1 = (django.VERSION[0] == 1 and django.VERSION[1] >= 1)
 
+
 class Test1Model(models.Model):
     field1 = models.CharField(max_length=10)
 
     history = HistoryField()
 
+
 class Test2Model(models.Model):
     field1 = models.FileField(upload_to="testup")
-    
     history = HistoryField()
+
 
 class Test3Model(models.Model):
     field1 = models.CharField(max_length=10)
@@ -30,16 +33,20 @@ class Test3Model(models.Model):
     test2_fk = models.ForeignKey(Test2Model, null=True)
     test1_m2m = models.ManyToManyField(Test1Model)
 
+
 class Test4Model(Test2Model):
     field2 = models.FloatField(default=0.0)
 
 if django1_1:
+
     class TestProxyModel(Test1Model):
+
         class Meta:
             proxy = True
 
+
 class FullHistoryTest(TestCase):
-    
+
     def setUp(self):
         if django1_1:
             fullhistory.register_model(TestProxyModel)
@@ -49,11 +56,12 @@ class FullHistoryTest(TestCase):
         fullhistory.register_model(Test1Model)
 
         try:
-            admin.site.register(Test3Model, FullHistoryAdmin) 
+            admin.site.register(Test3Model, FullHistoryAdmin)
         except:
             pass
-        
-        user = User(username='test', email='testemail@test.com', is_staff=True, is_superuser=True)
+
+        user = User(username='test', email='testemail@test.com',
+        is_staff=True, is_superuser=True)
         user.set_password('test')
         user.save()
         self.client.login(username='test', password='test')
@@ -63,6 +71,7 @@ class FullHistoryTest(TestCase):
         if not django1_1:
             return
         from django.db.models import signals
+
         def save_signal():
             raise Exception()
         signals.post_save.connect(save_signal, sender=TestProxyModel)
@@ -129,17 +138,23 @@ class FullHistoryTest(TestCase):
         t3.test1_m2m.add(t1b)
         history = fullhistory.adjust_history(t3)
         self.assertEqual(history.data['test1_m2m'][0], [t1a.pk])
-        self.assertTrue(t1a.pk in history.data['test1_m2m'][1] and t1b.pk in history.data['test1_m2m'][1])
+        self.assertTrue(t1a.pk in history.data['test1_m2m'][1] and t1b.pk in
+        history.data['test1_m2m'][1])
         self.assertEqual(2, len(FullHistory.objects.actions_for_object(t3)))
 
     def test_autofield_with_specified_obj(self):
         """
-        This fails due to the combination of an auto field and specifying an id that already is in use
-        Effectively we have no way of differing a record loaded from the database (which specifies an id)
+        This fails due to the combination of an auto field and specifying an
+        id that already is in use
+        Effectively we have no way of differing a record loaded from
+        the database (which specifies an id)
         or a record that we manually specify.
-        Another scenerio is creating specific object with an id and later setting another field before saving
-        In general, we should not specify the id of an object without first loading it
-        The alternative is to simply take a snapshot on save and not do differences
+        Another scenerio is creating specific object with an id and
+        later setting another field before saving
+        In general, we should not specify the id of an object without
+        first loading it
+        The alternative is to simply take a snapshot on save and
+        not do differences
         this would be easier but its nice to know what people changed
         """
         fullhistory.end_session()
@@ -154,32 +169,36 @@ class FullHistoryTest(TestCase):
         fullhistory.end_session()
         t3 = Test3Model(field1="test1", field2=5)
         t3.save()
-        
+
         self.assertEqual(1, len(FullHistory.objects.actions_for_object(t3)))
-        self.assertEqual('C', FullHistory.objects.actions_for_object(t3)[0].action)
+        self.assertEqual('C', FullHistory.objects.actions_for_object
+        (t3)[0].action)
         t3.field2 = 7
         t3.save()
-        self.assertEqual('U', FullHistory.objects.actions_for_object(t3)[1].action)
+        self.assertEqual('U', FullHistory.objects.actions_for_object
+        (t3)[1].action)
         pk = t3.pk
         FullHistory.objects.audit(t3)
         t3.delete()
-        
-        self.assertEqual('D', FullHistory.objects.actions_for_object(model=Test3Model, pk=pk).reverse()[0].action)
+
+        self.assertEqual('D', FullHistory.objects.actions_for_object
+        (model=Test3Model, pk=pk).reverse()[0].action)
         FullHistory.objects.audit(model=Test3Model, pk=pk)
-        
+
         previous_revision = -1
-        for history in FullHistory.objects.actions_for_object(model=Test3Model, pk=pk):
-            self.assertEqual(previous_revision+1, history.revision)
+        for history in FullHistory.objects.actions_for_object
+        (model = Test3Model, pk = pk):
+            self.assertEqual(previous_revision + 1, history.revision)
             previous_revision = history.revision
         #lets rollback to the 3rd version
         t3 = FullHistory.objects.rollback(version=3, model=Test3Model, pk=pk)
         t3 = Test3Model.objects.get(pk=pk)
         FullHistory.objects.audit(t3)
         t3.delete()
-        
+
         t3 = FullHistory.objects.rollback(model=Test3Model, pk=pk)
         t3 = Test3Model.objects.get(pk=pk)
-        
+
         actions = FullHistory.objects.actions_for_object(t3)
         first = actions[0]
         last = actions[len(actions)-1]
@@ -195,7 +214,7 @@ class FullHistoryTest(TestCase):
             except FullHistory.DoesNotExist:
                 self.assertEquals(first.pk, last.pk)
                 break
-    
+
     def test_django11(self):
         if not django1_1:
             return
@@ -204,12 +223,12 @@ class FullHistoryTest(TestCase):
         t3.save()
         t3.field2 = 5
         t3.save()
-        
-        base = '/admin/%s/%s/' % (Test3Model._meta.app_label, Test3Model._meta.module_name)
-        response = self.client.get(base+'%s/history/audit/' % t3.pk)
-        self.assertEqual(200, response.status_code)
-        response = self.client.get(base+'%s/history/version/1/' % t3.pk)
-        self.assertEqual(200, response.status_code)
-        response = self.client.get(base+'%s/history/version/256/' % t3.pk)
-        self.assertEqual(404, response.status_code)
 
+        base = '/admin/%s/%s/' % (Test3Model._meta.app_label,
+        Test3Model._meta.module_name)
+        response = self.client.get(base + '%s/history/audit/' % t3.pk)
+        self.assertEqual(200, response.status_code)
+        response = self.client.get(base + '%s/history/version/1/' % t3.pk)
+        self.assertEqual(200, response.status_code)
+        response = self.client.get(base + '%s/history/version/256/' % t3.pk)
+        self.assertEqual(404, response.status_code)

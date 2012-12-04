@@ -13,6 +13,7 @@ from signals import *
 # thread and the list is handled as a stack of values.
 state = {}
 
+
 def get_active_histories():
     '''
     Returns histories that have been created during the current request
@@ -22,8 +23,10 @@ def get_active_histories():
         return FullHistory.objects.none()
     return FullHistory.objects.filter(request=rq)
 
+
 def prepare_initial(entry):
     entry._fullhistory = get_all_data(entry)
+
 
 def get_difference(entry):
     ret = dict()
@@ -36,16 +39,19 @@ def get_difference(entry):
             ret[key] = (oldvalue, newvalue)
     return ret
 
+
 def get_all_data(entry):
     serial = serializers.serialize("python", [entry])[0]
     serial['fields'][entry._meta.pk.name] = serial['pk']
     return serial['fields']
+
 
 def get_all_data_tuple(entry):
     data = get_all_data(entry)
     for key, value in data.items():
         data[key] = (value,)
     return data
+
 
 def get_or_create_request():
     thread_ident = thread.get_ident()
@@ -65,6 +71,7 @@ def get_or_create_request():
         state[thread_ident] = (request, rq)
     return rq
 
+
 def create_history(entry, action):
     request = get_or_create_request()
     if action == 'U':
@@ -75,12 +82,14 @@ def create_history(entry, action):
         data = get_all_data_tuple(entry)
     else:
         data = None
-    fh = FullHistory(data=data, content_object=entry, action=action, request=request)
+    fh = FullHistory(data=data, content_object=entry,
+    action=action, request=request)
     fh.save()
     apply_parents(entry, lambda x: create_history(x, action))
     prepare_initial(entry)
     post_create.send(sender=type(entry), fullhistory=fh, instance=entry)
     return fh
+
 
 def adjust_history(obj, action='U'):
     '''
@@ -91,11 +100,12 @@ def adjust_history(obj, action='U'):
     if delta:
         ct = ContentType.objects.get_for_model(obj)
         try:
-            history = get_active_histories().filter(content_type=ct, object_id=obj.pk).latest()
+            history = get_active_histories().filter
+            (content_type = ct, object_id = obj.pk).latest()
         except FullHistory.DoesNotExist:
             history = FullHistory(content_object=obj,
-                                  request=get_or_create_request(), 
-                                  action=action, 
+                                  request=get_or_create_request(),
+                                  action=action,
                                   data=dict())
         if history.action == 'C':
             for key, value in delta.items():
@@ -110,26 +120,32 @@ def adjust_history(obj, action='U'):
         return history
     return None
 
+
 def apply_parents(instance, func):
     for field in instance._meta.parents.values():
         if field and getattr(instance, field.name, None):
             func(getattr(instance, field.name))
+
 
 def init_history_signal(instance, **kwargs):
     if instance.pk is not None:
         prepare_initial(instance)
         apply_parents(instance, prepare_initial)
 
+
 def save_history_signal(instance, created, **kwargs):
     create_history(instance, created and 'C' or 'U')
 
+
 def delete_history_signal(instance, **kwargs):
     create_history(instance, 'D')
+
 
 def end_session():
     state.pop(thread.get_ident(), None)
 
 registered_models = set()
+
 
 def register_model(cls):
     if cls in registered_models:
@@ -140,12 +156,13 @@ def register_model(cls):
     signals.post_save.connect(save_history_signal, sender=cls)
     signals.post_delete.connect(delete_history_signal, sender=cls)
     registered_models.add(cls)
-    
+
+
 class FullHistoryMiddleware(object):
+
     def process_request(self, request):
         state[thread.get_ident()] = (request, None)
 
     def process_response(self, request, response):
         end_session()
         return response
-

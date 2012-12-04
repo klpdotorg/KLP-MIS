@@ -13,7 +13,7 @@ from django.db import connection
 
 class QueryLogMiddleware:
 
-    def process_response (self, request, response):
+    def process_response(self, request, response):
         if settings.DEBUG:
             queries = {}
             for query in connection.queries:
@@ -24,12 +24,11 @@ class QueryLogMiddleware:
             print "------------------------------------------------------"
             print
             for query, count in queries.items():
-			#if count > 1:
-                	#print "%s x %s" % (count, query)
-                        pass     
+            #if count > 1:
+                #print "%s x %s" % (count, query)
+                        pass
             print "------------------------------------------------------"
             print "Total Queries:     %s" % len(queries)
             print "Duplicate Queries: %s" % duplicates
             print "------------------------------------------------------"
         return response
-
