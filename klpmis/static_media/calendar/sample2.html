@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+	<title>Tigra Calendar Sample #2 - Multiple Calendars</title>
+
+	<!-- link calendar files  -->
+	<script language="JavaScript" src="calendar_us.js"></script>
+	<link rel="stylesheet" href="calendar.css">
+
+	</head>
+<body>
+
+<form name="testform">
+
+	<!-- calendar attaches to existing form element -->
+	<input type="text" name="testinput" />
+	<script language="JavaScript">
+	var o_cal = new tcal ({
+		// form name
+		'formname': 'testform',
+		// input name
+		'controlname': 'testinput'
+	});
+	
+	// individual template parameters can be modified via the calendar variable
+	o_cal.a_tpl.yearscroll = false;
+	o_cal.a_tpl.weekstart = 1;
+	
+	</script>
+
+	<br />
+
+	<input type="text" name="testinput2" id="myOtherInput" />
+	<script language="JavaScript">
+
+	// whole calendar template can be redefined per individual calendar
+	var A_CALTPL = {
+		'months' : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+		'weekdays' : ['do', 'lu', 'ma', 'mi', 'ju', 'vi', 'sa'],
+		'yearscroll': true,
+		'weekstart': 0,
+		'centyear'  : 70,
+		'imgpath' : 'img/'
+	}
+	
+	new tcal ({
+		// if referenced by ID then form name is not required
+		'controlname': 'myOtherInput'
+	}, A_CALTPL);
+	</script>
+
+	</form>
+
+</body>
+</html>

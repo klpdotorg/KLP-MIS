@@ -1,0 +1,100 @@
+<div class="KLP_Button_Header">
+	
+</div>
+
+<div class="detailHead">
+	<span class="hedText">Teacher Details</span>
+</div>
+
+
+<div class="boundDetail">    
+	<div class="cl-txtbx"> 
+ 		<label>First Name</label>
+ 	</div>
+	<div class="bng-cl">	<!-- Show Staff first Name -->
+		<span>{{staff.firstName}}<input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / ></span>
+	</div>
+</div>
+<div class="boundDetail">
+	<div class="cl-txtbx"> 
+ 		<label>Middle Name</label>
+ 	</div>
+	<div class="bng-cl">
+		<span> <!-- Show Staff middle Name -->
+			{{staff.middleName}}
+		</span>
+	</div>
+</div>
+<div class="boundDetail">
+	<div class="cl-txtbx"> 
+ 		<label>Last Name</label>
+ 	</div>
+	<div class="bng-cl">
+		<span> <!-- Show Staff last Name -->
+			{{staff.lastName}}
+		</span>
+	</div>
+</div>
+<div class="boundDetail">    
+	<div class="cl-txtbx"> 
+ 		<label>Date of Joining</label>
+ 	</div>
+	<div class="bng-cl"> <!-- Show Staff doj -->
+		<span>{{staff.doj|date:'d-m-Y'}}</span>
+	</div>
+</div>
+<div class="boundDetail">
+	<div class="cl-txtbx"> 
+ 		<label>Gender</label>
+ 	</div>
+	<div class="bng-cl">
+		<span> <!-- Show Staff gender -->
+			{{staff.gender}}
+		</span>
+	</div>
+</div>
+<div class="boundDetail">    
+	<div class="cl-txtbx"> 
+ 		<label>MT</label>
+ 	</div>
+	<div class="bng-cl"> <!-- Show Staff mt -->
+		<span>{{staff.mt}}</span>
+	</div>
+</div>
+<div class="boundDetail">
+	<div class="cl-txtbx"> 
+ 		<label>Qualifiaction</label>
+ 	</div>
+	<div class="bng-cl">
+		<span>  <!-- Show Staff Qualification -->
+			{% for qualification in staff.qualification.all %}
+				{{qualification}}
+				{% if not forloop.last %}, {% endif %}
+			{% endfor %}
+		</span>
+	</div>
+</div>
+<div class="boundDetail">
+	<div class="cl-txtbx"> 
+ 		<label>Staff Type</label>
+ 	</div>
+	<div class="bng-cl">
+		<span>  <!-- Show Staff type -->
+			{{staff.staff_type}}
+		</span>
+	</div>
+</div>
+<div class="boundDetail">
+	<div class="cl-txtbx"> 
+ 		<label>Classes</label>
+ 	</div>
+	<div class="bng-cl">
+		<span>  <!-- Show Assigned Classes -->
+			{% for assignedGrup in staff.getAssigendClasses%}
+				{% if assignedGrup.name == '0' %}Anganwadi Class{% else %}{{assignedGrup.name}}{{assignedGrup.section}}{% endif %}
+				{% if not forloop.last %}, {% endif %}
+			{% endfor %}
+		</span>
+	</div>
+</div>
+

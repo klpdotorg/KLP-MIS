@@ -1,0 +1,93 @@
+{% load template_tags %}
+{% if  extra_context|displayValue:'replaceTrue'%}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>{{title}}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="/static_media/js/jquery.js"></script>
+<script language="javascript" type="text/javascript" src="/static_media/js/niceforms.js"></script>
+<script type="text/javascript" src="/static_media/js/thickbox.js" charset="utf-8"></script>
+
+
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/thickbox.css" charset="utf-8"/>
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/form.css" />
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/style.css" />
+</head>
+
+<body>
+<div id="container">
+
+{% if entry == "Add" %}
+<fieldset>
+    <legend>{{legend}}</legend>
+{% else %}
+<div class="tablebg">
+<div id="popData">
+{% endif %}
+{% endif %}
+<form action="." method="POST" enctype="multipart/form-data" class="niceform" name="languageForm" id="languageForm" onsubmit="return false;">{% csrf_token %}
+	<input type="hidden" name="form-buttonType" id="id_form-buttonType" value="create" />
+	<input type="hidden" id="success_status" size="15" value="{{extra_context|displayValue:'showsuccess'}}" />
+	<input type="hidden" id="replaceTrue" name="replaceTrue" size="15" value="True" / >
+	{{form.management_form}}
+	{% with form.forms|last as entryForm %}
+        <table>
+            <tr>
+      		    <td>
+      		        <table>
+      		            <tr>
+      		                <td class="rightprofile"><label class="KLP_required">Language</label></td>
+      		                <td class="leftprofile">
+      		                    {% render_field entryForm.name 'tabindex=1' %}
+      		                    <!-- Language Name Field -->
+      		                </td>
+      		                <td>
+      		                	<!-- If Name field has errors show errors -->
+                                	{% for error in entryForm.name.errors %}
+	                            		<span class="editErr">{{ error }}</span>
+	                           	{% endfor %}
+                                </td> 
+      		            </tr>
+      		            <tr>
+      				<td class="rightprofile">
+                    			<input type="submit" value="Add Language" tabindex=2 />
+      				</td>
+      			    </tr>
+      		        </table>
+      		    </td>
+      		</tr>
+        </table>
+        {% endwith %}
+</form>
+<script>
+	$(document).ready(function(){    
+  		setTimeout(function(){
+        		$('input:visible:enabled:first').focus();
+    		},200); 
+   		$("#languageForm").submit(function(){      
+   			/* Post data and get reponse on form submit */     
+			newlyAdded = $("#id_form-0-name").val();
+    			$.post(  
+        			'/language/creator/',  
+        			$("#languageForm").serialize(),  
+        	        	function(data){   
+        	        		$("#popData").html(data);        
+                			NFInit();
+                    			$('input:visible:enabled:first').focus();
+                    			var successStatus = $("#success_status").val();
+                    			if (successStatus == 'True'){
+                    				idVal = $("#obj_id").val();  
+                    				$("#id_form-0-languages", window.parent.document).append("<option value="+idVal+">"+newlyAdded+"</option>");
+                    				window.parent.tb_remove();
+                    			}                                                                                                   
+        	            		
+        	       		}  
+        	   	);  
+       		});  
+	});  
+</script> 
+</div>
+</div>
+</body>
+</html>

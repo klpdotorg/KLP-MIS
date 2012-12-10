@@ -1,0 +1,263 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>{{title}}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- Import js files -->
+<script type="text/javascript" src="/static_media/js/jquery.js"></script>
+<script language="javascript" type="text/javascript" src="/static_media/js/niceforms.js"></script>
+<script type="text/javascript" src="/static_media/js/jquery.treeview.js"></script>
+<script src="/static_media/js/jquery.treeview.async.js" type="text/javascript"></script>
+<script type="text/javascript" src="/static_media/js/jquery.datepick.js"></script>
+<script type="text/javascript" src="/static_media/js/thickbox.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static_media/js/tooltip/jquery.hoverIntent.minified.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static_media/js/tooltip/jquery.bt.min.js" charset="utf-8"></script>
+<script src="/static_media/js/tooltip/demo.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="/static_media/js/tooltip/jquery.easing.1.3.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static_media/js/jquery.customvalidate.js"></script>
+<script type="text/javascript" src="/static_media/js/KLP_script.js"></script>
+<!-- import css files -->
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/thickbox.css" charset="utf-8"/>
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/form.css" />
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/style.css" />
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/jquery.treeview.css" />
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/jquery.datepick.css"/>
+</head>
+
+<body>
+<script language="javascript" type="text/javascript">
+$(function() {
+$(this).bind("contextmenu", function(e) {
+e.preventDefault();
+});
+});
+</script>
+<script type="text/javascript">
+	/* Add loading image to body */
+	$("body").append("<div id='KLP_overlay' class='KLP_overlayBG'></div>");
+	$("body").append("<div id='KLP_load'><img src='/static_media/images/loadingAnimation.gif' alt='Process'></div>");
+        
+	$("#KLP_load").ajaxStart(function(){
+	  /* Check whether user is logged in or not and show process loading image on ajax start*/
+	  KLP_isLog();
+	  $("#KLP_overlay").show();	
+	  $(this).show();
+	});
+
+	$("#KLP_load").ajaxStop(function(){
+	  /* Hide process loading image on ajax stop*/
+	  $(this).hide();
+	  $("#KLP_overlay").hide();
+	});	
+	
+	$(document).ready(function(){
+	
+		var sch_typ_val = $("#boundary_type").val();
+		var asEntryVal = $("#id_entry_view").val();
+		if (sch_typ_val && asEntryVal != 'True'){
+			treeUrl = '/tree/?home={{home}}&filter='+$("#filtProg").val()+'&secFilter='+$("#filtAsmnt").val()+'&boundTyp='+sch_typ_val+'&permission='+$("#id_perm_assign").val()+'&assesspermission='+$("#id_assess_perm_assign").val()+'&shPerm='+$("#id_shPerm").val()+'&userSel='+$("#id_userSel").val();
+			$("#treeStruc").html('<ul id="treeBlk" class="filetree treeview-famfamfam"></ul>');
+			KLP_TreeBLK(treeUrl);
+			var homeView = $("#id_home_view").val();
+			var entryView = $("#id_entry_view").val();
+			var urHere = $("#id_urHere").val();
+			if (homeView == 'True' && entryView != 'True' ){
+				$("#rootBoundary").show()
+			}
+			if (urHere == 'Programme'){
+				$("#rootProgramme").show()
+		       }
+		}
+	
+		    
+		$("#boundary_type").change(function(){
+			/* Call TreeMenu on change of boundary type */
+			typVal = $("#boundary_type").val();  // get selected boundary type values
+			KLP_Set_Session(typVal); // set Session val for boundary type selected
+			if (typVal){
+				assessmentEntry = $("#id_entry_view").val();
+				if (assessmentEntry == 'True'){
+					/* If assessment entry is true get all related programmes to show in drop down */
+					$("#treeStruc").html('<ul id="treeBlk" class="filetree treeview-famfamfam"></ul>');
+					KLP_Programme_List(typVal)
+				}
+				else{
+					/* Else Call Tree Menu*/
+					treeUrl = '/tree/?home={{home}}&filter=None&secFilter='+$("#filtAsmnt").val()+'&boundTyp='+typVal+'&permission='+$("#id_perm_assign").val()+'&assesspermission='+$("#id_assess_perm_assign").val()+'&userSel='+$("#id_userSel").val()+'&shPerm='+$("#id_shPerm").val();
+					$("#treeStruc").html('<ul id="treeBlk" class="filetree treeview-famfamfam"></ul>');
+					KLP_TreeBLK(treeUrl);
+					$("#rootBoundary").show()
+				}
+			} 
+			else{
+				$("#treeStruc").html('<ul id="treeBlk" class="filetree treeview-famfamfam"></ul>');
+			}
+			var urHere = $("#id_urHere").val();
+			if (urHere == 'Programme'){
+				$("#rootProgramme").show()
+			}		
+		});
+		   
+		$("#filtProg").change(function(){
+			/* On programme value change get all related assessments under programme*/
+			$.ajax({                    
+		        	url: '/filter/programme/'+$('#filtProg option:selected').val()+'/assessments/',
+		        	success: function(data) {
+					if (data != 'fail'){
+						rows = data.split('&&')
+					        selOption = '<option value="None">--</option>'
+					        for (i=0;i<rows.length;i++){
+					        	vals = rows[i].split('$$')
+					        	selOption += "<option value="+vals[0]+">"+vals[1]+"</option>"
+						}
+					        $("#filtAsmnt").html(selOption);
+					}
+					KLP_ChangeFilter();
+		            	}
+		    	});
+		});
+	
+		$("#filtAsmnt").change(function(){
+			/* On Assessment value change Call Tree Menu*/
+			var asmVal = $("#filtAsmnt").val();
+			if (asmVal){
+				treeUrl = '/tree/?home={{home}}&filter='+$("#filtProg").val()+'&secFilter='+asmVal+'&boundTyp='+$("#boundary_type").val()+'&permission='+$("#id_perm_assign").val()+'&assesspermission='+$("#id_assess_perm_assign").val();
+				$("#treeStruc").html('<ul id="treeBlk" class="filetree treeview-famfamfam"></ul>');
+				KLP_TreeBLK(treeUrl);
+			}
+			else{
+				KLP_ChangeFilter();
+			}
+		
+		});
+		    
+		    
+	});
+
+</script>
+
+<div id="container">
+
+{% if entry == "Add" %}
+<fieldset>
+    <legend>{{legend}}</legend>
+{% else %}
+<div class="tablebg">
+{% endif %}
+	{% block leftpart %}
+	
+	<div class="leftPane">
+		{% if user.id %}
+			<!-- This block shows logged in user name and change password link if user login -->
+			<div class="KLP_Log">
+	    			<span class="KLP_brCrumb">Welcome: </span>
+	    			<span>{% if user.first_name%}{{user.first_name}}{% else %}{{user.username}}{%endif%}<span>
+	    			<span class="KLP_logOut"><a href="/logout/" title="logout">Log out</a><span>
+	    			<span class="KLP_logOut"><a href="/accounts/password/change/" title="ChangePassword">Change Password</a><span>
+	    		</div>
+ 		{% endif %}
+		<div class="addBound">
+			<!-- Drop Down shows boundary types -->
+            		<select id="boundary_type" name="boundary_type">
+	            		<option value="">----</option>
+	                		{% for boundType in boundType_List %}	                			
+	                			{% if session_sch_typ ==  boundType.id %}
+	                    				<option value="{{boundType.id}}" selected="true">{{boundType}}</option>
+	                    			{% else %}
+	                    				<option value="{{boundType.id}}">{{boundType}}</option>
+	                    			{% endif %}
+	                		{% endfor %}
+	            	</select>
+	            	<input type="hidden" name="entryView" id="id_entry_view" value="{{filter}}"/>
+	            	<input type="hidden" name="homeView" id="id_home_view" value="{{home}}"/>
+	            	<input type="hidden" name="prvSelNode" id="id_prvSelNode" value=""/>
+	            	<input type="hidden" name="perm" id="id_perm_assign" value="{{permission}}"/>
+	            	<input type="hidden" name="assessPerm" id="id_assess_perm_assign" value="{{assessmentpermission}}"/>
+	            	<input type="hidden" name="urHere" id="id_urHere" value="{{urHere}}"/>
+	            	<input type="hidden" name="shPerm" id="id_shPerm" value="{{shPerm}}"/>
+	            	<input type="hidden" name="userSel" id="id_userSel" value="{{userId}}"/>	            	
+            		<span style="{% if not filter %}display:none;{% endif %}">
+            			<!-- Drop Down shows programmes -->
+	        		<select id="filtProg" name="filtProg">
+	                		<option value="None">--</option>
+	                    		{% for prg in prgsList %}
+	                        		<option value="{{prg.id}}">{{prg}}</option>
+	                    		{% endfor %}
+	                	</select>
+	                	<!-- Drop Down shows Assessments -->
+	                	<select id="filtAsmnt" name="filtAsmnt">
+	                    		<option value="None">--</option>
+	                	</select>
+	        	</span>
+	        </div> 
+           
+           
+            <div class="treeMen" id="treeStruc">
+                   <ul id="treeBlk" class="filetree treeview-famfamfam"></ul>
+            </div>
+            
+            
+            {% if not shPerm %}
+            {% if home and not filter%}
+            	{% if user.is_superuser or user.is_staff %}
+			    <div class="addBound" id="rootBoundary" style="display:none;">
+				<div class="boundLink">
+				    <a href='/boundary/creator/' onclick="return KLP_View(this);" boundaryCategory="9" >Add Root Boundary <img src="/static_media/images/boundary_add.gif" title="Add Boundary" /></a>
+				</div>
+			    </div>
+            	{% endif %}
+            {% endif %}
+            {% if programme %}
+            	{% if user.is_superuser or user.is_staff %}
+		    <div class="addBound" id="rootProgramme" style="display:none;">
+		        <div class="boundLink">
+		            <a href='/programme/creator/' onclick="return KLP_View(this);">Add Programme <img src="/static_media/images/programme_add.gif" title="Add Programme" /></a>
+		        </div>
+		    </div>
+            	{% endif %}
+            {% endif %}
+            {% if 'Data Entry Executive' in usergroups or 'Data Entry Operator' in usergroups or user.is_superuser or user.is_staff%}
+		    <div class="addBound" style="margin:5px 0px;font-size:13px;">
+		        <div class="boundLink">
+		            {% if 'Data Entry Executive' in usergroups or user.is_superuser or user.is_staff %}
+		            	<a href='/home/' style="{% if home and not permission and not filter%}color:#75ad0a;{%endif%}">Home</a> |
+		            {% endif %}
+		            
+		            {% if user.is_staff or user.is_superuser%} 
+		            	<a href='/home/?respType=programme' style="{% if programme%}color:#75ad0a;{%endif%}">Programme</a>   | 
+		            {% endif %} 
+		               
+		            {% if 'Data Entry Operator' in usergroups or 'Data Entry Executive' in usergroups or user.is_superuser  or user.is_staff%}
+		            	<a href='/home/?respType=filter' style="{% if filter and not permission and not assessmentpermission %}color:#75ad0a;{%endif%}">Filter By Programme</a>
+		            {% endif %}  
+		            
+		        </div>
+		    </div>
+	    {% endif %}	
+	    {% if 'AdminGroup' in usergroups or user.is_superuser %}
+	    	<div class="addBound" style="margin:5px 0px;font-size:13px;">
+			<div class="boundLink">
+		        	{% if user.is_superuser  %} <a href='/console/'>Admin Console </a> |{% endif %}
+		        	{% if 'AdminGroup' in usergroups or user.is_superuser %} 
+		        		<a href="/accounts/auth/user/add/"> Create User</a> |
+		        		<a href="/home/?respType=userpermissions" style="{% if permission%}color:#75ad0a;{%endif%}"> Assign Permissions</a> |
+		        		<a href="/home/?respType=assessmentpermissions" style="{% if assessmentpermission%}color:#75ad0a;{%endif%}"> Assessment Permissions</a> |<a href="/list/users/"> List Users</a> |  <a href="/KLP_activaterecords_form/">Activate Records</a> |
+		        		<a href="/list/users/"> List Users</a> 
+		        	{% endif %} 
+		        	{% if user.is_superuser or 'AdminGroup' in usergroups %} | <a href='/audit/trial'>Audit Trial </a>{% endif %}
+		        </div>
+		</div>
+            {% endif %}
+            {% endif %}
+       </div>
+    {% endblock %}
+	{% block midpart %}{% endblock %}
+
+{% if entry == "Add" %}
+</fieldset>
+{% else %}
+</div>
+{% endif %}
+</div>
+</body>
+</html>

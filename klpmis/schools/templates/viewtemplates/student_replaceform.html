@@ -1,0 +1,186 @@
+{% load template_tags %}
+<form action="." method="POST" enctype="multipart/form-data" id="studentForm" onsubmit="return false;" class="niceform">{% csrf_token %}
+                            <input type="hidden" name="url" value="/studentgroup/{{extra_context|displayValue:'referKey'}}/student/creator/" id="url" />    
+                            <input type="hidden" name="parentId" value="{{extra_context|displayValue:'referKey'}}" id="parentId" />
+                            <input type="hidden" name="form-buttonType" id="id_form-buttonType" value="save" />
+			    <input type="hidden" id="success_status" size="15" value="{{extra_context|displayValue:'showsuccess'}}" / >
+			    <table class="tblprofile">
+                            {% with form|first as childForm %}
+				{{childForm.management_form}}
+				{% with childForm.forms|first as entryForm %}
+				<tr>
+				    <td><label class="KLP_required">First Name:</label></td>
+				    <td>
+					{{entryForm.firstName}}
+				    </td>
+				    <td>
+                                    	{% for error in entryForm.firstName.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+				</tr>
+				<tr>
+				    <td><label class="KLP_required">Last Name:</label></td>
+				    <td>
+					{{entryForm.lastName}}
+				    </td>
+				    <td>
+                                    	{% for error in entryForm.lastName.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+				</tr>
+				<tr>
+				    <td><label for="address">Date of Birth:</label></td>
+				    <td>
+					{{entryForm.dob}}
+				    </td>
+				</tr>
+				<tr>
+				    <td><label class="KLP_required">Gender:</label></td>
+				    <td>
+					{{entryForm.gender}}
+				    </td>
+				    <td>
+                                    	{% for error in entryForm.gender.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+				</tr>
+				<tr>
+				    <td><label class="KLP_required">Mother Tounge:</label></td>
+				    <td>
+					{{entryForm.mt}}<input type="hidden" name="form-0-relations" id="id_relations" size="15" value=""/>
+				    </td>
+				    <td>
+                                    	{% for error in entryForm.mt.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+				</tr>
+				{% endwith %}
+			    {% endwith %}
+				<tr>
+				    <td><label class="KLP_required">Mother Name:</label></td>
+				    <td>
+					<input type="text" name="form-0-mother" id="id_mother" size="15" value=""/>
+				    </td>
+				    <td>
+                                    	{% for error in entryForm.mother.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+				</tr>
+				<tr>
+				    <td><label class="KLP_required">Father Name:</label></td>
+				    <td>
+					<input type="text" name="form-0-father" id="id_father" size="15" value=""/>
+				    </td>
+				    <td>
+                                    	{% for error in entryForm.father.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+				</tr>
+    			    
+    			    {% with form|last as studentForm %}
+				{{studentForm.management_form}}
+				{% with studentForm.forms|first as entryForm %}
+                                <tr>
+                                    <td><label class="KLP_required">Academic Year:</label></td>
+                                    <td>                                        
+                                        {{entryForm.academic}}
+					<input type="hidden" name="form-0-boundary" id="id_boundary" size="15" value="{{extra_context|displayValue:'boundary'}}"/>
+					<input type="hidden" name="form-0-student_group" id="id_student_group" size="15" value="{{extra_context|displayValue:'referKey'}}"/>
+					<input type="hidden" name="form-0-name" id="id_name" size="15" value=""/>
+					<input type="hidden" name="form-0-active" id="id_form-0-active" value="True" />
+                                    </td>
+				    <td>
+                                    	{% for error in entryForm.academic.errors %}
+	                                	<span class="editErr">{{ error }}</span>
+	                                {% endfor %}
+                                    </td>
+                                </tr>
+				{% endwith %}
+			    {% endwith %}
+
+                                <tr></tr>
+                    		<tr></tr>
+                    		<tr></tr>
+                    		<tr></tr>
+                    		<tr></tr>
+                                <tr>
+                                    <td>
+                                    	<input type="submit" name="save" id="id_save" value="Save" />
+                                    </td>
+                                    <!--td>
+                                    	<input type="submit" name="save_and_continue" id="id_save_and_continue" value="Save And Continue" />
+                                    </td>
+                                    <td>
+                    	    		<input type="submit" name="save_and_create" id="id_save_and_create" value="Save And Create Another" />
+      				    </td-->
+                                </tr>
+				</table>
+        </form>
+<script>
+  $(document).ready(function(){  
+  
+   $("#id_save").click(function(){
+   	$("#id_form-buttonType").val('save');
+   	KLP_form_submit();
+   });
+   
+   $("#id_save_and_continue").click(function(){
+   	$("#id_form-buttonType").val('save and continue');
+   });
+   
+   $("#id_save_and_create").click(function(){
+   	parentVal = $("#id_form-0-parent").val();
+   	$("#id_form-buttonType").val('save and add another');
+   	KLP_form_submit('id_form-0-parent', parentVal);
+   	
+   	
+   });
+    
+    
+   var KLP_form_submit = function(parentId, parentVal){
+   	$.post(
+        	$('#url').val(),
+        	$("#studentForm").serialize(),
+                function(data){
+			$("#studEntrForm").html(data);
+			var successStatus = $("#success_status").val();
+			if (successStatus == 'True'){
+				window.parent.tb_remove();
+				window.parent.$('#StudentDetail  > tbody:last').append(data);
+				window.parent.tb_init('#StudentDetail a.thickbox, area.thickbox, input.thickbox');
+				window.parent.$("#stud_Detail").show();
+			}
+			else{
+				
+				NFInit();
+			}
+                    //$("#dyncData").html(data);
+                    //NFInit();
+                    //if (parentId != null)
+                    //	$("#"+parentId).val(parentVal);
+               }
+           );
+   } 
+
+     
+   /*$("#schoolForm").submit(function(){
+   parentId=$('#id_boundary').val();
+    $.post(  
+        $('#url').val(),  
+        $("#schoolForm").serialize(),  
+                function(data){
+                    $("#dyncData").html(data);
+			ObjId='#boundary_'+parentId
+            		Obj=$(ObjId)
+                    	call_js(Obj,'school');
+               }  
+           );  
+       });  */
+});  
+</script>

@@ -1,0 +1,210 @@
+{% load template_tags %}
+<div class="detailHead">
+    <span class="hedText">Question Form</span>
+</div>
+<form action="." method="POST" enctype="multipart/form-data" class="niceform" id="questionForm" name="questionForm" onsubmit="return false;">{% csrf_token %}
+	<input type="hidden" name="url" value="/assessment/question/{{extra_context|displayValue:'referKey'}}/creator/" id="url" />   
+	<input type="hidden" name="form-buttonType" id="id_form-buttonType" value="save" />
+	<input type="hidden" name="form-0-active" id="id_form-0-active" value="2"/>
+	<input type="hidden" name="form-0-doubleEntry" id="id_form-0-doubleEntry" value="True"/>
+	<input type="hidden" name="form-0-required" id="id_form-0-required" value="True"/>
+	<input type="hidden" name="form-0-assessment" id="id_form-0-assessment" value="{{extra_context|displayValue:'referKey'}}"/>
+	<input type="hidden" id="question_id" size="15" value="{{extra_context|displayValue:'prevousId'}}" / >
+	<input type="hidden" id="success_status" size="15" value="{{extra_context|displayValue:'showsuccess'}}" / >
+	{{form.management_form}}
+	{% with form.forms|last as entryForm %} 
+		<table>
+        		<tr>
+      	    			<td>
+      		    			<table class="tblprofile">      			        				
+      						<tr>
+      				    			<td class="rightprofile"><label class="KLP_required">Question</label></td>
+      							<td class="leftprofile">
+                            					{% render_field entryForm.name 'tabindex=1' %}
+                            					<!-- Question Name Field -->
+                        				</td>
+                        				<td>
+                        					<!-- If Name field has errors show errors -->
+                                    				{% for error in entryForm.name.errors %}
+	                                				<span class="editErr">{{ error }}</span>
+	                                			{% endfor %}
+                                    			</td> 
+      						</tr>   
+      						<tr>
+      				    			<td class="rightprofile">Type</td>
+      							<td class="leftprofile">
+                            					{% render_field entryForm.questionType 'tabindex=2' %}
+                            					<!-- Question type Field -->
+                        				</td>
+                        				<td>
+                        					<!-- If Question type field has errors show errors -->
+                                    				{% for error in entryForm.questionType.errors %}
+	                                				<span class="editErr">{{ error }}</span>
+	                                			{% endfor %}
+                                    			</td> 
+      						</tr> 
+      						<tr id="markTypMin">
+      				    			<td class="rightprofile"><label class="KLP_required">Score Min</label></td>
+      							<td class="leftprofile">
+                            					{% render_field entryForm.scoreMin 'tabindex=3' %}
+                            					<!-- Question score min Field -->
+                        				</td>
+                        				<td>
+                        					<!-- If scoreMin field has errors show errors -->
+                                    				{% for error in entryForm.scoreMin.errors %}
+	                                				<span class="editErr">{{ error }}</span>
+	                                			{% endfor %}
+                                    			</td>
+      						</tr>    
+      						<tr id="markTypMax">
+      				    			<td class="rightprofile"><label class="KLP_required">Score Max</label></td>
+      							<td class="leftprofile">      							
+      								{% render_field entryForm.scoreMax 'tabindex=4' %}
+      								<!-- Question score max Field -->
+                        				</td>
+                        				<td>
+                        					<!-- If scoreMax field has errors show errors -->
+                                    				{% for error in entryForm.scoreMax.errors %}
+	                                				<span class="editErr">{{ error }}</span>
+	                                			{% endfor %}
+                                    			</td>
+                        				
+      						</tr> 
+      						<tr id="gradeTyp" style="display:none;">
+      				    			<td class="rightprofile"><label class="KLP_required">Grade</label></td>
+      							<td class="leftprofile">
+                            					{% render_field entryForm.grade 'tabindex=3' %}
+                            					<input type="hidden" name="form-0-order" value="{{extra_context|displayValue:'order'}}"/>
+                            					<!-- Question grade Field -->
+                        				</td>
+                        				<td>
+                        					<!-- If grade field has errors show errors -->
+                                    				{% for error in entryForm.grade.errors %}
+	                                				<span class="editErr">{{ error }}</span>
+	                                			{% endfor %}
+                                    			</td>
+      						</tr> 
+      						<tr id="gradeTyp">
+      				    			<td class="rightprofile"><label class="KLP_required">Order</label></td>
+      							<td class="leftprofile">
+                            					<input type="text" name="form-0-order" value="{{extra_context|displayValue:'order'}}" tabindex=4/>
+                            					<!-- Question order Field -->
+                        				</td>
+                        				<td>
+                        					<!-- If order field has errors show errors -->
+                                    				{% for error in entryForm.order.errors %}
+	                                				<span class="editErr">{{ error }}</span>
+	                                			{% endfor %}
+                                    			</td>
+      						</tr> 
+      						<tr><td> &nbsp;</td></tr>
+                    				<tr><td> &nbsp;</td></tr>
+                    				<tr><td> &nbsp;</td></tr>
+                    				
+      			    			<tr>
+      				    			<td>
+                                    				<input type="submit" name="save" id="id_save" value="Save" tabindex=5  />
+                                    			</td>
+                                    			<td>
+                                    				<input type="submit" name="save_and_continue" id="id_save_and_continue" value="Save And Continue" tabindex=6 />
+                                    			</td>
+                                    			<td>
+                    	    					<input type="submit" name="save_and_create" id="id_save_and_create" value="Save And Create Another" tabindex=7 />
+      				    			</td>
+      						</tr>
+      					</table>
+      				</td>
+      			</tr>
+    		</table>
+    	{% endwith %}
+</form>
+<script>
+  $(document).ready(function(){ 
+  
+   var qType=  $("#id_form-0-questionType").val();
+   
+   if (qType == '2'){
+   	$("#markTypMin").hide();
+   	$("#markTypMax").hide();
+   	$("#gradeTyp").show();
+   	$('#gradeTyp').focus();
+   
+   }
+  
+   $("#id_form-0-questionType").change(function(){
+   	/* If Value is change in question type field hide and show score min, score max and grade fields based on value */
+   	quesType = $("#id_form-0-questionType").val();
+   	if (quesType == '2'){
+   		/* If type 2 (grade) hide score min and max, show grade field */
+   		$("#markTypMin").hide();
+   		$("#markTypMax").hide();
+   		$("#gradeTyp").show();
+   		$('#gradeTyp').focus();
+   		
+   	}
+   	else{
+   		/* If type 1 (marks) show score min and max, hide grade field */
+   		$("#markTypMin").show();
+   		$("#markTypMax").show();
+   		$("#gradeTyp").hide();
+   		$('#markTypMin').focus();
+   	}
+   });
+  
+  
+   $("#id_save").click(function(){
+   	/* Clicking on save button hide all prv msgs and call form submit and pass button type is save */
+   	KLP_Hide_Msg();
+   	parentVal = $("#id_form-0-assessment").val();
+   	$("#id_form-buttonType").val('save');
+   	KLP_form_submit(parentVal);
+   	
+   });
+   
+   $("#id_save_and_continue").click(function(){
+   	/* Clicking on save and continue button hide all prv msgs and call form submit and pass button type is save and continue */
+   	KLP_Hide_Msg();
+   	$("#id_form-buttonType").val('save and continue');
+   	parentVal = $("#id_form-0-assessment").val();
+   	KLP_form_submit(parentVal);
+   });
+   
+   $("#id_save_and_create").click(function(){
+   	/* Clicking on save and add another button hide all prv msgs and call form submit and pass button type is save and add another */
+   	KLP_Hide_Msg();
+   	parentVal = $("#id_form-0-assessment").val();
+   	$("#id_form-buttonType").val('save and add another');
+   	KLP_form_submit(parentVal, 'id_form-0-assessment');
+   	
+   	
+   });
+    
+    
+   var KLP_form_submit = function(parentVal, parentId){
+   	/* post data using post method */
+   	$.post(
+        	$('#url').val(),
+        	$("#questionForm").serialize(),
+                function(data){
+                    /* Get Response */
+                    $("#dyncData").html(data);
+                    NFInit();
+                    $('input:visible:enabled:first').focus();
+                    var successStatus = $("#success_status").val();
+                    if (successStatus == 'True'){
+                    	/* If It success show success msg and create new node in tree */
+                    	$("#successMsgHead").show();
+   		    	$("#klp_MsgTxt").html("Question Created Successfully")
+                    	
+                    	if (parentId != null)
+                    		$("#"+parentId).val(parentVal);
+                    	ObjId='#assessment_'+parentVal
+            	    	Obj=$(ObjId)                          
+                    	KLP_Create_Node(Obj,'question');
+                    }
+               }
+           );
+   }
+   
+}); 
+</script>

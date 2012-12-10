@@ -1,0 +1,63 @@
+{% extends "index.html" %}	
+{% load i18n %}
+{{% block leftpart%}{% endblock %}
+{% block midpart %}
+<style>
+.bigfont{
+font-size:15px;
+color:#0000FF;
+}
+</style>
+	<form action="" method="post" class="bigfont">{% csrf_token %}
+	    <table align="center" width="500">
+	        <tr>
+    	        <td colspan="3" bgcolor="#336699" align="Center"><span class="pwdHead">User List</span> </td>    	        
+    	    </tr>
+    	    <tr>
+                    <td align="Center" colspan="3">&nbsp;</td>
+            </tr>
+            {% if user_list %}
+                {% for indvUser in user_list %}
+                    {% ifequal user indvUser %}
+                    
+                    {% else %}
+                        {% if indvUser.is_active %}
+                            <tr>
+                                <td style="color:#000 !important;">{{indvUser}}</td>
+                                <td><span onclick="calldelete({{indvUser.id}},'delete')" style="cursor:pointer"> Delete </span></td>
+                                <td><a href="/user/{{indvUser.id}}/permissions"> Show Permissions </a></td>
+                            </tr>
+                  
+                                          {% else %}
+                            <tr>
+                                <td style="color:#000 !important;">{{indvUser}}</td>
+                                <td><span onclick="calldelete({{indvUser.id}},'activateuser')" style="cursor:pointer"> Activate </span></td>
+                                <td><!--a href="/user/{{indvUser.id}}/permissions"> Show Permissions </a--></td>
+                            </tr>
+                       
+                                    {% endif %}
+                    {% endifequal %}
+                {% endfor %}
+            {% endif %}
+            <tr>
+                    <td align="Center" colspan="3">&nbsp;</td>
+            </tr>
+            <tr>
+            	<td>
+    	       		<a href="{% if user.is_superuser %}/home/ {% else %}/home/?respType=userpermissions {% endif %}"> << Click Here</a> to go Back
+    	       	</td>
+            </tr>
+	    </table>	    
+	</form>
+   <script>
+                            function calldelete(userid,functionname)
+                                                                  {
+                                                    var conf = confirm("Are you sure, you want to "+functionname);
+                                                                         if(conf){
+                                       window.location.href="/user/"+userid+"/"+functionname;
+                                        }
+                                }
+                        
+                </script>
+{% endblock %}
+

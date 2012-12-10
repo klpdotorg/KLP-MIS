@@ -1,0 +1,70 @@
+{% extends "index.html" %}
+{% load i18n %}
+{% load template_tags %}
+{% block leftpart%}{% endblock %}
+{% block midpart %} 
+  <div style="padding:10px 0px 10px 0px;">
+  	<a href="{% if user.is_superuser %}/home/ {% endif %}"> << Click Here</a> to go Back
+  </div>
+  <div style="width:90%;text-align:center;min-height:200px;overflow:auto;">
+    <form action="." method="post">{% csrf_token %}     
+    	<div style="padding:10px 0px 20px 0px;">   	    	        	
+		<table>
+			<th> Select Start Date </th> 
+			<th> Select End Date </th>
+			<th> Submit </th>
+			<tr>
+				<td><input type="text" name="startDate" id="id_startDate" value="{{startDate}}"/></td>
+				<td><input type="text" name="endDate" id="id_endDate" value="{{endDate}}"/></td>
+				<td>
+					<input type="submit" value="GO" />
+				</td>
+				
+			</tr>
+		</table>
+        </div>
+        {% if deDict %}
+        	<div class="tot-border">
+        		<table border="0" cellpadding="0" cellspacing="0" style="text-align:center;width:100%">
+        			<th class="tot-border3">Sl.No</th>
+        			<th class="tot-border3">User</th>
+        			<th class="tot-border3">sch created</th>
+        			<th class="tot-border3">sch mod</th>
+        			<th class="tot-border3">stud created</th>
+        			<th class="tot-border3">stud mod</th>
+        			<th class="tot-border3">teacher created</th>
+        			<th class="tot-border3">teacher mod</th>
+        			{% for assessment in assessments %}
+        				<th class="tot-border3">{{assessment}}</th>
+        				<th class="tot-border3">{{assessment}} DE</th>
+        			{% endfor %}
+        			{% for username,data in deDict.iteritems %}
+        				<tr>
+						<td class="tot-border1">{{forloop.counter}}</td>
+						<td class="tot-border1">{{username}}</td>
+						<td class="tot-border1">{{data|displayValue:'institution_c'}}</td>
+						<td class="tot-border1">{{data|displayValue:'institution_u'}}</td>
+						<td class="tot-border1">{{data|displayValue:'student_c'}}</td>
+						<td class="tot-border1">{{data|displayValue:'student_u'}}</td>
+						<td class="tot-border1">{{data|displayValue:'staff_c'}}</td>
+						<td class="tot-border1">{{data|displayValue:'staff_u'}}</td>
+						{% for assessment in assessments %}
+        						<td class="tot-border1">{{data|displayValue:assessment.name}}</td>
+        						<td class="tot-border1">{{data|assesmentUpdation:assessment.name}}</td>
+        					{% endfor %}
+					</tr>
+        			{% endfor %}
+        		</table>
+        	</div>
+        {% endif %}
+    	<script>
+    		$("#id_startDate").datepick({dateFormat: 'dd-mm-yyyy'});
+	        $("#id_endDate" ).datepick({dateFormat: 'dd-mm-yyyy'});
+	                    				</script>    	
+    </form>
+  </div>
+  <div style="padding:20px 0px 10px 0px;">
+  	<a href="{% if user.is_superuser %}/home/{% else %}/home/?respType=userpermissions {% endif %}"> << Click Here</a> to go Back
+  </div>
+{% endblock %}
+	

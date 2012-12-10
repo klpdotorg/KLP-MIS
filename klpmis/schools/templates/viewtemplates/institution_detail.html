@@ -1,0 +1,123 @@
+<div class="KLP_Button_Header">
+	{% if institution.boundary.boundary_category.boundary_category|lower == 'cluster' %}
+		<!-- Shows Add Class Button if boundary category is cluster -->
+		<span class="KLP_Sub">
+			<a class="KLP_Button"  href="/boundary/institution/{{institution.id}}/studentgroup/creator/" onclick="return KLP_View(this);">Add Class</a>
+		</span>
+	{% endif %}
+	{% if institution.boundary.boundary_category.boundary_category|lower == 'circle' %}
+		<!-- Shows Add Circle Button if boundary category is circle -->
+		<span class="KLP_Sub">
+			<a class="KLP_Button"  href="/boundary/institution/{{institution.id}}/studentgroup/creator/?group_typ=center" onclick="return KLP_View(this);">Add Center</a>
+		</span>
+	{% endif %}
+	<span class="KLP_Sub">
+		<a class="KLP_Button"  href="/institution/{{institution.id}}/update/" onclick="return KLP_View(this);">Edit</a> <!-- Edit Button -->
+	</span>
+	<span class="KLP_Sub">
+		<span class="KLP_SpanButton"  onclick="KLP_Del('{{institution.id}}', 'institution', '{{institution.name}}')">Delete</span>  <!-- Delete Button -->
+	</span>
+	<span class="KLP_Sub">
+		<a class="KLP_Button"  href="/institution/{{institution.id}}/staff/creator/" onclick="return KLP_View(this);">Add Teacher</a> <!-- Add Teacher button -->
+	</span>
+	<span class="KLP_Sub">
+		<a class="KLP_Button"  href="/institution/{{institution.id}}/staff/view/" onclick="return KLP_View(this);">View Teachers</a> <!-- View Teachers button -->
+	</span>
+	
+</div>
+
+<div class="detailHead">
+<!-- Shows Institution/Anganwadi details -->
+<span class="hedText">{% if institution.boundary.boundary_category.boundary_category|lower == 'cluster' %} Institution {% else %} Anganwadi {% endif %}Details</span>
+</div>
+<div class="boundDetail">
+    <div class="cl-txtbx">
+    	<label>{% if institution.boundary.boundary_category.boundary_category|lower == 'cluster' %} Cluster {% else %} Circle {% endif %}</label>
+    </div>
+    <div class="bng-cl">
+    	<span>{{institution.boundary}}</span><input type="hidden" name="id" id="institution_id" size="15" value="{{institution.id}}" / >
+    	<input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / >
+    </div>
+</div>
+
+<div class="boundDetail">    
+    <div class="cl-txtbx">
+    	<label>{% if institution.boundary.boundary_category.boundary_category|lower == 'cluster' %} Institution {% else %} Anganwadi {% endif %} Name</label>
+    </div>
+    <div class="bng-cl"><span>{{institution.name}}</span></div>
+</div>
+<div class="boundDetail">    
+    <div class="cl-txtbx">
+    	<label>{% if institution.boundary.boundary_category.boundary_category|lower == 'cluster' %} Institution {% else %} Anganwadi {% endif %} Category</label>
+    </div>
+    <div class="bng-cl"><span>{{institution.cat}}</span></div>
+</div>
+<div class="boundDetail">    
+    <div class="cl-txtbx">
+    	<label>{% if institution.boundary.boundary_category.boundary_category|lower == 'cluster' %} Institution {% else %} Anganwadi {% endif %} Gender</label>
+    </div>
+    <div class="bng-cl"><span>{{institution.institution_gender}}</span></div>
+</div>
+<div class="boundDetail">
+    <div class="cl-txtbx">
+    	<label>Dise Code</label>
+    </div>
+    <div class="bng-cl"><span>{{institution.dise_code}}</span></div>
+</div>
+
+<div class="boundDetail">    
+    <div class="cl-txtbx">
+    	<label>Languages</label>
+    </div>
+    <div class="bng-cl">
+    	<span>
+        	{% for lang in institution.languages.all %}
+        	    {{lang.name}}
+        	{% endfor %}
+    	</span>
+    </div>
+</div>
+<div class="boundDetail">    
+    <div class="cl-txtbx">
+    	<label>Management</label>
+    </div>
+    <div class="bng-cl"><span>{{institution.mgmt}}</span></div>
+</div>
+<div class="boundDetail">    
+    <div class="cl-txtbx">
+    	<label>Address</label>
+    </div>
+    <div class="bng-cl"><span>{{institution.inst_address.address}}</span></div>
+</div>
+
+<div class="boundDetail">    
+    <div class="cl-txtbx">
+    	<label>Landmark</label>
+    </div>
+    <div class="bng-cl"><span>{{institution.inst_address.landmark}}</span></div>
+</div>
+
+<div class="boundDetail">    
+    <div class="cl-txtbx">
+    	<label>Pincode</label>
+    </div>
+    <div class="bng-cl"><span>{{institution.inst_address.pincode}}</span></div>
+</div>
+<div class="boundDetail">    
+    <div class="cl-txtbx">
+    	<label>Area</label>
+    </div>
+    <div class="bng-cl"><span>{{institution.inst_address.area}}</span></div>
+</div>
+<div class="boundDetail">    
+    <div class="cl-txtbx">
+    	<label>Identification</label>
+    </div>
+    <div class="bng-cl"><span>{{institution.inst_address.instidentification}}</span></div>
+</div>
+<div class="boundDetail">    
+    <div class="cl-txtbx">
+    	<label>Route Information</label>
+    </div>
+    <div class="bng-cl"><span>{{institution.inst_address.routeInformation}}</span></div>
+</div>

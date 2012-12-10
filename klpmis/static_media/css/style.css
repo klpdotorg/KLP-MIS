@@ -1,0 +1,386 @@
+#container{
+    width:94%;
+    margin:auto;
+}
+.aksHead{
+    width:95%;
+    text-align:center;
+}
+.boundRow{
+    height:40px;
+    margin:10px auto;
+    padding:5px 10px;    
+    width:95%;
+}
+.boundLink{
+    float:left;
+    width:18%;
+    font-size:14px;
+    padding:2px 10px;
+    text-decoration:none;
+    width:94%;
+    text-align:center
+}
+.addBound .boundLink a{
+    color:#F16422;
+}
+a:link, a:visited {
+	color: #0000FF;
+	text-decoration:none;
+}
+
+a:link:hover,
+a:visited:hover {
+	color: #75ad0a;
+}
+.adNewBoundTyp{
+    font-size:16px;
+    font-weight:bold;
+    margin:0 10px;
+    cursor:pointer;
+}
+
+.selBoundary{
+    float:left;
+    width:95%;
+    margin:5px;
+}
+.selGo{
+    margin-left:15px;
+}
+.delConf{
+  color: #0000FF;
+  cursor:pointer;
+}
+.delConf:hover{
+   color: #75ad0a; 
+}
+.tablebg {
+    background:none repeat scroll 0 0 #F2F2E6;
+    border-color:#FFFFFF #666661 #666661 #FFFFFF;
+    border-style:solid;
+    border-width:1px;
+    margin-bottom:36px;
+    padding:10px;
+    width:95%;
+}
+.boundDetail{
+    clear:both;
+    padding:5px 20px;
+}
+.boundDetail label {
+    float:left;
+    padding-right:5px;
+    width:150px;
+}
+.leftCol{
+    width:65%;
+    float:left;
+    padding:5px;
+}
+.leftPane{
+    width:30%;
+    float:left;
+    padding:5px;
+    border-right: 1px inset;
+}
+img{
+    border:none;
+}
+.klp{
+	padding:20px; 
+	font-weight:bold;
+	color:#75AD0A; 
+	font-size:25px;
+	width:95%;
+	text-align:center;
+}
+.shwMsg{
+	padding:5px;
+	width:95%;
+	color:#75AD0A; 
+	background-color:#ccc;
+	font-size:15px;
+	vertical-align:middle;
+	
+}
+#successMsgHead{
+	padding:5px;
+}
+#failureMsgHead{
+	padding:5px;
+}
+.failMsg{
+	padding:5px;
+	width:95%;
+	color:#FF0000; 
+	background-color:#ccc;
+	font-size:15px;
+	vertical-align:middle;
+	
+}
+#dyncData{
+	padding:5px;
+}
+.addBound{
+	float:left;
+	text-decoration:none;
+	background-color:#fff;
+	text-align:center;
+	padding:5px 10px;
+	width:94%;
+}
+.treeMen{
+   float:left;
+       text-decoration:none;        
+       padding:5px 10px;
+       width:95%;
+}
+
+.detailHead{
+    clear:both;
+    padding:5px 20px;
+    text-align:center;
+}
+.qSearch{
+    clear:both;
+    padding:5px 20px;
+    
+}
+.hedText{
+    font-size:14px;
+    font-weight:bold;
+    color:#75AD0A;
+}
+.KLP_required{
+	background:url(/static_media/images/icon_star_red-10x10.gif) no-repeat scroll right top transparent;
+	margin-right:15px;
+	padding:5px 5px 5px 0px;
+}
+
+/*load process*/
+
+#KLP_overlay {
+	position: fixed;
+	z-index:100;
+	top: 0px;
+	left: 0px;
+	height:100%;
+	width:100%;
+}
+
+.KLP_overlayBG {
+	display:none;
+	background-color:#000;
+	filter:alpha(opacity=75);
+	-moz-opacity: 0.75;
+	opacity: 0.75;
+}
+
+* html #KLP_overlay { /* ie6 hack */
+     position: absolute;
+     height: expression(document.body.scrollHeight > document.body.offsetHeight ? document.body.scrollHeight : document.body.offsetHeight + 'px');
+}
+
+#KLP_load{
+	position: fixed;
+	display:none;
+	height:13px;
+	width:208px;
+	z-index:103;
+	top: 50%;
+	left: 50%;
+	margin: -6px 0 0 -104px; /* -height/2 0 0 -width/2 */
+}
+
+* html #KLP_load { /* ie6 hack */
+position: absolute;
+margin-top: expression(0 - parseInt(this.offsetHeight / 2) + (TBWindowMargin = document.documentElement && document.documentElement.scrollTop || document.body.scrollTop) + 'px');
+}
+/*load process end */
+/* django error message*/
+.editErr{
+    color:#FF0000;
+}
+/*django error message end*/
+/* tree text*/
+.KLP_treetxt{
+	color:#000 !important;
+}
+.KLP_selNode{
+   color:#00FF00 !important;
+   font-weight: bold;
+}
+/* tree text end */
+.KLP_Button{
+	width:auto;
+	padding: 4px 8px;
+	background: url(/static_media/images/price_bg.jpg) center right;
+	color:#fff !important;
+	font-weight:bold;
+}
+.KLP_SpanButton{
+	width:auto;
+	padding: 4px 15px;
+	background: url(/static_media/images/price_bg.jpg) center right;
+	color:#fff !important;
+	cursor:pointer;	
+	font-weight:bold;
+}
+.KLP_Button_Header{
+	width:98%;
+	padding:5px 5px 20px 5px;
+}
+.KLP_Sub{
+	font-weight:bold;
+	/*font-size:15px;*/
+	padding:5px 5px 5px 0px;
+}
+.KLP_lef_Div{
+	float:left;
+}
+.KLP_txt_cen{
+	text-align:center;
+}
+.KLP_td_height{
+	height:50px;
+	min-width:100px;
+	max-width:100px;
+	text-align:center;
+}
+.KLP_td_width{
+	height:50px;
+	min-width:66px;
+	max-width:66px;
+	text-align:center;
+}
+.KLP_td_check{
+	height:50px;
+	min-width:30px;
+	max-width:30px;
+	text-align:center;
+}
+label.error, label.error {
+	color: red;
+	font-style: italic;
+	float:left;
+	min-width:100px;
+	max-width:100px;
+	text-align:center;
+}
+.KLP_Scroll_Div{
+	width:70%;
+	height:auto;
+	overflow:auto;
+}
+.KLP_DE_Submit{
+	float:left;
+	width:90%;
+	padding:10px;
+}
+/* Bread Crumb */
+.KLP_BreadCrumb{
+	padding:5px 10px;
+	width:90%;
+}
+.KLP_BreadCrumbTxt{
+	color:#75AD0A;
+}
+.KLP_brCrumb{
+	color:#800000;
+}
+/* Bread Crumb Ends */
+/* login */
+.KLP_Log{
+	width:90%;
+	color:#75AD0A;
+	padding:5px 0px;
+}
+.KLP_logOut{
+	padding:0 5px;
+}
+.KLP_logOut a{
+	color:#FF8040;
+}
+.KLP_Log_Head{
+ 	color: #FFFFFF;
+ 	font-weight: bold;
+}   
+.KLP_logUser{
+    width:100%;
+    font-size:14px;
+    text-align:center;
+}
+/* login End */
+.KLP_Form_status {
+	display:none;
+	color:#00FF00;
+	float:left;
+	font-weight:bold;
+}
+.KLP_td_teacher{
+	height:30px;
+	min-width:100px;
+	text-align:center;
+}
+.KLP_DE_AdStudent{
+	padding-left: 20px;
+}
+.KLP_Ans_Fix{
+	height: 55px;
+}
+.KLP_Fix_Div{
+	height:100%;
+	overflow:hidden;
+}
+.editErr .errorlist li{
+	margin:20px 0px;
+	list-style:none outside none;
+	font-weight:bold;
+}
+/* admin console css*/
+.klp_admin{
+	width:90%;
+	padding:5px;
+}
+.klp_admin_note{
+	width:90%;
+	padding:5px;
+	color:#5C5858;	
+}
+.pwdHead{
+    color:#fff;
+    font-weight:bold;
+}
+/* admin console css ends here */
+/* view page css */
+.cl-txtbx {
+	width:170px;
+	border-top:1px solid #000;
+	border-left:1px solid #000;
+	border-bottom:1px solid #000;
+	float:left;
+	padding:3px 4px;
+}
+.bng-cl {
+	float:left;
+	width:315px;
+	border:1px solid #000;
+	padding:3px 4px;
+	min-height:17px;
+}
+.tot-border {
+	border:1px solid #000; 
+}
+.tot-border1 {
+	border-right:1px solid #000; border-top:1px solid #000; 
+}
+.tot-border2 {
+	 border-top:1px solid #000; 
+}
+.tot-border3 {
+	border-right:1px solid #000;
+}
+.tot-border4 {
+	border:none;
+}	

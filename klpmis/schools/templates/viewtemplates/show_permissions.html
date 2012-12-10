@@ -1,0 +1,321 @@
+<table>
+	<tr>
+		<td colspan="6">
+	       	 	<a href="/list/users/"> << Back To List Users</a>
+	       	</td>
+	</tr>
+	<tr>&nbsp;</tr>
+	<tr>&nbsp;</tr>
+	{% if confirmMsg %}
+		<tr>
+			<td colspan="3" align="center">
+    				<a href="/list/{{boundary_id}}/user/{{userId}}/permissions/" onclick="return KLP_View(this);"> Show Schools</a>
+    			</td>
+    		</tr>
+		<tr>&nbsp;</tr>
+		<tr>&nbsp;</tr>
+	{% else %}
+	<tr>
+    	       	<td colspan="6" bgcolor="#336699" align="Center"><span class="pwdHead">Permissions For User {{userName}}</span> </td>    	        
+    	</tr>
+    	
+	{% if assignedInst %}
+		<tr>
+			<td valign="top">
+				<form name="form-assignedInst" id="id_form-assignedInst" method="POST" onsubmit="return false;">{%csrf_token%}
+	    				<input type="hidden" name="userId" value="{{userId}}" />
+	    				<table align="center" width="500">
+						
+					    	<tr>&nbsp;</tr>
+					    	<tr>&nbsp;</tr>
+			
+				    	    
+				    	    	<tr>
+						    	<td align="Center" colspan="5">&nbsp;</td>
+					    	</tr>
+					    	<tr bgcolor="#408080">
+					    		<td align="center"><input type="checkbox" name="checkInst" id="id_checkInst"/></td>
+					    		<td align="center"><font color="#fff"><b>Institution&nbsp;ID</b></font> </td>
+					    		<td align="center" colspan="3"><font color="#fff"><b>Assigned Institutions</b></font> </td>
+					    	</tr>
+					    	
+						{% for inst in assignedInst %}
+							<tr>
+								<td align="center">
+									<input type="checkbox" name="assignedInst" id="id_assignedInst" value="{{inst.id}}"/>
+								</td>
+								<td>
+									{{inst.id}}  
+								</td>
+								<td>
+									{{inst}}  
+								</td>
+								<td>
+									({{inst.boundary}}-->{{inst.boundary.parent}}-->{{inst.boundary.parent.parent}})
+								</td>
+							</tr>
+						{% endfor %}
+						<tr>&nbsp;</tr>
+					    	<tr>&nbsp;</tr>
+					    	<tr>
+					    		<td colspan=5 align="center">
+					    			<input type="submit" name="revoke" formId="id_form-assignedInst" actUrl="/revoke/user/permissions/" redUrl="{{redUrl}}" id="id_revokeIntPerm" value="Revoke" />
+					    		</td>
+					    	</tr>	            	
+            	
+	    				</table>
+	    			</form>
+	    		</td>
+	    	</tr>
+	{% endif %}
+	{% if unAssignedInst %}
+		<tr>
+	    		<td valign="top">
+	    			<form name="unassignedInst" id="id_form-unassignedInst" onsubmit="return false;" method="POST">{%csrf_token%}
+	    				<input type="hidden" name="userId" value="{{userId}}" />
+	    				<table align="center" width="500">					    	
+				    	    	<tr>
+						    	<td align="Center" colspan="5">&nbsp;</td>
+					    	</tr>
+					    	<tr bgcolor="#408080">
+					    		<td align="center"><input type="checkbox" name="checkunassignInst" id="id_checkunassignInst"/></td>
+					    		<td align="center"><font color="#fff"><b>Institution&nbsp;ID</b></font> </td>
+					    		<td align="center" colspan="3"><font color="#fff"><b>Unassigned Institutions</b></font> </td>
+					    	</tr>
+					    	
+						{% for inst in unAssignedInst %}
+							<tr>
+								<td align="center">
+									<input type="checkbox" name="unassignedInst" id="id_unassignedInst" value="{{inst.id}}"/>
+								</td>
+								<td>
+									{{inst.id}} 
+								</td>
+								<td>
+									{{inst}} 
+								</td>
+								<td>
+									({{inst.boundary}}-->{{inst.boundary.parent}}-->{{inst.boundary.parent.parent}})
+								</td>
+							</tr>							
+						{% endfor %}
+						<tr>&nbsp;</tr>
+					    	<tr>&nbsp;</tr>
+					    	<tr>
+					    		<td colspan=5 align="center">
+					    			<input type="submit" name="assign" id="id_assignInstPerm" formId="id_form-unassignedInst" actUrl="/assign/user/permissions/" redUrl="{{redUrl}}" value="Assign Institutions And Related Assessments" />
+					    		</td>
+					    	</tr>	
+				    	
+			    		</table>
+	    			</form>
+	    		</td>
+	    	</tr>
+	{% endif %}
+	<tr>&nbsp;</tr>
+        <tr>&nbsp;</tr>
+	<tr>
+    		<td colspan="6" bgcolor="#336699" align="Center"><span class="pwdHead">Assessment Permissions For User {{userName}}</span> </td>    	        
+    	</tr>
+	{% if assignedpermObjects %}
+		<tr>
+			<td valign="top">
+	    			<form name="assignedAsmt" id="id_form-assignedAsmt" onsubmit="return false;"  method="POST">{%csrf_token%}
+	    				<input type="hidden" name="userId" value="{{userId}}" />
+	    				<table align="center" width="600">	        
+					    	<tr>&nbsp;</tr>
+					    	<tr>&nbsp;</tr>					    	
+				    	    	<tr>
+						    	<td align="Center" colspan="6">&nbsp;</td>
+					    	</tr>
+					    	<tr bgcolor="#408080">
+					    		<td align="center"><input type="checkbox" name="checkAsmInst" id="id_checkAsmInst"/></td>
+					    		<td align="center"><font color="#fff"><b>Institution&nbsp;ID</b></font> </td>
+					    		<td align="center" colspan="2"><font color="#fff"><b>Institute</b></font> </td> 
+					    		<td align="center" colspan="2"> <font color="#fff" weight="bold"><b>Assessment</b></font> 
+					    		
+					    	</tr>
+					    	
+					    	{% for permObj in assignedpermObjects %}
+					    		<tr id="id_assessment_pems_{{permObj.id}}">
+					    			<td align="center">
+					    				<input type="checkbox" name="assignedAsm" id="id_assignedAsm" value="{{permObj.id}}"/>
+					    			</td>
+					    			<td>
+					    				{{permObj.instituion.id}} 
+								</td>
+					    			<td>
+					    				{{permObj.instituion}} 
+								</td>
+								<td>
+									({{permObj.instituion.boundary}}-->{{permObj.instituion.boundary.parent}}-->{{permObj.instituion.boundary.parent.parent}})
+								</td>
+								<td>{{permObj.assessment}}</td>
+								<td>({{permObj.assessment.programme}})</td>
+					    		</tr>
+					    	{% endfor %}
+					    	<tr>&nbsp;</tr>
+					    	<tr>&nbsp;</tr>
+					    	<tr>
+					    		<td colspan="6" align="center">
+					    			<input type="submit" name="revoke" id="id_revokeAsmIntPerm" value="Revoke" formId="id_form-assignedAsmt" actUrl="/revoke/user/asmpermissions/" redUrl="{{redUrl}}"/>
+					    		</td>
+					    	</tr>
+            	
+	    				</table>	
+	    			</form>	    
+	    		</td>	    	    
+	    	</tr>
+	{% endif %}
+	{% if qList %}
+		<tr>	    	
+	    		<td valign="top">
+	    			<form name="assignedAsmt" id="id_form-unassignedAsmt" onsubmit="return false;" method="POST">{%csrf_token%}
+			    		<input type="hidden" name="userId" value="{{userId}}" />
+			    		<table align="center" width="600">
+				
+				    	    	<tr>
+						    	<td align="Center" colspan="6">&nbsp;</td>
+					    	</tr>
+					    	<tr bgcolor="#408080">
+					    		<td align="center"><input type="checkbox" name="uncheckAsmInst" id="id_uncheckAsmInst"/></td>
+					    		<td align="center"><font color="#fff"><b>Institution&nbsp;ID</b></font> </td>
+					    		<td align="center" colspan="2"><font color="#fff"><b>Unassigned Institute</b></font> </td> 
+					    		<td align="center" colspan="2"> <font color="#fff" weight="bold"><b>Unassigned Assessment</b></font> 
+					    		
+					    	</tr>
+					    	
+					    	{% for permObj in qList %}
+					    		<tr id="id_assessment_pems_{{permObj.id}}">
+					    			<td align="center">
+					    				<input type="checkbox" name="unassignedAsm" id="id_unassignedAsm" value="{{permObj.student_group.institution.id}}_{{permObj.assessment.id}}"/>
+					    			</td>
+					    			<td>
+					    				{{permObj.student_group.institution.id}}
+					    			</td>
+					    			<td>
+					    				{{permObj.student_group.institution}}
+					    			</td>
+					    			<td>
+					    				 ({{permObj.student_group.institution.boundary}}-->{{permObj.student_group.institution.boundary.parent}}-->{{permObj.student_group.institution.boundary.parent.parent}})
+								</td>
+								<td>{{permObj.assessment}}</td>
+								<td>({{permObj.assessment.programme}})</td>
+					    		</tr>
+					    	{% endfor %}
+					    	<tr>&nbsp;</tr>
+			    			<tr>&nbsp;</tr>
+					    	<tr>
+					    		<td colspan="6" align="center"><input type="submit" name="assignAsmPerm" id="id_assignAsmPerm" value="Assign" formId="id_form-unassignedAsmt" actUrl="/assign/user/asmpermissions/" redUrl="{{redUrl}}" /></td>
+					    	</tr>
+			    	
+			    		</table>	
+			    	</form>
+	    		</td>
+	    	</tr>
+	{% endif %}
+	{% endif %}
+	<tr>
+		<td colspan="6">
+	       	 	<a href="/list/users/"> << Back To List Users</a>
+	       	</td>
+	</tr>
+</table>
+<script>
+	$(document).ready(function()
+	{
+		$("#id_checkInst").click(function()				
+		{
+			var checked_status = this.checked;
+			$("input[name=assignedInst]").each(function()
+			{
+				this.checked = checked_status;
+			});
+		});
+			
+		$("#id_checkAsmInst").click(function()				
+		{
+			var checked_status = this.checked;
+			$("input[name=assignedAsm]").each(function()
+			{
+				this.checked = checked_status;
+			});
+		});	
+			
+		$("#id_checkunassignInst").click(function()				
+		{
+			var checked_status = this.checked;
+			$("input[name=unassignedInst]").each(function()
+			{
+				this.checked = checked_status;
+			});
+		});		
+			
+		$("#id_uncheckAsmInst").click(function()				
+		{
+			var checked_status = this.checked;
+			$("input[name=unassignedAsm]").each(function()
+			{
+				this.checked = checked_status;
+			});
+		});	
+			
+		$("#id_revokeIntPerm").click(function(){
+			KLP_Hide_Msg();
+			var conf = confirm("Are you sure, you want to Revoke Permissions");
+			if (conf==true)
+				KLP_RevokePermission("id_revokeIntPerm", "Revoke");			
+		});
+			
+		$("#id_assignInstPerm").click(function(){
+			KLP_Hide_Msg();
+			var conf = confirm("Are you sure, you want to Assign Permissions");
+			if (conf==true)
+				KLP_RevokePermission("id_assignInstPerm", "Assign");
+		});
+			
+		$("#id_revokeAsmIntPerm").click(function(){
+			KLP_Hide_Msg();
+			var conf = confirm("Are you sure, you want to Revoke Permissions");
+			if (conf==true)
+				KLP_RevokePermission("id_revokeAsmIntPerm", "Revoke");
+		});
+			
+		$("#id_assignAsmPerm").click(function(){
+			KLP_Hide_Msg();
+			var conf = confirm("Are you sure, you want to Assign Permissions");
+			if (conf==true)
+				KLP_RevokePermission("id_assignAsmPerm", "Assign");
+		});
+	});
+		
+	var KLP_RevokePermission = function(thisId, permTyp){
+		thisFormId = $("#"+thisId).attr("formId");
+		$.post(
+			$("#"+thisId).attr("actUrl"),
+			$("#"+thisFormId).serialize(),
+			function(data){
+				if(data == 'success'){
+					KLP_ReloadPermissions(thisId);
+					$("#successMsgHead").show();
+					$("#klp_MsgTxt").html(permTyp+" Permissions Successfully");
+				}
+				else{
+					$("#failureMsgHead").show();
+				}
+						
+			}
+		);
+		
+	
+	}
+	var KLP_ReloadPermissions = function(thisId){
+		$.ajax({
+			url:$("#"+thisId).attr("redUrl"),
+			success:function(data){
+				$("#dyncData").html(data);
+			}
+		});
+		return false;
+	}
+</script>

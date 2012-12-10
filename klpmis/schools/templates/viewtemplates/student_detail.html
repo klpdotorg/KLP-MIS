@@ -1,0 +1,8 @@
+
+	<tr id="student_{{child.id}}"><td>{{child.firstName}}<input type="hidden" id="success_status" size="15" value="True" / ></td> <td>{{child.lastName}}</td> <td>{{child.dob|date:"d M Y"}}</td> <td>{{child.gender}}</td> <td>{{child.relations.mother}}</td> <td>{{child.relations.father}}</td> <td>{{child.mt}}</td>
+
+<td><a href="/student/{{child.id}}/update/?keepThis=true&TB_iframe=true&height=400&width=800" title="Edit Student" title="Edit Student" class="thickbox"><img title="Edit" src="/static_media/images/pagebuilder_edit.gif"></a>
+
+		<span style="color:blue;cursor:pointer"  onclick="KLP_Del('{{child.id}}', 'student', '{{child.firstName}}')"><img width="11" title="Delete" src="/static_media/images/PageRow_delete.gif" title="Delete"></span></td>
+</tr>
+

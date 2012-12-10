@@ -1,0 +1,66 @@
+{% extends "index.html" %}
+{% block leftpart%}{% endblock %}
+{% block midpart %}                                 
+    <div style="width:90%; padding:5px">
+    	<div class="KLP_BreadCrumb">
+    		<span class="KLP_brCrumb">You are here: </span>
+    		<span class="KLP_BreadCrumbTxt">  admin Console  </span> >  
+    		<span id="custom_BreadCrumb"><span>
+    	</div>
+    	<div id="successMsgHead" style="display:none;">
+    		<div class="shwMsg"> 
+    			<span >
+    				<img src="/static_media/images/correct_icon.jpg" height="18"/>
+    			</span>
+    			<span style="padding:2px;" id="klp_MsgTxt">
+    				Created Successfully 
+    			</span>
+    		</div>
+	</div>
+	<div id="failureMsgHead" style="display:none;">
+    		<div class="failMsg"> 
+    			<span >
+    				<img src="/static_media/images/err_icon.jpg" height="18"/>
+    			</span>
+    			<span style="padding:2px;" id="klp_fail_MsgTxt">
+    				Failure
+    			</span>
+    		</div>
+	</div>
+	<div id="dyncData">
+		<div class="klp_admin"> <a href="/home/"> << Back To Home </a> </div>
+		<div class="klp_admin">
+			<form name="klpQueryForm" id="id_klpQueryForm" onsubmit="return false;" class="niceform">
+				<span><textarea name="form-production-query" id="id_form-production-query" cols="80" rows="5"></textarea></span>
+                                 <span><select id="modelname" name="modelname"><option value="1">Boundary</option>
+                                        <option value="2">Institution</option>
+                          
+				<span class="klp_admin"><input type="submit" name="querySubmit" value="Execute" /></span>
+			</form>
+		</div>
+		<script>
+			 $(document).ready(function(){
+			 	$("#id_klpQueryForm").submit(function(){
+			 		$("#successMsgHead").hide();
+			 		$("#failureMsgHead").hide();
+			 		$.post(
+			 			'/activaterecord/',
+			 			$("#id_klpQueryForm").serialize(),
+			 			function(data){
+			 				if (data['isExecute'] == true){
+			 					$("#klp_MsgTxt").html(data['respStr'] );
+			 					$("#successMsgHead").show();
+			 				}
+			 				else{
+			 					$("#klp_fail_MsgTxt").html(data['respStr']);
+			 					$("#failureMsgHead").show();
+			 				}
+			 			}
+			 		);
+			 	});
+			 })
+			
+		</script>
+	</div>
+    </div>
+{% endblock %}

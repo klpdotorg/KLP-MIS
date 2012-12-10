@@ -1,0 +1,128 @@
+<!-- This is to show Boundaries/Instituions In Assign Permissions Screen -->
+<div>
+	<span style="color:#75AD0A;font-size:12px;font-weight:bold;padding:5px;">
+		{%if boundary.boundary_type.boundary_type|lower == 'pre-school' %}
+			{%if boundary.boundary_category.boundary_category|lower == 'district' %} Projects {% endif %}
+			{%if boundary.boundary_category.boundary_category|lower == 'project' %} Circles {% endif %}
+			{%if boundary.boundary_category.boundary_category|lower == 'circle'%} Anganwadis {% endif %}
+		{% else %}
+			{%if boundary.boundary_category.boundary_category|lower == 'district' %} Blocks {% endif %}
+			{%if boundary.boundary_category.boundary_category|lower == 'block' %} Clusters {% endif %}
+			{%if boundary.boundary_category.boundary_category|lower == 'cluster'%} Institutions {% endif %}
+			  
+		{% endif %} Under {{boundary.name}}
+	</span>
+	<form name="klp_PermissionForm" id="id_klp_PermissionForm" onsubmit="return false;" class="niceform">{% csrf_token %}
+		<input type="hidden" name="permissionType" value="{{permissionType}}" />
+		<input type="hidden" name="assessmentId" value="{{assessmentId}}" />
+		<input type="hidden" name="bound_cat" id="id_BoundCat" value="{{bound_cat}}" />
+		<div style="float:left;width:100%; padding:5px;">
+		<span style="float:left;width:100%;color:#000;font-weight:bold;">
+			Select <span style="cursor:pointer;color:#1569C7;" onclick="checkAll()">All</span> / <span style="cursor:pointer;color:#1569C7;" onclick="unCheckAll()">None</span>
+		</span>
+		<!-- Display Institutions -->
+		{% for inst in institution_list %}
+			<span style="float:left;width:100%;color:#000;font-weight:bold;">
+				<!-- Check box to select and institution name -->
+				<input type="checkbox" name="instName" value="{{inst.id}}" />  {{inst.name}}
+			</span>
+		{% endfor %}
+		<!-- Display Boundaries -->
+		{% for boundary in boundary_list %}
+			<span style="float:left;width:100%;color:#000;font-weight:bold;">
+				<!-- Check box to select and Boundary name -->
+				<input type="checkbox" name="boundaryName" value="{{boundary.id}}" />  {{boundary.name}} 
+				
+			</span>
+		{% endfor %}
+		</div>
+		<div style="float:left;width:35%;padding:20px 5px 5px 5px;">
+			<!-- Multi Select drop down for selecting users -->
+			<span style="color:#75AD0A;font-size:12px;font-weight:bold;width:100%;text-align:center;padding:5px;">Select User</span><br/>
+			<select name="assignToUser" id="id_assignToUser" multiple="true"  >
+				{% for dEUser in users %}
+					<option value="{{dEUser.id}}">{{dEUser.username}}</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div style="float:left;width:35%;padding:20px 5px 5px 5px;">
+			<span style="color:#75AD0A;font-size:12px;font-weight:bold;width:100%;text-align:center;padding:5px;">Select Permission</span><br/>
+			<input type="checkbox" name="userPermission" value="Acess" minlength=1 checked="true"/> Access <br/>
+		</div>
+		{% if not assessmentId %}
+		<div style="float:left;width:20%;padding:20px 5px 5px 5px;">
+			<span style="color:#75AD0A;font-size:12px;font-weight:bold;width:100%;text-align:center;padding:5px;">Assign assessments also</span><br/>
+			<input type="checkbox" name="assessmentPerm" value="True" minlength=1 /> Access <br/>
+		</div>
+		{% endif %}
+		<div style="float:left;width:100%;padding:20px 5px 5px 5px;">
+			<input type="hidden" name="cur_Url" id="id_cur_Url" value={{url}} />
+			<input type="submit" value="Assign" name="permissions"/>
+		</div>
+	</form>
+	<script>
+		$(document).ready(function(){
+			
+			$("#id_klp_PermissionForm").submit(function(){
+				/* Post Data on Form Submit */
+				KLP_Hide_Msg();
+				NFDo('stop');
+				isValid = $("#id_klp_PermissionForm").valid();
+				NFDo('start');
+				if (isValid){
+					$.post(
+						'/assign/permissions/',
+						$("#id_klp_PermissionForm").serialize(),
+						function(data){
+							if(data['isSuccess'] == true){
+								$("#successMsgHead").show();
+   		    						$("#klp_MsgTxt").html(data['respMsg']);
+							}
+							else{
+								$("#failureMsgHead").show();
+								$("#klp_fail_MsgTxt").html(data['respMsg']);
+							}
+							NFDo('stop');
+							NFDo('start');
+						}
+					);
+					
+				/*	$.ajax({
+						url: $("#id_cur_Url").val(),
+						success: function(data) {
+							$("#dyncData").html(data);
+							NFInit();
+						}
+		
+					});*/
+				}
+			});
+		});
+		var checkAll = function(){
+			bound_cat = $("#id_BoundCat").val();
+			NFDo('stop');
+			if (bound_cat == 'circle' || bound_cat == 'cluster')
+				allCheckboxes = $('input[name=instName]:unchecked');				
+			else
+				allCheckboxes = $('input[name=boundaryName]:unchecked');
+			allCheckboxes.each(function(index){
+				$(this).attr("checked", "true")
+			});
+			NFDo('start');
+		}
+
+		var unCheckAll = function(){
+			bound_cat = $("#id_BoundCat").val();
+			NFDo('stop');
+			if (bound_cat == 'circle' || bound_cat == 'cluster')
+				allCheckboxes = $('input[name=instName]:checked')
+			else
+				allCheckboxes = $('input[name=boundaryName]:checked');
+			allCheckboxes.each(function(index){
+				$(this).removeAttr("checked");
+			});
+			NFDo('start');
+	
+		}
+	</script>
+</div>

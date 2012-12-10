@@ -1,0 +1,114 @@
+from django.core.management.base import BaseCommand, CommandError
+from schools.models import *
+import django, datetime, os, csv
+from klprestApi.TreeMenu import KLP_assignedInstitutions
+
+class Command(BaseCommand):
+	''' Command To map assessments with student group and to assign permissions to users automatically. And then it list out the user permissions.''' 
+	def handle(self, *args, **options):
+		try:
+			# Reads the arguments from command line.
+			fileName = args[0]
+			assessment_id = args[1]
+			# checks for arguments
+			if fileName and assessment_id:
+				try:
+					mapFile = open(fileName, 'r')  # open file to read data
+					studenGroups = mapFile.read().replace('\n', '')  # read data from file
+					mapFile.close()   	       # Close file after reading data
+					sgList = studenGroups.split(',')  #  splits student group ids by ,
+					assessmentObj = Assessment.objects.get(id=assessment_id)  # get assessment object.
+					# get assessment list under programme to assign permissions to user.
+					prgObj = assessmentObj.programme
+					assessment_list = Assessment.objects.filter(programme=prgObj, active=2).values_list("id", flat=True).distinct()
+					inst_list = []
+					for sg in sgList:
+					    if sg: 
+						sgObj = StudentGroup.objects.get(id=sg)           # get student group object
+						inst_list.append(sgObj.institution.id)
+						# mapping assesment and student group
+						mapObj = Assessment_StudentGroup_Association(assessment = assessmentObj, student_group=sgObj, active=2)
+						
+						try:
+							mapObj.save()
+							self.stdout.write('%s - Assessment and StudentGroup - %s%s are Mapped ...\n'%(assessmentObj.name, sgObj.name, sgObj.section))
+						except django.db.utils.IntegrityError:
+							self.stdout.write('%s - Assessment and StudentGroup - %s%s Already Mapped ...\n'%(assessmentObj.name, sgObj.name, sgObj.section))
+					# get users to assign permissions		
+					users_List =  User.objects.filter(groups__name__in=['Data Entry Executive', 'Data Entry Operator'], is_active=1)
+					inst_list = list(set(inst_list))
+					cwd = os.getcwd()
+					path = "%s/logFiles/" %(cwd)
+					if not os.path.exists(path):
+						os.makedirs(path)
+					instPermCsv = "%s/%s.csv" %(path, 'instpermissions')				
+					instPermFile = csv.writer(open(instPermCsv, 'wb'))
+					asmPermCsv = "%s/%s.csv" %(path, 'assessmentPermissions')
+					asmPermFile = 	csv.writer(open(asmPermCsv, 'wb'))
+					instPermFile.writerow(['User', 'Institutions', 'Boundaries'])
+					asmPermFile.writerow(['User', 'Institutions', 'Boundaries', 'Assessment', 'Programme'])
+					for user in users_List:
+						asmPerm = []
+						# get user permissions in programme
+						for asmId in assessment_list:
+							permObjs = UserAssessmentPermissions.objects.filter(user=user, assessment__id=asmId, access=1)
+							if len(permObjs) >= 1:
+									asmPerm.append(True)
+						lenTrue = asmPerm.count(True)
+						lenAsm = len(assessment_list)
+						# get institutions assigned to user to generate report and to verify user permission.
+						perm_instList = KLP_assignedInstitutions(user.id)
+						if lenTrue == lenAsm or  lenTrue == lenAsm-1:
+							for inst in inst_list:
+								# if users has permission for all assessments in programme
+								# check user has permission with instituion.
+								if inst in perm_instList:
+									# if user has permission then assign assessment permission
+									instObj = Institution.objects.get(id=inst)
+									try:
+										asmPermObj = UserAssessmentPermissions.objects.get(user=user, assessment = assessmentObj, instituion = instObj)
+										asmPermObj.access = 1
+										asmPermObj.save()
+									except UserAssessmentPermissions.DoesNotExist:
+										asmPermObj = UserAssessmentPermissions(user=user, assessment = assessmentObj, instituion = instObj, access = 1)
+										asmPermObj.save()
+					
+					
+						# To generate Institution permission report.
+						for perm_inst in perm_instList: 
+							instPermData = []
+							permInstObj = Institution.objects.get(id=perm_inst)
+							boundaryStr = "%s --> %s --> %s" %(permInstObj.boundary, permInstObj.boundary.parent, permInstObj.boundary.parent.parent)
+							if perm_instList.index(perm_inst) == 0:
+								instPermData.append(user)
+							else:
+								instPermData.append(' ')
+							
+							instPermData.append(permInstObj.name)
+							instPermData.append(boundaryStr)
+							instPermFile.writerow(instPermData)
+						
+						# To generate Assessment permission report.
+						asmPermObjs = UserAssessmentPermissions.objects.filter(user=user, access = 1)
+						objCounter = 0
+						for asmPermObj in asmPermObjs:
+							asmPermData = []
+							boundaryStr = "%s --> %s --> %s" %(asmPermObj.instituion.boundary, asmPermObj.instituion.boundary.parent, asmPermObj.instituion.boundary.parent.parent)
+							if objCounter == 0:
+								asmPermData.append(user)
+							else:
+								asmPermData.append(' ')
+							asmPermData.append(asmPermObj.instituion.name)
+							asmPermData.append(boundaryStr)
+							asmPermData.append(asmPermObj.assessment)
+							asmPermData.append(asmPermObj.assessment.programme)
+							asmPermFile.writerow(asmPermData)
+							objCounter += 1
+						
+				except IOError:
+					## If Arguments are not in proper order raises an command error
+					raise CommandError('Pass First Parameter is FileName and Second Parameter is Assessment Id\n')
+					
+		except IndexError:
+			# If Arguments are not passed raises an command error
+			raise CommandError('Pass FileName and Assessment Id\n')

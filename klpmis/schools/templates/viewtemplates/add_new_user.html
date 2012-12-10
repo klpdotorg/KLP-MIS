@@ -1,0 +1,90 @@
+{% extends "index.html" %}
+{% load i18n %}
+{% block leftpart%}{% endblock %}
+{% block midpart %} 
+    <form action="" method="post">{% csrf_token %}        	    	        	
+        <table align="center" width="500">               	        
+    	    <tr>
+    	        <td colspan="3" bgcolor="#336699" align="Center"><span class="pwdHead">Add New User</span> </td>
+    	    </tr>
+    	    <tr>
+                    <td align="Center" colspan="3">&nbsp;</td>
+            </tr>
+            {% if form.username.errors %}
+            <tr>
+                <td colspan="3" bgcolor="#FFF8C6"> 
+    	            {% for error in form.username.errors %}
+	                    <span class="editErr">{{ error }}</span>
+	                {% endfor %}
+	            </td>
+            </tr>
+    	    {% endif %}
+    	    <tr>
+    	        <td width="200"><label for="id_old_password">{% trans 'Username:' %}</label><span class="editErr">*</span></td>
+    	        <td>{{form.username}} </td>
+    	        <td>&nbsp; </td>
+    	    </tr>
+    	    {% if form.password1.errors %}
+            <tr>
+                <td colspan="3" bgcolor="#FFF8C6"> 
+    	            {% for error in form.password1.errors %}
+	                    <span class="editErr">{{ error }}</span>
+	                {% endfor %}
+	            </td>
+            </tr>
+    	    {% endif %}
+    	    <tr>
+    	        <td><label for="id_new_password1">{% trans 'Password:' %}</label><span class="editErr">*</span></td>
+    	        <td> {{form.password1}}</td>
+    	        <td>&nbsp;</td>
+    	    </tr>
+    	    {% if form.password2.errors %}
+            <tr>
+                <td colspan="3" bgcolor="#FFF8C6"> 
+    	            {% for error in form.password2.errors %}
+	                    <span class="editErr">{{ error }}</span>
+	                {% endfor %}
+	            </td>
+            </tr>
+    	    {% endif %}
+    	    <tr>
+    	        <td><label for="id_new_password2">{% trans 'Password (again):' %}</label><span class="editErr">*</span></td>
+    	        <td> {{form.password2}} </td>
+    	        <td>&nbsp;</td>
+    	    </tr>
+    	    {% if form.groups.errors %}
+            <tr>
+                <td colspan="3" bgcolor="#FFF8C6"> 
+    	            {% for error in form.groups.errors %}
+	                    <span class="editErr">{{ error }}</span>
+	                {% endfor %}
+	            </td>
+            </tr>
+    	    {% endif %}
+    	    <tr>
+    	        <td><label for="id_new_password2">{% trans 'Groups :' %}</label><span class="editErr">*</span></td>
+    	        <td> {{form.groups}} </td>
+    	        <td>&nbsp;</td>
+    	    </tr>
+    	    
+    	    <tr>
+                <td align="Center" colspan="2">&nbsp;</td>
+            </tr>
+    	    <tr>
+    	        <td align="Center" colspan="2"><input name="form.button.PROCEED" value="{% trans 'Add User' %}" type="submit"/></td>
+    	        <input name="" value="" type="hidden">    	        
+    	    </tr>
+    	    <tr>
+    	    	<td>&nbsp;</td>
+    	    </tr>
+    	    <tr>
+    	        <td colspan="1"><span class="editErr">Field marked with <span>*</span> are mandatory</span></td>
+    	        <td>
+    	        	<a href="{% if user.is_superuser %}/home/ {% else %}/home/?respType=userpermissions {% endif %}"> << Click Here</a> to go Back
+    	        </td>
+    	    </tr>
+    	</table>    	   
+    	    	
+    </form>
+{% endblock %}
+	

@@ -1,0 +1,72 @@
+<div class="KLP_Button_Header">
+	<span class="KLP_Sub">
+		{% if boundary.boundary_type.boundary_type|lower == 'anganwadi' or boundary.boundary_type.boundary_type|lower == 'preschool' %}
+			{% if boundary.boundary_category.boundary_category|lower == 'district' %}
+				<!-- If boundary type is anganwadi and boundary category is district show Add Project button -->
+				<a class="KLP_Button" id="{{boundary.id}}_add" onclick="return KLP_Boundary_Add(this);" href="/boundary/creator/" name="addBoundary" boundaryCategory="14">Add Project</a>
+			{% else %}
+				{% if boundary.boundary_category.boundary_category|lower == 'project' %}
+					<!-- If boundary type is anganwadi and boundary category is project show Add Circle button -->
+					<a class="KLP_Button" id="{{boundary.id}}_add" onclick="return KLP_Boundary_Add(this);" href="/boundary/creator/" name="addBoundary" boundaryCategory="15">Add Circle</a>
+				{% else %}
+					<!-- If boundary type is anganwadi and boundary category is circle show Add Anganwadi button -->
+					<a class="KLP_Button" onclick="return KLP_View(this);" href="/boundary/{{boundary.id}}/institution/creator/" name="addAnganwadi">Add Anganwadi</a>
+					
+				{% endif %}
+			{% endif %}
+		{% else %}
+			{% if boundary.boundary_category.boundary_category|lower == 'district' %}
+				<!-- If boundary type is primary and boundary category is district show Add Block button -->
+				<a class="KLP_Button" id="{{boundary.id}}_add" onclick="return KLP_Boundary_Add(this);" href="/boundary/creator/" name="addBoundary" boundaryCategory="10">Add Block</a>
+			{% else %}
+				{% if boundary.boundary_category.boundary_category|lower == 'block' %}
+					<!-- If boundary type is primary and boundary category is block show Add Cluster button -->
+					<a class="KLP_Button"  id="{{boundary.id}}_add" onclick="return KLP_Boundary_Add(this);" href="/boundary/creator/" name="addBoundary" boundaryCategory="11">Add Cluster</a>
+				{% else %}
+					<!-- If boundary type is primary and boundary category is cluster show Add Institution button -->
+					<a class="KLP_Button"   onclick="return KLP_View(this);" href="/boundary/{{boundary.id}}/institution/creator/" name="addInstituion" >Add Institution</a>
+					
+				{% endif %}
+			{% endif %}
+		{% endif %}
+	</span>
+	<span class="KLP_Sub">
+		<a class="KLP_Button"  href="/boundary/{{boundary.id}}/update/" onclick="return KLP_View(this);">Edit</a> <!-- Edit Boundary Button -->
+	</span>
+	<span class="KLP_Sub">
+		<span class="KLP_SpanButton"  onclick="KLP_Del('{{boundary.id}}', 'boundary', '{{boundary.name}}')">Delete</span> <!-- Delete Boundary Button -->
+	</span>
+	
+</div>
+
+<div class="detailHead">
+	<span class="hedText">Boundary Details</span>
+</div>
+
+<div class="boundDetail">
+	<div class="cl-txtbx">
+		<label>Parent Boundary</label>
+	</div>
+	<div class="bng-cl">
+		<span>{{boundary.parent}}</span>  <!-- Show Parent Boundary -->
+	</div>
+	<input type="hidden" name="id" id="boundary_id" size="15" value="{{boundary.id}}" / > <!-- Boundary Id val used while create new node in tree-->
+	<input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / >  <!-- For Success msg-->
+</div>
+<div class="boundDetail">    
+	<div class="cl-txtbx">
+		<label>Boundary Name</label>
+	</div>
+	<div class="bng-cl">
+		<span>{{boundary.name}}</span>  <!-- Show Boundary Name-->
+	</div>
+</div>
+<div class="boundDetail">
+	<div class="cl-txtbx">
+		<label>Boundary Category</label>
+	</div>
+	<div class="bng-cl">
+		<span>{{boundary.boundary_category}}</span>  <!-- Show Boundary Category-->
+	</div>
+</div>
+
