@@ -1,5 +1,5 @@
 """
-Boundary Api is used 
+Boundary Api is used
 1) To view Individual Boundary details
 2) To create new boundary
 3) To update existing boundary
@@ -22,51 +22,72 @@ from schools.receivers import KLP_user_Perm
 
 
 class ChoiceEntry(Entry):
-      pass
+    pass
+
 
 class KLP_Boundary(Collection):
     """To get Selected Boundary """
-    def get_entry(self, boundary_id): 
-    	# Query For selected boundary based on boundary_id
+
+    def get_entry(self, boundary_id):
+        # Query For selected boundary based on boundary_id
         boundary = Boundary.objects.get(id=int(boundary_id))
-        return ChoiceEntry(self, boundary)     
-  
+        return ChoiceEntry(self, boundary)
+
 
 def KLP_Boundary_View(request, boundary_id, boundarytype_id):
-	""" To View Selected Boundary boundary/(?P<boundary_id>\d+)/(?P<boundarytype_id>\d+)/view/$"""
-	kwrg = {'is_entry':True}
-	boundaryTypObj = Boundary_Type.objects.get(pk = boundarytype_id)
-	resp=KLP_Boundary(queryset = Boundary.objects.filter(pk=boundary_id), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'boundary', extra_context={'boundary_type':boundaryTypObj.boundary_type}),)(request, boundary_id, **kwrg)
-        return HttpResponse(resp)  
+    """ To View Selected Boundary boundary/(?P<boundary_id>\d+)
+    /(?P<boundarytype_id>\d+)/view/$"""
+    kwrg = {'is_entry': True}
+    boundaryTypObj = Boundary_Type.objects.get(pk=boundarytype_id)
+    resp = KLP_Boundary(queryset=Boundary.objects.
+    filter(pk=boundary_id), permitted_methods = ('GET', 'POST'),
+    responder = TemplateResponder(template_dir = 'viewtemplates',
+    template_object_name = 'boundary',
+    extra_context = {
+    'boundary_type': boundaryTypObj.boundary_type}),)(
+    request, boundary_id, **kwrg)
+    return HttpResponse(resp)
 
 
 def KLP_Boundary_Create(request):
-	""" To Create New Boundary boundary/creator/"""
-	# Checking user Permissions
-	KLP_user_Perm(request.user, "Boundary", "Add")
-	buttonType = request.POST.get('form-buttonType')
-        KLP_Create_Boundary =KLP_Boundary(queryset = Boundary.objects.filter(pk=0), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'viewtemplates', template_object_name = 'boundary', extra_context={'buttonType':buttonType}), receiver = XMLReceiver(),)
-        
-	response = KLP_Create_Boundary.responder.create_form(request,form_class=Boundary_Form)
-	
-	return HttpResponse(response)
-	
+    """ To Create New Boundary boundary/creator/"""
+    # Checking user Permissions
+    KLP_user_Perm(request.user, "Boundary", "Add")
+    buttonType = request.POST.get('form-buttonType')
+    KLP_Create_Boundary = KLP_Boundary(queryset =
+    Boundary.objects.filter(pk=0), permitted_methods = ('GET', 'POST'),
+    responder = TemplateResponder(template_dir = 'viewtemplates',
+    template_object_name = 'boundary', extra_context =
+    {'buttonType': buttonType}), receiver = XMLReceiver(),)
+
+    response = KLP_Create_Boundary.responder.create_form(
+    request, form_class=Boundary_Form)
+
+    return HttpResponse(response)
+
+
 def KLP_Boundary_Update(request, boundary_id):
-	""" To update Selected Boundary boundary/(?P<boundary_id>\d+)/update/"""
-	# Checking user Permissions
-        KLP_user_Perm(request.user, "Boundary", "Update")
-	buttonType = request.POST.get('form-buttonType')
-	referKey = request.POST.get('form-0-boundary')
-	KLP_Edit_Boundary =KLP_Boundary(queryset = Boundary.objects.filter(pk=boundary_id), permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'edittemplates', template_object_name = 'boundary', extra_context={'buttonType':buttonType, 'referKey':referKey}), receiver = XMLReceiver(),)
-        
-	response = KLP_Edit_Boundary.responder.update_form(request, pk=boundary_id, form_class=Boundary_Form)
-	
-	return HttpResponse(response)
+    """ To update Selected Boundary boundary/(?P<boundary_id>\d+)/update/"""
+    # Checking user Permissions
+    KLP_user_Perm(request.user, "Boundary", "Update")
+    buttonType = request.POST.get('form-buttonType')
+    referKey = request.POST.get('form-0-boundary')
+    KLP_Edit_Boundary = KLP_Boundary(queryset = Boundary.objects.
+    filter(pk=boundary_id), permitted_methods = ('GET', 'POST'),
+    responder = TemplateResponder(template_dir = 'edittemplates',
+    template_object_name = 'boundary', extra_context =
+    {'buttonType': buttonType, 'referKey': referKey}),
+    receiver = XMLReceiver(),)
+
+    response = KLP_Edit_Boundary.responder.update_form(
+    request, pk=boundary_id, form_class=Boundary_Form)
+
+    return HttpResponse(response)
 
 
 urlpatterns = patterns('',
-   url(r'^boundary/(?P<boundary_id>\d+)/(?P<boundarytype_id>\d+)/view/$', KLP_Boundary_View),
-   url(r'^boundary/creator/?$', KLP_Boundary_Create),
-   url(r'^boundary/(?P<boundary_id>\d+)/update/$', KLP_Boundary_Update),
-   
-)
+    url(r'^boundary/(?P<boundary_id>\d+)/(?P<boundarytype_id>\d+)/view/$',
+    KLP_Boundary_View),
+    url(r'^boundary/creator/?$', KLP_Boundary_Create),
+    url(r'^boundary/(?P<boundary_id>\d+)/update/$',
+    KLP_Boundary_Update),)

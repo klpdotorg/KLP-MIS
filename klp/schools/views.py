@@ -5,12 +5,9 @@ from django.forms import ModelForm
 from django.db.models import Q
 from django.core.context_processors import csrf
 
-from django.http import HttpResponseRedirect,HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import Template, Context, RequestContext
 
 from models import *
 from forms import *
-
-
-

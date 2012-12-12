@@ -107,7 +107,8 @@ class HttpDigestAuthentication(object):
             amap[k] = v.replace('"', '')
         return amap
 
-    def get_auth_response(self, http_method, fullpath, username, nonce, realm, qop, cnonce, nc):
+    def get_auth_response(self, http_method, fullpath, username, nonce,
+    realm, qop, cnonce, nc):
         """
         Returns the server-computed digest response key.
         
@@ -193,7 +194,8 @@ class HttpDigestAuthentication(object):
             return False
 
         # Compute response key    
-        computed_response = self.get_auth_response(request.method, fullpath, username, nonce, realm, qop, cnonce, nc)
+        computed_response = self.get_auth_response(request.method, fullpath,
+        username, nonce, realm, qop, cnonce, nc)
         
         # Compare server-side key with key from client
         # Prevent replay attacks
@@ -208,4 +210,3 @@ class HttpDigestAuthentication(object):
             return False # stale = True
         self.nonce[nonce] = nc
         return True
-    

@@ -11,6 +11,7 @@ import datetime
 
 encoder = DjangoJSONEncoder()
 
+
 class Request(models.Model):
     user_name = models.CharField(max_length=255, blank=True, null=True)
     user_pk = models.PositiveIntegerField(null=True, db_index=True)
@@ -28,10 +29,12 @@ class Request(models.Model):
     def __unicode__(self):
         return self.request_path
 
+
 class FullHistoryManager(models.Manager):
+
     def user_actions(self, user):
         return self.get_query_set().filter(user_pk=user.pk)
-    
+
     def actions_for_object(self, entry=None, model=None, pk=None):
         '''
         Retries all revisions for an object
@@ -42,7 +45,8 @@ class FullHistoryManager(models.Manager):
             ct = ContentType.objects.get_for_model(entry)
         else:
             ct = ContentType.objects.get_for_model(model)
-        return self.get_query_set().filter(content_type=ct, object_id=pk).order_by('revision')
+        return self.get_query_set().filter(
+        content_type=ct, object_id=pk).order_by('revision')
 
     def audit(self, entry=None, model=None, pk=None):
         from fullhistory import get_all_data
@@ -52,10 +56,12 @@ class FullHistoryManager(models.Manager):
                 #!Truncates microseconds for datetime fields
                 if isinstance(value, datetime.datetime):
                     value = str(value.replace(microsecond=0))
-                assert obj[key] == value, '%s does not match %s for attr %s' % (obj[key], value, key)
+                    assert obj[key] == value, ' % s does not match % s\
+                    for attr %s' % (obj[key], value, key)
         return obj
-    
-    def get_version(self, entry=None, model=None, pk=None, version=None, audit=True):
+
+    def get_version(self, entry = None, model = None, pk = None,
+    version = None, audit = True):
         '''
         Returns a dictionary representing the object at a given version
         '''
@@ -73,13 +79,15 @@ class FullHistoryManager(models.Manager):
             for key, value in history.data.items():
                 if len(value) == 2:
                     if audit:
-                        assert obj[key] == value[0], '%s does not match %s for attr %s' % (obj[key], value[0], key)
-                    obj[key] = value[1]
-                else:
-                    obj[key] = value[0]
+                        assert obj[key] == value[0], ' % s does not match\
+                        % s for attr % s' % (obj[key], value[0], key)
+                        obj[key] = value[1]
+                    else:
+                        obj[key] = value[0]
         return obj
-    
-    def rollback(self, entry=None, model=None, pk=None, version=None, commit=True, audit=True):
+
+    def rollback(self, entry = None, model = None, pk = None, version = None,
+    commit = True, audit = True):
         '''
         Rollback an object to a certain revision number
         '''
@@ -91,9 +99,11 @@ class FullHistoryManager(models.Manager):
             field = model._meta.get_field_by_name(key)
             if field and not field[-1]:
                 if isinstance(field[0], models.DateTimeField):
-                    value = datetime.datetime.strptime(value, "%s %s" % (encoder.DATE_FORMAT, encoder.TIME_FORMAT))
+                    value = datetime.datetime.strptime(value, "%s %s" %
+                    (encoder.DATE_FORMAT, encoder.TIME_FORMAT))
                 elif isinstance(field[0], models.DateField):
-                    value = datetime.datetime.strptime(value, encoder.DATE_FORMAT)
+                    value = datetime.datetime.strptime(value,
+                    encoder.DATE_FORMAT)
                 kwargs[field[0].name] = value
         obj = model(**kwargs)
         if commit:
@@ -101,6 +111,7 @@ class FullHistoryManager(models.Manager):
         return obj
 
 ACTIONS = (('C', 'Create'), ('U', 'Update'), ('D', 'Delete'))
+
 
 class FullHistory(models.Model):
     content_type = models.ForeignKey(ContentType)
@@ -110,10 +121,10 @@ class FullHistory(models.Model):
     action_time = models.DateTimeField(auto_now_add=True)
     _data = models.TextField(db_column='data')
     request = models.ForeignKey(Request, null=True, blank=True)
-    site = models.ForeignKey(Site, default=Site.objects.get_current)
+    #site = models.ForeignKey('Site', default=Site.objects.get_current)
     action = models.CharField(max_length=1, choices=ACTIONS)
     info = models.TextField()
-    
+
     objects = FullHistoryManager()
 
     def set_data(self, val):
@@ -126,7 +137,7 @@ class FullHistory(models.Model):
 
     def action_display(self):
         return dict(ACTIONS)[self.action]
-    
+
     def user(self):
         '''
         Returns the user entry responsible for this change
@@ -143,58 +154,65 @@ class FullHistory(models.Model):
         user_name = u'(System)'
         if self.request:
             user_name = self.request.user_name
-        ret = {'C':u'%s Created',
-               'U':u'%s Updated',
-               'D':u'%s Deleted',}[self.action] % user_name
+        ret = {'C': u'%s Created',
+               'U': u'%s Updated',
+               'D': u'%s Deleted', }[self.action] % user_name
         if self.action == 'U':
             for key, value in self.data.items():
-                if not isinstance(value, tuple) or len(value) != 2: #fix for old admin
+                if not isinstance(value, tuple) or len(value) != 2:
+                #fix for old admin
                     continue
-                ret += u'\n"%s" changed from [%s] to [%s]' % (key, unicode(value[0])[:50], unicode(value[1])[:50])
+                ret += u'\n"%s" changed from [%s] to [%s]' % (
+                key, unicode(value[0])[:50], unicode(value[1])[:50])
         return ret
-    
+
     def previous(self):
         '''
         Retrieves the previous history entry for this object
         '''
         return FullHistory.objects.get(content_type=self.content_type,
                                        object_id=self.object_id,
-                                       revision=self.revision-1)
-    
+                                       revision=self.revision - 1)
+
     def next(self):
         '''
         Retrieves the next history entry for this object
         '''
         return FullHistory.objects.get(content_type=self.content_type,
                                        object_id=self.object_id,
-                                       revision=self.revision+1)
+                                       revision=self.revision + 1)
 
     def related_changes(self):
         '''
-        Returns a queryset of the changes that have also occurred with this change
+        Returns a queryset of the changes that have also occurred with
+        this change
         '''
         if self.request:
-            return FullHistory.objects.filter(request=self.request).exclude(pk=self.pk)
+            return FullHistory.objects.filter(
+            request=self.request).exclude(pk=self.pk)
         return FullHistory.objects.none()
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            self.revision = len(FullHistory.objects.filter(content_type=self.content_type, object_id=self.object_id))
+            self.revision = len(FullHistory.objects.filter
+            (content_type=self.content_type, object_id=self.object_id))
         if not self.info:
             self.info = self.create_info()
         return super(FullHistory, self).save(*args, **kwargs)
 
     def __unicode__(self):
-        return u'%s %s %s' % (self.content_type, self.object_id, self.action_time)
+        return u'%s %s %s' % (self.content_type, self.object_id,
+        self.action_time)
 
     objects = FullHistoryManager()
-    
+
     class Meta:
         verbose_name_plural = _("full histories")
         get_latest_by = "revision"
         unique_together = (('revision', 'content_type', 'object_id'),)
 
+
 class HistoryField(generic.GenericRelation):
+
     def __init__(self, **kwargs):
         return super(HistoryField, self).__init__(FullHistory, **kwargs)
-
