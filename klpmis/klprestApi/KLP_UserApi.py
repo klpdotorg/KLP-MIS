@@ -25,8 +25,8 @@ post_change_redirect=None):
     'AdminGroup' in user_GroupsList):
         # if use is login and user is super user or in admin group
         if post_change_redirect is None:
-            post_change_redirect = reverse('production.klprestApi.
-            'KLP_UserApi.KLP_addNewUser_done')
+            post_change_redirect = reverse(
+            'production.klprestApi.KLP_UserApi.KLP_addNewUser_done')
         if request.method == "POST":
             # Get Data From Form
             form = UserCreationFormExtended(request.POST)
@@ -65,7 +65,7 @@ def KLP_password_change(request, template_name=
 'viewtemplates/password_change_form.html',
 post_change_redirect=None):
     """ To Change Password """
-    user = request.user # Get logged in user
+    user = request.user  # Get logged in user
     usrUrl = {'Data Entry Executive': '/home/',
     'Data Entry Operator': '/home/?respType=filter',
     'AdminGroup': '/home/?respType=userpermissions'}
@@ -79,8 +79,8 @@ post_change_redirect=None):
     if user.id is not None:
         # if user is logged in
         if post_change_redirect is None:
-            post_change_redirect = reverse('production.klprestApi.
-            'KLP_UserApi.KLP_password_change_done')
+            post_change_redirect = reverse(
+            'production.klprestApi.KLP_UserApi.KLP_password_change_done')
         if request.method == "POST":
             # if request method is post post data to form
             form = PasswordChangeForm(request.user, request.POST)

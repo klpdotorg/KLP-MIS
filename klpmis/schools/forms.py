@@ -76,7 +76,7 @@ class Relations_Form(ModelForm):
 
 class Child_Form(Relations_Form):
     thisyear = datetime.date.today().year
-    startyear = thisyear-20
+    startyear = thisyear - 20
     dob = forms.DateField(widget=SelectDateWidget(years=range
     (startyear, thisyear + 1), attrs={'tabindex': 1}))
 
@@ -107,7 +107,7 @@ class Student_Form(ModelForm):
 
 class Staff_Form(ModelForm):
     thisyear = datetime.date.today().year
-    startyear = thisyear-40
+    startyear = thisyear - 40
     doj = forms.DateField(widget=SelectDateWidget(years=range
     (startyear, thisyear + 1), attrs={'tabindex': 5}), required=False)
     active = forms.IntegerField(initial=2, widget=forms.HiddenInput)
@@ -162,8 +162,8 @@ class Question_Form(ModelForm):
             else:
                 scoreMax = self.cleaned_data.get('scoreMax', '')
                 if scoreMin > scoreMax:
-                    raise forms.ValidationError("Score Min Should be
-                    'Less than Score Min.")
+                    raise forms.ValidationError("Score Min Should be\
+                    Less than Score Min.")
         return scoreMin
 
     def clean_scoreMax(self):
@@ -201,9 +201,8 @@ class Answer_Form(ModelForm):
 class UserCreationFormExtended(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
-        super(UserCreationFormExtended, self).__init__(*args,
-**kwargs)
-    self.fields['groups'].required = True
+        super(UserCreationFormExtended,self).__init__(*args,**kwargs)
+        self.fields['groups'].required = True
 
     def save(self, commit=True):
         user = super(UserCreationFormExtended, self).save(commit=False)

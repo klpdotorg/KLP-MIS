@@ -48,20 +48,18 @@ def KLP_Staff_Create(request, referKey):
     url = '/institution/%s/staff/creator/' % (referKey)
     extra_dict = {'buttonType': buttonType, 'referKey': referKey, 'url': url}
     extra_dict['institution_id'] = referKey
-    extra_dict['stgrps'] = StudentGroup.objects.
-    filter(institution__id = referKey, active=2).
-    order_by("name", "section")
+    extra_dict['stgrps'] = StudentGroup.objects.filter(
+    institution__id = referKey, active=2).order_by("name", "section")
     institutionObj = Institution.objects.get(pk = referKey)
-    if institutionObj.boundary.boundary_category.
-    boundary_category.lower() == 'circle':
+    i = institutionObj.boundary.boundary_category.boundary_category.lower()
+    if i == 'circle':
         # if the boundary category is circle get anganwadi staff types.
         extra_dict['institutionType'] = 'Anganwadi'
         Staff_Types = Staff_Type.objects.filter(categoryType=2)
     else:
         # if the boundary category is not circle get Institution staff types.
         extra_dict['institutionType'] = 'Institution'
-        Staff_Types = Staff_Type.objects.
-        filter(categoryType=1)
+        Staff_Types = Staff_Type.objects.filter(categoryType=1)
         extra_dict['Staff_Types'] = Staff_Types
         #before Staff.objects.all()
         KLP_Create_Staff = KLP_Staff(queryset = Staff.objects.filter(pk=0),
@@ -70,8 +68,8 @@ def KLP_Staff_Create(request, referKey):
         template_object_name = 'staff', extra_context=extra_dict),
         receiver = XMLReceiver(),)
 
-    response = KLP_Create_Staff.responder.
-    create_form(request, form_class=Staff_Form)
+    response = KLP_Create_Staff.responder.create_form(
+    request, form_class=Staff_Form)
     return HttpResponse(response)
 
 
@@ -100,12 +98,12 @@ def KLP_Staff_Update(request, staff_id):
     buttonType = request.POST.get('form-buttonType')
     referKey = request.POST.get('form-0-boundary')
     querysetstaff = Staff.objects.filter(pk=staff_id)
-    staff = querysetstaff[0] #Staff.objects.get(pk=staff_id)
+    staff = querysetstaff[0]  # Staff.objects.get(pk=staff_id)
     stgrps = StudentGroup.objects.filter(institution =
     staff.institution, active=2)
     institutionObj = staff.institution
-    if institutionObj.boundary.boundary_category.
-    boundary_category.lower() == 'circle':
+    ins = institutionObj.boundary.boundary_category.boundary_category.lower()
+    if ins == 'circle':
         # if the boundary category is circle get anganwadi staff types.
         institutionType = 'Anganwadi'
         Staff_Types = Staff_Type.objects.filter(categoryType=2)
@@ -121,8 +119,8 @@ def KLP_Staff_Update(request, staff_id):
         extra_context={'buttonType': buttonType, 'referKey': referKey,
         'stgrps': stgrps, 'institutionType': institutionType,
         'Staff_Types': Staff_Types}), receiver = XMLReceiver(),)
-        response = KLP_Edit_Staff.responder.
-        update_form(request, pk=staff_id, form_class=Staff_Form)
+        response = KLP_Edit_Staff.responder.update_form(
+        request, pk=staff_id, form_class=Staff_Form)
         return HttpResponse(response)
 
 

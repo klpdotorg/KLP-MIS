@@ -42,7 +42,7 @@ def KLP_Question_Create(request, referKey):
     (?P<referKey>\d+)/creator/"""
     # Checking user Permissions for Question add
     KLP_user_Perm(request.user, "Question", "Add")
-    buttonType = request.POST.get('form-buttonType') # Get Button Type
+    buttonType = request.POST.get('form-buttonType')  # Get Button Type
     # get number of questions under assessments for question order
     order = Question.objects.filter(assessment__id=referKey).count() + 1
     #before Question.objects.all()
@@ -53,8 +53,8 @@ def KLP_Question_Create(request, referKey):
     template_object_name = 'question', extra_context
     ={'buttonType': buttonType,
     'referKey': referKey, 'order': order}), receiver = XMLReceiver(),)
-    response = KLP_Create_Question.responder.
-    create_form(request, form_class=Question_Form)
+    response = KLP_Create_Question.responder.create_form(
+    request, form_class=Question_Form)
 
     return HttpResponse(response)
 
@@ -74,8 +74,8 @@ def KLP_Question_Update(request, question_id):
     template_object_name = 'question', extra_context
     ={'buttonType': buttonType, 'referKey': referKey}),
     receiver = XMLReceiver(),)
-    response = KLP_Edit_Question.responder.
-    update_form(request, pk=question_id, form_class=Question_Form)
+    response = KLP_Edit_Question.responder.update_form(
+    request, pk=question_id, form_class=Question_Form)
 
     return HttpResponse(response)
 

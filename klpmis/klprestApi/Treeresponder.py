@@ -64,8 +64,8 @@ class TreeSerializeResponder(object):
         response = serializers.serialize(self.format, object_list)
         # Show unexposed fields again
 
-        response1 = serializers.
-        serialize(self.format, object_list, use_natural_keys=True)
+        response1 = serializers.serialize(
+        self.format, object_list, use_natural_keys=True)
         response1 = simplejson.loads(response)
         """ This is customised to generate list of
         dictionaries for tree structure"""

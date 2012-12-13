@@ -168,7 +168,7 @@ class Boundary(models.Model):
         "return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src=\
         "/static_media/tree-images\
         "/reicons/boundary.gif" title="Boundary" />\
-        \n&nbsp;<span id="boundary_%s_text">%s</span> </a>'%(self.id,
+        &nbsp;<span id="boundary_%s_text">%s</span> </a>' % (self.id,
         boundaryType, self.name, self.id, self.name)
 
     def CreateNewFolder(self, boundaryType):
@@ -176,7 +176,8 @@ class Boundary(models.Model):
         "return KLP_View(this)" class="KLP_treetxt" title="%s">\
         <img src="/static_media/tree-images/reicons/boundary.gif"\
         title="Boundary" />&nbsp<span id="boundary_%s_text"> % s\
-        </span></a></span>' %(self.id,boundaryType,self.name, self.id,self.name)
+        </span></a></span>' % (self.id, boundaryType, self.name,
+        self.id, self.name)
 
     def get_view_url(self, boundaryType):
         return '/boundary/%s/%s/view/' % (self.id, boundaryType)
@@ -197,28 +198,29 @@ class Boundary(models.Model):
     def getPermissionViewUrl(self):
         return '<a href="/boundary/%s/permissions/" onclick =\
         "return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src =\
-        "/static_media/tree-images/reicons/boundary.gif" title="boundary"/> % s\
-        </a>' % (self.id,self.name,self.name)
+        "/static_media/tree-images/reicons/boundary.gif"\
+        title="boundary"/> % s\
+        </a>' % (self.id, self.name, self.name)
 
     def getAssessmentPermissionViewUrl(self, assessment_id):
         return '<a href="/boundary/%s/assessmentpermissions/%s/" onclick =\
         "return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src =\
         "/static_media/tree-images/reicons/boundary.gif"\
-        title="boundary" /> % s</a>' %(self.id,assessment_id,
-        self.name,self.name)
+        title="boundary" /> % s</a>' % (self.id, assessment_id,
+        self.name, self.name)
 
     def showPermissionViewUrl(self, userSel):
         if self.boundary_category.id in [9, 10, 13, 14]:
             return '<a href="/show/%s/user/%s/permissions/" onclick =\
             "return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src =\
             "/static_media/tree-images/reicons/boundary.gif"\
-            title="boundary" /> % s</a>' %(self.id, userSel,
+            title="boundary" /> % s</a>' % (self.id, userSel,
             self.name, self.name)
         else:
             return '<a href="/list/%s/user/%s/permissions/" onclick =\
             "return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src =\
             "/static_media/tree-images/reicons/boundary.gif"\
-            title="boundary" /> % s</a>' %(self.id, userSel,
+            title="boundary" /> % s</a>' % (self.id, userSel,
             self.name, self.name)
 
 
@@ -243,7 +245,7 @@ class Institution(models.Model):
         ordering = ["name"]
 
     def __unicode__(self):
-        return "%s"%(self.name)
+        return "%s" % (self.name)
 
     def get_all_cat(self, categoryType):
         return Institution_Category.objects.all(categoryType = categoryType)
@@ -272,8 +274,8 @@ class Institution(models.Model):
         "return KLP_View(this)" class="KLP_treetxt" title="%s">\
         <img src="/static_media/tree-images/reicons/institution.gif"\
         title="institution" />&nbsp<span id="institution_%s_text"> %\
-        s</span></a>' %(self.id, self.name +' ('+str(self.id)+')',
-        self.id, self.name+' ('+str(self.id)+')')
+        s</span></a>' % (self.id, self.name + ' (' + str(self.id) + ')',
+        self.id, self.name + ' (' + str(self.id) + ')')
 
     def get_view_url(self):
         return '/institution/%s/view/' % (self.id)
@@ -286,13 +288,13 @@ class Institution(models.Model):
         "return KLP_View(this)" class="KLP_treetxt" title="%s">\
         <img src="/static_media/tree-images/reicons/institution.gif"\
         title="institution" /> &nbsp; <span id="institution_%s_text"> % s\
-        </span></a> </span>' %(self.id, self.name +' ('+str(self.id)+')',
-        self.id, self.name+' ('+str(self.id)+')')
+        </span></a> </span>' % (self.id, self.name + ' (' + str(self.id) + ')',
+        self.id, self.name + ' (' + str(self.id) + ')')
         groupObjects = StudentGroup.objects.filter(institution__id = self.id,
         active=2)
         if groupObjects:
             retStr = "<div class='hitarea hasChildren-hitarea\
-            'collapsable-hitarea'></div>"+retStr+"<ul>"
+            'collapsable-hitarea'></div>" + retStr + "<ul>"
             for groupObj in groupObjects:
                 groupName = groupObj.name
 
@@ -304,14 +306,14 @@ class Institution(models.Model):
                     studentgroup/%s/view/"
                     title="%s"> <img title="Class" src="/static_media/
                     tree-images/reicons/studentgroup_%s.gif"> <span id=
-                    "studentgroup_%s_text">%s</span></a></span></li>"""%(
-                    str(groupObj.id),str(groupObj.id),str(groupName),
-                    str(groupObj.group_type),str(groupObj.id),groupName)
+                    "studentgroup_%s_text">%s</span></a></span></li>""" % (
+                    str(groupObj.id), str(groupObj.id), str(groupName),
+                    str(groupObj.group_type), str(groupObj.id), groupName)
                     retStr = retStr + "</ul>"
             return retStr
 
 
-register(['Acess'], Institution) # Register model for Object permissions
+register(['Acess'], Institution)  # Register model for Object permissions
 register_model(Institution)  # Register model for to store
 #information in fullhistory
 
@@ -324,12 +326,12 @@ post_save.connect(KLP_NewInst_Permission, sender=Institution)
 class Child(models.Model):
     ''' This class stores the personnel information of the childrens'''
     firstName = models.CharField(max_length = 50)
-    middleName = models.CharField(max_length = 50,blank=True,null=True)
-    lastName = models.CharField(max_length = 50,blank=True,null=True)
-    uid = models.CharField(max_length = 100,blank=True,null=True)
+    middleName = models.CharField(max_length = 50, blank=True, null=True)
+    lastName = models.CharField(max_length = 50, blank=True, null=True)
+    uid = models.CharField(max_length = 100, blank=True, null=True)
     dob = models.DateField(max_length = 20)
-    gender = models.CharField(max_length=10,choices=Gender,default="male")
-    mt =  models.ForeignKey(Moi_Type,default="kannada")
+    gender = models.CharField(max_length=10, choices=Gender, default="male")
+    mt = models.ForeignKey(Moi_Type, default="kannada")
 
     class Meta:
         ordering = ["firstName", "middleName", "lastName"]
@@ -341,10 +343,10 @@ class Child(models.Model):
         return Relations.objects.filter(child__id=self.id)
 
     def getFather(self):
-        return Relations.objects.get(relation_type="Father",child__id=self.id)
+        return Relations.objects.get(relation_type="Father", child__id=self.id)
 
     def getMother(self):
-        return Relations.objects.get(relation_type="Mother",child__id=self.id)
+        return Relations.objects.get(relation_type="Mother", child__id=self.id)
 
     def getStudent(self):
         return Student.objects.get(child__id=self.id)
@@ -361,10 +363,10 @@ class Child(models.Model):
 class Relations(models.Model):
     ''' This class stores relation information of the childrens'''
     relation_type = models.CharField(max_length=10,
-    choices=Relation_Type,default="Mother")
+    choices=Relation_Type, default="Mother")
     first_name = models.CharField(max_length = 100)
-    middle_name = models.CharField(max_length = 50,blank=True,null=True)
-    last_name = models.CharField(max_length = 50,blank=True,null=True)
+    middle_name = models.CharField(max_length = 50, blank=True, null=True)
+    last_name = models.CharField(max_length = 50, blank=True, null=True)
     child = models.ForeignKey(Child)
 
     def __unicode__(self):
@@ -381,30 +383,30 @@ class StudentGroup(models.Model):
     section of the Institutions'''
     institution = models.ForeignKey(Institution)
     name = models.CharField(max_length=50)
-    section = models.CharField(max_length=10,choices=Alpha_list,
-    blank=True,default="")
-    active = models.IntegerField(blank = True, null = True,default=2)
-    group_type = models.CharField(max_length=10,choices=
-    Group_Type,default="Class")
+    section = models.CharField(max_length=10, choices=Alpha_list,
+    blank=True, default="")
+    active = models.IntegerField(blank = True, null = True, default=2)
+    group_type = models.CharField(max_length=10, choices=
+    Group_Type, default="Class")
 
     class Meta:
         unique_together = (('institution', 'name', 'section'),)
         ordering = ["name", "section"]
 
     def __unicode__(self):
-        return "%s"%(self.name)
+        return "%s" % (self.name)
 
     def getChild(self):
         return False
 
     def getSchoolIdentity(self):
-        return '%s: %s' %(self.institution__id, self.institution__name)
+        return '%s: %s' % (self.institution__id, self.institution__name)
 
     def getModuleName(self):
         return 'studentgroup'
 
     def get_update_url(self):
-        return '/studentgroup/%d/update/' %(self.id)
+        return '/studentgroup/%d/update/' % (self.id)
 
     def getViewUrl(self):
         sec = self.section
@@ -417,12 +419,13 @@ class StudentGroup(models.Model):
         "return KLP_View(this)" class="KLP_treetxt"\
         title="%s %s"> <img src="/static_media/tree-images/\
         reicons/studentgroup_%s.gif" title="%s" />\
-        <span id="studentgroup_%s_text">%s %s</span> </a>' %(self.id,
+        <span id="studentgroup_%s_text">%s %s</span> </a>' % (self.id,
         groupName, sec, self.group_type, self.group_type,
         self.id, groupName, sec)
 
     def getStudentProgrammeUrl(self, filter_id, secfilter_id):
-        assname=Assessment.objects.filter(id=secfilter_id).values_list('name',
+        assname = Assessment.objects.filter(id=secfilter_id).values_list(
+        'name',
         flat=True)[0]
         groupName = self.name
         if groupName == '0':
@@ -434,12 +437,12 @@ class StudentGroup(models.Model):
          onclick="return KLP_View(this)" class="KLP_treetxt" title="%s %s">\
          <img src="/static_media/tree-images/reicons/studentgroup_%s.gif"\
         title="%s" /> &nbsp; <span id="studentgroup_%s_text">%s %s</span>\
-        <span style="color:green;font-size:12px">%s</span></a>' %(self.id,
+        <span style="color:green;font-size:12px">%s</span></a>' % (self.id,
         filter_id, secfilter_id, groupName, sec,
-        self.group_type, self.group_type, self.id,  groupName, sec,assname)
+        self.group_type, self.group_type, self.id, groupName, sec, assname)
 
     def get_view_url(self):
-        return '/studentgroup/%s/view/' %(self.id)
+        return '/studentgroup/%s/view/' % (self.id)
 
     def CreateNewFolder(self):
         sec = self.section
@@ -452,7 +455,7 @@ class StudentGroup(models.Model):
         "return KLP_View(this)" class="KLP_treetxt" title="%s %s">\
         <img src="/static_media/tree-images/reicons/studentgroup_%s.gif"\
         title="%s" />&nbsp<span id="studentgroup_%s_text"> % s % s\
-        </span> </a></span>' %(self.id, groupName, sec, self.group_type,
+        </span> </a></span>' % (self.id, groupName, sec, self.group_type,
         self.group_type, self.id,  groupName, sec)
 # Register model for to store information in fullhistory
 register_model(StudentGroup)
@@ -473,42 +476,44 @@ def current_academic():
     now = datetime.date.today()
     currentYear = int(now.strftime('%Y'))
     currentMont = int(now.strftime('%m'))
-    if currentMont>=1 and currentMont<=8:
-        academic = '%s-%s' %(currentYear-1, currentYear)
+    if currentMont >= 1 and currentMont <= 8:
+        academic = '%s-%s' % (currentYear - 1, currentYear)
     else:
-        academic = '%s-%s' %(currentYear, currentYear+1)
+        academic = '%s-%s' % (currentYear, currentYear + 1)
     try:
         academicObj = Academic_Year.objects.get(name=academic)
         return academicObj
     except Academic_Year.DoesNotExist:
         return 1
 
+
 class Staff(models.Model):
     '''This Class stores the Institution Worker(Staff) Information'''
     institution = models.ForeignKey(Institution, blank = True, null = True)
     firstName = models.CharField(max_length = 50)
-    middleName = models.CharField(max_length = 50,blank=True,null=True)
-    lastName = models.CharField(max_length = 50,blank=True,null=True)
-    uid = models.CharField(max_length = 100,blank=True,null=True)
-    doj = models.DateField(max_length = 20,blank=True,null=True)
-    gender = models.CharField(max_length=10,choices=Gender, default="female")
-    mt =  models.ForeignKey(Moi_Type,default="kannada")
+    middleName = models.CharField(max_length = 50, blank=True, null=True)
+    lastName = models.CharField(max_length = 50, blank=True, null=True)
+    uid = models.CharField(max_length = 100, blank=True, null=True)
+    doj = models.DateField(max_length = 20, blank=True, null=True)
+    gender = models.CharField(max_length=10, choices=Gender, default="female")
+    mt = models.ForeignKey(Moi_Type, default="kannada")
     #qualification = models.ForeignKey(Staff_Qualifications,
     #blank=True,null=True, default=1)
     qualification = models.ManyToManyField(Staff_Qualifications,
-    blank=True,null=True)
+    blank=True, null=True)
     staff_type = models.ForeignKey(Staff_Type, default=1)
-    active = models.IntegerField(blank = True, null = True,default=2)
+    active = models.IntegerField(blank = True, null = True, default=2)
 
     class Meta:
         ordering = ["firstName", "middleName", "lastName"]
 
     def __unicode__(self):
-        return "%s %s %s"%(self.firstName, self.middleName, self.lastName)
+        return "%s %s %s" % (self.firstName, self.middleName, self.lastName)
 
     def getAssigendClasses(self):
-        return StudentGroup.objects.filter(staff_studentgrouprelation__staff__id
-         = self.id, staff_studentgrouprelation__active=2)
+        return StudentGroup.objects.filter(
+        staff_studentgrouprelation__staff__id = self.id,
+        staff_studentgrouprelation__active=2)
 # Register model for to store information in fullhistory
 register_model(Staff)
 
@@ -517,9 +522,9 @@ class Student(models.Model):
     ''' This class gives information regarding the students class ,
     academic year and personnel details'''
     child = models.ForeignKey(Child)
-    otherStudentId = models.CharField(max_length = 100,blank = True,
+    otherStudentId = models.CharField(max_length = 100, blank = True,
     null = True)
-    active = models.IntegerField(blank = True, null = True,default=2)
+    active = models.IntegerField(blank = True, null = True, default=2)
 
     class Meta:
         ordering = ["child__firstName"]
@@ -528,7 +533,7 @@ class Student(models.Model):
         return self.child.firstName
 
     def __unicode__(self):
-        return "%s"%(self.child)
+        return "%s" % (self.child)
 
     def getChild(self):
         return False
@@ -548,7 +553,7 @@ class Student(models.Model):
     def getViewUrl(self):
         return '<a href="/student/%s/view/" onclick =\
         "return KLP_View(this)" class="KLP_treetxt"\
-        title="%s"> %s </a>' %(self.id,self.child, self.child)
+        title="%s"> %s </a>' % (self.id, self.child, self.child)
 
     def get_view_url(self):
         return '/student/%s/view/' % (self.id)
@@ -566,21 +571,23 @@ class Student(models.Model):
         "deleteSchool(\'%s\', \'student\', \'%s\')"><img width="11"\
         title="Delete"\
         src="/static_media/images/PageRow_delete.gif"\
-        title="Delete"></span></span>' %(
-        self.class_section.classname.sid.boundary.id, 
-        self.class_section.classname.sid.id, self.class_section.classname.id, self.class_section.id,self.id,self.name,
+        title="Delete"></span></span>' % (
+        self.class_section.classname.sid.boundary.id,
+        self.class_section.classname.sid.id, self.class_section.classname.id,
+        self.class_section.id, self.id, self.name,
         self.class_section.classname.sid.boundary.id,
         self.class_section.classname.sid.id, self.class_section.classname.id,
         self.class_section.id, self.id, self.id, self.name)
 # Register model for to store information in fullhistory
 register_model(Student)
 
+
 class Student_StudentGroupRelation(models.Model):
     '''This Class stores the Student and Student Group Realation Information'''
     student = models.ForeignKey(Student)
     student_group = models.ForeignKey(StudentGroup)
     academic = models.ForeignKey(Academic_Year, default=current_academic)
-    active = models.IntegerField(blank = True, null = True,default=2)
+    active = models.IntegerField(blank = True, null = True, default=2)
 
     class Meta:
         unique_together = (('student', 'student_group', 'academic'),)
@@ -593,20 +600,21 @@ class Staff_StudentGroupRelation(models.Model):
     staff = models.ForeignKey(Staff)
     student_group = models.ForeignKey(StudentGroup)
     academic = models.ForeignKey(Academic_Year, default=current_academic)
-    active = models.IntegerField(blank = True, null = True,default=2)
+    active = models.IntegerField(blank = True, null = True, default=2)
 
     class Meta:
         unique_together = (('staff', 'student_group', 'academic'),)
 # Register model for to store information in fullhistory
 register_model(Staff_StudentGroupRelation)
 
+
 def default_end_date():
     ''' To select academic year end date'''
     now = datetime.date.today()
     currentYear = int(now.strftime('%Y'))
     currentMont = int(now.strftime('%m'))
-    if currentMont>5:
-        academic_end_date = datetime.date(currentYear+1, 5, 30)
+    if currentMont > 5:
+        academic_end_date = datetime.date(currentYear + 1, 5, 30)
     else:
         academic_end_date = datetime.date(currentYear, 5, 30)
     return academic_end_date
@@ -615,28 +623,28 @@ def default_end_date():
 class Programme(models.Model):
     """ This class Stores information about Programme """
     name = models.CharField(max_length = 100)
-    description = models.CharField(max_length = 500,blank = True, null = True)
+    description = models.CharField(max_length = 500, blank = True, null = True)
     startDate = models.DateField(max_length = 20, default=datetime.date.today)
     endDate = models.DateField(max_length = 20, default=default_end_date)
     programme_institution_category = models.ForeignKey(Boundary_Type,
-    blank=True,null=True)
-    active = models.IntegerField(blank = True, null = True,default=2)
+    blank=True, null=True)
+    active = models.IntegerField(blank = True, null = True, default=2)
 
     class Meta:
         ordering = ["-startDate", "-endDate", "name"]
 
     def __unicode__(self):
-        return "%s (%s-%s)"%(self.name, self.startDate.strftime("%Y"),
+        return "%s (%s-%s)" % (self.name, self.startDate.strftime("%Y"),
         self.endDate.strftime("%Y"))
 
     def get_view_url(self):
-        return '/programme/%s/view/' %self.id
+        return '/programme/%s/view/' % self.id
 
     def get_edit_url(self):
-        return '/programme/%s/update/' %(self.id)
+        return '/programme/%s/update/' % (self.id)
 
     def getChild(self):
-        if Assessment.objects.filter(programme__id=self.id ,active=2).count():
+        if Assessment.objects.filter(programme__id=self.id, active=2).count():
             return True
         else:
             return False
@@ -649,7 +657,7 @@ class Programme(models.Model):
         "return KLP_View(this)" class="KLP_treetxt"\
         title="%s (%s-%s)"> <img src="/static_media/tree-images/\
         reicons/programme.gif" title="Programme" />&nbsp\
-        <span id="programme_%s_text">%s (%s-%s)</span> </a>'%(self.id,
+        <span id="programme_%s_text">%s (%s-%s)</span> </a>' % (self.id,
         self.name, self.startDate.strftime("%Y"),
         self.endDate.strftime("%Y"), self.id, self.name,
         self.startDate.strftime("%Y"), self.endDate.strftime("%Y"))
@@ -659,7 +667,7 @@ class Programme(models.Model):
         "return KLP_View(this)" class="KLP_treetxt" title="%s (%s-%s)">\
         <img src="/static_media/tree-images/reicons/programme.gif"\
         title="Programme" /> &nbsp; <span id="programme_%s_text"> %s\
-        (%s-%s)</span></a></span>' %(self.id,self.name,
+        (%s-%s)</span></a></span>' % (self.id, self.name,
         self.startDate.strftime("%Y"), self.endDate.strftime("%Y"),
         self.id, self.name, self.startDate.strftime("%Y"),
         self.endDate.strftime("%Y"))
@@ -673,23 +681,23 @@ class Assessment(models.Model):
     name =  models.CharField(max_length = 100)
     startDate = models.DateField(max_length = 20, default=datetime.date.today)
     endDate = models.DateField(max_length = 20, default=default_end_date)
-    query = models.CharField(max_length = 500,blank = True, null = True)
+    query = models.CharField(max_length = 500, blank = True, null = True)
     active = models.IntegerField(blank=True, null=True, default=2)
-    typ = models.IntegerField(choices=Assessment_type,default=3)
-    doubleEntry = models.BooleanField("Requires double entry",default=True)
+    typ = models.IntegerField(choices=Assessment_type, default=3)
+    doubleEntry = models.BooleanField("Requires double entry", default=True)
 
     class Meta:
         unique_together = (('programme', 'name'),)
         ordering = ["startDate"]
 
     def __unicode__(self):
-        return "%s"%(self.name)
+        return "%s" % (self.name)
 
     def get_view_url(self):
-        return '/assessment/%s/view/' %self.id
+        return '/assessment/%s/view/' % self.id
 
     def get_edit_url(self):
-        return '/assessment/%s/update/' %(self.id)
+        return '/assessment/%s/update/' % (self.id)
 
     def getChild(self):
         if Question.objects.filter(assessment__id=self.id, active=2).count():
@@ -724,7 +732,7 @@ class Assessment_StudentGroup_Association(models.Model):
     Association Information'''
     assessment = models.ForeignKey(Assessment)
     student_group = models.ForeignKey(StudentGroup)
-    active = models.IntegerField(blank = True, null = True,default=2)
+    active = models.IntegerField(blank = True, null = True, default=2)
 
     class Meta:
         unique_together = (('assessment', 'student_group'),)
@@ -736,15 +744,15 @@ class Question(models.Model):
     """ This class stores Assessment detail information """
     assessment = models.ForeignKey(Assessment)
     name = models.CharField(max_length = 200)
-    questionType = models.IntegerField(choices=QuestionType,default=1)
+    questionType = models.IntegerField(choices=QuestionType, default=1)
     scoreMin = models.DecimalField(max_digits=5, decimal_places=2,
     blank = True, null = True)
     scoreMax = models.DecimalField(max_digits=5, decimal_places=2,
     blank = True, null = True)
-    grade = models.CharField(max_length = 100,blank = True, null = True)
+    grade = models.CharField(max_length = 100, blank = True, null = True)
     order = models.IntegerField()
     doubleEntry = models.BooleanField(default=True)
-    active = models.IntegerField(blank = True, null = True,default=2)
+    active = models.IntegerField(blank = True, null = True, default=2)
 
     class Meta:
         unique_together = (('assessment', 'name'),)
@@ -769,24 +777,24 @@ class Question(models.Model):
         return '<a href="/question/%s/view/" onclick=\
         "return KLP_View(this)" class="KLP_treetxt" title="%s"> <img src="\
         /static_media/tree-images/reicons/question.gif" title="Question" />\
-        &nbsp<span id="question_%s_text">%s</span> </a>' %(self.id, self.name,
+        &nbsp<span id="question_%s_text">%s</span> </a>' % (self.id, self.name,
         self.id, self.name)
 
     def getModuleName(self):
         return 'question'
 
     def get_view_url(self):
-        return  '/question/%s/view/' %(self.id)
+        return  '/question/%s/view/' % (self.id)
 
     def get_edit_url(self):
-        return '/question/%s/update/' %(self.id)
+        return '/question/%s/update/' % (self.id)
 
     def CreateNewFolder(self):
         return '<span><a href="/question/%s/view/" onclick =\
         "return KLP_View(this)" class="KLP_treetxt" title="%s">\
         <img src="/static_media/tree-images/reicons/question.gif"\
         title="Question" /> &nbsp; <span id="question_%s_text">\
-        % s</span></a></span>' %(self.id, self.name, self.id, self.name)
+        % s</span></a></span>' % (self.id, self.name, self.id, self.name)
 # Register model for to store information in fullhistory
 register_model(Question)
 
@@ -799,7 +807,7 @@ class Answer(models.Model):
     blank = True, null = True)
     answerGrade = models.CharField(max_length = 30, blank = True,
     null = True)
-    doubleEntry = models.IntegerField(blank = True, null = True,default=0)
+    doubleEntry = models.IntegerField(blank = True, null = True, default=0)
     status = models.IntegerField(blank = True, null = True,)
     user1 = models.ForeignKey(User, blank = True, null = True,
     related_name = 'user1')

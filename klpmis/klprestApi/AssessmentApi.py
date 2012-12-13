@@ -35,8 +35,7 @@ def KLP_Assessment_View(request, assessment_id):
     filter(pk=assessment_id), permitted_methods = ('GET', 'POST'),
     responder = TemplateResponder(template_dir = 'viewtemplates',
     template_object_name =
-    'assessment',),)
-    (request, assessment_id, **kwrg)
+    'assessment',),)(request, assessment_id, **kwrg)
     return HttpResponse(resp)
 
 
@@ -50,7 +49,7 @@ def KLP_Assessment_Create(request, referKey):
     buttonType = request.POST.get('form-buttonType')
     currentMont = int(now.strftime('%m'))
     endYear = int(now.strftime('%Y'))
-    if currentMont>4:
+    if currentMont > 4:
         endYear = endYear + 1
         print referKey
         #before Assessment.objects.all()
@@ -60,8 +59,8 @@ def KLP_Assessment_Create(request, referKey):
         template_object_name = 'assessment', extra_context={'buttonType':
         buttonType, 'referKey': referKey, 'endDate': 30, 'endYear':
         endYear, 'endMonth': 'APRIL'}), receiver = XMLReceiver(),)
-        response = KLP_Create_Assessment.responder.
-        create_form(request, form_class=Assessment_Form)
+        response = KLP_Create_Assessment.responder.create_form(
+        request, form_class=Assessment_Form)
         print response
         return HttpResponse(response)
 
@@ -77,7 +76,7 @@ def KLP_Assessment_Update(request, assessment_id):
     referKey = request.POST.get('form-0-programme')
     currentMont = int(now.strftime('%m'))
     endYear = int(now.strftime('%Y'))
-    if currentMont>4:
+    if currentMont > 4:
         endYear = endYear + 1
         #before Assessment.objects.all()
         KLP_Edit_Assessment = KLP_Assessment(queryset =
@@ -104,9 +103,9 @@ class KLP_Get_Assessments(Resource):
             =programme_id, active=2).defer("programme")
             respStr = ''
             for assessment in assessments_list:
-                respStr += '%s$$%s&&' %(assessment.id, assessment)
+                respStr += '%s$$%s&&' % (assessment.id, assessment)
                 # slice string to remove "&&" added at last of string
-                return HttpResponse(respStr[0:len(respStr)-2])
+                return HttpResponse(respStr[0:len(respStr) - 2])
         except:
             return HttpResponse('fail')
 

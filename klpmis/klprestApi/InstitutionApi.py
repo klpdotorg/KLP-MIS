@@ -51,8 +51,8 @@ def KLP_Institution_Create(request, referKey):
         institutionType = 'Anganwadi'
         categoryType = 2
         # Query for Institution Category based on  categoryType
-        categoryList = Institution_Category.objects.
-        filter(categoryType=categoryType)
+        categoryList = Institution_Category.objects.filter(
+        categoryType=categoryType)
         #before Institution.objects.all()
         KLP_Create_Institution = KLP_Institution(queryset=
         Institution.objects.filter(pk=0), permitted_methods
@@ -63,8 +63,8 @@ def KLP_Institution_Create(request, referKey):
         'institutionType': institutionType,
         'categoryList': categoryList, 'selCategoryTyp':
         selCategoryTyp}), receiver = XMLReceiver(),)
-        response = KLP_Create_Institution.
-        responder.create_form(request, form_class=Institution_Form)
+        response = KLP_Create_Institution.responder.create_form(
+        request, form_class=Institution_Form)
 
         return HttpResponse(response)
 
@@ -94,8 +94,7 @@ def KLP_Institution_Update(request, institution_id):
     institutionObj = Institution.objects.get(id=institution_id)
     institutionType = 'Institution'
     categoryType = 1
-    if institutionObj.boundary.boundary_category.
-    boundary_category == 'Circle':
+    if institutionObj.boundary.boundary_category.boundary_category == 'Circle':
         institutionType = 'Anganwadi'
         categoryType = 2
         categoryList = Institution_Category.objects.filter(categoryType=
@@ -119,10 +118,10 @@ def KLP_Institution_Boundary(request, boundary_id, permissionType,
 assessment_id=None):
     """ To List Institutions Under Boundary to
     Assign Permissions to the User """
-    user = request.user # get logged in user
+    user = request.user  # get logged in user
     # Checking user Permissions
     KLP_user_Perm(request.user, "Users", None)
-    klp_UserGroups = user.groups.all() # Get all user groups
+    klp_UserGroups = user.groups.all()  # Get all user groups
     klp_GroupsList = ['%s' % (usergroup.name) for usergroup
     in klp_UserGroups]
     if user.is_superuser or 'AdminGroup' in klp_GroupsList:
@@ -144,51 +143,49 @@ assessment_id=None):
             if bound_cat in ['district', 'block', 'project']:
                 # if bound_cat in "district, block, project"
                 #get active(2) child boundaries
-                respDict['boundary_list'] =
-                Boundary.objects.filter(parent = boundaryObj,
+                respDict['boundary_list'] = Boundary.objects.filter(
+                parent = boundaryObj,
                 active=2).distinct()
             else:
                 # else get all active(2) child Institutions
-                respDict['institution_list'] = Institution.
-                objects.filter(boundary = boundaryObj, active=2).distinct()
+                respDict['institution_list'] = Institution.objects.filter(
+                boundary = boundaryObj, active=2).distinct()
         else:
             # If permissionType is not permissions
             # Get All active(2) Mapped Sg's
-            studentgroup_list = Assessment_StudentGroup_Association
-            .objects.filter(assessment__id=assessment_id, active=2)
-            .values_list('student_group', flat=True).distinct()
+            st = Assessment_StudentGroup_Association.objects.filter
+            studentgroup_list = st(
+            assessment__id=assessment_id, active=2).values_list(
+            'student_group', flat=True).distinct()
             # Get Institutions based Sg's
-            map_institutions_list = StudentGroup.objects.
-            filter(id__in=studentgroup_list, active=2).
-            values_list('institution__id', flat=True).distinct()
+            map_institutions_list = StudentGroup.objects.filter(
+            id__in=studentgroup_list, active=2).values_list(
+            'institution__id', flat=True).distinct()
             if bound_cat == 'district':
                 # if bound_cat is district query block or project
                 #level  boundaries
-                boundary_list = Boundary.objects.
-                filter(institution__pk__in=
+                boundary_list = Boundary.objects.filter(
+                institution__pk__in=
                 map_institutions_list,
-                active=2, parent__parent=boundaryObj).
-                values_list('parent__id', flat=True).distinct()
-                respDict['boundary_list'] = Boundary.objects.
-                filter(id__in=boundary_list, active=2).distinct()
+                active=2, parent__parent=boundaryObj).values_list(
+                'parent__id', flat=True).distinct()
+                respDict['boundary_list'] = Boundary.objects.filter(
+                id__in=boundary_list, active=2).distinct()
             elif bound_cat in ['block', 'project']:
                 # if bound_cat in block or project query circle or
                 #cluster level  boundaries
-                respDict['boundary_list'] = Boundary.objects.
-                filter(institution__pk__in=
-                map_institutions_list, active=2,
+                respDict['boundary_list'] = Boundary.objects.filter(
+                institution__pk__in=map_institutions_list, active=2,
                 parent=boundaryObj).distinct()
             else:
                 # else Query Institutions
-                respDict['institution_list'] =
-                Institution.objects.
-                filter(id__in=map_institutions_list,
+                respDict['institution_list'] = Institution.objects.filter(
+                id__in=map_institutions_list,
                 boundary = boundaryObj, active=2).distinct()
             respDict['assessmentId'] = assessment_id
 
-        return render_to_response('viewtemplates
-        '/institution_list.html', respDict,
-        context_instance=RequestContext(request))
+        return render_to_response('viewtemplates/institution_list.html',
+        respDict, context_instance=RequestContext(request))
     else:
         return HttpResponse('Insufficient Priviliges!')
 
@@ -200,7 +197,7 @@ urlpatterns = patterns('',
     KLP_Institution_View),
     url(r'^institution/(?P<institution_id>\d+)/update/?$',
     KLP_Institution_Update),
-    url(r'^boundary/(?P<boundary_id>\d+)/(?P<permissionType>\w+)
-    '/?$', KLP_Institution_Boundary),
-    url(r'^boundary/(?P<boundary_id>\d+)/(?P<permissionType>\w+)
-    '/(?P<assessment_id>\d+)/?$', KLP_Institution_Boundary),)
+    url(r'^boundary/(?P<boundary_id>\d+)/(?P<permissionType>\w+)/\
+    /?$', KLP_Institution_Boundary),
+    url(r'^boundary/(?P<boundary_id>\d+)/(?P<permissionType>\w+)\
+    /(?P<assessment_id>\d+)/?$', KLP_Institution_Boundary),)

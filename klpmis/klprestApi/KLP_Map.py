@@ -15,8 +15,8 @@ def KLP_Map_SG(request):
     boundary_id = request.GET.get("boundary")
     asssessment_id = request.GET.get("assessment")
     assessmentObj = Assessment.objects.get(id=asssessment_id)
-    studentgroup_list = StudentGroup.objects.filter(institution__
-    boundary__parent__parent__id=boundary_id)
+    studentgroup_list = StudentGroup.objects.filter(
+    institution__boundary__parent__parent__id=boundary_id)
     for sg in studentgroup_list:
         sg_as_mapObj = Assessment_StudentGroup_
         Association(assessment=assessmentObj, student_group=sg, active=2)

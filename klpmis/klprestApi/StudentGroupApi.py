@@ -47,8 +47,8 @@ def KLP_StudentGroup_Create(request, referKey):
     referKey, 'group_typ':
     group_typ, 'sch_typ': instObj.boundary.boundary_category.
     boundary_category}), receiver = XMLReceiver(),)
-    response = KLP_Create_StudentGroup.responder.create_form
-    (request, form_class = StudentGroup_Form)
+    response = KLP_Create_StudentGroup.responder.create_form(
+    request, form_class = StudentGroup_Form)
     return HttpResponse(response)
 
 
@@ -67,20 +67,20 @@ def KLP_StudentGroup_View(request, studentgroup_id):
     school = Institution.objects.get(id = studentgroup.institution.id)
     studgrpParent = school
     # Get All centers under Institution
-    studentGroups = StudentGroup.objects.filter
-    (institution__id = studgrpParent.id, group_type = "Center", active = 2)
+    studentGroups = StudentGroup.objects.filter(
+    institution__id = studgrpParent.id, group_type = "Center", active = 2)
     # Get Total Number of students
-    Norecords = Student_StudentGroupRelation.objects.filter
-    (student_group__id = studentgroup_id, academic = current_academic,
+    Norecords = Student_StudentGroupRelation.objects.filter(
+    student_group__id = studentgroup_id, academic = current_academic,
     active = 2).count()
     # Query Child onjects
-    child_list = Student_StudentGroupRelation.objects.filter
-    (student_group__id = studentgroup_id, academic = current_academic,
+    child_list = Student_StudentGroupRelation.objects.filter(
+    student_group__id = studentgroup_id, academic = current_academic,
     active = 2, student__active = 2).values_list('student__child',
     flat = True)
 
-    students = Child.objects.filter(id__in = child_list).extra
-    (select = {'lower_firstname': 'lower(trim("firstName"))',
+    students = Child.objects.filter(id__in = child_list).extra(
+    select = {'lower_firstname': 'lower(trim("firstName"))',
     'lower_midname': 'lower(trim("middleName"))',
     'lower_lastname': 'lower(trim("lastName"))'}).order_by
     ('lower_firstname', 'lower_midname', 'lower_lastname')
@@ -102,8 +102,8 @@ def KLP_StudentGroup_Update(request, studentgroup_id):
     ParentKey = request.POST.get('form-0-institution')
     group_typ = request.GET.get("group_typ") or request.POST.get("group_typ")
     sgObj = StudentGroup.objects.get(pk=studentgroup_id)
-    sch_typ = request.GET.get("sch_typ") or sgObj.institution.
-    boundary.boundary_category
+    sch_typ = request.GET.get(
+    "sch_typ") or sgObj.institution.boundary.boundary_category
     #before StudentGroup.objects.all()
     KLP_Edit_StudentGroup = KLP_StudentGroup(queryset =
     StudentGroup.objects.filter(pk=0), permitted_methods =
@@ -111,8 +111,8 @@ def KLP_StudentGroup_Update(request, studentgroup_id):
     'edittemplates', template_object_name = 'studentgroup',
     extra_context = {'buttonType': buttonType, 'ParentKey': ParentKey,
     'group_typ': group_typ, 'sch_typ': sch_typ}), receiver = XMLReceiver(),)
-    response = KLP_Edit_StudentGroup.responder.update_form
-    (request, pk = studentgroup_id, form_class = StudentGroup_Form)
+    response = KLP_Edit_StudentGroup.responder.update_form(
+    request, pk = studentgroup_id, form_class = StudentGroup_Form)
     return HttpResponse(response)
 
 
@@ -123,31 +123,31 @@ programme_id, assessment_id):
     \d+)/view/"""
     """ This Method is used for to generate student answers grid to
     enter data/answers for the assessment questions """
-    user = request.user  #get logged in user
-    url = "/studentgroup/%s/programme/%s/assessment/%s/view/" %
-    (studentgroup_id, programme_id, assessment_id)
+    user = request.user  # get logged in user
+    url = "/studentgroup/%s/programme/%s/assessment/%s/view/" % (
+    studentgroup_id, programme_id, assessment_id)
     # Query Childs based on studentgroup relation
 
     students = Student_StudentGroupRelation.objects.select_related
     ("student").filter(student_group__id = studentgroup_id,
-    academic = current_academic, active = 2).values_list
-    ('student__child', flat = True).distinct()
-    grupObj = StudentGroup.objects.filter(pk = studentgroup_id)
-    .only("group_type")
+    academic = current_academic, active = 2).values_list(
+    'student__child', flat = True).distinct()
+    grupObj = StudentGroup.objects.filter(pk = studentgroup_id).only(
+    "group_type")
     schoolIdentity = grupObj.getSchoolIdentity()
-    childs_list = Child.objects.filter(id__in = students).extra
-    (select = {'lower_firstname': 'lower(trim("firstName"))'}).
-    order_by('lower_firstname').defer("mt")
+    childs_list = Child.objects.filter(id__in = students).extra(
+    select = {'lower_firstname': 'lower(trim("firstName"))'}).order_by(
+    'lower_firstname').defer("mt")
     question_list = Question.objects.filter(assessment__id = assessment_id,
     active = 2).defer("assessment")
     studIdList, qNamesList, qIdList, chList, rDict, childDict,
     counter = [], [], [], [], {}, {}, 0
     paginator = Paginator(childs_list, 20)
-    page = request.GET.get('page')  #get page to show result
+    page = request.GET.get('page')  # get page to show result
     try:
-        page = int(page)# If page is there convert to inr
+        page = int(page)  # If page is there convert to inr
     except (ValueError, TypeError):
-        page = 1# else default page is 1
+        page = 1  # else default page is 1
     try:
         pagchilds_list = paginator.page(page)
     except (EmptyPage, InvalidPage):
@@ -160,8 +160,8 @@ programme_id, assessment_id):
         chId = child.id
         chList.append(chId)
         # Query for active student using child object
-        student = Student.objects.filter(child = child, active = 2).
-        defer("child")
+        student = Student.objects.filter(
+        child = child, active = 2).defer("child")
         studId = student[0].id
         # get Child and student information to show in grid.
         if child.dob:
@@ -210,9 +210,9 @@ programme_id, assessment_id):
             dataDict['scMax'] = ques.scoreMax
         qDict = {}
         # Query For Answers based on question id and studens
-        ansList = Answer.objects.select_related("user1").
-        filter(question = ques, student__id__in = studIdList).
-        defer("question").values()
+        ansList = Answer.objects.select_related("user1").filter(
+        question = ques, student__id__in = studIdList).defer(
+        "question").values()
         if ansList:
             for ansObj in ansList:
                 # If answers is there get answer Information
@@ -320,8 +320,8 @@ def MapStudents(request, id):
             'student_group': studentgroup, 'academic': academic,
             'active': 2}
             try:
-                sgRelObj = Student_StudentGroupRelation.objects.get
-                (student = student, student_group = studentgroup,
+                sgRelObj = Student_StudentGroupRelation.objects.get(
+                student = student, student_group = studentgroup,
                 academic = academic)
                 sgRelObj.active = 2
                 sgRelObj.save()
@@ -334,14 +334,14 @@ def MapStudents(request, id):
 
 
 urlpatterns = patterns('',
-    url(r'^boundary/institution/(?P<referKey>.*)
-    '/studentgroup/creator/$', KLP_StudentGroup_Create),
+    url(r'^boundary/institution/(?P<referKey>.*)\
+    /studentgroup/creator/$', KLP_StudentGroup_Create),
     url(r'^studentgroup/(?P<studentgroup_id>\d+)/view/?$',
     KLP_StudentGroup_View),
     url(r'^studentgroup/(?P<studentgroup_id>\d+)/update/?$',
     KLP_StudentGroup_Update),
-    url(r'^studentgroup/(?P<studentgroup_id>\d+)/programme
-    '/(?P<programme_id>\d+)/assessment/
-    '(?P<assessment_id>\d+)/view/?$',
+    url(r'^studentgroup/(?P<studentgroup_id>\d+)/programme\
+    /(?P<programme_id>\d+)/assessment/\
+    (?P<assessment_id>\d+)/view/?$',
     KLP_StudentGroup_Answer_Entry),
     url(r'^mapstudents/(?P<id>\d+)/$', MapStudents),)

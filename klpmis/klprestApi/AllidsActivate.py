@@ -19,7 +19,7 @@ from django.utils import simplejson
 from django.template import loader, RequestContext
 
 from django.core.mail import send_mail
-from production.settings import *
+from klpmis.settings import *
 from django.views.decorators.csrf import csrf_exempt
 #from django.conf import settings
 
@@ -63,8 +63,8 @@ def KLP_Activation(request):
             allids.append(int(k))
             modelDict = {1: Boundary, 2: Institution, 4: Programme,
             5: Assessment, 6: Question, 3: StudentGroup, 7: Staff, 8: Student}
-            obj = obj1 = modelDict[model_name1].objects.
-            filter(id__in=allids, active=2)
+            obj = obj1 = modelDict[model_name1].objects.filter(
+            id__in=allids, active=2)
 
             flag = len(obj1) != 0
             obj3 = modelDict[model_name1].objects.filter(id__in=allids)
@@ -74,14 +74,14 @@ def KLP_Activation(request):
                 idlist4 = []
                 for k in idslist3:
                     idlist4.append(k[0])
-                    resStr = obj1.model._meta.module_name + " Ids " + ','.
-                    join(str(v) for v in allids if v not in idlist4) +
-                    " are not exist .Please verify the ids ."
+                    resStr = obj1.model._meta.module_name + " Ids " + ','.join(
+                    str(v) for v in allids if v not in idlist4
+                    ) + "are not exist .Please verify the ids ."
             elif len(obj1) != 0:
                 idlist1 = obj1.values_list('id')
-                resStr = obj1.model._meta.module_name + " Ids " + ','.
-                join(str(v1[0]) for v1 in idlist1) +
-                " are already activated .Please verify the ids."
+                resStr = obj1.model._meta.module_name + " Ids " + ','.join(
+                str(v1[0]) for v1 in idlist1
+                ) + " are already activated .Please verify the ids."
             else:
                 obj2 = modelDict[model_name1].objects.filter(id__in=allids,
                 active=0)
@@ -93,10 +93,10 @@ def KLP_Activation(request):
                 SendingMail(idstr, obj2.model._meta.module_name)
                 receiver = settings.REPORTMAIL_RECEIVER
                 receiver = ','.join(str(v1) for v1 in receiver)
-                message = "A mail will be sent to % s as soon as all the
-                'records are activated ." % (receiver)
-                resStr = obj2.model._meta.module_name + " Ids " + idstr +
-                " are Successfully Activated. " + message
+                message = "A mail will be sent to % s as soon as all the\
+                records are activated ." % (receiver)
+                resStr = obj2.model._meta.module_name + " Ids " + idstr + "\
+                are Successfully Activated. " + message
         respDict = {"respStr": resStr, "isExecute": isExecute}
 
         return HttpResponse(simplejson.dumps(respDict),
@@ -108,8 +108,8 @@ def SendingMail(idlist, mname):
     sender = settings.REPORTMAIL_SENDER
     receiver = settings.REPORTMAIL_RECEIVER
     subject = "Activated list"
-    fullmsg = "Following % s Ids are Activated  :  \n % s " %
-    (mname, inst_liststr)
+    fullmsg = "Following % s Ids are Activated  :  \n % s " % (
+    mname, inst_liststr)
     send_mail(subject, fullmsg, sender, receiver)
 
 

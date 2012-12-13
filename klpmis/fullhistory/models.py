@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.core.serializers.json import DjangoJSONEncoder, simplejson
 from django import forms
 
@@ -43,15 +44,9 @@ class FullHistoryManager(models.Manager):
             pk = entry.pk
             ct = ContentType.objects.get_for_model(entry)
         else:
-<<<<<<< HEAD:klp/fullhistory/models.py
             ct = ContentType.objects.get_for_model(model)
         return self.get_query_set().filter(
         content_type=ct, object_id=pk).order_by('revision')
-=======
-            ct = ContentType.objects.get_for_model(model)   
-        return self.get_query_set().filter(content_type=ct, 
-                            object_id=pk).order_by('revision')
->>>>>>> c4fe4887ceb637424ee30c8a3353d73c856997d4:klpmis/fullhistory/models.py
 
     def audit(self, entry=None, model=None, pk=None):
         from fullhistory import get_all_data
@@ -61,12 +56,8 @@ class FullHistoryManager(models.Manager):
                 #!Truncates microseconds for datetime fields
                 if isinstance(value, datetime.datetime):
                     value = str(value.replace(microsecond=0))
-<<<<<<< HEAD:klp/fullhistory/models.py
                     assert obj[key] == value, ' % s does not match % s\
                     for attr %s' % (obj[key], value, key)
-=======
-                    assert obj[key] == value, ' % s does not match % s for attr %s' % (obj[key], value, key)
->>>>>>> c4fe4887ceb637424ee30c8a3353d73c856997d4:klpmis/fullhistory/models.py
         return obj
 
     def get_version(self, entry = None, model = None, pk = None,
@@ -88,12 +79,8 @@ class FullHistoryManager(models.Manager):
             for key, value in history.data.items():
                 if len(value) == 2:
                     if audit:
-<<<<<<< HEAD:klp/fullhistory/models.py
                         assert obj[key] == value[0], ' % s does not match\
                         % s for attr % s' % (obj[key], value[0], key)
-=======
-                        assert obj[key] == value[0], ' % s does not match % s for attr % s' % (obj[key], value[0], key)
->>>>>>> c4fe4887ceb637424ee30c8a3353d73c856997d4:klpmis/fullhistory/models.py
                         obj[key] = value[1]
                     else:
                         obj[key] = value[0]
@@ -134,10 +121,7 @@ class FullHistory(models.Model):
     action_time = models.DateTimeField(auto_now_add=True)
     _data = models.TextField(db_column='data')
     request = models.ForeignKey(Request, null=True, blank=True)
-<<<<<<< HEAD:klp/fullhistory/models.py
     #site = models.ForeignKey('Site', default=Site.objects.get_current)
-=======
->>>>>>> c4fe4887ceb637424ee30c8a3353d73c856997d4:klpmis/fullhistory/models.py
     action = models.CharField(max_length=1, choices=ACTIONS)
     info = models.TextField()
 
@@ -175,19 +159,11 @@ class FullHistory(models.Model):
                'D': u'%s Deleted', }[self.action] % user_name
         if self.action == 'U':
             for key, value in self.data.items():
-<<<<<<< HEAD:klp/fullhistory/models.py
                 if not isinstance(value, tuple) or len(value) != 2:
                 #fix for old admin
                     continue
                 ret += u'\n"%s" changed from [%s] to [%s]' % (
                 key, unicode(value[0])[:50], unicode(value[1])[:50])
-=======
-                if not isinstance(value, tuple) or len(value) != 2: 
-                    #fix for old admin
-                    continue
-                ret += u'\n"%s" changed from [%s] to [%s]' % (key, 
-                unicode(value[0])[:50], unicode(value[1])[:50])
->>>>>>> c4fe4887ceb637424ee30c8a3353d73c856997d4:klpmis/fullhistory/models.py
         return ret
 
     def previous(self):
@@ -196,11 +172,7 @@ class FullHistory(models.Model):
         '''
         return FullHistory.objects.get(content_type=self.content_type,
                                        object_id=self.object_id,
-<<<<<<< HEAD:klp/fullhistory/models.py
                                        revision=self.revision - 1)
-=======
-                                       revision=self.revision-1)
->>>>>>> c4fe4887ceb637424ee30c8a3353d73c856997d4:klpmis/fullhistory/models.py
 
     def next(self):
         '''
@@ -216,13 +188,8 @@ class FullHistory(models.Model):
         this change
         '''
         if self.request:
-<<<<<<< HEAD:klp/fullhistory/models.py
             return FullHistory.objects.filter(
             request=self.request).exclude(pk=self.pk)
-=======
-            return FullHistory.objects.filter(request=self.request).exclude(
-                                                                   pk=self.pk)
->>>>>>> c4fe4887ceb637424ee30c8a3353d73c856997d4:klpmis/fullhistory/models.py
         return FullHistory.objects.none()
 
     def save(self, *args, **kwargs):

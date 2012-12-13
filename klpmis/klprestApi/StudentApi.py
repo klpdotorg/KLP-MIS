@@ -37,12 +37,12 @@ def KLP_Student_Create(request, studentgroup_id, counter=0):
 
     buttonType = request.POST.get('form-buttonType')
     model = StudentGroup.objects.get(id=studentgroup_id)
-    mapStudent = request.GET.get('map_Student')
-    or request.POST.get('mapStudent') or 0
-    assessment_id = request.GET.get('assessment_id')
-    or request.POST.get('assessment_id') or 0
-    referKey = Institution.objects.get(id=model.institution.id).
-    boundary.id
+    mapStudent = request.GET.get(
+    'map_Student') or request.POST.get(
+    'mapStudent') or 0
+    assessment_id = request.GET.get('assessment_id') or request.POST.get(
+    'assessment_id') or 0
+    referKey = Institution.objects.get(id=model.institution.id).boundary.id
     #before Child.objects.all()
     queryset = Child.objects.filter(pk=0)
     print queryset
@@ -56,8 +56,8 @@ def KLP_Student_Create(request, studentgroup_id, counter=0):
     'modelName': "student", "mapStudent": mapStudent,
     'assessment_id': assessment_id, 'counter': counter}),
     receiver = XMLReceiver(),)
-    response = KLP_Create_Student.responder.
-    create_form(request, form_class=Child_Form)
+    response = KLP_Create_Student.responder.create_form(
+    request, form_class=Child_Form)
     return HttpResponse(response)
 
 
@@ -86,8 +86,8 @@ def KLP_Student_View(request, student_id):
     Student.objects.filter(pk=student_id),
     permitted_methods = ('GET', 'POST'),
     responder = TemplateResponder(template_dir =
-    'viewtemplates', template_object_name = 'student',),)
-    (request, student_id, **kwrg)
+    'viewtemplates', template_object_name = 'student',),)(
+    request, student_id, **kwrg)
     return HttpResponse(resp)
 
 
@@ -97,16 +97,16 @@ def KLP_Student_Update(request, student_id, counter=0):
     KLP_user_Perm(request.user, "Student", "Update")
     buttonType = request.POST.get('form-buttonType')
     #before Child.objects.all()
-    KLP_Edit_Student =KLP_Student(queryset =
-    Child.objects.filter(pk=student_id), permitted_methods
+    KLP_Edit_Student = KLP_Student(queryset = Child.objects.filter(
+    pk=student_id), permitted_methods
     = ('GET', 'POST'),
     responder = TemplateResponder(template_dir = 'edittemplates',
     template_object_name = 'child',
     extra_context={'buttonType': buttonType,
     'modelName': "student", 'counter': counter}),
     receiver = XMLReceiver(),)
-    response = KLP_Edit_Student.responder.
-    update_form(request, pk=student_id, form_class=Child_Form)
+    response = KLP_Edit_Student.responder.update_form(
+    request, pk=student_id, form_class=Child_Form)
 
     return HttpResponse(response)
 
@@ -123,14 +123,14 @@ def KLP_DeleteStudnet(request, id):
             # get Student Object to delete
             obj = Student.objects.get(child__id=stud_id)
             try:
-                relObjects = Student_StudentGroupRelation.
-                objects.filter(student = obj,
+                relObjects = Student_StudentGroupRelation.objects.filter(
+                student = obj,
                 academic=current_academic, active=2)
                 if relObjects.count() <= 1:
                     obj.active = 0
                     obj.save()
-                    sgRelObj = Student_StudentGroupRelation.
-                    objects.get(student = obj,
+                    sgRelObj = Student_StudentGroupRelation.objects.get(
+                    student = obj,
                     student_group__id=id,
                     academic=current_academic, active=2)
                     sgRelObj.active = 0
@@ -143,14 +143,14 @@ def KLP_DeleteStudnet(request, id):
         return HttpResponse
         ("All Selected Students has been deleted successfully")
     else:
-        return HttpResponse("Studens"+ delFailed+" Deletion Failed")
+        return HttpResponse("Studens" + delFailed + " Deletion Failed")
 
 
 urlpatterns = patterns('',
-    url(r'^studentgroup/(?P<studentgroup_id>.*)
-    '/student/creator/$', KLP_Student_Create),
-    url(r'^studentgroup/(?P<studentgroup_id>.*)
-    '/student/creator/(?P<counter>\d+)/$', KLP_Student_Create),
+    url(r'^studentgroup/(?P<studentgroup_id>.*)\
+    /student/creator/$', KLP_Student_Create),
+    url(r'^studentgroup/(?P<studentgroup_id>.*)\
+    /student/creator/(?P<counter>\d+)/$', KLP_Student_Create),
     url(r'^student/(?P<student_id>\d+)/view/?$', KLP_Student_View),
     url(r'^student/(?P<student_id>\d+)/update/?$', KLP_Student_Update),
     url(r'^student/(?P<student_id>\d+)/update/(?P<counter>\d+)/$',

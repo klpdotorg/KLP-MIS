@@ -6,7 +6,7 @@ from django_restapi.model_resource import Collection
 from django_restapi.responder import *
 from schools.models import *
 from django.http import *
-from production.klprestApi.Treeresponder import *
+from klprestApi.Treeresponder import *
 from django.db.models.query import QuerySet
 
 
@@ -22,22 +22,20 @@ permFilter, assessmentPerm, shPerm, userSel):
                 templist = [i.getPermissionChild(boundaryType),
                 i.getPermissionViewUrl()]
             elif assessmentPerm:
-                templist =
-                [i.getPermissionChild(boundaryType),
+                templist = [i.getPermissionChild(boundaryType),
                 i.getAssessmentPermissionViewUrl(secFilter[0])]
             elif shPerm:
-                templist =
-                [i.getPermissionChild(boundaryType),
+                templist = [i.getPermissionChild(boundaryType),
                 i.showPermissionViewUrl(userSel)]
             else:
                 templist = [i.getChild(boundaryType),
                 i.getViewUrl(boundaryType)]
-        elif  typ == 'institution' and filterBy !=
-        'None' and permFilter in ['', ' ', None]:
+        elif  typ == 'institution' and filterBy != 'None' and permFilter in [
+        '', ' ', None]:
             templist = []
             for secFil in secFilter:
-                mapObj = Assessment_StudentGroup_Association.
-                objects.filter(assessment__id
+                mapObj = Assessment_StudentGroup_Association.objects.filter(
+                assessment__id
                 =secFil, student_group=i, active=2)
                 if mapObj:
                     templist.append([i.getChild(),
@@ -66,10 +64,9 @@ def KLP_assignedInstitutions(userId):
 
 def KLP_assignedAssessmentInst(userId, assessmentId):
     """ This method returns assigned Assessments for the user"""
-    inst_list = UserAssessmentPermissions.
-    objects.filter(user__id=userId, assessment__id__in
-    =assessmentId, access=True).
-    values_list("instituion__id", flat=True).distinct()
+    inst_list = UserAssessmentPermissions.objects.filter(
+    user__id=userId, assessment__id__in=assessmentId, access=True).values_list(
+    "instituion__id", flat=True).distinct()
     return inst_list
 
 
@@ -81,113 +78,114 @@ def TreeClass(request):
     if filterBy != 'None' and secFilter != 'None':
         seclist = [secFilter]
         secFilter = seclist
-    if secFilter == 'None' and filterBy != 'None':
-        secFilter = GetAssementList(filterBy)
-        boundaryType = request.GET['boundTyp']
-        permFilter = request.GET.get('permission')
-        assessmentPerm = request.GET.get('assesspermission')
-        shPerm = request.GET.get('shPerm')
-        userSel = request.GET.get('userSel')
-        model = model.split('_')
-        typ = model[0]
-        logUser = request.user
-        klp_UserGroups = logUser.groups.all()
-        user_GroupsList = ['%s' % (usergroup.name) for
-        usergroup in klp_UserGroups]
-        if typ == "source":
-            # if type is source
-            if data:
-                # if home is true query for boundaries
-                if (logUser.is_superuser or logUser.is_staff or
-                'AdminGroup' in user_GroupsList) and filterBy == 'None':
-                    # if logged in user is super user or staff or
-                    #in AdminGroup and filterBy is none query all active
-                    #boundary's where parent is 1 and based on boundaryType
-                    query = Boundary.objects.
-                    filter(parent__id=1, active=2, boundary_type=boundaryType)
-                    .order_by("name").extra(select=
-                    {'lower_name': 'lower(name)'}).order_by("lower_name")
-            else:
-                if (logUser.is_superuser or logUser.is_staff or
-                'AdminGroup' in user_GroupsList):
-                    # if logged in user is super user or staff or
-                    #in AdminGroup and filterBy is not none query
-                    #all active SG's based on assessments
-                    print secFilter, 'sssssssssssssssss'
-                    studentgroup_list = Assessment_StudentGroup_Association.
-                    objects.filter(assessment__id__in=secFilter,
-                    active=2).values_list('student_group',
-                    flat=True).distinct()
-                    # Query institutions based SG's
-                    institutions_list = StudentGroup.objects.
-                    filter(id__in=studentgroup_list, active=2).
-                    values_list('institution__id', flat=True).distinct()
-            elif filterBy == 'None':
-                # if user is not superuser and not staff
-                #and not related to admin group and filterby is
-                #none get all assigned institutions.
-                institutions_list = KLP_assignedInstitutions(logUser.id)
+        if secFilter == 'None' and filterBy != 'None':
+            secFilter = GetAssementList(filterBy)
+            boundaryType = request.GET['boundTyp']
+            permFilter = request.GET.get('permission')
+            assessmentPerm = request.GET.get('assesspermission')
+            shPerm = request.GET.get('shPerm')
+            userSel = request.GET.get('userSel')
+            model = model.split('_')
+            typ = model[0]
+            logUser = request.user
+            klp_UserGroups = logUser.groups.all()
+            user_GroupsList = ['%s' % (usergroup.name) for
+            usergroup in klp_UserGroups]
+            if typ == "source":
+                # if type is source
+                if data:
+                    # if home is true query for boundaries
+                    if (logUser.is_superuser or logUser.is_staff or
+                    'AdminGroup' in user_GroupsList) and filterBy == 'None':
+                        # if logged in user is super user or staff or
+                        #in AdminGroup and filterBy is none query all active
+                        #boundary's where parent is 1 and based on boundaryType
+                        query = Boundary.objects.filter(
+                        parent__id=1, active=2,
+                        boundary_type=boundaryType).order_by(
+                        "name").extra(select=
+                        {'lower_name': 'lower(name)'}).order_by("lower_name")
+                else:
+                    if (logUser.is_superuser or logUser.is_staff or
+                    'AdminGroup' in user_GroupsList):
+                        # if logged in user is super user or staff or
+                        #in AdminGroup and filterBy is not none query
+                        #all active SG's based on assessments
+                        print secFilter, 'sssssssssssssssss'
+                        a = Assessment_StudentGroup_Association.objects.filter
+                        studentgroup_list = a(
+                        assessment__id__in=secFilter,
+                        active=2).values_list('student_group',
+                        flat=True).distinct()
+                        # Query institutions based SG's
+                        institutions_list = StudentGroup.objects.filter(
+                        id__in=studentgroup_list, active=2).values_list(
+                        'institution__id', flat=True).distinct()
+                    elif filterBy == 'None':
+                        # if user is not superuser and not staff
+                        #and not related to admin group and filterby is
+                        #none get all assigned institutions.
+                        institutions_list = KLP_assignedInstitutions(
+                        logUser.id)
             else:
                 # else query for institutions based on map Sg's
-                studentgroup_list = Assessment_StudentGroup_Association
-                .objects.filter(assessment__id__in=secFilter, active=2)
-                .values_list('student_group', flat=True).distinct()
-                map_institutions_list = StudentGroup.objects.
-                filter(id__in=studentgroup_list, active=2).
-                values_list('institution__id', flat=True).distinct()
+                ases = Assessment_StudentGroup_Association.objects.filter
+                studentgroup_list = ases(
+                assessment__id__in=secFilter, active=2).values_list(
+                'student_group', flat=True).distinct()
+                map_institutions_list = StudentGroup.objects.filter(
+                id__in=studentgroup_list, active=2).values_list(
+                'institution__id', flat=True).distinct()
 
                 institutions_list = list(set(map_institutions_list)
                 & set(KLP_assignedAssessmentInst(logUser.id, secFilter)))
-            try:
-                boundary_list = Boundary.objects.
-                filter(institution__pk__in=institutions_list, active=2,
-                boundary_type=boundaryType).
-                values_list('parent__parent__id', flat=True).distinct()
-            except:
-                boundary_list = Boundary.objects.
-                filter(institution__pk__in=institutions_list,
-                active=2, boundary_type=boundaryType).
-                values_list('parent__id', flat=True).distinct()
+                try:
+                    boundary_list = Boundary.objects.filter(
+                    institution__pk__in=institutions_list, active=2,
+                    boundary_type=boundaryType).values_list(
+                    'parent__parent__id', flat=True).distinct()
+                except:
+                    boundary_list = Boundary.objects.filter(
+                    institution__pk__in=institutions_list,
+                    active=2, boundary_type=boundaryType).values_list(
+                    'parent__id', flat=True).distinct()
 
-            query = Boundary.objects.
-            filter(pk__in=boundary_list, active=2, parent__id=1).
-            distinct().extra(select={'lower_name': 'lower(name)'}).
-            order_by("lower_name")
-    else:
-        # if data is not true query for all active programmes.
-        query = Programme.objects.
-        filter(active=2, programme_institution_category
-        =boundaryType).
-        extra(select={'lower_name': 'lower(name)'}).
-        order_by("-startDate", "-endDate", "lower_name")
-        typ = 'programme'
+                query = Boundary.objects.filter(
+                pk__in=boundary_list, active=2, parent__id=1).distinct().extra(
+                select={'lower_name': 'lower(name)'}).order_by("lower_name")
+        else:
+            # if data is not true query for all active programmes.
+            query = Programme.objects.filter(
+            active=2, programme_institution_category
+            =boundaryType).extra(
+            select={'lower_name': 'lower(name)'}).order_by(
+            "-startDate", "-endDate", "lower_name")
+            typ = 'programme'
     else:
         # typ is not source
         if typ == 'boundary':
             # if typ is boundary Query for sub boundaries or Institutions
             if (logUser.is_superuser or logUser.is_staff or
-            'AdminGroup' in user_GroupsList) and
-            filterBy == 'None':
+            'AdminGroup' in user_GroupsList) and filterBy == 'None':
                 # if logged in user is super user or staff or
                 #in AdminGroup and filterBy is none query all active
                 #boundary's where parent is 1 and based on boundaryType
                 query = Boundary.objects.filter(parent__id=model[1],
-                active=2, boundary_type=boundaryType).
-                extra(select={'lower_name': 'lower(name)'}).
-                order_by("lower_name")
+                active=2, boundary_type=boundaryType).extra(
+                select={'lower_name': 'lower(name)'}).order_by("lower_name")
         else:
             if (logUser.is_superuser or logUser.is_staff or 'AdminGroup'
             in user_GroupsList):
                 # if logged in user is super user or staff or in
                 #AdminGroup and filterBy is not none query all
                 #active SG's based on assessments
-                studentgroup_list = Assessment_StudentGroup_Association.
-                objects.filter(assessment__id__in=secFilter,
+                a = Assessment_StudentGroup_Association.objects.filter
+                studentgroup_list = a(assessment__id__in=secFilter,
                 active=2).values_list('student_group', flat=True).distinct()
                 # Query institutions based SG's
-                institutions_list = StudentGroup.objects.
-                filter(id__in=studentgroup_list, active=2).
-                values_list('institution_id', flat=True).distinct()
+                institutions_list = StudentGroup.objects.filter(
+                id__in=studentgroup_list, active=2).values_list(
+                'institution_id', flat=True).distinct()
             elif filterBy == 'None':
                 # if user is not superuser and not staff and not
                 #related to admin group and filterby is none get all
@@ -195,38 +193,37 @@ def TreeClass(request):
                 institutions_list = KLP_assignedInstitutions(logUser.id)
             else:
                 # else query for institutions based on map Sg's
-                studentgroup_list = Assessment_StudentGroup_Association.
-                objects.filter(assessment__id__in=secFilter, active=2)
-                .values_list('student_group', flat=True).distinct()
-                map_institutions_list = StudentGroup.objects.
-                filter(id__in=studentgroup_list, active=2).
-                values_list('institution_id', flat=True).distinct()
+                asess = Assessment_StudentGroup_Association.objects.filter
+                studentgroup_list = asess(assessment__id__in=secFilter,
+                active=2).values_list('student_group', flat=True).distinct()
+                map_institutions_list = StudentGroup.objects.filter(
+                id__in=studentgroup_list, active=2).values_list(
+                'institution_id', flat=True).distinct()
                 institutions_list = list(set(map_institutions_list)
                 & set(KLP_assignedAssessmentInst(logUser.id, secFilter)))
 
                 parentBoundary = Boundary.objects.get(id=model[1])
-                if parentBoundary.boundary_category.
-                boundary_category in ['district', ]:
+                if parentBoundary.boundary_category.boundary_category in [
+                'district', ]:
                     # Query for Boundaries based on institutions
-                    boundary_list = Boundary.objects.
-                    filter(institution__pk__in=institutions_list, active=2,
+                    boundary_list = Boundary.objects.filter(
+                    institution__pk__in=institutions_list, active=2,
                     boundary_type=boundaryType).values_list('parent',
                     flat=True).distinct()
                     query = Boundary.objects.filter(parent__id=model[1],
                     pk__in = boundary_list, active=2,
-                    boundary_type=boundaryType).distinct().
-                    extra(select={'lower_name': 'lower(name)'}).
-                    order_by("lower_name")
+                    boundary_type=boundaryType).distinct().extra(
+                    select={'lower_name': 'lower(name)'}).order_by(
+                    "lower_name")
                 else:
-                    boundaries = Boundary.objects.
-                    filter(parent__id=model[1],
+                    boundaries = Boundary.objects.filter(parent__id=model[1],
                     institution__pk__in=institutions_list,
-                    active=2, boundary_type=boundaryType).
-                    values_list('id', flat=True).distinct()
-                    query = Boundary.objects.
-                    filter(id__in=boundaries).
-                    extra(select={'lower_name': 'lower(name)'})
-                    .order_by("lower_name")
+                    active=2, boundary_type=boundaryType).values_list(
+                    'id', flat=True).distinct()
+                    query = Boundary.objects.filter(
+                    id__in=boundaries).extra(
+                    select={'lower_name': 'lower(name)'}).order_by(
+                    "lower_name")
 
         if not query:
             # If Query is Empty Query for Institutions under boundary
@@ -245,13 +242,13 @@ def TreeClass(request):
                     # if logged in user is super user or staff or
                     #in AdminGroup and filterBy is not none query all
                     #active SG's based on assessments
-                    studentgroup_list = Assessment_StudentGroup_Association.
-                    objects.filter(assessment__id__in=secFilter,
+                    a = Assessment_StudentGroup_Association.objects.filter
+                    studentgroup_list = a(assessment__id__in=secFilter,
                     active=2).values_list('student_group',
                     flat=True).distinct()
-                    institutions_list = StudentGroup.objects.
-                    filter(id__in=studentgroup_list, active=2).
-                    values_list('institution_id', flat=True).distinct()
+                    institutions_list = StudentGroup.objects.filter(
+                    id__in=studentgroup_list, active=2).values_list(
+                    'institution_id', flat=True).distinct()
                 elif filterBy == 'None':
                     # if user is not superuser and not staff and
                     # not related to admin group and filterby is
@@ -259,21 +256,21 @@ def TreeClass(request):
                     institutions_list = KLP_assignedInstitutions(logUser.id)
                 else:
                     # else query for institutions based on map Sg's
-                    studentgroup_list = Assessment_StudentGroup_Association.
-                    objects.filter(assessment__id__in=secFilter,
+                    a = Assessment_StudentGroup_Association.objects.filter
+                    studentgroup_list = a(assessment__id__in=secFilter,
                     active=2).values_list('student_group',
                     flat=True).distinct()
-                    map_institutions_list = StudentGroup.
-                    objects.filter(id__in=studentgroup_list, active=2).
-                    values_list('institution_id', flat=True).distinct()
-                    institutions_list = list(set(map_institutions_list)
-                    & set(KLP_assignedAssessmentInst(logUser.id, secFilter)))
+                    map_institutions_list = StudentGroup.objects.filter(
+                    id__in=studentgroup_list, active=2).values_list(
+                    'institution_id', flat=True).distinct()
+                    institutions_list = list(set(map_institutions_list) & set(
+                    KLP_assignedAssessmentInst(logUser.id, secFilter)))
 
-                    query = Institution.objects.
-                    filter(pk__in=institutions_list, boundary__id=model[1],
-                    active=2).distinct().
-                    extra(select={'lower_name': 'lower(name)'}).
-                    order_by("lower_name")
+                    query = Institution.objects.filter(
+                    pk__in=institutions_list, boundary__id=model[1],
+                    active=2).distinct().extra(
+                    select={'lower_name': 'lower(name)'}).order_by(
+                    "lower_name")
                     typ = 'sch'
 
         elif typ == 'programme':
@@ -288,23 +285,21 @@ def TreeClass(request):
             if typ == 'institution':
                 # if typ is Institution Query For active Sgs
                 if filterBy != 'None':
-                    studentgroup_list =
-                    Assessment_StudentGroup_Association.objects.
-                    filter(assessment__id__in=secFilter,
+                    a = Assessment_StudentGroup_Association.objects.filter
+                    studentgroup_list = a(assessment__id__in=secFilter,
                     student_group__institution__id=model[1],
                     active=2).values_list('student_group',
                     flat=True).distinct()
                     query = StudentGroup.objects.filter(institution__id =
-                    model[1], active=2, id__in=studentgroup_list).
-                    distinct().extra(select={'lower_class': 'lower(name)'}).
-                    order_by("lower_class", "section")
+                    model[1], active=2,
+                    id__in=studentgroup_list).distinct().extra(
+                    select={'lower_class': 'lower(name)'}).order_by(
+                    "lower_class", "section")
                 else:
-                    query = StudentGroup.objects.
-                    filter(institution__id = model[1],
+                    query = StudentGroup.objects.filter(
+                    institution__id = model[1],
                     active=2).extra(select={'lower_class':
                     'lower(name)'}).order_by("lower_class", "section")
-
-
         CDict = hasChild(query, typ, boundaryType,
         filterBy, secFilter, permFilter, assessmentPerm,
         shPerm, userSel)  # Checking for child objects
@@ -317,8 +312,8 @@ def TreeClass(request):
 
 def GetAssementList(programId):
     try:
-        Asslist = Assessment.objects.
-        filter(programme__id=programId, active=2).values_list('id', flat=True)
+        Asslist = Assessment.objects.filter(
+        programme__id=programId, active=2).values_list('id', flat=True)
         return Asslist
     except:
         return

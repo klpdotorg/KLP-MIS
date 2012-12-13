@@ -100,13 +100,8 @@ def adjust_history(obj, action='U'):
     if delta:
         ct = ContentType.objects.get_for_model(obj)
         try:
-<<<<<<< HEAD:klp/fullhistory/fullhistory.py
             history = get_active_histories().filter(
             content_type = ct, object_id = obj.pk).latest()
-=======
-            history = get_active_histories().filter(content_type = ct,
-            object_id = obj.pk).latest()
->>>>>>> c4fe4887ceb637424ee30c8a3353d73c856997d4:klpmis/fullhistory/fullhistory.py
         except FullHistory.DoesNotExist:
             history = FullHistory(content_object=obj,
                                   request=get_or_create_request(),

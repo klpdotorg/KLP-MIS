@@ -15,8 +15,8 @@ class KLP_Institution_Category(Collection):
     """ To create new Institution Category school-category/creator/ """
 
     def get_entry(self, institution_category_id):
-        institution_category = Institution_Category.
-        objects.all(id=institution_category_id)
+        institution_category = Institution_Category.objects.all(
+        id=institution_category_id)
         return ChoiceEntry(self, institution_category)
 
 
@@ -25,15 +25,15 @@ def KLP_Institution_Category_Create(request):
     buttonType = request.POST.get('form-buttonType')
     categoryType = request.GET.get('categoryType')
     #before Institution_Category.objects.all()
-    KLP_Institution_Category_Create = KLP_Institution_Category
-    (queryset=Institution_Category.objects.filter(pk=0),
-    permitted_methods=('GET', 'POST'), responder=
+    KLP_Institution_Category_Create = KLP_Institution_Category(
+    queryset=Institution_Category.objects.filter(pk=0), permitted_methods=(
+    'GET', 'POST'), responder=
     TemplateResponder(template_dir = 'viewtemplates',
     template_object_name = 'InstitutionCategory',
     extra_context={'buttonType': buttonType,
     'categoryType': categoryType}), receiver = XMLReceiver(),)
-    response = KLP_Institution_Category_Create.
-    responder.create_form(request, form_class=Institution_Category_Form)
+    response = KLP_Institution_Category_Create.responder.create_form(
+    request, form_class=Institution_Category_Form)
 
     return HttpResponse(response)
 

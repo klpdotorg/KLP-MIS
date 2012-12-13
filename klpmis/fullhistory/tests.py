@@ -3,13 +3,8 @@ import unittest
 from django.test import TestCase
 from django.test.client import Client
 from django.core import urlresolvers
-<<<<<<< HEAD:klp/fullhistory/tests.py
 #this app requires auth so we can do tests against it
 from django.contrib.auth.models import User
-=======
-from django.contrib.auth.models import User #this app requires auth,
-#so we can do tests against it
->>>>>>> c4fe4887ceb637424ee30c8a3353d73c856997d4:klpmis/fullhistory/tests.py
 from django.contrib import admin
 
 from models import *
@@ -191,13 +186,8 @@ class FullHistoryTest(TestCase):
         FullHistory.objects.audit(model=Test3Model, pk=pk)
 
         previous_revision = -1
-<<<<<<< HEAD:klp/fullhistory/tests.py
         for history in FullHistory.objects.actions_for_object(
         model = Test3Model, pk=pk):
-=======
-        for history in FullHistory.objects.actions_for_object
-        (model = Test3Model, pk = pk):
->>>>>>> c4fe4887ceb637424ee30c8a3353d73c856997d4:klpmis/fullhistory/tests.py
             self.assertEqual(previous_revision + 1, history.revision)
             previous_revision = history.revision
         #lets rollback to the 3rd version

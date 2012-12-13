@@ -6,21 +6,23 @@ from django.conf.urls import patterns, include, url
 
 urlpatterns = patterns('',
     # Examples:
-    # url(r'^$', 'klpmis.views.home', name='home'),
-    # url(r'^klpmis/', include('klpmis.foo.urls')),
+    #url(r'^$', 'klpmis.views.home', name='home'),
+    #url(r'^klpmis/', include('klpmis.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
-    # url(r'^admin/', include(admin.site.urls)),
-    # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
+    #url(r'^admin/', include(admin.site.urls)),
+    # Uncomment the admin/doc line below and add
+    #'django.contrib.admindocs'
     # to INSTALLED_APPS to enable admin documentation:
-    # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
-    (r'^admin/', include(admin.site.urls)),
-    (r'^static_media/(?P<path>.*)$', 'django.views.static.serve',{'document_root': 'static_media'}),
+    #(r'^admin/', include(admin.site.urls)),
+    (r'^static_media/(?P<path>.*)$', 'django.views.static.serve',
+    {'document_root': 'static_media'}),
     url(r'', include('klprestApi.HomeApi')),
     url(r'', include('klprestApi.TreeMenu')),
     url(r'', include('klprestApi.BoundaryApi')),
@@ -43,5 +45,4 @@ urlpatterns = patterns('',
     url(r'', include('klprestApi.KLP_AuditTrial')),
     url(r'', include('klprestApi.AllidsActivate')),
     url(r'', include('klprestApi.KLP_Common')),
-)
 )

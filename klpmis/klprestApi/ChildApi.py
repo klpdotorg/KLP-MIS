@@ -30,8 +30,8 @@ def KLP_Child_Create(request, referKey):
     'viewtemplates', template_object_name = 'child',
     extra_context={'buttonType': buttonType, 'referKey': referKey}),
     receiver = XMLReceiver(),)
-    response = KLP_Create_Child.responder.
-    create_form(request, form_class=Child_Form)
+    response = KLP_Create_Child.responder.create_form(
+    request, form_class=Child_Form)
     return HttpResponse(response)
 
 
@@ -57,8 +57,8 @@ def KLP_Child_Update(request, child_id):
     template_object_name = 'child',
     extra_context={'buttonType': buttonType, 'referKey': referKey}),
     receiver = XMLReceiver(),)
-    response = KLP_Edit_Child.responder.
-    update_form(request, pk=child_id, form_class=Child_Form)
+    response = KLP_Edit_Child.responder.update_form(
+    request, pk=child_id, form_class=Child_Form)
     return HttpResponse(response)
 
 
@@ -108,35 +108,34 @@ def getStudentSearch(request, boundary, fieldName, searchtext):
         child_list = Child.objects.filter(gender__startswith=searchtext,
         boundary__id = boundary).values_list('id', flat=True)
 
-    if fieldName=='mt':
+    if fieldName == 'mt':
         child_list = Child.objects.filter(mt__name__startswith=searchtext,
         boundary__id = boundary).values_list('id', flat=True)
 
-    if fieldName=='mother':
+    if fieldName == 'mother':
         child_list = Child.objects.filter(relations__relation_type="Mother",
         relations__name__startswith=searchtext,
         boundary__id = boundary).values_list('id', flat=True)
 
-    if fieldName=='father':
+    if fieldName == 'father':
         child_list = Child.objects.filter(relations__relation_type="Father",
         relations__name__startswith=searchtext,
         boundary__id = boundary).values_list('id', flat=True)
 
-        studentslist=Student.objects.exclude(child__id__in = child_list,
-        school__isnull=True).
-        values_list('child__id', flat=True)
-        queryset=Child.objects.filter(id__in = child_list,
-        boundary__id = boundary).exclude(id__in = studentslist).
-        order_by('firstName')
+        studentslist = Student.objects.exclude(child__id__in = child_list,
+        school__isnull=True).values_list('child__id', flat=True)
+        queryset = Child.objects.filter(id__in = child_list,
+        boundary__id = boundary).exclude(
+        id__in = studentslist).order_by('firstName')
         return queryset
 
 
 def ChildrenList(request, boundary_id):
     ''' To display the Child details according to Pagination'''
     queryset = []
-    reqlist= request.GET.items()
-    itemlist=[str(k[0]) for k in reqlist]
-    url = '/boundary/'+boundary_id+'/child/view/'
+    reqlist = request.GET.items()
+    itemlist = [str(k[0]) for k in reqlist]
+    url = '/boundary/' + boundary_id + '/child/view/'
     schools = School.objects.filter(boundary__id = boundary_id, active=2)
     studentGroups = StudentGroup.objects.filter(content_type__model
     ="boundary", object_id = boundary_id, active=2)
@@ -147,16 +146,16 @@ def ChildrenList(request, boundary_id):
         if 'fieldName' in itemlist or 'searchtext' in itemlist:
             fieldName = request.GET['fieldName']
             searchtext = request.GET['searchtext']
-            url+='?fieldName='+fieldName+'&searchtext='+searchtext
+            url += '?fieldName=' + fieldName + '&searchtext=' + searchtext
             queryset = getStudentSearch(request, boundary_id,
             fieldName, searchtext)
         else:
-            studentslist=Student.objects.filter(school__isnull
+            studentslist = Student.objects.filter(school__isnull
             =False).values_list('child__id', flat=True)
-            queryset=Child.objects.exclude(id__in
+            queryset = Child.objects.exclude(id__in
             = studentslist, boundary__id = boundary_id).order_by('firstName')
             boundary = Boundary.objects.get(pk = boundary_id)
-            val=Collection(queryset,
+            val = Collection(queryset,
             permitted_methods = ('GET', 'POST'),
             responder = TemplateResponder(
             paginate_by = 10,
@@ -175,14 +174,14 @@ class StdGrpFilter(Resource):
 
     def read(self, request, school_id):
         if 1:
-            stdgrp_list = StudentGroup.objects.
-            filter(content_type__model = "school",
+            stdgrp_list = StudentGroup.objects.filter(
+            content_type__model = "school",
             object_id = school_id, group_type="Class")
             respStr = ''
             for stdgrp in stdgrp_list:
                 respStr += '%s$$%s %s&&' % (stdgrp.id,
                 stdgrp.name, stdgrp.section)
-                return HttpResponse(respStr[0:len(respStr)-2])
+                return HttpResponse(respStr[0:len(respStr) - 2])
         else:
             return HttpResponse('fail')
 
@@ -192,8 +191,8 @@ def childsql(request, boundary_id):
     students_id = request.POST.getlist('students')
     count = 0
     studentgroup = request.POST['studentgroup']
-    if studentgroup =='None':
-        studentgroup=''
+    if studentgroup == 'None':
+        studentgroup = ''
         if children_id and studentgroup:
             studentgroup = StudentGroup.objects.get(pk = studentgroup)
             school = School.objects.get(pk = request.POST['school'])
@@ -207,8 +206,8 @@ def childsql(request, boundary_id):
                 param = {'id': None, 'student': stdobj[0],
                 'student_group': studentgroup,
                 'academic': academic, 'active': 2}
-                stdgrp_rels = Student_StudentGroupRelation.
-                objects.get_or_create(**param)
+                st = Student_StudentGroupRelation.objects.get_or_create
+                stdgrp_rels = st(**param)
                 count = count + 1
         elif students_id and studentgroup:
             studentgroup = StudentGroup.objects.get(pk = studentgroup)
@@ -221,11 +220,11 @@ def childsql(request, boundary_id):
                 param = {'id': None, 'student': stdobj[0],
                 'student_group': studentgroup,
                 'academic': academic, 'active': 2}
-                stdgrp_rels = Student_StudentGroupRelation.
-                objects.get_or_create(**param)
-                count = count+1
-    return HttpResponseRedirect('/boundary/'+str(boundary_id) +
-    '/child/view/?count='+str(count))
+                st = Student_StudentGroupRelation.objects.get_or_create
+                stdgrp_rels = st(**param)
+                count = count + 1
+    return HttpResponseRedirect('/boundary/' + str(boundary_id) +
+    '/child/view/?count=' + str(count))
 
 
 urlpatterns = patterns('',

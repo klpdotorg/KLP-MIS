@@ -7,8 +7,8 @@ import views
 
 
 class FullHistoryAdminSite(admin.AdminSite):
-
-    def get_urls(self): #django 1.1
+    #django 1.1
+    def get_urls(self):
         urls = super(FullHistoryAdminSite, self).get_urls()
 
         def wrap(view, model):
@@ -30,8 +30,8 @@ class FullHistoryAdminSite(admin.AdminSite):
                 (r'^%s/%s/(?P<object_id>.+)/history/audit/$' %
                 (model._meta.app_label, model._meta.module_name),
                     wrap(self.history_audit_view, model)),
-                url(r'^%s/%s/(?P<object_id>.+)/history/version/
-                '(?P<version>\d+)/$' % (model._meta.app_label,
+                url(r'^%s/%s/(?P<object_id>.+)/history/version/\
+                (?P<version>\d+)/$' % (model._meta.app_label,
                 model._meta.module_name),
                     wrap(self.history_version_view, model),
                     name='%sadmin_%s_%s_history_version' % info),
@@ -56,10 +56,10 @@ class FullHistoryAdminSite(admin.AdminSite):
         return views.history_audit(request,
                                     object_id,
                                     model,
-                                    ("admin/%s/%s/object_audit_
-                                    'fullhistory.html"
-                                    '% (opts.app_label, opts.
-                                    'object_name.lower()),
+                                    ("admin/%s/%s/object_audit_\
+                                    fullhistory.html"
+                                    % (opts.app_label, opts.
+                                    object_name.lower()),
                                     "admin/%s/object_audit_fullhistory.html"
                                     % opts.app_label,
                                     "admin/object_audit_fullhistory.html"),
@@ -72,17 +72,19 @@ class FullHistoryAdminSite(admin.AdminSite):
                                     object_id,
                                     version,
                                     model,
-                                    ("admin/%s/%s/object_
-                                    'version_fullhistory.html" %
-                                    '(opts.app_label, opts.object_
-                                    "admin/%s/object_version_
-                                    'fullhistory.html" % opts.app_label,
+                                    ("admin/%s/%s/\
+                                    object_version_fullhistory.html" % (
+                                    opts.app_label, opts.object_name.lower()),
+                                    "admin/%s/object_version_\
+                                    fullhistory.html" % opts.app_label,
                                     "admin/object_version_fullhistory.html"),
                                     {'root_path': self.root_path,
                                     'admin_name': self.name, })
 
+
 class FullHistoryAdmin(admin.ModelAdmin):
-    def get_urls(self): #django 1.1
+    #django 1.1
+    def get_urls(self):
         urls = super(FullHistoryAdmin, self).get_urls()
         info = self.admin_site.name, self.model._meta.app_label,
         self.model._meta.module_name
@@ -103,26 +105,25 @@ class FullHistoryAdmin(admin.ModelAdmin):
         return views.history_log(request,
                                  object_id,
                                  self.model,
-                                 ("admin/%s/%s/object_fullhistory.html" %
-                                 (opts.app_label, opts.object_name.lower()),
-                                  "admin/%s/object_fullhistory.html" %
-                                  opts.app_label,
-                                  "admin/object_fullhistory.html"),
-                                {'root_path': self.admin_site.root_path,
-                                 'admin_name': self.admin_site.name,})
+                                 ("admin/%s/%s/object_fullhistory.html" % (
+                                 opts.app_label, opts.object_name.lower()),
+                                 "admin/%s/\
+                                 object_fullhistory.html" % opts.app_label,
+                                 "admin/object_fullhistory.html"),
+                                 {'root_path': self.admin_site.root_path,
+                                 'admin_name': self.admin_site.name, })
 
     def history_audit_view(self, request, object_id):
         opts = self.model._meta
         return views.history_audit(request,
                                    object_id,
                                    self.model,
-                                   ("admin/%s/%s/object_audit_
-                                   'fullhistory.html" %
-                                   '(opts.app_label, opts.object_
-                                   'name.lower()),
-                                    "admin/%s/object_audit_fullhistory.html"
-                                    % opts.app_label,
-                                    "admin/object_audit_fullhistory.html"),
+                                   ("admin/%s/%s/object_audit_\
+                                   fullhistory.html" % (
+                                   opts.app_label, opts.object_name.lower()),
+                                   "admin/%s/object_audit_fullhistory.html"
+                                   % opts.app_label,
+                                   "admin/object_audit_fullhistory.html"),
                                    {'root_path': self.admin_site.root_path,
                                     'admin_name': self.admin_site.name, })
 
@@ -132,15 +133,14 @@ class FullHistoryAdmin(admin.ModelAdmin):
                                     object_id,
                                     version,
                                     self.model,
-                                    ("admin/%s/%s/object_
-                                    'version_fullhistory.html" %
-                                    '(opts.app_label, opts.object_
-                                    'name.lower()),
-                                    "admin/%s/object_version_
-                                    'fullhistory.html" % opts.app_label,
+                                    ("admin/%s/%s/\
+                                    object_version_fullhistory.html" % (
+                                    opts.app_label, opts.object_name.lower()),
+                                    "admin/%s/object_version_fullhistory.html"
+                                    % opts.app_label,
                                     "admin/object_version_fullhistory.html"),
                                     {'root_path': self.admin_site.root_path,
-                                    'admin_name': self.admin_site.name,})
+                                    'admin_name': self.admin_site.name, })
 
     def log_addition(self, request, obj):
         fullhistory.adjust_history(obj, 'A')

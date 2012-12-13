@@ -56,13 +56,8 @@ extra_context=None):
         obj = FullHistory.objects.restore(model, object_id,
         commit=False, audit=False)
     try:
-<<<<<<< HEAD:klp/fullhistory/views.py
         action = FullHistory.objects.actions_for_object(obj).get(
         revision=version)
-=======
-        action = FullHistory.objects.actions_for_object(obj).
-        get(revision=version)
->>>>>>> c4fe4887ceb637424ee30c8a3353d73c856997d4:klpmis/fullhistory/views.py
     except FullHistory.DoesNotExist:
         raise Http404()
     opts = model._meta

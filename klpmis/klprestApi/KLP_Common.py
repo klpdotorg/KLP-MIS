@@ -65,12 +65,12 @@ class KLP_Delete(Resource):
             filter(student_group__id = referKey).update(active=0)
             """
         if flag:
-            message = model_name1.lower() + " has child objects.
-            "So can not delete it.First delete the child object,
-            "then try to delete it"
+            message = model_name1.lower() + " has child objects\
+            So can not delete it.First delete the child object,\
+            then try to delete it"
         else:
-            obj.active = 0 # Change active to 0(object is deleted)
-            obj.save() # Save Data
+            obj.active = 0  # Change active to 0(object is deleted)
+            obj.save()  # Save Data
             message = "Deleted"
         return HttpResponse(message)
 

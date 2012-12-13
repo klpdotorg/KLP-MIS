@@ -10,14 +10,13 @@ def KLP_obj_Perm(userObj, instObj, permission, assessmentObj):
     """ This method is used to check user object level permissions """
     """ Get user, instance(Instituion), assessment objects to
     check permissions"""
-
-
-    # Check user is logged in or not if logged in, check user is active user or not
+    # Check user is logged in or not if logged in, check user is
+    #active user or not
     if (userObj.id is not None or userObj.is_active):
         # If true check user has permissions to access intitution and
         #assessment object
         chkPerm = False
-        userAsmList = UserAssessmentPermissions.objects.filter(user=userObj, 
+        userAsmList = UserAssessmentPermissions.objects.filter(user=userObj,
         instituion=instObj, assessment=assessmentObj).values()
         if userAsmList:
             chkPerm = userAsmList[0].get('access') or False
@@ -38,7 +37,7 @@ def KLP_user_Perm(userObj, modelName, operation):
     check permissions"""
     # get user groups
     klp_UserGroups = userObj.groups.all()
-    user_GroupsList = ['%s' %(str(usergroup.name))
+    user_GroupsList = ['%s' % (str(usergroup.name))
     for usergroup in klp_UserGroups]
     # check logged in user is active user or not
     if userObj.is_active:
@@ -97,7 +96,7 @@ def KLP_NewInst_Permission(sender, instance, created, **kwargs):
             for inst in inst_list:
                 # check user permission with institutions under boundary
                 userPerm.append(user.has_any_perms(inst, perms=['Acess']))
-            lenTrue = userPerm.count(True) # get count of instituions
+            lenTrue = userPerm.count(True)  # get count of instituions
             #where user has permission
             if lenTrue == lenInst - 1:
                 # if user has permission with all institutions under

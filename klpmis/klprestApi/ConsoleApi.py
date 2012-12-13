@@ -15,7 +15,7 @@ from django.template import RequestContext
 import psycopg2
 from django.utils import simplejson
 from django.views.decorators.csrf import csrf_exempt
-from production.settings import *
+from klpmis.settings import *
 from django.db import transaction
 
 

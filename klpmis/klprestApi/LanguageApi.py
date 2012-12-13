@@ -30,8 +30,8 @@ def KLP_Language_Create(request):
     template_object_name = 'Language',
     extra_context={'buttonType': buttonType}),
     receiver = XMLReceiver(),)
-    response = KLP_Language_Create.responder.
-    create_form(request, form_class=Moi_Type_Form)
+    response = KLP_Language_Create.responder.create_form(
+    request, form_class=Moi_Type_Form)
 
     return HttpResponse(response)
 

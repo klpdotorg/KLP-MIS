@@ -56,11 +56,11 @@ def KLP_audit(request):
         int(enDate[0]))), request__user_pk=selUser)
         respDict['fullHistoryList'] = fullHistoryList
         # return reponse to template
-        return render_to_response
-        ('viewtemplates/auditTrial.html', respDict,
+        return render_to_response(
+        'viewtemplates/auditTrial.html', respDict,
         context_instance = RequestContext(request))
-    return render_to_response
-    ('viewtemplates/auditTrial.html', respDict,
+    return render_to_response(
+    'viewtemplates/auditTrial.html', respDict,
     context_instance = RequestContext(request))
 
 

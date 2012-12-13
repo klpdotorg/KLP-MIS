@@ -40,8 +40,8 @@ def KLP_Assign_Permissions(request):
     # get permission type
     receiver = settings.REPORTMAIL_RECEIVER
     receiver = ','.join(str(v1) for v1 in receiver)
-    message = "A mail will be sent to %s as soon as
-    "all the permissions are assigned" % (receiver)
+    message = "A mail will be sent to %s as soon as\
+    all the permissions are assigned" % (receiver)
     permissionType = request.POST.get('permissionType')
     # get assessment Id to assign assessment permissions
     assessmentId = request.POST.get('assessmentId')
@@ -57,9 +57,9 @@ def KLP_Assign_Permissions(request):
     assessmentId, bound_cat,
     inst_list, bound_list,
     assessmentPermcount, asmCount, assignedAsmIds = 0, 0, []
-    bound_list=','.join(str(v1) for v1 in bound_list if v1 > 0)
-    permissions=','.join(str(v1) for v1 in permissions if v1 > 0)
-    deUserList=','.join(str(v1) for v1 in deUserList if v1 > 0)
+    bound_list = ','.join(str(v1) for v1 in bound_list if v1 > 0)
+    permissions = ','.join(str(v1) for v1 in permissions if v1 > 0)
+    deUserList = ','.join(str(v1) for v1 in deUserList if v1 > 0)
     if not deUserList:
         # If no users selected respond back with error message
         #(Select Atleast One User)
@@ -108,14 +108,14 @@ def KLP_Assign_Permissions(request):
             #institution objects to user
             count = count + len(inst_list)
             # call assignPermission method to assign permissions
-            inst_list=','.join(str(v1) for v1 in inst_list if v1 > 0)
+            inst_list = ','.join(str(v1) for v1 in inst_list if v1 > 0)
             print "FDFDF", bound_cat, bound_list, "HREEEEEEE"
             Popen(["python", "/home/klp/production/manage.py",
             "KLP_assignPermissions", str(inst_list), str(deUserList),
             str(permissions), str(permissionType), str(assessmentId),
             str(assessmentPerm), bound_cat, str(bound_list).strip(),
             request.user.username])
-            respDict['respMsg'] = message #'Assigned Permissions
+            respDict['respMsg'] = message  # Assigned Permissions
             #successfully for  %s Institutions' %(count)
             respDict['isSuccess'] = True
             #Tosendmailteam(inst_list,deUserList,permissions,
@@ -128,52 +128,53 @@ def assignPermission(inst_list, deUserList, permissions, permissionType,
 assessmentId=None, assessmentPerm=None):
     assignedAsmIds = []
     print inst_list, "SSSSSSSSSSs"
-    assignedInsIds=[]
+    assignedInsIds = []
     if assessmentId:
         assessmentObjsel = Assessment.objects.get(id=assessmentId)
     for inst_id in inst_list:
         # get Institution object using id
-        inst_id=int(inst_id)
+        inst_id = int(inst_id)
         instObj = Institution.objects.get(pk=inst_id)
         for deUser in deUserList:
             # get user object
-            deUser=int(deUser)
+            deUser = int(deUser)
             userObj = User.objects.get(id=deUser)
             if assessmentPerm!=None and assessmentPerm!='None':
-                uobj=UserAssessmentPermissions.objects.
-                filter(user=userObj, instituion= instObj,
+                uobj = UserAssessmentPermissions.objects.filter(
+                user=userObj, instituion= instObj,
                 assessment=assessmentObjsel)
                 if uobj:
-                    uflag=True
+                    uflag = True
                 else:
-                    uflag=False
-                else:
-                    uflag=True
-                    if uflag:
-                        print userObj, permissionType
-                        assignedInsIds.append(inst_id)
+                    uflag = False
+            else:
+                uflag = True
+                if uflag:
+                    print userObj, permissionType
+                    assignedInsIds.append(inst_id)
             if permissionType == 'permissions':
                 # if permission type is permissions set institution
                 #level permissions for the user
                 userObj.set_perms(permissions, instObj)
-                if assessmentPerm!=None and assessmentPerm!='None':
+                if assessmentPerm != None and assessmentPerm != 'None':
                     # if assessmentPerm is true assign assessment
                     #also to the user.
-                    sg_list = StudentGroup.objects.
-                    filter(institution__id=inst_id).values_list('id',
+                    sg_list = StudentGroup.objects.filter(
+                    institution__id=inst_id).values_list('id',
                     flat=True).distinct()
                     print sg_list[:10], inst_id
                     #print sg_list
-                    asmIds = Assessment_StudentGroup_Association.
-                    objects.filter(student_group__id__in=sg_list,
+                    asess = Assessment_StudentGroup_Association.objects.filter
+                    asmIds = asess(
+                    student_group__id__in=sg_list,
                     active=2).values_list("assessment__id",
                     flat=True).distinct()
                     print asmIds
                     for asmId in asmIds:
                         assessmentObj = Assessment.objects.get(id=asmId)
                         try:
-                            permObj = UserAssessmentPermissions.
-                            objects.get(user = userObj,
+                            permObj = UserAssessmentPermissions.objects.get(
+                            user = userObj,
                             instituion = instObj,
                             assessment = assessmentObj)
                             permObj.access = True
@@ -192,8 +193,8 @@ assessmentId=None, assessmentPerm=None):
                 # else assign assessment permissions to user.
                 assessmentObj = Assessment.objects.get(pk=assessmentId)
                 try:
-                    permObj = UserAssessmentPermissions.objects.
-                    get(user = userObj, instituion = instObj,
+                    permObj = UserAssessmentPermissions.objects.get(
+                    user = userObj, instituion = instObj,
                     assessment = assessmentObj)
                     permObj.access = True
                     permObj.save()
@@ -217,11 +218,11 @@ def KLP_Users_list(request):
         KLP_user_Perm(request.user, "Users", None)
         # get all active(1) users list other than staff and
         #super user order by username
-        user_list = User.objects.filter(is_staff=0, is_superuser=0).
-        order_by("username")
+        user_list = User.objects.filter(is_staff=0, is_superuser=0).order_by(
+        "username")
         # render show users form with users list
-        return render_to_response
-        ('viewtemplates/show_users_form.html',
+        return render_to_response(
+        'viewtemplates/show_users_form.html',
         {'user_list': user_list, 'user': user, 'title': 'KLP Users',
         'legend': 'Karnataka Learning Partnership',
         'entry': "Add"}, context_instance=RequestContext(request))
@@ -240,8 +241,8 @@ def KLP_User_Activate(request, user_id):
             userObj = User.objects.get(pk=user_id)
             userObj.is_active = 1  # activate user
             userObj.save()  # save user object
-            return render_to_response
-            ('viewtemplates/userAction_done.html',
+            return render_to_response(
+            'viewtemplates/userAction_done.html',
             {'user': request.user, 'selUser': userObj,
             'message': 'User Activated Successfully',
             'legend': 'Karnataka Learning Partnership',
@@ -270,8 +271,8 @@ def KLP_User_Delete(request, user_id):
         #userObj.set_password(randomStr)
         # replace password with random string
         userObj.save()  # save user object
-        return render_to_response
-        ('viewtemplates/userAction_done.html',
+        return render_to_response(
+        'viewtemplates/userAction_done.html',
         {'user': request.user, 'selUser': userObj,
         'message': 'User Deletion Successful',
         'legend': 'Karnataka Learning Partnership',
@@ -313,73 +314,71 @@ def KLP_User_Permissions(request, user_id):
 
 def KLP_Show_Permissions(request, boundary_id, user_id):
     """ This method is used to show user permissions """
-    userObj = User.objects.get(pk=user_id) # get user object
+    userObj = User.objects.get(pk=user_id)  # get user object
     boundType_List = Boundary_Type.objects.all()  # get all boundary types
     # get session value, if session is not set default value is 0
     try:
         sessionVal = int(request.session['session_sch_typ'])
     except:
         sessionVal = 0
-    redUrl = '/list/%s/user/%s/permissions/' %(boundary_id, user_id)
+    redUrl = '/list/%s/user/%s/permissions/' % (boundary_id, user_id)
     # get all assigned institutions to the user
     assignedInst = Institution.objects.select_
-    related("boundary").filter(Q(boundary__id=
-    boundary_id)|Q(boundary__parent__id=boundary_id)|
-    Q(boundary__parent__parent__id=boundary_id),
+    related("boundary").filter(
+    Q(boundary__id=boundary_id) | Q(
+    boundary__parent__id = boundary_id) | Q(
+    boundary__parent__parent__id = boundary_id),
     active=2).extra(where
     =['''schools_institution.id in (SELECT
     "obj_id" FROM "public"."object_permissions_institution_perms"
-    WHERE "user_id" = '%s' AND "Acess" = 't')'''
-    % (user_id)]).only("id", "name", "boundary").
-    order_by("boundary", "boundary__parent", "name")
+    WHERE "user_id" = '%s' AND "Acess" = 't')''' % (
+    user_id)]).only("id", "name", "boundary").order_by(
+    "boundary", "boundary__parent", "name")
 
     assignedInstIds = assignedInst.values_list("id", flat=True)
     # get unassigned institutions based on assigned institutions
-    unAssignedInst = Institution.objects.
-    select_related("boundary").
-    filter(Q(boundary__id=boundary_id)|
-    Q(boundary__parent__id=boundary_id)|
+    unAssignedInst = Institution.objects.select_related("boundary").filter(
+    Q(boundary__id=boundary_id) |
+    Q(boundary__parent__id=boundary_id) |
     Q(boundary__parent__parent__id=boundary_id),
-    active=2).exclude(pk__in=assignedInstIds).
-    only("id", "name", "boundary").
-    order_by("boundary", "boundary__parent", "name")
-
-
+    active=2).exclude(pk__in=assignedInstIds).only(
+    "id", "name", "boundary").order_by(
+    "boundary", "boundary__parent", "name")
     # get all assigned assessment objects
-    assignedpermObjects = UserAssessmentPermissions.
-    objects.select_related("assessment", "instituion")
-    .filter(Q(instituion__boundary__id=
-    boundary_id)|Q(instituion__boundary__parent__id
-    =boundary_id)|Q(instituion__boundary__parent__
-    parent__id=boundary_id), user=userObj,
-    access=True).defer("access").
-    order_by("instituion__boundary",
+    assignedpermObjects = UserAssessmentPermissions.objects.select_related(
+    "assessment", "instituion").filter(
+    Q(instituion__boundary__id=boundary_id) | Q(
+    instituion__boundary__parent__id
+    =boundary_id) | Q(instituion__boundary__parent__parent__id=boundary_id),
+    user=userObj,
+    access=True).defer("access").order_by(
+    "instituion__boundary",
     "instituion__boundary__parent", "instituion__name",)
-    unMapObjs = Assessment_StudentGroup_Association.
-    objects.select_related("student_group",
-    "assessment").filter(Q(student_group__institution
-    __boundary__id=boundary_id)|
-    Q(student_group__institution__boundary__parent__id
-    =boundary_id)|
-    Q(student_group__institution__boundary__parent__parent__id
-    =boundary_id), active=2).defer("active").
-    order_by("student_group__institution__boundary",
+    unMapObjs = Assessment_StudentGroup_Association.objects.select_related(
+    "student_group",
+    "assessment").filter(Q(
+    student_group__institution__boundary__id=boundary_id) | Q(
+    student_group__institution__boundary__parent__id
+    =boundary_id) | Q(
+    student_group__institution__boundary__parent__parent__id=boundary_id),
+    active=2).defer("active").order_by(
+    "student_group__institution__boundary",
     "student_group__institution__boundary__parent",
     "student_group__institution__name")
     for assignedPermObj in assignedpermObjects:
-        qsets = (Q(assessment = assignedPermObj.assessment)
-        &Q(student_group__institution = assignedPermObj.instituion))
+        qsets = (Q(assessment = assignedPermObj.assessment) & Q(
+        student_group__institution = assignedPermObj.instituion))
         unMapObjs = unMapObjs.exclude(qsets)
         unMapList = unMapObjs.values_list("student_group__institution",
         "assessment").distinct()
         # get all unassigned assessment objects
-        qList=[Assessment_StudentGroup_Association.
-        objects.select_related("student_group", "assessment").
-        filter(student_group__institution__id=unMapVal[0],
+        qList = [Assessment_StudentGroup_Association.objects.select_related(
+        "student_group", "assessment").filter(
+        student_group__institution__id=unMapVal[0],
         assessment__id = unMapVal[1]).defer("active")[0]
         for unMapVal in unMapList]
-    return render_to_response
-    ('viewtemplates/show_permissions.html',
+    return render_to_response(
+    'viewtemplates/show_permissions.html',
     {'assignedInst': assignedInst, 'userId': user_id,
     'userName': userObj.username,
     'unAssignedInst': unAssignedInst,
@@ -389,8 +388,8 @@ def KLP_Show_Permissions(request, boundary_id, user_id):
 
 
 def KLP_Show_User_Permissions(request, boundary_id, user_id):
-    return render_to_response
-    ('viewtemplates/show_permissions.html',
+    return render_to_response(
+    'viewtemplates/show_permissions.html',
     {'userId': user_id, 'boundary_id': boundary_id,
     'confirmMsg': True},
     context_instance=RequestContext(request))
@@ -437,7 +436,7 @@ def KLP_ReAssign_Permissions(request, permissionType):
     permissions = ['Acess']
     opStatus = "success"
     try:
-        if permissionType== 'permissions':
+        if permissionType == 'permissions':
             # if permissionsType is permissions assign instituions to user
             # get selected institution list
             inst_list = request.POST.getlist('unassignedInst')
@@ -467,9 +466,9 @@ urlpatterns = patterns('',
     url(r'^user/(?P<user_id>\d+)/delete?$', KLP_User_Delete),
     url(r'^user/(?P<user_id>\d+)/activateuser?$', KLP_User_Activate),
     url(r'^user/(?P<user_id>\d+)/permissions/?$', KLP_User_Permissions),
-    url(r'^list/(?P<boundary_id>\d+)/user/(?P<user_id>\d+)
-    '/permissions/?$', KLP_Show_Permissions),
+    url(r'^list/(?P<boundary_id>\d+)/user/(?P<user_id>\d+)\
+    /permissions/?$', KLP_Show_Permissions),
     url(r'^revoke/user/(?P<permissionType>\w+)/?$', KLP_Revoke_Permissions),
     url(r'^assign/user/(?P<permissionType>\w+)/?$', KLP_ReAssign_Permissions),
-    url(r'^show/(?P<boundary_id>\d+)/user/(?P<user_id>\d+)
-    '/permissions/?$', KLP_Show_User_Permissions),)
+    url(r'^show/(?P<boundary_id>\d+)/user/(?P<user_id>\d+)\
+    /permissions/?$', KLP_Show_User_Permissions),)
