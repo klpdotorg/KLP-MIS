@@ -3,3 +3,5 @@
 *.csv
 settings.py
 *.log
+*.swo
+*.swp
