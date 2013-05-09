@@ -30,6 +30,43 @@ var KLP_TreeBLK = function(treeUrl){
 	});
 }
 
+/* Edit the the asessement lookup edit*/
+var KLP_EditEvent2=function(){
+
+        lookupId=$(this).attr('id');
+                
+                valueTDObj=$('#'+lookupId+'_value');
+                desTDObj=$('#'+lookupId+'_des');
+                CurObj=$(this);
+                Curhtml=CurObj.html();
+                if(Curhtml=='Edit'){
+                
+                
+                valueTDObj.html('<input type="text" value="'+valueTDObj.html()+'" id="'+lookupId+'_valueinput" name="'+lookupId+'_value">');
+                desTDObj.html('<input type="text" value="'+desTDObj.html()+'" id="'+lookupId+'_desinput" name="'+lookupId+'_des">');
+                CurObj.html('Save');
+                }
+                else{
+                $.post(
+                "/assessment_lookup_value/inlineedit/",
+                'lookupId='+lookupId+'&name='+$('#'+lookupId+'_valueinput').val()+'&des='+$('#'+lookupId+'_desinput').val(),
+                function(data){ 
+                        
+                        $("#"+lookupId+'_status').html(data);
+                        $("#"+lookupId+'_status').show();
+                        if(data=='Data Saved'){
+                           valueTDObj.html($('#'+lookupId+'_valueinput').val())
+                           desTDObj.html($('#'+lookupId+'_desinput').val());
+                           }
+                         
+                CurObj.html('Edit');
+                
+                });
+                
+                }
+        return false;
+}
+
 
 /* KLP_Set_Session is used to change or set session value, on change of boundary type value */
 var KLP_Set_Session = function(typVal){
@@ -88,16 +125,16 @@ var KLP_Del = function(referKey,type, msgText){
                 $.ajax({                    
                 	url: '/delete/'+type+'/'+referKey+'/',
                 	success: function(data) {
-                          if(data=='Deleted'){
-				nodeId.remove();
+				//nodeId.remove();
+                                 if(type=='staff'){
+                                                  $("#staff_"+referKey).remove();
+                                        }
+                                 else{
 				$("#dyncData").html("");
+                                      nodeId.remove();
+                                            }
 				$("#klp_MsgTxt").html(" Sucessfully deleted "+msgType+'  '+msgText);
 				$("#successMsgHead").show();
-                                 }
-                           else{
-                                   $('#klp_fail_MsgTxt').html(data);
-                                  $('#failureMsgHead').show();
-                         }
                     }
                 });
         }
@@ -161,6 +198,8 @@ var KLP_Hide_Msg = function(){
 var KLP_Create_Node = function(thisObj,ObjValue){
 	currentId=thisObj;
 	ccid = currentId.attr('id');
+	ObjValues=ObjValue.split('_');
+	ObjValue=ObjValues[0];
         if (typeof ccid=='undefined' ){
         	currentId=$('#treeBlk');
                 ObjValue='boundary';
@@ -169,9 +208,15 @@ var KLP_Create_Node = function(thisObj,ObjValue){
         else{
         	ObjId = $('#'+ObjValue+'_id').val();
         }
-	newChildId = (ObjValue+'_'+$('#'+ObjValue+'_id').val());
+        syncflag=true;
+        if (ObjValues.length==2){
+        
+          syncflag=false;
+        }  
+	newChildId = ObjValue+'_'+$('#'+ObjValue+'_id').val();
 	$.ajax({
 		url: '/createnew/'+ObjValue+'/'+ObjId+'/',
+                        async:syncflag,
             	data: 'boundaryType='+$("#boundary_type").val(),
             	success: function(data) {
             		curentHtml=currentId.html();
@@ -201,10 +246,10 @@ var KLP_Create_Node = function(thisObj,ObjValue){
                        $("#"+curId).treeview({
                        		add: topbranch,
                        });
-                       
+                       if(ObjValues.length!=2){
                        var newNode = $('#'+newChildId).find("a:first");
 		       KLP_BredaCrumb(newNode);
-		       
+		       }
                        return false;
 		        
 		}
@@ -272,6 +317,7 @@ var KLP_validateScript=function(formId){
         		$("#failureMsgHead").hide();
         		var txtFields = $(form).find("input[type=text]:visible");
         	        DeFlag=false		
+                        
        			txtFields.each(function(index){
        				isDE = $(this).attr("dE");
        				tempAt = "#"+$(this).attr("id");
@@ -283,8 +329,10 @@ var KLP_validateScript=function(formId){
        				}
        				
        			});
+                        
        			if (DeFlag == true && count == txtFields.length){ 
        			    errLength = $(form).children().find('label.error:visible').length
+                            //alert(errLength);
        			    if (errLength == 0){
 			   		KLP_post_script(form,formName)
 			    }
@@ -308,8 +356,21 @@ var KLP_post_script=function(form,formName){
 		"/answer/data/entry/",
 		$(form).serialize(),
 		function(data){	
-			$("#"+formName+"_status").html(data);
-			$("#"+formName+"_status").show();
+			statusObj=$("#"+formName).find('#formcounter');
+			//$("#id_Student"+statusObj.val()+"_status").html(data);
+			//$("#id_Student"+statusObj.val()+"_status").show();
+                        successData=data.split('|');
+			$("#id_Student_"+$("#"+formName).find('#formcounter').val()+"_status").html(successData[0]);
+                        //set the saved ansId
+                        if (successData.length==2){
+                         ansObjs=$("#"+formName).find('.ansIds');
+                         ansVals=successData[1].split(',');
+                         $.each(ansObjs,function(index,val ){
+                                $(this).val(ansVals[index]);
+                         })  
+
+                       }  
+			$("#id_Student_"+$("#"+formName).find('#formcounter').val()+"_status").show();
 			var txtFields = $(form).find("input[type=text]:visible");
 			txtFields.each(function(index){
        				isSE = $(this).attr("sE");

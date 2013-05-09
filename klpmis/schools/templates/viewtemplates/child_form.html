@@ -1,5 +1,6 @@
 {% load template_tags %}
-<div id="popData">
+<div id="popData1"></div>
+{% if extra_context|displayValue:'reload' == False or extra_context|displayValue:'reload' == ''%}
 <script type="text/javascript" src="/static_media/js/jquery.js"></script>
 <script language="javascript" type="text/javascript" src="/static_media/js/niceforms.js"></script>
 <script type="text/javascript" src="/static_media/js/thickbox.js" charset="utf-8"></script>
@@ -8,6 +9,8 @@
 <link rel="stylesheet" type="text/css" media="all" href="/static_media/css/thickbox.css" charset="utf-8"/>
 <link rel="stylesheet" type="text/css" media="all" href="/static_media/css/form.css" />
 <link rel="stylesheet" type="text/css" media="all" href="/static_media/css/style.css" />
+{% endif %}
+<div id="popData">
 <form action="." method="POST" enctype="multipart/form-data" id="childForm" onsubmit="return false;" >{% csrf_token %}
 			    {% if not extra_context|displayValue:'modelName' %}
                             <input type="hidden" name="url" value="/boundary/{{extra_context|displayValue:'referKey'}}/child/creator/" id="url" />
@@ -53,11 +56,11 @@
 				<tr>
 				    <!-- render all fields for child -->
 				    <td align="center">
-					{% render_field entryForm.firstName 'tabindex=1' %}
+					{% render_field entryForm.first_name 'tabindex=1' %}
 				    </td>
 				   
 				    <td align="center">
-					{% render_field entryForm.lastName 'tabindex=1' %}
+					{% render_field entryForm.last_name 'tabindex=1' %}
 				    </td>
 				   
 				   
@@ -72,7 +75,7 @@
 					<input type="hidden" name="form-0-child" id="id_child" size="15" value=""/>
 					<input type="hidden" name="form-0-boundary" id="id_boundary" size="15" value="{{extra_context|displayValue:'referKey'}}"/>
 					<input type="hidden" name="form-0-active" id="id_active" size="15" value="2"/>
-					<input type="hidden" name="ModelName" id = "model" value="{{extra_context|displayValue:'modelName'}}" />
+					<input type="hidden" name="form-0-ModelName" id = "model" value="{{extra_context|displayValue:'modelName'}}" />
 				    </td>
 				    <td align="center">&nbsp;</td> 
 				    <td align="center">
@@ -90,7 +93,7 @@
 					{% render_field entryForm.uid 'tabindex=1' %}
 				    </td>
 				     <td align="center">
-					{% render_field entryForm.middleName 'tabindex=1' %}
+					{% render_field entryForm.middle_name 'tabindex=1' %}
 				    </td>
 				    <td align="center">
 					<input type="text" name = "form-0-mothermiddlename" id="id_form-0-mothermiddlename" tabindex='1' size=8 value="{{extra_context|dictValue:'form-0-mothermiddlename'}}" />
@@ -116,13 +119,13 @@
 				<tr>
 				   <!-- Show error msgs if field id not valid -->
 				   <td align="center">
-                                    	{% for error in entryForm.firstName.errors %}
+                                    	{% for error in entryForm.first_name.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
                                     </td>
 				    
 				    <td align="center">
-                                    	{% for error in entryForm.lastName.errors %}
+                                    	{% for error in entryForm.last_name.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
                                     </td>
@@ -145,7 +148,7 @@
 	                                {% endfor %}
                                     </td>
                                     <td align="center" colspan="3">
-                                    	{% for error in entryForm.first_name.errors %}
+                                    	{% for error in entryForm.errors.fatherfirstname %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
                                     </td>
@@ -157,7 +160,7 @@
                                     </td>
 
                                        <td align="center">
-                                        {% for error in entryForm.middleName.errors %}
+                                        {% for error in entryForm.middle_name.errors %}
                                                 <span class="editErr">{{ error }}</span>
                                         {% endfor %}
                                     </td>
@@ -195,6 +198,8 @@
     
     
    var KLP_form_submit = function(parentVal,parentId ){
+    var d = new Date();
+
    	$("#id_save").attr("disabled", "true");
         modelName=$('#model').val();
         var studentgroup_id = $('#id_studentgroup').val()
@@ -220,7 +225,7 @@
 			    //window.parent.parent.tb_init('a.thickbox, area.thickbox, input.thickbox');
 			    var successStatus = $("#success_status").val();
 		            if (successStatus == 'True'){
-		            	$("body").html("Student Created Successfully");
+		            	$("body").html("Student Created Successfully "+d.getTime());
 				if (modelName != 'student') {
 					$("#successMsgHead").show();
 					$("#klp_MsgTxt").html("Child Created Successfully")

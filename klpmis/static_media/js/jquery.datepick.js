@@ -1475,16 +1475,16 @@ $.extend(Datepicker.prototype, {
 	/* Set the selected date(s) for a datepicker.
 	   @param  target   (element) the control to examine
 	   @param  dates    (CDate or number or string or [] of these) the selected date(s)
-	   @param  endDate  (CDate or number or string) the ending date for a range (optional)
+	   @param  end_date  (CDate or number or string) the ending date for a range (optional)
 	   @param  keyUp    (boolean, internal) true if coming from keyUp processing
 	   @param  setOpt   (boolean, internal) true if coming from option processing */
-	setDate: function(target, dates, endDate, keyUp, setOpt) {
+	setDate: function(target, dates, end_date, keyUp, setOpt) {
 		var inst = $.data(target, this.dataName);
 		if (inst) {
 			if (!$.isArray(dates)) {
 				dates = [dates];
-				if (endDate) {
-					dates.push(endDate);
+				if (end_date) {
+					dates.push(end_date);
 				}
 			}
 			var dateFormat = inst.get('dateFormat');

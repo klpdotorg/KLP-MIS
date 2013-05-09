@@ -32,7 +32,8 @@
 		    								{% with childDict|displayValue:i as cDic %}
 										<td class="KLP_td_width">{{cDic|displayValue:'studId'}}</td>
 										<td class="KLP_td_width" style="min-width:108px;max-width:108px;">
-											<span class="blue" title="Father: {{cDic|displayValue:'fName'}}, Mother: {{cDic|displayValue:'mName'}}, Gender: {{cDic|displayValue:'Gender'}}, DOB: {{cDic|displayValue:'dob'}}">{{cDic|displayValue:'firstName'}} {{cDic|displayValue:'lastName'}}</span><span class="KLP_Form_status" id="id_Student_{{cDic|displayValue:'studId'}}_status">Form Status</span>
+											<span class="blue" title="Father: {{cDic|displayValue:'fName'}}, Mother: {{cDic|displayValue:'mName'}}, Gender: {{cDic|displayValue:'Gender'}}, DOB: {{cDic|displayValue:'dob'}}">{{cDic|displayValue:'first_name'}} {{cDic|displayValue:'last_name'}}</span>
+											<span class="KLP_Form_status" name="answerstatus" id="id_Student_{{forloop.counter}}_status">Form Status</span>
 										
 										</td>
 										{% endwith%}
@@ -68,22 +69,22 @@
 	     				</td>
 	     			</tr>
 	                        <!-- shows grid for the each student -->
-	     			{% for i in studIdList%}
+	     			{% for i in studIdListprifix%}
 	     				<tr class="KLP_txt_cen">
 						<td class="KLP_Ans_Fix">
 							<div class="KLP_Fix_Div">
-								<form name="student_{{i}}" id="id_Student_{{i}}" class="validForm" onsubmit="return false;">{% csrf_token %}
+								<form name="student_{{i}}" id="id_Student_{{i}}" class="validForm" onsubmit="return false;">{% csrf_token %}{{formmanage}}
 									<input type="hidden" name="student_groupId" value="{{studentgroup_id}}" />
 									<input type="hidden" name="programId" value="{{filter_id}}"/>
 									<input type="hidden" name="assessmentId" value="{{assessment_id}}"/>
 									<input type="hidden" name="student" value="{{i}}"/>
-								
+									<input type="hidden" name="formcounter" id="formcounter" value="{{forloop.counter}}"/>
 									<table>
 										<tr>
 										        <!-- Repeat Question -->
 											{% for qId in qIdList %}
-											{% with rDict|displayValue:qId as qData %}
-											{% with qData|displayValue:i as qDict %}
+										{% with qId|CatString:i as datadicKey %}
+												{% with rDict|displayValue:datadicKey as qDict %}
 											<!-- Get Question data based on question id and student id -->
 			        							<td class="KLP_td_height">
 			        								<!-- if ibox value false show answer value -->
@@ -93,9 +94,12 @@
 			        								<!-- else Show question order with input box -->
 			        								<span style="color:#736F6E;">{{qDict|displayValue:'qOrder'}}</span><br/>
 			        								<!-- If 2nd user login hide data and attributes dE and sE -->
+														<input type="hidden" class="ansIds" name="ansId_{{datadicKey}}" 
+																		   id="id_ansId_{{datadicKey}}" 
+																						   value="{{qDict|displayValue:'ansId'}}" size="10">
 												<input type="text"	
-									   					       name="student_{{i}}_{{qDict|displayValue:'qId'}}" 
-									   					       id="id_student_{{i}}_{{qDict|displayValue:'qId'}}" 
+									   					       name="student_{{datadicKey}}" 
+									   					       id="id_student_{{datadicKey}}" 
 									   					       tabindex="1"
 									   					       value="{%if qDict|displayValue:'shVal' %}{{qDict|displayValue:'ansVal'}}{% endif %}" 
 									   					       

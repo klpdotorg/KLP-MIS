@@ -1,14 +1,18 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
-Data format classes that can be plugged into
+Data format classes that can be plugged into 
 model_resource.ModelResource and determine how submissions
 of model data need to look like (e.g. form submission MIME types,
 XML, JSON, ...).
 """
+
 from django.core import serializers
 from django.forms import model_to_dict
 
 
 class InvalidFormData(Exception):
+
     """
     Raised if form data can not be decoded into key-value
     pairs.
@@ -16,6 +20,7 @@ class InvalidFormData(Exception):
 
 
 class Receiver(object):
+
     """
     Base class for all "receiver" data format classes.
     All subclasses need to implement the method
@@ -23,7 +28,8 @@ class Receiver(object):
     """
 
     def get_data(self, request, method):
-        raise Exception("Receiver subclass needs to implement get_data!")
+        raise Exception('Receiver subclass needs to implement get_data!'
+                        )
 
     def get_post_data(self, request):
         return self.get_data(request, 'POST')
@@ -33,8 +39,9 @@ class Receiver(object):
 
 
 class FormReceiver(Receiver):
+
     """
-    Data format class with standard Django behavior:
+    Data format class with standard Django behavior: 
     POST and PUT data is in form submission format.
     """
 
@@ -43,6 +50,7 @@ class FormReceiver(Receiver):
 
 
 class SerializeReceiver(Receiver):
+
     """
     Base class for all data formats possible
     within Django's serializer framework.
@@ -53,8 +61,9 @@ class SerializeReceiver(Receiver):
 
     def get_data(self, request, method):
         try:
-            deserialized_objects = list(serializers.deserialize(
-            self.format, request.raw_post_data))
+            deserialized_objects = \
+                list(serializers.deserialize(self.format,
+                     request.raw_post_data))
         except serializers.base.DeserializationError:
             raise InvalidFormData
         if len(deserialized_objects) != 1:
@@ -65,18 +74,24 @@ class SerializeReceiver(Receiver):
 
 
 class JSONReceiver(SerializeReceiver):
+
     """
-    Data format class for form submission in JSON,
+    Data format class for form submission in JSON, 
     e.g. for web browsers.
     """
+
     def __init__(self):
         self.format = 'json'
 
 
 class XMLReceiver(SerializeReceiver):
+
     """
-    Data format class for form submission in XML,
+    Data format class for form submission in XML, 
     e.g. for software clients.
     """
+
     def __init__(self):
         self.format = 'xml'
+
+

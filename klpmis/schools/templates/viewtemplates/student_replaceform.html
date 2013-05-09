@@ -11,10 +11,10 @@
 				<tr>
 				    <td><label class="KLP_required">First Name:</label></td>
 				    <td>
-					{{entryForm.firstName}}
+					{{entryForm.first_name}}
 				    </td>
 				    <td>
-                                    	{% for error in entryForm.firstName.errors %}
+                                    	{% for error in entryForm.first_name.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
                                     </td>
@@ -22,10 +22,10 @@
 				<tr>
 				    <td><label class="KLP_required">Last Name:</label></td>
 				    <td>
-					{{entryForm.lastName}}
+					{{entryForm.last_name}}
 				    </td>
 				    <td>
-                                    	{% for error in entryForm.lastName.errors %}
+                                    	{% for error in entryForm.last_name.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
                                     </td>

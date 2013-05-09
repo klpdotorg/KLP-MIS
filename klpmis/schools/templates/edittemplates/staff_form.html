@@ -33,7 +33,7 @@
 <form action="." method="POST" enctype="multipart/form-data" class="niceform" id="staffForm" onsubmit="return false;">{% csrf_token %}
 	{{form.management_form}}
 	<input type="hidden" name="form-buttonType" id="id_form-buttonType" value="save" />
-	<input type="hidden" id="replaceTrue" name="replaceTrue" size="15" value="True" / >
+	<input type="hidden" id="replaceTrue" name="replaceTrue" size="15" value="{{extra_context|displayValue:'replaceTrue'}}" / >
 	<input type="hidden" id="url" value="/staff/{{staff.id}}/update/" />
 	<input type="hidden" id="staff_id" value="{{staff.id}}" />
 	<input type="hidden" id="success_status" size="15" value="{{extra_context|displayValue:'showsuccess'}}" / >
@@ -42,13 +42,13 @@
         		<tr>
                                     <td><label class="KLP_required">First Name:</label></td>
                                     <td>
-                                         {% render_field entryForm.firstName 'tabindex=1' %}
+                                         {% render_field entryForm.first_name 'tabindex=1' %}
                                          <!-- Staff First Name Field -->
                                     </td>
                                     <td>&nbsp;</td>
                                     <td>
                                     	<!-- If First Name field has errors show errors -->
-                                    	{% for error in entryForm.firstName.errors %}
+                                    	{% for error in entryForm.first_name.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
                                     </td>
@@ -56,13 +56,13 @@
                                 <tr>
 					<td><label>Middle Name:</label></td>
 					<td>
-                                        	{% render_field entryForm.middleName 'tabindex=2' %}
+                                        	{% render_field entryForm.middle_name 'tabindex=2' %}
                                         	<!-- Staff Middle Name Field -->
                                     	</td>
                                     	<td>&nbsp;</td>
                                     	<td>
                                     		<!-- If Middle Name field has errors show errors -->
-                                    		{% for error in entryForm.middleName.errors %}
+                                    		{% for error in entryForm.middle_name.errors %}
 	                                		<span class="editErr">{{ error }}</span>
 	                                	{% endfor %}
                                     	</td>
@@ -72,13 +72,13 @@
                                 <tr>
 					<td><label>Last Name:</label></td>
 					<td>
-                                        	{% render_field entryForm.lastName 'tabindex=3' %}
+                                        	{% render_field entryForm.last_name 'tabindex=3' %}
                                         	<!-- Staff Last Name Field -->
                                     	</td>
                                     	<td>&nbsp;</td>
                                     	<td>
                                     		<!-- If Last Name field has errors show errors -->
-                                    		{% for error in entryForm.lastName.errors %}
+                                    		{% for error in entryForm.last_name.errors %}
 	                                		<span class="editErr">{{ error }}</span>
 	                                	{% endfor %}
                                     	</td>
@@ -94,7 +94,7 @@
                                     	<td>&nbsp;</td>
                                     	<td>
                                     		<!-- If UID field has errors show errors -->
-                                    		{% for error in entryForm.middleName.errors %}
+                                    		{% for error in entryForm.middle_name.errors %}
 	                                		<span class="editErr">{{ error }}</span>
 	                                	{% endfor %}
                                     	</td>
@@ -152,8 +152,8 @@
 				    <td>
 				    	<!-- Staff type  Field -->
 					<select name="form-0-staff_type" id="id_form-0-staff_type" tabindex=9>						
-						{% for staffType in extra_context|displayValue:'Staff_Types' %}
-							<option value="{{staffType.id}}" {%if staff.staff_type == staffType %}selected="selected"{% endif %}>{{staffType.staffType}}</option>
+						{% for staff_type in extra_context|displayValue:'Staff_Types' %}
+							<option value="{{staff_type.id}}" {%if staff.staff_type == staff_type %}selected="selected"{% endif %}>{{staff_type.staff_type}}</option>
 						{% endfor %}
 					</select>
 					<input type="hidden" name="form-0-active" id="id_form-0-active" value="2" />
@@ -187,10 +187,21 @@
                         			<input type="hidden" id="id_form-0-active" name="form-0-active" value="2">
                         			{{entryForm.id}}
                         			<input type="hidden" id="id_form-0-institution" name="form-0-institution" value="{{staff.institution.id}}" />
-                        		</span>	
+                        		</span>
+                                             	
                                         <input type="submit" name="save" id="id_save" value="Save" tabindex=11/>
+                                               
+
                                 </td>
-                                
+                                   {% if not extra_context|displayValue:'replaceTrue'%}
+                                <!--td>
+                                        <input type="submit" name="save_and_continue" id="id_save_and_continue" value="Save And Continue" tabindex=11/>
+                                    </td-->
+                                    <td colspan="2">
+                                        <input type="submit" name="save_and_create" id="id_save_and_create" value="Save And Create Another" tabindex=12/>
+                                    </td>
+
+                               {% endif %} 
                         </tr>        
                 </table>
         {%endwith%}             
@@ -208,20 +219,37 @@ $(document).ready(function(){
    	
    });
    
+  $("#id_save_and_continue").click(function(){
+        KLP_Hide_Msg();
+        parentVal = $('#institution_id').val();
+        $("#id_form-buttonType").val('save and continue');
+        KLP_form_submit(parentVal);
+   });
+   
+   $("#id_save_and_create").click(function(){
+        KLP_Hide_Msg();
+        parentVal = $('#institution_id').val();
+        $("#id_form-buttonType").val('save and add another');
+        KLP_form_submit(parentVal, 'institution_id');
+        
+        
+   });
     
    var KLP_form_submit = function(){
     	newName = $('#id_form-0-name').val();
-    	replaceId =  'staff_{{staff.id}}'
+    	replaceId =  'staff_{{staff.id}}';
+      buttonType=$("#id_form-buttonType").val();
+    popup=$('#replaceTrue').val();
    	$.post(
         	$('#url').val(),
         	$("#staffForm").serialize(),
                 function(data){	
                     $("#popData").html(data);
                     $("#id_save").removeAttr("disabled");
-                    NFInit();
+                    //NFInit();
                     $('input:visible:enabled:first').focus();
                     var successStatus = $("#success_status").val();
-                    if (successStatus == 'True'){
+                    if (successStatus == 'True' && popup=='True'){
                     	$('#'+replaceId, self.parent.document).replaceWith(data);
                     	window.parent.tb_init('#'+replaceId+' a.thickbox, area.thickbox, input.thickbox');
                     	window.parent.$("#successMsgHead").show();
@@ -229,6 +257,11 @@ $(document).ready(function(){
                     	window.parent.tb_remove();
                     	
                     }
+                           if( buttonType=='save and add another'){
+                                            $('#dyncData').html(data);
+                                      NFInit();
+
+                                    }
                }
            );
    } 

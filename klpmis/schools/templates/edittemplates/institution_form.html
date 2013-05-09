@@ -167,12 +167,12 @@
                         <tr>
 				<td><label>Route Information:</label></td>
                                 <td>
-                                	<input type="text" name="form-0-routeInformation" id="id_routeInformation" size="15" value='{{institution.inst_address.routeInformation}}' tabindex=12 />
+                                	<input type="text" name="form-0-route_information" id="id_route_information" size="15" value='{{institution.inst_address.route_information}}' tabindex=12 />
                                 	 <!-- Route Information Field -->
                                 </td>
                                 <td>
-                                	<!-- If routeInformation field has errors show errors -->
-                                	{% for error in entryForm.routeInformation.errors %}
+                                	<!-- If route_information field has errors show errors -->
+                                	{% for error in entryForm.route_information.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
                                 </td>
@@ -190,10 +190,10 @@
                         		</span>	
                                         <input type="submit" name="save" id="id_save" value="Save" tabindex=10/>
                                 </td>
-                                <td>
+                                <!--td>
                                     	<input type="submit" name="save_and_continue" id="id_save_and_continue" value="Save And Continue" tabindex=11/>
                                 </td>
-                                <!--td>
+                                <td>
                     	    		<input type="submit" name="save_and_create" id="id_save_and_create" value="Save And Create Another" tabindex=12/>
       				</td-->
                         </tr>        

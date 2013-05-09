@@ -12,6 +12,10 @@
 			  
 		{% endif %} Under {{boundary.name}}
 	</span>
+         <div style="font-size:12px;font-weight:bold;padding:5px;">
+              Note: not only assessments will be assigned but institution/boundary/class permissions if not already present will also be assigned<br/><br/>
+        
+</div>
 	<form name="klp_PermissionForm" id="id_klp_PermissionForm" onsubmit="return false;" class="niceform">{% csrf_token %}
 		<input type="hidden" name="permissionType" value="{{permissionType}}" />
 		<input type="hidden" name="assessmentId" value="{{assessmentId}}" />
@@ -24,7 +28,7 @@
 		{% for inst in institution_list %}
 			<span style="float:left;width:100%;color:#000;font-weight:bold;">
 				<!-- Check box to select and institution name -->
-				<input type="checkbox" name="instName" value="{{inst.id}}" />  {{inst.name}}
+				<input type="checkbox" name="instName" value="{{inst.id}}" /> {{inst.name}}   ({{inst.id}}) 
 			</span>
 		{% endfor %}
 		<!-- Display Boundaries -->
@@ -39,15 +43,15 @@
 		<div style="float:left;width:35%;padding:20px 5px 5px 5px;">
 			<!-- Multi Select drop down for selecting users -->
 			<span style="color:#75AD0A;font-size:12px;font-weight:bold;width:100%;text-align:center;padding:5px;">Select User</span><br/>
-			<select name="assignToUser" id="id_assignToUser" multiple="true"  >
+			<select size="20" name="assignToUser" id="id_assignToUser" multiple="true"  >
 				{% for dEUser in users %}
 					<option value="{{dEUser.id}}">{{dEUser.username}}</option>
 				{% endfor %}
 			</select>
 		</div>
 		<div style="float:left;width:35%;padding:20px 5px 5px 5px;">
-			<span style="color:#75AD0A;font-size:12px;font-weight:bold;width:100%;text-align:center;padding:5px;">Select Permission</span><br/>
-			<input type="checkbox" name="userPermission" value="Acess" minlength=1 checked="true"/> Access <br/>
+			<span style="color:#75AD0A;font-size:12px;font-weight:bold;width:100%;text-align:center;padding:5px;">Selected Permission</span><br/>
+			<input type="hidden" name="userPermission" value="Acess" minlength=1 /> Access <br/>
 		</div>
 		{% if not assessmentId %}
 		<div style="float:left;width:20%;padding:20px 5px 5px 5px;">

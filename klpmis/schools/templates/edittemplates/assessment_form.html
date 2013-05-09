@@ -2,10 +2,12 @@
 <div class="detailHead">
     <span class="hedText">Assessment Form</span>
 </div>
+ {% with extra_context|displayValue:'editable' as editable %}
+{% if editable == True %}
 <form action="." method="POST" enctype="multipart/form-data" class="niceform" id="assessmentForm" name="assessmentForm" onsubmit="return false;">{% csrf_token %}
 	<input type="hidden" name="form-buttonType" id="id_form-buttonType" value="save" />
 	<input type="hidden" id="url" value="/assessment/{{assessment.id}}/update/" />
-     <input type="hidden" name="form-0-typ" id="id_form-0-typ" value="3"/>
+   
 	<input type="hidden" id="assessment_id" value="{{assessment.id}}" />
 	<input type="hidden" id="success_status" size="15" value="{{extra_context|displayValue:'showsuccess'}}" / >
 	{{form.management_form}} 
@@ -33,12 +35,12 @@
       						<tr>
       				    			<td class="rightprofile"><label class="KLP_required">Start Date</label></td>
       							<td class="leftprofile">
-                            					{% render_field entryForm.startDate 'tabindex=2' %}
+                            					{% render_field entryForm.start_date 'tabindex=2' %}
                             					<!-- Start Date Field -->
                         				</td>
                         				<td>
                         					<!-- If Start Date field has errors show errors -->
-                                    				{% for error in entryForm.startDate.errors %}
+                                    				{% for error in entryForm.start_date.errors %}
 	                                				<span class="editErr">{{ error }}</span>
 	                                			{% endfor %}
                                     			</td> 
@@ -46,19 +48,19 @@
       						<tr>
       				    			<td class="rightprofile"><label class="KLP_required">End Date</label></td>
       							<td class="leftprofile">
-                            					{% render_field entryForm.endDate 'tabindex=3' %}
+                            					{% render_field entryForm.end_date 'tabindex=3' %}
                             					<!-- End Date Field -->
                         				</td>
                         				<td>
                         					<!-- If End Date field has errors show errors -->
-                                    				{% for error in entryForm.endDate.errors %}
+                                    				{% for error in entryForm.end_date.errors %}
 	                                				<span class="editErr">{{ error }}</span>
 	                                			{% endfor %}
                                     			</td> 
                         				<script>
                         					/* To Show Calendar on focus on date fields */
-                        					$( "#id_form-0-startDate" ).datepick({dateFormat: 'dd-mm-yyyy'});
-		                        			$( "#id_form-0-endDate" ).datepick({defaultDate: new Date("{{extra_context|displayValue:'endDate'}} {{extra_context|displayValue:'endMonth'}} {{extra_context|displayValue:'endYear'}}"), dateFormat: 'dd-mm-yyyy'});
+                        					$( "#id_form-0-start_date" ).datepick({dateFormat: 'dd-mm-yyyy'});
+		                        			$( "#id_form-0-end_date" ).datepick({defaultDate: new Date("{{extra_context|displayValue:'end_date'}} {{extra_context|displayValue:'endMonth'}} {{extra_context|displayValue:'endYear'}}"), dateFormat: 'dd-mm-yyyy'});
 	                    				</script>
       						</tr>
                                                 <tr >
@@ -71,15 +73,58 @@
                                                     <tr >
                                                         <td class="rightprofile"><label class="KLP_required">Double Entry</label></td>
                                                         
-                                                        <td class="leftprofile">
-                                                                {% render_field entryForm.doubleEntry %}
+                                                        <td class="leftprofile"><br/>
+                                                                {% render_field entryForm.double_entry %}
                                                         </td>
                                                 </tr>
-
-      						<tr>      				    
+												<tr>
+      				    			<td class="rightprofile"><label >Flexi Assessment</label></td>
+      							<td class="leftprofile"><br/>
+                            					&nbsp;&nbsp;{% render_field entryForm.flexi_assessment 'tabindex=6' %}
+                            					<!-- Start flexi Field -->
+                        				</td>
+                        				<td>
+                        					<!-- If Flexi field has errors show errors -->
+                                    				{% for error in entryForm.flexi_assessment.errors %}
+	                                				<span class="editErr">{{ error }}</span>
+	                                			{% endfor %}
+                                    			</td> 
+      						</tr>
+                              <tr {% if  not entryForm.flexi_assessment.value %}style="display:none" {% endif %} class="flexifield">
+      				    			<td class="rightprofile"><label class="KLP_required">Primary Field Name</label></td>
+      							<td class="leftprofile">
+                            					{% render_field entryForm.primary_field_name 'tabindex=7' %}
+                            					<!-- Primary Field Name Field -->
+                        				</td>
+                        				<td>
+                        					<!-- If Primary Field Name field has errors show errors -->
+                                    				{% for error in entryForm.primary_field_name.errors %}
+	                                				<span class="editErr">{{ error }}</span>
+	                                			{% endfor %}
+                                    			</td> 
+      						</tr>
+                                                  <tr  {% if  not entryForm.flexi_assessment.value %}style="display:none" {% endif %} class="flexifield">
+      				    			<td class="rightprofile"><label class="KLP_required">Primary Field Type</label></td>
+      							<td class="leftprofile">
+                            					{% render_field entryForm.primary_field_type 'tabindex=8' %}
+                            					<!-- Primary Field Name Field -->
+                        				</td>
+                        				<td>
+                        					<!-- If Primary Field Name has errors show errors -->
+                                    				{% for error in entryForm.primary_field_type.errors %}
+	                                				<span class="editErr">{{ error }}</span>
+	                                			{% endfor %}
+                                    			</td> 
+      						</tr>  
+       						<tr>      				    
+                                                            <td class="rightprofile"><label class="KLP_required">Active Status</label></td>
       			        			<td class="leftprofile">
-      			            				<span style="display:none">
-      			            					<input type="hidden" id="id_form-0-active" name="form-0-active" value="2">
+      			            				<span  {% if 'AdminGroup' in usergroups or user.is_superuser %} syle="display:block"  {% else %} style="display:none" {% endif %}>
+                                                        <select id="id_form-0-active" name="form-0-active">
+                                                                   <!--option value="0" {% ifequal  entryForm.active.value 0  %} selcted="selected" {% endifequal %}>Deleted</option-->
+                                                                   <option value="1" {% ifequal  entryForm.active.value 1  %} selected="selected" {% endifequal %}>Inactive</option>
+                                                                   <option value="2" {% ifequal  entryForm.active.value 2  %} selected="selected" {% endifequal %}>Active</option>
+                                                              </select>       
       			            					{{entryForm.id}}
       			            				</span>
       			        			</td>
@@ -91,10 +136,10 @@
       				    			<td>
                                     				<input type="submit" name="save" id="id_save" value="Save" tabindex=4 />
                                     			</td>
-                                    			<td>
+                                    			<!--td>
                                     				<input type="submit" name="save_and_continue" id="id_save_and_continue" value="Save And Continue" tabindex=5 />
                                     			</td>
-                                    			<!--td>
+                                    			<td>
                     	    					<input type="submit" name="save_and_create" id="id_save_and_create" value="Save And Create Another" tabindex=6 />
       				    			</td-->
       						</tr>
@@ -106,12 +151,21 @@
 </form>
 <script>
   $(document).ready(function(){   
-  
+   	
+    $("#id_form-0-flexi_assessment").click(function(){
+	
+	 $('.flexifield').toggle();
+	});
    $("#id_save").click(function(){
    	/* Clicking on save button hide all prv msgs and call form submit and pass button type is save */
    	KLP_Hide_Msg();
+	if( $("#id_form-0-flexi_assessment:checked").length==1 && $("#id_form-0-typ").val()==3){
+	 alert("Flexi Assessment is not allowed for Student");
+	 return false;
+	}
    	parentVal = $("#id_form-0-programme").val();
    	$("#id_form-buttonType").val('save');
+	
    	KLP_form_submit(parentVal);
    	
    });
@@ -167,3 +221,7 @@
   
 });
 </script>
+{% else %}<span class="KLP_Form_status" style="color:red !important;display:block !important">
+Assessement is  already is started .So you can not edit it</span>
+{% endif %}
+{% endwith %}

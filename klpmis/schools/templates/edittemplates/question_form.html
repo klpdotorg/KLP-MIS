@@ -31,44 +31,44 @@
                         			<tr>
       				    			<td class="rightprofile">Type</td>
       							<td class="leftprofile">
-                            					{% render_field entryForm.questionType 'tabindex=2' %}
+                            					{% render_field entryForm.question_type 'tabindex=2' %}
                             					<!-- Question type Field -->
                         				</td>
                         				<td>
                         					<!-- If Question type field has errors show errors -->
-                                    				{% for error in entryForm.questionType.errors %}
+                                    				{% for error in entryForm.question_type.errors %}
 	                                				<span class="editErr">{{ error }}</span>
 	                                			{% endfor %}
                                     			</td>
       						</tr> 
-      						<tr id="markTypMin" style="{% if question.questionType == 2 %}display:none;{% endif %}">
+      						<tr id="markTypMin" style="{% if question.question_type == 2 %}display:none;{% endif %}">
       				    			<td class="rightprofile"><label class="KLP_required">Score Min</label></td>
       							<td class="leftprofile">
-                            					{% render_field entryForm.scoreMin 'tabindex=3' %}
+                            					{% render_field entryForm.score_min 'tabindex=3' %}
                             					<!-- Question score min Field -->
                         				</td>
                         				<td>
-                        					<!-- If scoreMin field has errors show errors -->
-                                    				{% for error in entryForm.scoreMin.errors %}
+                        					<!-- If score_min field has errors show errors -->
+                                    				{% for error in entryForm.score_min.errors %}
 	                                				<span class="editErr">{{ error }}</span>
 	                                			{% endfor %}
                                     			</td>
       						</tr>
-      						<tr id="markTypMax" style="{% if question.questionType == 2 %}display:none;{% endif %}">
+      						<tr id="markTypMax" style="{% if question.question_type == 2 %}display:none;{% endif %}">
       				    			<td class="rightprofile"><label class="KLP_required">Score Max</label></td>
       							<td class="leftprofile">
-                            					{% render_field entryForm.scoreMax 'tabindex=4' %}
+                            					{% render_field entryForm.score_max 'tabindex=4' %}
                             					<!-- Question score max Field -->
                         				</td>
                         				<td>
-                        					<!-- If scoreMax field has errors show errors -->
-                                    				{% for error in entryForm.scoreMax.errors %}
+                        					<!-- If score_max field has errors show errors -->
+                                    				{% for error in entryForm.score_max.errors %}
 	                                				<span class="editErr">{{ error }}</span>
 	                                			{% endfor %}
                                     			</td>
       						</tr>
-      						<tr id="gradeTyp" style="{% if question.questionType == 1 %}display:none;{% endif %}">
-      				    			<td class="rightprofile"><label class="KLP_required">Grade</label></td>
+      						<tr id="gradeTyp" style="{% if question.question_type == 1 %}display:none;{% endif %}">
+      				    			<td class="rightprofile"><label class="KLP_required">Grade (Eg: A,B,C)</label></td>
       							<td class="leftprofile">
                             					{% render_field entryForm.grade 'tabindex=3' %}
                             					<!-- Question grade Field -->
@@ -104,15 +104,15 @@
       				    				<span style="display:none">
       				        				{{entryForm.active}}
       				        				{{entryForm.id}}
-      				        				{{entryForm.doubleEntry}}
+      				        				{{entryForm.double_entry}}
       				        				{{entryForm.required}}
       				        			</span>
                                     				<input type="submit" name="save" id="id_save" value="Save" tabindex=5 />
                                     			</td>
-                                    			<td>
+                                    			<!--td>
                                     				<input type="submit" name="save_and_continue" id="id_save_and_continue" value="Save And Continue" tabindex=6 />
                                     			</td>
-                                    			<!--td>
+                                    			<td>
                     	    					<input type="submit" name="save_and_create" id="id_save_and_create" value="Save And Create Another" tabindex=7 />
       				    			</td-->
       						</tr>
@@ -126,7 +126,7 @@
 <script>
   $(document).ready(function(){    
   
-   var qType=  $("#id_form-0-questionType").val();
+   var qType=  $("#id_form-0-question_type").val();
    if (qType == '2'){
    	$("#markTypMin").hide();
    	$("#markTypMax").hide();
@@ -141,15 +141,15 @@
    	$('#markTypMin').focus();
    }
   
-   $("#id_form-0-questionType").change(function(){
+   $("#id_form-0-question_type").change(function(){
    	/* If Value is change in question type field hide and show score min, score max and grade fields based on value */
-   	quesType = $("#id_form-0-questionType").val();
+   	quesType = $("#id_form-0-question_type").val();
    	if (quesType == '2'){
    		/* If type 2 (grade) hide score min and max, show grade field */
    		$("#markTypMin").hide();
-   		$("#id_form-0-scoreMin").val('');
+   		$("#id_form-0-score_min").val('');
    		$("#markTypMax").hide();
-   		$("#id_form-0-scoreMax").val('');
+   		$("#id_form-0-score_max").val('');
    		$("#gradeTyp").show();
    		$('#gradeTyp').focus();
    	}

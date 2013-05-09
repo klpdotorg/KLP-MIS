@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 from django.shortcuts import get_object_or_404, render_to_response
 from django.http import Http404
 from django.utils.encoding import force_unicode
@@ -8,24 +10,37 @@ from django.utils.translation import ugettext as _
 from models import FullHistory
 
 
-def history_log(request, object_id, model, template, extra_context=None):
+def history_log(
+    request,
+    object_id,
+    model,
+    template,
+    extra_context=None,
+    ):
     opts = model._meta
     app_label = opts.app_label
     obj = get_object_or_404(model, pk=object_id)
-    action_list = FullHistory.objects.actions_for_object(obj).select_related()
+    action_list = \
+        FullHistory.objects.actions_for_object(obj).select_related()
     context = {
         'title': _(u'Change history: %s') % force_unicode(obj),
         'action_list': action_list,
         'module_name': capfirst(force_unicode(opts.verbose_name_plural)),
         'object': obj,
         'app_label': app_label,
-    }
+        }
     context.update(extra_context or {})
-    return render_to_response(template, context, context_instance =
-    RequestContext(request))
+    return render_to_response(template, context,
+                              context_instance=RequestContext(request))
 
 
-def history_audit(request, object_id, model, template, extra_context=None):
+def history_audit(
+    request,
+    object_id,
+    model,
+    template,
+    extra_context=None,
+    ):
     obj = get_object_or_404(model, pk=object_id)
     failure = None
     try:
@@ -40,38 +55,45 @@ def history_audit(request, object_id, model, template, extra_context=None):
         'object': obj,
         'app_label': app_label,
         'failure': failure,
-    }
+        }
     context.update(extra_context or {})
-    return render_to_response(template, context, context_instance =
-    RequestContext(request))
+    return render_to_response(template, context,
+                              context_instance=RequestContext(request))
 
 
-def history_version(request, object_id, version, model, template,
-extra_context=None):
+def history_version(
+    request,
+    object_id,
+    version,
+    model,
+    template,
+    extra_context=None,
+    ):
     version = int(version)
     obj = None
     try:
         obj = model.objects.get(pk=object_id)
     except model.DoesNotExist:
         obj = FullHistory.objects.restore(model, object_id,
-        commit=False, audit=False)
+                commit=False, audit=False)
     try:
-        action = FullHistory.objects.actions_for_object(obj).get(
-        revision=version)
+        action = \
+            FullHistory.objects.actions_for_object(obj).get(revision=version)
     except FullHistory.DoesNotExist:
         raise Http404()
     opts = model._meta
     app_label = opts.app_label
     context = {
-        'title': _(u'History Version %s for: %s') %
-        (version, force_unicode(obj)),
-        'module_name': capfirst(force_unicode
-        (opts.verbose_name_plural)),
+        'title': _(u'History Version %s for: %s') % (version,
+                force_unicode(obj)),
+        'module_name': capfirst(force_unicode(opts.verbose_name_plural)),
         'object': obj,
         'app_label': app_label,
         'version': version,
         'action': action,
-    }
+        }
     context.update(extra_context or {})
-    return render_to_response(template, context, context_instance =
-    RequestContext(request))
+    return render_to_response(template, context,
+                              context_instance=RequestContext(request))
+
+

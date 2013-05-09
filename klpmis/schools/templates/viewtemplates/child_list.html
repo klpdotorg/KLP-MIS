@@ -38,8 +38,8 @@
     {% with child.student_set.all|first as student %}
     <tr id = "student_{{child.id}}">
     	<!-- Child Information -->
-	<td class="tot-border1">{{child.firstName}}</td>
-	<td class="tot-border1">{{child.lastName}}</td>
+	<td class="tot-border1">{{child.first_name}}</td>
+	<td class="tot-border1">{{child.last_name}}</td>
 	<td class="tot-border1">{{child.dob|date:"d M Y" }}</td>
 	<td class="tot-border1">{{child.mt}}</td>
 	<td class="tot-border1">{{child.gender}}</td> 

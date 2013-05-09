@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 """
 Print the query log to standard out.
 
@@ -5,7 +8,6 @@ Useful for optimizing database calls.
 
 Insipired by the method at: <http://www.djangosnippets.org/snippets/344/>
 """
-
 
 from django.conf import settings
 from django.db import connection
@@ -17,18 +19,22 @@ class QueryLogMiddleware:
         if settings.DEBUG:
             queries = {}
             for query in connection.queries:
-                sql = query["sql"]
+                sql = query['sql']
                 queries.setdefault(sql, 0)
                 queries[sql] += 1
             duplicates = sum([count - 1 for count in queries.values()])
-            print "------------------------------------------------------"
+            print '------------------------------------------------------'
             print
-            for query, count in queries.items():
-            #if count > 1:
-                #print "%s x %s" % (count, query)
-                        pass
-            print "------------------------------------------------------"
-            print "Total Queries:     %s" % len(queries)
-            print "Duplicate Queries: %s" % duplicates
-            print "------------------------------------------------------"
+            for (query, count) in queries.items():
+                if count > 1:
+                    print '%s x %s' % (count, query)
+
+                        # pass
+
+            print '------------------------------------------------------'
+            print 'Total Queries:     %s' % len(queries)
+            print 'Duplicate Queries: %s' % duplicates
+            print '------------------------------------------------------'
         return response
+
+

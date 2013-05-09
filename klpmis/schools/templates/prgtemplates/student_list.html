@@ -30,7 +30,7 @@
 		    							<tr>
 										<td class="KLP_td_width">{{i.id}}</td>
 										<td class="KLP_td_width">
-											<span class="blue" title="Father: {{i.child.getFather.first_name}}, Mother: {{i.child.getMother.first_name}}, Gender: {{i.child.gender}}, MT: {{i.child.mt}}, DOB: {% if i.child.dob %}{{i.child.dob|date:'d-m-Y'}}{% endif %}">{{i.child.firstName}}&nbsp;{{i.child.lastName}}</span><span class="KLP_Form_status" id="id_Student_{{i.id}}_status">Form Status</span>
+											<span class="blue" title="Father: {{i.child.getFather.first_name}}, Mother: {{i.child.getMother.first_name}}, Gender: {{i.child.gender}}, MT: {{i.child.mt}}, DOB: {% if i.child.dob %}{{i.child.dob|date:'d-m-Y'}}{% endif %}">{{i.child.first_name}}&nbsp;{{i.child.last_name}}</span><span class="KLP_Form_status" id="id_Student_{{i.id}}_status">Form Status</span>
 										
 										</td>
 									</tr>
@@ -64,7 +64,7 @@
 	     				</td>
 	     			</tr>
 	     
-	     			{% for i in students_list%}
+	     			{% for i in students_list%}{{students_list}}
 	     				<tr class="KLP_txt_cen">
 						<td class="KLP_Ans_Fix">
 							<div class="KLP_Fix_Div">
@@ -90,7 +90,7 @@
 									   					       tabindex="1"
 									   					       value="{% if ques|getAnswer:i %}{%if user.id == ques|firstUser:i and ques|dEStatus:i == 1  %}{{ques|getAnswerValue:i}}{% endif %}{% endif %}" 
 									   					       size="3"
-									   					       class="required {% if ques.questionType == 2 %}letters{%else%}number{%endif%}"
+									   					       class="required {% if ques.question_type == 2 %}letters{%else%}number{%endif%}"
 									   					       {% if user.id != ques|firstUser:i and ques|dEStatus:i == 1%}dE="true" sE="true"{% endif %}
 									   					       />
 									   					       
