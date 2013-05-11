@@ -343,6 +343,16 @@ class Institution(models.Model):
             assname,
             )
 
+    def save(self, *args, **kwargs):
+        # custom save method
+        #pdb.set_trace()
+        from django.db import connection
+        connection.features.can_return_id_from_insert = False
+        print "save"
+
+        print "name is",self.name, "=================== active is", self.active
+        self.full_clean()
+        super(Institution, self).save(*args, **kwargs)
 
 register(['Acess'], Institution)  # Register model for Object permissions
 register_model(Institution)  # Register model for to store information in fullhistory
@@ -537,6 +547,16 @@ class StudentGroup(models.Model):
             sec,
             )
 
+    def save(self, *args, **kwargs):
+        # custom save method
+        #pdb.set_trace()
+        from django.db import connection
+        connection.features.can_return_id_from_insert = False
+        print "save"
+
+        print "name is",self.name, "=================== active is", self.active
+        self.full_clean()
+        super(StudentGroup, self).save(*args, **kwargs)
 
 register_model(StudentGroup)  # Register model for to store information in fullhistory
 
@@ -685,6 +705,16 @@ class Student_StudentGroupRelation(models.Model):
 
         unique_together = (('student', 'student_group', 'academic'), )
 
+    def save(self, *args, **kwargs):
+        # custom save method
+        #pdb.set_trace()
+        from django.db import connection
+        connection.features.can_return_id_from_insert = False
+        print "save"
+
+        print "active is", self.active
+        self.full_clean()
+        super(Student_StudentGroupRelation, self).save(*args, **kwargs)
 
 register_model(Student_StudentGroupRelation)  # Register model for to store information in fullhistory
 
@@ -981,7 +1011,7 @@ register_model(Question)  # Register model for to store information in fullhisto
 class Answer(models.Model):
 
     """ This class stores information about student marks and grade """
-
+    
     question = models.ForeignKey(Question)
 
     # student = models.IntegerField(blank = True, null = True,default=0) # models.ForeignKey(Student)

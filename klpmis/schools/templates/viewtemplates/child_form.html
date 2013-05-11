@@ -224,8 +224,11 @@
 			    },200);
 			    //window.parent.parent.tb_init('a.thickbox, area.thickbox, input.thickbox');
 			    var successStatus = $("#success_status").val();
+			    
 		            if (successStatus == 'True'){
-		            	$("body").html("Student Created Successfully "+d.getTime());
+		                var d2 = new Date();
+			            diff = (d2.getTime() - d.getTime())/1000;
+		            	$("body").html("Student Created Successfully in "+diff + "seconds");
 				if (modelName != 'student') {
 					$("#successMsgHead").show();
 					$("#klp_MsgTxt").html("Child Created Successfully")
