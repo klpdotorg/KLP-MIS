@@ -12,6 +12,35 @@ import os
 import csv
 import pdb
 
+def student_update_status(contentName,schoolStudentsList):
+    created = validFullHistoryRecords.filter(request__user_pk=user.id,
+            content_type__id=contentTypeIds[contentName
+            ],
+            object_id__in=schoolStudentsList,
+            action='C').count()
+    modified = validFullHistoryRecords.filter(request__user_pk=user.id,
+            content_type__id=contentTypeIds[contentName
+            ],
+            object_id__in=schoolStudentsList,
+            action='U'
+            ).exclude(_data__contains='"active": [2,'
+            ).count()
+    deleted = validFullHistoryRecords.filter(request__user_pk=user.id,
+            content_type__id=contentTypeIds[contentName
+            ],
+            object_id__in=schoolStudentsList,
+            action='U',
+            _data__contains='"active": [2,'
+            ).count()
+
+    return {'created':created,'modified':modified,'deleted':deleted }
+
+def user_boundary_update(contentTypeName):
+    strList = validFullHistoryRecords.filter(request__user_pk=user.id,
+                                content_type__id=contentTypeIds[contentTypeName
+                                ]).only('object_id'
+                                ).values_list('object_id', flat=True)
+    return [int(item) for item in strList]
 
 class Command(BaseCommand):
 
@@ -185,14 +214,8 @@ class Command(BaseCommand):
                         #
                         # ###############################
 
-                        boundariesUpdatedByUserStrList = \
-                            validFullHistoryRecords.filter(request__user_pk=user.id,
-                                content_type__id=contentTypeIds['boundary'
-                                ]).only('object_id'
-                                ).values_list('object_id', flat=True)
-                        boundariesUpdatedByUser = [int(item)
-                                for item in
-                                boundariesUpdatedByUserStrList]
+                        boundariesUpdatedByUser = user_boundary_update('boundary')
+                       
 
                         if boundariesUpdatedByUser:
                             preSchoolBoundaries = \
@@ -202,28 +225,10 @@ class Command(BaseCommand):
                             if preSchoolBoundaries:
                                 preSchoolBoundaries = ['%s' % i
                                         for i in preSchoolBoundaries]
-                                pre_boundary_created = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['boundary'
-                                        ],
-                                        object_id__in=preSchoolBoundaries,
-                                        action='C').count()
-                                pre_boundary_modified = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['boundary'
-                                        ],
-                                        object_id__in=preSchoolBoundaries,
-                                        action='U'
-                                        ).exclude(_data__contains="'active': [2,"
-                                        ).count()
-                                pre_boundary_deleted = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['boundary'
-                                        ],
-                                        object_id__in=preSchoolBoundaries,
-                                        action='U',
-                                        _data__contains='"active": [2,'
-                                        ).count()
+                                preboundaryDict = student_update_status('boundary',preSchoolBoundaries)
+                                pre_boundary_created = preboundaryDict['created'] 
+                                pre_boundary_modified = preboundaryDict['modified']
+                                pre_boundary_deleted = preboundaryDict['deleted']
 
                             primarySchoolBoundaries = \
                                 Boundary.objects.filter(id__in=boundariesUpdatedByUser,
@@ -233,28 +238,10 @@ class Command(BaseCommand):
                                 primarySchoolBoundaries = ['%s' % i
                                         for i in
                                         primarySchoolBoundaries]
-                                primary_boundary_created = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['boundary'
-                                        ],
-                                        object_id__in=primarySchoolBoundaries,
-                                        action='C').count()
-                                primary_boundary_modified = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['boundary'
-                                        ],
-                                        object_id__in=primarySchoolBoundaries,
-                                        action='U'
-                                        ).exclude(_data__contains="'active': [2,"
-                                        ).count()
-                                primary_boundary_deleted = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['boundary'
-                                        ],
-                                        object_id__in=primarySchoolBoundaries,
-                                        action='U',
-                                        _data__contains="'active': [2,"
-                                        ).count()
+                                primaryboundaryDict = student_update_status('boundary',primarySchoolBoundaries)
+                                primary_boundary_created = primaryboundaryDict['created'] 
+                                primary_boundary_modified = primaryboundaryDict['modified']
+                                primary_boundary_deleted = primaryboundaryDict['deleted']
 
                         schoolsUpdatedByUserStrList = \
                             validFullHistoryRecords.filter(request__user_pk=user.id,
@@ -271,62 +258,23 @@ class Command(BaseCommand):
                                     boundary__boundary_type__id=2).only('id'
                                     ).values_list('id', flat=True)]
                             if preSchools:
-                                pre_sch_created = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['institution'
-                                        ], object_id__in=preSchools,
-                                        action='C').count()
-                                pre_sch_modified = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['institution'
-                                        ], object_id__in=preSchools,
-                                        action='U'
-                                        ).exclude(_data__contains="'active': [2,"
-                                        ).count()
-                                pre_sch_deleted = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['institution'
-                                        ], object_id__in=preSchools,
-                                        action='U',
-                                        _data__contains="'active': [2,"
-                                        ).count()
+                                schoolDict2 = student_update_status('institution',preSchools)
+                                pre_sch_created = schoolDict2['created']
+                                pre_sch_modified = schoolDict2['modified']
+                                pre_sch_deleted = schoolDict2['deleted']
 
                             primarySchools = [str(school) for school in
                                     Institution.objects.filter(id__in=schoolsUpdatedByUser,
                                     boundary__boundary_type__id=1).only('id'
                                     ).values_list('id', flat=True)]
                             if primarySchools:
-                                primary_sch_created = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['institution'
-                                        ],
-                                        object_id__in=primarySchools,
-                                        action='C').count()
-                                primary_sch_modified = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['institution'
-                                        ],
-                                        object_id__in=primarySchools,
-                                        action='U'
-                                        ).exclude(_data__contains="'active': [2,"
-                                        ).count()
-                                primary_sch_deleted = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['institution'
-                                        ],
-                                        object_id__in=primarySchools,
-                                        action='U',
-                                        _data__contains="'active': [2,"
-                                        ).count()
+                                schoolDict1 = student_update_status('institution',primarySchools)
+                                primary_sch_created = schoolDict1['created']
+                                primary_sch_modified = schoolDict1['modified']
+                                primary_sch_deleted = schoolDict1['deleted']
+                        studentsUpdatedByUser = user_boundary_update('student')
 
-                        studentsUpdatedByUserStrList = \
-                            validFullHistoryRecords.filter(request__user_pk=user.id,
-                                content_type__id=contentTypeIds['student'
-                                ]).only('object_id'
-                                ).values_list('object_id', flat=True)
 
-                        studentsUpdatedByUser = [int(item) for item in
-                                studentsUpdatedByUserStrList]
 
                         # pdb.set_trace()
 
@@ -340,28 +288,10 @@ class Command(BaseCommand):
                             if preSchoolStudents:
                                 preSchoolStudents = ['%s' % i for i in
                                         preSchoolStudents]
-                                pre_stud_created = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['student'
-                                        ],
-                                        object_id__in=preSchoolStudents,
-                                        action='C').count()
-                                pre_stud_modified = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['student'
-                                        ],
-                                        object_id__in=preSchoolStudents,
-                                        action='U'
-                                        ).exclude(_data__contains='"active": [2,'
-                                        ).count()
-                                pre_stud_deleted = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['student'
-                                        ],
-                                        object_id__in=preSchoolStudents,
-                                        action='U',
-                                        _data__contains='"active": [2,'
-                                        ).count()
+                                studentDict2 = student_update_status('student',preSchoolStudents)
+                                pre_stud_created = studentDic2['created']
+                                pre_stud_modified = studentDict2['modified']
+                                pre_stud_deleted = studentDict2['deleted']
 
                             primarySchoolStudents = [str(student)
                                     for student in
@@ -372,36 +302,13 @@ class Command(BaseCommand):
                             if primarySchoolStudents:
                                 primarySchoolStudents = ['%s' % i
                                         for i in primarySchoolStudents]
-                                primary_stud_created = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['student'
-                                        ],
-                                        object_id__in=primarySchoolStudents,
-                                        action='C').count()
-                                primary_stud_modified = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['student'
-                                        ],
-                                        object_id__in=primarySchoolStudents,
-                                        action='U'
-                                        ).exclude(_data__contains='"active": [2,'
-                                        ).count()
-                                primary_stud_deleted = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['student'
-                                        ],
-                                        object_id__in=primarySchoolStudents,
-                                        action='U',
-                                        _data__contains='"active": [2,'
-                                        ).count()
+                                studentDict = student_update_status('student',primarySchoolStudents)
+                                primary_stud_created = studentDict['created']
+                                primary_stud_modified = studentDict['modified']
+                                primary_stud_deleted = studentDict['deleted']
 
-                        teachersUpdatedByUserStrList = \
-                            validFullHistoryRecords.filter(request__user_pk=user.id,
-                                content_type__id=contentTypeIds['staff'
-                                ]).only('object_id'
-                                ).values_list('object_id', flat=True)
-                        teachersUpdatedByUser = [int(item) for item in
-                                teachersUpdatedByUserStrList]
+                        teachersUpdatedByUser = user_boundary_update('staff')
+
 
                         if teachersUpdatedByUser:
                             preSchoolTeachers = [str(teacher)
@@ -409,64 +316,22 @@ class Command(BaseCommand):
                                     Staff.objects.filter(id__in=teachersUpdatedByUser,
                                     institution__boundary__boundary_type__id=2)]
                             if preSchoolTeachers:
-                                pre_techer_created = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['staff'
-                                        ],
-                                        object_id__in=preSchoolTeachers,
-                                        action='C').count()
-                                pre_teacher_modified = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['staff'
-                                        ],
-                                        object_id__in=preSchoolTeachers,
-                                        action='U'
-                                        ).exclude(_data__contains="'active': [2,"
-                                        ).count()
-                                pre_teacher_deleted = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['staff'
-                                        ],
-                                        object_id__in=preSchoolTeachers,
-                                        action='U',
-                                        _data__contains="'active': [2,"
-                                        ).count()
-
+                                studentDict2 = student_update_status('staff',preSchoolTeachers)
+                                pre_techer_created = studentDict2['created']
+                                pre_teacher_modified = studentDict2['modified']
+                                pre_teacher_deleted = studentDict2['deleted']
                             primarySchoolTeachers = [str(teacher)
                                     for teacher in
                                     Staff.objects.filter(id__in=studentsUpdatedByUser,
                                     institution__boundary__boundary_type__id=1)]
                             if primarySchoolTeachers:
-                                primary_teacher_created = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['staff'
-                                        ],
-                                        object_id__in=primarySchoolTeachers,
-                                        action='C').count()
-                                primary_teacher_modified = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['staff'
-                                        ],
-                                        object_id__in=primarySchoolTeachers,
-                                        action='U'
-                                        ).exclude(_data__contains="'active': [2,"
-                                        ).count()
-                                primary_teacher_deleted = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['staff'
-                                        ],
-                                        object_id__in=primarySchoolTeachers,
-                                        action='U',
-                                        _data__contains="'active': [2,"
-                                        ).count()
+                                studentDict3 = student_update_status('staff',primarySchoolTeachers)
+                                primary_teacher_created = studentDict3['created']
+                                primary_teacher_modified = studentDict3['modified']
+                                primary_teacher_deleted = studentDict3['deleted']
 
-                        answersUpdatedByUserStr = \
-                            validFullHistoryRecords.filter(request__user_pk=user.id,
-                                content_type__id=contentTypeIds['answer'
-                                ]).only('object_id'
-                                ).values_list('object_id', flat=True)
-                        answersUpdatedByUser = [int(item) for item in
-                                answersUpdatedByUserStr]
+                        answersUpdatedByUser = user_boundary_update('answer')
+
 
                         # ############################### Objects of type Answer
                         #  C+ request__user_pk=user.id  =>Content created by user

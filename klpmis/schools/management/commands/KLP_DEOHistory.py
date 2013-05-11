@@ -11,6 +11,43 @@ import datetime
 import os
 import csv
 
+def data_appendList(listname):
+    
+    dataList.append(FullHistory.objects.filter(action_time__range=(sTime,
+                                        eTime),
+                                        request__user_pk=userId,
+                                        content_type__id=contId,
+                                        object_id__in=listname,
+                                        action='C').count())
+    dataList.append(FullHistory.objects.filter(action_time__range=(sTime,
+                                        eTime),
+                                        request__user_pk=userId,
+                                        content_type__id=contId,
+                                        object_id__in=listname,
+                                        action='U'
+                                        ).exclude(_data__icontains='active'
+                                        ).count())
+
+    dataList.append(FullHistory.objects.filter(
+                                    action_time__range=(sTime, eTime),
+                                    request__user_pk=userId,
+                                    content_type__id=contId,
+                                    object_id__in=listname,
+                                    action='U',
+                                    _data__icontains='active',
+                                    ).count())
+    return True
+
+
+def boundary_list_query(listname,btype,fieldtype):
+    return Boundary.objects.filter(id__in=listname,
+                            boundary_type__id=btype).values_list(fieldtype,
+        flat=True).distinct()
+
+def institution_list_query(listname,fieldtype):
+    return Institution.objects.filter(id__in=listname,
+                            boundary_type__id=2).values_list(fieldtype,
+        flat=True).distinct()
 
 class Command(BaseCommand):
 
@@ -181,41 +218,27 @@ class Command(BaseCommand):
                                 if content == 'boundary':
                                     (preBoundaryList,
         primaryBoundaryList) = ([], [])
-                                    BoundaryList = \
-    Institution.objects.filter(id__in=preSchList).values_list('boundary'
-        , flat=True).distinct()
+                                    BoundaryList = institution_list_query(preSchList,'boundary')
                                     preBoundaryList.extend(list(BoundaryList))
 
                                     # print preBoundaryList,'LLLLLLLLLLLLLLLLLLLLLLLl'
-
-                                    BoundaryList = \
-    Boundary.objects.filter(id__in=preBoundaryList,
-                            boundary_type__id=2).values_list('parent',
-        flat=True).distinct()
-
-                                    preBoundaryList.extend(list(BoundaryList))
-                                    BoundaryList = \
-    Boundary.objects.filter(id__in=preBoundaryList,
-                            boundary_type__id=1).values_list('parent',
-        flat=True).distinct()
+                                    BoundaryList = boundary_list_query(preBoundaryList,2,'parent')
                                     preBoundaryList.extend(list(BoundaryList))
 
-                                    BoundaryList = \
-    Institution.objects.filter(id__in=primarySchList).values_list('boundary'
-        , flat=True).distinct()
 
-                                    primaryBoundaryList.extend(list(BoundaryList))
-                                    BoundaryList = \
-    Boundary.objects.filter(id__in=primaryBoundaryList,
-                            boundary_type__id=2).values_list('parent',
-        flat=True).distinct()
+                                    BoundaryList = boundary_list_query(preBoundaryList,1,'parent')
+                                    preBoundaryList.extend(list(BoundaryList))
+
+
+                                    BoundaryList = institution_list_query(primarySchList,'boundary')
                                     primaryBoundaryList.extend(list(BoundaryList))
 
-                                    BoundaryList = \
-    Boundary.objects.filter(id__in=primaryBoundaryList,
-                            boundary_type__id=2).values_list('parent',
-        flat=True).distinct()
+                                    BoundaryList = boundary_list_query(primaryBoundaryList,1,'parent')
                                     primaryBoundaryList.extend(list(BoundaryList))
+
+                                    BoundaryList = boundary_list_query(primaryBoundaryList,2,'parent')
+                                    primaryBoundaryList.extend(list(BoundaryList))
+
                                     preList = preBoundaryList  # ['%s' %i for i in preBoundaryList]
                                     primaryList = primaryBoundaryList  # ['%s' %i for i in primaryBoundaryList]
                                 elif content == 'institution':
@@ -245,104 +268,25 @@ class Command(BaseCommand):
                                 institution__boundary__boundary_type__id=2).values_list('id'
         , flat=True)
 
-                                                                # print 1
-                                                                # preSGList=map(int,preSGList)
-                                                                # print 2
-
                                     primarySGList = \
     StudentGroup.objects.filter(institution__id__in=primarySchList,
                                 institution__boundary__boundary_type__id=1).values_list('id'
         , flat=True)
 
-                                                                # print 3
-                                                                # primarySGList=map(int,primarySGList)
-                                                                # print 4
-
                                     preStList = \
     Student_StudentGroupRelation.objects.filter(student_group__id__in=preSGList).values_list('student'
         , flat=True)
-
-                                                                # print 5
 
                                     primaryStList = \
     Student_StudentGroupRelation.objects.filter(student_group__id__in=primarySGList).values_list('student'
         , flat=True)
 
-                                                                # print 6
-
-                                    preList = map(int, preStList)  # ['%s' % i for i in preStList]
-
-                                                                # print 7
-
-                                    primaryList = map(int,
-        primaryStList)  # ['%s' %i for i in primaryStList]
-
-                                        # print primaryStList[:5]
-                                        # print 8
-                                # preList.append(0)
-                                # primaryList.append(0)
-                                                        # print primaryList,'findal'
-                                # get all boundary/instituion/staff/student creates/Edited/Deleted by user.
-
-                                # print sTime, eTime, userId, contId, len(preList), len(primaryList)
-                                # print contId,eTime,sTime
-                                                        # preList=map(int,preList)
-
-                                dataList.append(FullHistory.objects.filter(action_time__range=(sTime,
-                                        eTime),
-                                        request__user_pk=userId,
-                                        content_type__id=contId,
-                                        object_id__in=preList,
-                                        action='C').count())
-                                dataList.append(FullHistory.objects.filter(action_time__range=(sTime,
-                                        eTime),
-                                        request__user_pk=userId,
-                                        content_type__id=contId,
-                                        object_id__in=preList,
-                                        action='U'
-                                        ).exclude(_data__icontains='active'
-                                        ).count())
-
-                                dataList.append(FullHistory.objects.filter(
-                                    action_time__range=(sTime, eTime),
-                                    request__user_pk=userId,
-                                    content_type__id=contId,
-                                    object_id__in=preList,
-                                    action='U',
-                                    _data__icontains='active',
-                                    ).count())
-                                primaryList = map(int, primaryList)
-
-                                                        # print 'afff'....
-
-                                dataList.append(FullHistory.objects.filter(action_time__range=(sTime,
-                                        eTime),
-                                        request__user_pk=userId,
-                                        content_type__id=contId,
-                                        object_id__in=primaryList,
-                                        action='C').count())
-
-                                                        # print '11'
-
-                                dataList.append(FullHistory.objects.filter(action_time__range=(sTime,
-                                        eTime),
-                                        request__user_pk=userId,
-                                        content_type__id=contId,
-                                        object_id__in=primaryList,
-                                        action='U'
-                                        ).exclude(_data__icontains='active'
-                                        ).count())
-
-                                # print '12'
-
-                                dataList.append(FullHistory.objects.filter(
-                                    action_time__range=(sTime, eTime),
-                                    request__user_pk=userId,
-                                    content_type__id=contId,
-                                    object_id__in=primaryList,
-                                    action='U',
-                                    _data__icontains='active',
-                                    ).count())
+                                    preList = map(int, preStList)
+                                    data_appendList(preList)
+                                
+                                    primaryList = map(int, primaryList)
+                                    data_appendList(primaryList)
+                                
 
                                                         # print '13'
                                     # print dataList....
