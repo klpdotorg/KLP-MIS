@@ -232,7 +232,7 @@ class Child_Form(Relations_Form):
                 first_name = cleaned_data.get("first_name")
                 last_name = cleaned_data.get("last_name")
                 if not first_name:
-                      msg = u"Enter First Name "
+                      msg = u"Enter First Name"
                       self._errors["first_name"] = self.error_class([msg])
                       del cleaned_data["first_name"]
                       del cleaned_data["last_name"]

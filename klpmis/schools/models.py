@@ -1042,6 +1042,18 @@ class Answer(models.Model):
         unique_together = (('question', 'object_id', 'flexi_data'), )
 
 
+    def save(self, *args, **kwargs):
+        # custom save method
+        #pdb.set_trace()
+        from django.db import connection
+        connection.features.can_return_id_from_insert = False
+        print "save"
+
+        print "name is",self.answer_score
+        self.full_clean()
+        super(Answer, self).save(*args, **kwargs)
+
+
 register_model(Answer)  # Register model for to store information in fullhistory
 
 
