@@ -1,0 +1,136 @@
+{% load template_tags %}
+<style>
+body{
+
+padding:0px !important;
+}
+</style>
+<div id="popData">
+<script type="text/javascript" src="/static_media/js/jquery.js"></script>
+<script language="javascript" type="text/javascript" src="/static_media/js/niceforms.js"></script>
+<script type="text/javascript" src="/static_media/js/thickbox.js" charset="utf-8"></script>
+
+
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/thickbox.css" charset="utf-8"/>
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/form.css" />
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/style.css" />
+<form action="." method="POST" enctype="multipart/form-data" id="assessment_lookupForm" onsubmit="return false;" >{% csrf_token %}
+			    
+			    
+			   
+			     
+			   
+			    
+                            <input type="hidden" name="form-buttonType" id="id_form-buttonType" value="save" />
+			    <input type="hidden" id="success_status" size="15" value="{{extra_context|displayValue:'showsuccess'}}" / >
+			    <input type="hidden" id="replaceTrue" name="replaceTrue" size="15" value="True" / >
+			 
+			   <input type="hidden" name="counter" id="id_counter" value="{{extra_context|displayValue:'counter'}}"/>
+				 <input type="hidden" id="assessment_id" name="assessment_id" size="15" value="{{extra_context|displayValue:'referKey'}}" / >
+				   <input type="hidden" name="url" id="replace_id" value="{{extra_context|displayValue:'assessment_lookup_id'}}" />
+				 <input type="hidden" name="url" id="id_lookupUpdateUrl" value="/assessment/{{extra_context|displayValue:'referKey'}}/assessment_lookup/{{extra_context|displayValue:'assessment_lookup_id'}}/update/" />
+			    <table class="tblprofile">
+				{{form.management_form}}
+				{% for entryForm in form.forms %}
+				
+				<span style="display:none">{{entryForm.id}} <input type="hidden" id="id_form-0-assessment" name="form-0-assessment" size="15" value="{{extra_context|displayValue:'referKey'}}" / ></span>
+		<table>
+        		<tr>
+      	    			<td>
+      		    			<table class="tblprofile">      			          				  				
+      						<tr>
+      							<td class="rightprofile"><label class="KLP_required">Name</label></td>
+      							<td class="rightprofile"><label class="KLP_required">Description</label></td>
+								<td>&nbsp;</td>
+      						</tr>
+      						<tr><td class="leftprofile">
+                            					{% render_field entryForm.name 'tabindex=1' %}
+                            					<!-- Assessment Name Field -->
+                            				
+                            					  
+                        				<br>
+                        					<!-- If Name field has errors show errors -->
+                                    				{% for error in entryForm.name.errors %}
+	                                				<span class="editErr">{{ error }}</span>
+	                                			{% endfor %}
+                                    			</td> 
+      				    			
+      							<td class="leftprofile">
+                            					{% render_field entryForm.description 'tabindex=2' %}
+                            					<!-- Start Date Field -->
+                        				</br>
+                        					<!-- If Start Date field has errors show errors -->
+                                    				{% for error in entryForm.description.errors %}
+	                                				<span class="editErr">{{ error }}</span>
+	                                			{% endfor %}
+                                    			</td> 
+												<td>
+                                    				<input type="submit" name="save" id="id_save" value="Save" tabindex=4 />
+                                    			</td>
+      						</tr>
+      												      						      										
+      						 
+                                   
+      			    			
+      					</table>
+      				</td>
+      			</tr>
+				  {% endfor %}
+    		</table>
+ 
+                                
+				
+</form>
+				<script>
+  $(document).ready(function(){
+     setTimeout(function(){
+		$('input:visible:enabled:first').focus();
+	},200);
+
+     var KLP_Hide_Msg = function(){
+	$("#successMsgHead").hide();
+        $("#failureMsgHead").hide();
+}
+
+   $("#id_save").click(function(){
+        /* Clicking on save button hide all prv msgs and call form submit and pass button type is save */
+	KLP_Hide_Msg();
+	
+   	KLP_form_submit();
+   });
+
+   
+
+var KLP_form_submit = function(){
+    $("#id_save").attr("disabled", "true");
+   
+    replaceId =  $('#replace_id').val()
+    /* post data using post method */
+	assessementId=$('#id_form-0-assessment').val();
+	
+	alokupname=$('#id_form-0-name').val();
+	alookupdescription=$('#id_form-0-description').val();
+	
+    $.post(  
+        $("#id_lookupUpdateUrl").val(),  
+        $("#assessment_lookupForm").serialize(),  
+        function(data){
+        	$('#popData').html(data);
+			
+		NFInit();
+		$("#id_save").removeAttr("disabled");
+		var successStatus = $("#success_status").val();
+		
+		if (successStatus == 'True'){
+			/* If Success update row */
+			$('#assessment_'+assessementId+'_'+replaceId+' .tot-border2', self.parent.parent.document).html(alokupname);
+			$('#assessment_'+assessementId+'_'+replaceId+' .tot-border1', self.parent.parent.document).html(alookupdescription);
+			window.parent.parent.tb_init('#'+replaceId+' a.thickbox, area.thickbox, input.thickbox');
+			window.parent.parent.$("#successMsgHead").show();
+	   		window.parent.parent.$("#klp_MsgTxt").html("Assessement Lookup Updated Successfully");
+	   		$("body").html("Assessement Lookup Updated Successfully");
+        	} 
+    	});  
+}
+});
+</script>

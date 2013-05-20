@@ -1,0 +1,115 @@
+<div class="KLP_Button_Header">
+	<!-- This Block shows the buttons for add, edit and delete-->
+	<span class="KLP_Sub">
+		<a class="KLP_Button"  href="/assessment/question/{{assessment.id}}/creator" onclick="return KLP_View(this);">Add Question</a>
+	</span>
+	<span class="KLP_Sub">
+		<a class="KLP_Button"  href="/assessment/{{assessment.id}}/update/" onclick="return KLP_View(this);">Edit</a>
+	</span>
+	<span class="KLP_Sub">
+		<span class="KLP_SpanButton"  onclick="KLP_Del('{{assessment.id}}', 'assessment', '{{assessment.name}}')">Delete</span>
+	</span>
+	<span class="KLP_Sub">
+                <a class="KLP_Button"  href="/assessment/{{assessment.id}}/copy/" onclick="return KLP_View(this);">Copy</a>
+        </span>
+	<span {% if  not assessment.flexi_assessment %} style="display:none" {% endif %} class="KLP_Sub" >
+                <a class="KLP_Button"  href="/assessment/assessment_lookup/{{assessment.id}}/view" onclick="return KLP_View(this);">Assessement Loop up View</a>
+    </span>
+</div>
+
+
+<div class="detailHead">
+<span class="hedText">Assessment Details</span>
+</div>
+
+<div class="boundDetail">
+    <div class="cl-txtbx">
+    	<label>Programme Name</label>
+    </div>
+    <div class="bng-cl">
+    	<span>{{assessment.programme}}</span>	<!--Displays Programme name -->
+    </div>
+</div>
+
+<div class="boundDetail">
+    <div class="cl-txtbx">
+    	<label>Assessment Name</label>
+    </div>
+    <div class="bng-cl">
+	    <span>
+	    	<!--Displays Assessment name -->
+		{{assessment}}
+		<input type="hidden" name="id" id="assessment_id" size="15" value="{{assessment.id}}" / >  <!-- Assessment Id val to create new node in tree-->
+		<input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / >   <!-- For Success msg-->
+	    </span>
+    </div>	
+</div>
+<div class="boundDetail">    
+    <div class="cl-txtbx">
+    	<label>Start Date</label>
+    </div>
+    <div class="bng-cl">
+    	<span>{% if assessment.start_date %}{{assessment.start_date|date:'d-m-Y'}}{% endif %}</span>  <!-- Display Start Date -->
+    </div>
+</div>
+<div class="boundDetail">
+    <div class="cl-txtbx">
+    	<label>End Date</label>
+    </div>
+    <div class="bng-cl">
+    	<span>{% if assessment.end_date %}{{assessment.end_date|date:'d-m-Y'}}{% endif %}</span>   <!-- Display End Date -->
+    </div>
+</div>
+
+
+<div class="boundDetail">
+    <div class="cl-txtbx">
+        <label>Flexi Assessement Type</label>
+    </div>
+    <div class="bng-cl">
+        <span>{{assessment.get_typ_display}}</span>  <!-- Display Assessment Type -->
+    </div>
+</div>
+<div class="boundDetail">
+    <div class="cl-txtbx">
+        <label>Double Entry</label>
+    </div>
+    <div class="bng-cl">
+        <span>{{assessment.double_entry}}</span>   <!-- Display End Date -->
+    </div>
+</div>
+
+<div class="boundDetail">
+    <div class="cl-txtbx">
+        <label>Flexi Assessement </label>
+    </div>
+    <div class="bng-cl">
+        <span>{{assessment.flexi_assessment}}</span>  <!-- Display Flexi Assessment Type -->
+    </div>
+</div>
+<div {% if  not assessment.flexi_assessment %} style="display:none" {% endif %}>
+<div class="boundDetail">
+    <div class="cl-txtbx">
+        <label>Primary Field Name</label>
+    </div>
+    <div class="bng-cl">
+        <span>{{assessment.primary_field_name}}</span>   <!-- Display Primary Field Name -->
+    </div>
+</div>
+<div class="boundDetail">
+    <div class="cl-txtbx">
+        <label>Primary Field Type</label>
+    </div>
+    <div class="bng-cl">
+        <span>{{assessment.get_primary_field_type_display}}</span>   <!-- Display Primary Field TYpe -->
+    </div>
+</div>
+</div>
+<div class="boundDetail">
+    <div class="cl-txtbx">
+        <label>Active Status</label>
+    </div>
+    <div class="bng-cl">
+        <span>{% if assessment.active == 2 %} Active {% else  %} InActive {% endif%}</span>   <!-- Display ACtive -->
+    </div>
+</div>

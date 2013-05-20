@@ -1,0 +1,249 @@
+{% load template_tags %}
+
+<div  id="searchRes" style="width:650px;">
+	<div class="detailHead">
+	<span class="hedText">Institution Details</span>
+	</div>
+		<div class="KLP_lef_Div">
+			<table cellspacing="0" cellpadding="0" border="1" id="ans_Student_Detail">
+	    			<tr class="KLP_txt_cen">
+	    				<td class="KLP_Ans_Fix">
+	    					<div class="KLP_Fix_Div">
+		    					<table>
+		    						<tr>
+		    						
+					    				{% if not AssObj.flexi_assessment %}<td class="KLP_td_width">Ins.Id</td>{% endif %}
+					    				<td class="KLP_td_width">
+					    					Name
+					    					<input type="hidden" name="studentgroup" id="studentgroup_id" value="{{studentgroup_id}}" />
+					    				</td>
+					    			</tr>
+					    		</table>
+				    		</div>
+				    	</td>
+	    			</tr>
+	    			<!-- Shows Student Id and Name -->
+	    			{% for i in chList%}
+	    				<tr class="KLP_txt_cen">
+	    					<td class="KLP_Ans_Fix">
+	    						<div class="KLP_Fix_Div">
+		    						<table>
+		    							<tr>{% if forloop.first %}  
+		    								{% with childDict|displayValue:i as cDic %}
+								{% if not AssObj.flexi_assessment %}		<td class="KLP_td_width">{{cDic|displayValue:'instId'}}</td>{% endif %}
+										<td class="KLP_td_width" style="min-width:108px;max-width:108px;">
+											
+										 <span class="blue" title="Name: {{cDic|displayValue:'name'}}">{{cDic|displayValue:'name'}} </span>
+										 <br/><span class="KLP_Form_status" id="id_Student_{{forloop.counter}}_status">Form Status</span>	
+
+										</td>
+										
+										{% endwith%}
+										{% else %}
+										 <td class="KLP_td_width">&nbsp;</td>
+										  <td class="KLP_td_width" style="min-width:108px;max-width:108px;">
+										  <span class="KLP_Form_status" id="id_Student_{{forloop.counter}}_status">Form Status</span></td>
+										   
+										{% endif %}
+									</tr>
+								</table>
+							</div>
+						</td>
+					</tr>
+	    			{% endfor %}		
+			</table>	
+			
+		</div>
+		<div class="KLP_Scroll_Div">
+			<table cellspacing="0" cellpadding="0" border="1" width="100%" id="id_ans_data_point">
+	     			<tr>
+	     				<td class="KLP_Ans_Fix">
+	     					<div class="KLP_Fix_Div">
+		     					<table>
+		     						<!-- Question names row -->
+		     						<tr>
+									{% if qNamesList %} {% if AssObj.flexi_assessment %}<td class="KLP_td_height"> {{AssObj.primary_field_name}}</td>{% endif%} 
+										{% for ques in qNamesList %}
+						    					<td class="KLP_td_height"><span class="blue" title="{{ques}}">{{ques}}</span></td>
+
+										{% endfor %}
+										<td class="KLP_td_height"> Submit{{extra_context}} </td>
+					    				{% else %}
+										<td class="KLP_td_height">&nbsp;</td>
+									{% endif %}
+						
+		     						</tr>
+		     					</table>
+	     					</div>
+	     				</td>
+	     			</tr>
+	                        <!-- shows grid for the each student -->
+							
+										
+						{% for studId in studIdList %} 
+						{% with studId|CatString:forloop.counter as i%}
+							<tr class="KLP_txt_cen">
+							<td class="KLP_Ans_Fix">
+								<div class="KLP_Fix_Div">
+									<form name="student_{{i}}" id="id_Student_{{i}}" class="validForm" onsubmit="return false;">{% csrf_token %}
+{{formmanage}} 
+										<input type="hidden" name="student_groupId" value="{{studentgroup_id}}" />
+										<input type="hidden" name="programId" value="{{filter_id}}"/>
+										<input type="hidden" name="assessmentId" value="{{assessment_id}}"/>
+										<input type="hidden" name="student" value="{{i}}"/>
+									<input type="hidden" name="formcounter" id="formcounter" value="{{forloop.counter}}"/>
+										<table>
+																	   
+												 <tr>
+													<!-- Repeat Question -->
+												{% for qId in qIdList %}
+												{% with qId|CatString:i as datadicKey %}
+												{% with rDict|displayValue:datadicKey as qDict %}
+											
+												
+												<!-- Get Question data based on question id and student id -->
+													{% if  AssObj.flexi_assessment and  forloop.first %} 
+														<td class="KLP_td_height">
+														{% if  not qDict|displayValue:'iBox' %}
+                                                                                                                                {{qDict|displayValue:'lookupname'}}
+                                                                                                                        {% else %}
+	
+															{% if AssObj.primary_field_type == 4 %} 
+
+																<select class="required" tabindex="1" name="primaryvalue_{{i}}" 
+																   id="id_primaryvalue_{{i}}">
+																   <option value="">Select</option>
+																 {% for lookupfield in lookupfields %}
+																			<option value="{{lookupfield.id}}" 
+																			{% if qDict|displayValue:'flexi_data' == lookupfield.id|slugify %} selected="selected" <{% endif %}>{{lookupfield.name}}
+																 
+																		   </option>
+																{% endfor %}
+																</select>
+                                                                                                                              {% else %}
+                                                                                                                                             <input  {% if AssObj.primary_field_type == 1 %}   class="required numbersonly" {% endif %}  {% if AssObj.primary_field_type == 3 %}  class="required dateDE" {% endif %}  {% if AssObj.primary_field_type == 2 %}  class="required characters" {% endif %} name="primaryvalue_{{i}}" value="{{qDict|displayValue:'flexi_data'}}" type="text" size="10" tabindex="1" id="id_primaryvalue_{{i}}">
+
+															{% endif %}
+                                                                                                                  {% endif %}
+                                                                                 
+														<td>
+													{% endif %}
+														<td class="KLP_td_height">
+															<!-- if ibox value false show answer value -->
+															{% if  not qDict|displayValue:'iBox' %}
+																{{qDict|displayValue:'ansVal'}}
+															{% else %}
+																<!-- else Show question order with input box -->
+																<span style="color:#736F6E;">{{qDict|displayValue:'qOrder'}}</span><br/>
+																<!-- If 2nd user login hide data and attributes dE and sE -->
+																<input type="hidden" class="ansIds" name="ansId_{{datadicKey}}" 
+																		   id="id_ansId_{{datadicKey}}" 
+																						   value="{{qDict|displayValue:'ansId'}}" size="10">
+																<input type="text"	
+																		   name="student_{{datadicKey}}" 
+																		   id="id_student_{{datadicKey}}" 
+																		   tabindex="1"
+																		   value="{%if qDict|displayValue:'shVal' %}{{qDict|displayValue:'ansVal'}}{% endif %}" 
+																		   
+																		   size="3"
+																		   {% if qDict|displayValue:'qType' == 2 %}isinGrades="{{qDict|displayValue:'ansIn'}}"{% else %}min="{{qDict|displayValue:'scMin'}}" max="{{qDict|displayValue:'scMax'}}" {% endif %}
+																		   class="required {% if qDict|displayValue:'qType' == 1 %}number{%endif%}"
+																		   {% if qDict|displayValue:'dE'%}dE="true" sE="true"{% endif %}
+																		   />
+																	   
+															{% endif %}
+															
+													
+													
+														</td>
+														{% if forloop.last %}
+															<td class="KLP_td_height"> <br/><input id="id_Student_{{i}}_submit" type="submit" tabindex="1"   value="submit"  {% if not qDict|displayValue:'iBox' %}disabled{%endif%}/>       
+															
+															<script>
+															$().ready(function() {
+															{% if AssObj.primary_field_type == 3 %}
+                                                                 $( "#id_primaryvalue_{{i}}" ).datepick({dateFormat: 'dd-mm-yyyy'});
+                                                           {% endif %}
+															KLP_validateScript("id_Student_{{i}}");
+															});
+															</script>
+															</td>				
+														{% endif %}
+													{% endwith %}	
+													{% endwith %}
+														
+												{% endfor %}
+												
+											</tr>
+										</table>
+										</form>
+										
+										</div>
+										
+									</td>
+									
+						</tr>
+					
+						{% endwith %}
+						{% endfor %}
+						
+			</table>
+			
+</div><br/>
+<div id="student_pagenation" style="{% if not childs_list %}display:none;{% endif %}">
+	        <!-- Pagination -->
+		page <span id="id_currentPage">{{page}}</span> of <span id="id_totPages">{{pages}}</span>
+		<input type="hidden" name="resultPerPage" id="id_resultPerPage" value="{{results_per_page}}" />
+		<input type="hidden" value = "{{Norecords}}" id="Norecords" name="Norecords"/>
+		<input type="hidden" name="lastPage" id="id_lastPage" value="{{pages}}" />
+		{% if pages > 1 %}
+			{% for i in pages|KLPrange %}  
+	   			<span page='page_{{forloop.counter}}' onclick="Pagination(this)" style="cursor:pointer;color:blue;padding-left:10px;">{{ forloop.counter }}</span>
+			{% endfor %}  
+		{% endif %}
+	
+</div>
+<span id ="list_url" style="display:none;" value = "{{url}}"></span>
+<div class="KLP_DE_Submit">
+	<span class="KLP_SpanButton"  id="id_ans_global_submit">Submit</span>
+</div>
+
+
+<script>
+$(document).ready(function(){
+      $('.blue').bt(); // For tool tip
+	
+       
+       $("#id_ans_global_submit").click(function(){
+       		/* Clicking on submit get all forms and validate and submits the forms */
+       		var forms = $("form");
+       		forms.each(function(index){
+       			var dataForm = $(this).find("input[type=text]:visible").length
+       			if (dataForm > 0){
+	       			var formId  = $(this).attr("id");
+	  			$('#'+formId).trigger('submit');
+	       			KLP_validateScript(formId);
+	       		}
+       			
+       		});
+       });
+       
+      
+});
+function Pagination(thisObj){
+	pages = $(thisObj).attr('page')
+	page = pages.split('_')[1]
+        $.ajax({
+            url: $('#list_url').attr('value'),
+            data:'&page='+page,
+            success: function(data) {
+                $('#searchRes').html(data);
+		tb_init('a.thickbox, area.thickbox, input.thickbox');
+            }
+        });
+	return false;
+}
+</script>
+
+
+

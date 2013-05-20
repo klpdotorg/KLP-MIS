@@ -1,0 +1,90 @@
+{% load template_tags %}
+
+<div class="KLP_Button_Header">
+	<!-- This Block shows the buttons for add, edit and delete-->
+	
+	<span class="KLP_Sub">
+                <a class="KLP_Button"  href="/assessment/{{assessment_id}}/view/" onclick="KLP_View(this);">View Assessement</a>
+        </span>
+		<span  style="display:none" id="viewlookup" class="KLP_Sub" >
+                <a class="KLP_Button" id="lookuplist" href="/assessment/assessment_lookup/{{assessment_id}}/view" onclick="return KLP_View(this);">View Lookup Value</a>
+    </span>
+		
+</div>
+
+<div class="detailHead">
+<span class="hedText">Copy The Lookup Value </span>
+<span id ="showsuccess" style="display:none;" class="klp_MsgTxt"></span>
+</div>
+
+<form action="." method="POST" class="niceform" name="name_copyassessmentLooupDetail" id="id_copyassessmentLooupDetail">
+
+<div>
+	From Assessment</th> 
+   
+    	<!-- Child Information -->
+		 
+		  <select id="lookupValues" name="lookupValues">
+		 {% for assessment in assessmentList %}
+		 <option value="{{assessment.id}}">{{assessment.programme.name}}-->{{assessment.name}}</option>
+    
+			
+	   {% endfor %}
+	</select>
+	
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="save" id="id_save" value="Copy" tabindex=4 />
+      
+
+<div>
+
+
+
+</div>
+
+</form>
+
+<script>
+$(document).ready(function(){
+$("#id_save").click(function(){
+
+    	 
+	
+
+$.ajax({
+      type: "POST",
+      url:"/assessment/assessment_lookup/{{assessment_id}}/copy",
+      data: $("#id_copyassessmentLooupDetail").serialize(),
+      
+      
+	  success:function(data){
+			
+		    
+			 
+                    if (data == 'Copied Successfully'){
+			
+			
+			
+			$('#lookuplist').trigger('onclick');
+			$("#successMsgHead").show();
+			$("#copiedstatus").html(data);
+		
+		}
+		else{
+			
+		   $('#failureMsgHead').show();
+		   successObj.hide();
+		}
+		
+	 
+	  }
+});
+		
+		return false;
+		
+   
+	
+});	
+});	
+
+</script>
+</div>
