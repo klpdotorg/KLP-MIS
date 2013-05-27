@@ -6,20 +6,25 @@ import django
 import datetime
 import os
 import csv
+import pdb
 from klprestApi.TreeMenu import KLP_assignedInstitutions
 import datetime
 from django.db import transaction
 
 from schools.forms import *
 from django.forms.models import modelformset_factory
+
+def cmpT(t1, t2): 
+    return sorted(t1) == sorted(t2)
+
 class Command(BaseCommand):
 
     ''' Command To map assessments with student group and to assign permissions to users automatically. And then it list out the user permissions.'''
 
     @transaction.autocommit
     def handle(self, *args, **options):
-        try:
-
+        if 1:
+           
             # Reads the arguments from command line.
 
             fileName = args[0]
@@ -30,14 +35,14 @@ class Command(BaseCommand):
                 reportflag = 0
 
             # checks for arguments
-
+            #pdb.set_trace()
             starttime = procestime = datetime.datetime.now()
             self.stdout.write('The mapping is started at %s\n'
                               % starttime)
             asstypedic = {1: 'Institution', 2: 'Student',
                           2: 'Student Group'}
             if fileName and assessment_id:
-                try: 
+                if 1: 
                     mapFile = open(fileName, 'r')  # open file to read data
                     studenGroups = mapFile.read().replace('\n', '')  # read data from file
                     mapFile.close()  # Close file after reading data
@@ -111,7 +116,7 @@ class Command(BaseCommand):
                                 else:
 
                                                                 # mapping assement and Institution
-                                    ASAObj=Assessment_Institution_Association.objects.filter(student_group=sgObj,  assessment=assessmentObj) 
+                                    ASAObj=Assessment_Institution_Association.objects.filter(institution=sgObj,  assessment=assessmentObj) 
                                     # mapObj = \Assessment_Institution_Association(assessment=assessmentObj,institution=sgObj, active=2)
                                     AssStudAssForm= modelformset_factory(Assessment_Institution_Association,form=Assessment_Institution_Association_Form)
                                     MappingStr = \
@@ -132,8 +137,28 @@ class Command(BaseCommand):
                                                      self.stdout.write('%s are Already Mapped ...\n'
          % MappingStr)
                                           else:
-                                             rform.save()
-                                             self.stdout.write('%s are Mapped ...\n'
+                                             try:
+                                                 ascopy = Assessment_Institution_Association.objects.get(institution__id=requestcopy['form-0-student_group']
+                                             ,assessment__id = requestcopy['form-0-assessment'])
+                                             except:
+                                                 if not assessmentObj.typ == 1:
+                                                    rform.save()
+                                                 else:
+                                                     if not Assessment_Institution_Association.objects.filter(assessment__id=requestcopy['form-0-assessment'], institution__id = requestcopy['form-0-assessment']).exists():
+                                                         from django.db import connection
+                                                         cursor = connection.cursor()
+                                                         q1 = """select count(*) from schools_assessment_institution_association where assessment_id = %d and institution_id = %d and active=2 """ %(requestcopy['form-0-assessment'],requestcopy['form-0-student_group'])
+                                                         cursor.execute(q1)
+                                                         res = cursor.fetchone()
+                                                         bt = (0L,)
+                                                         qres = cmpT(res,bt)
+                                                         if qres:
+                                                             qu = """insert into schools_Assessment_Institution_Association(assessment_id, institution_id, active) \
+                                                             values (%s, %s, 2) """ %(requestcopy['form-0-assessment'],requestcopy['form-0-student_group'])
+                                                             cursor.execute(qu)
+                                                         else:
+                                                             print "record exist"
+                                                 self.stdout.write('%s are Mapped ...\n'
          % MappingStr)
                                 '''
                                 try:
@@ -184,6 +209,7 @@ class Command(BaseCommand):
                         self.stdout.write('\n%s .Now performing %s ,'
                                 % (str(userNo), user.username))
                         print user.username
+                        #pdb.set_trace()
                         perm_instList = \
                             KLP_assignedInstitutions(user.id)
                         perm_instSet = \
@@ -303,14 +329,14 @@ class Command(BaseCommand):
  Total time was taken for all the users %s 
 '''
                             % str(datetime.datetime.now() - starttime))
-                except:
+                else:
 
                          # except IOError:
                     # # If Arguments are not in proper order raises an command error
 
                     raise CommandError('Pass First Parameter is FileName and Second Parameter is Assessment Id\n'
                             )
-        except:
+        else:
 
                # except IndexError:
             # If Arguments are not passed raises an command error

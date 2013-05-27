@@ -1030,9 +1030,9 @@ class Answer(models.Model):
                               related_name='user1')
     user2 = models.ForeignKey(User, blank=True, null=True,
                               related_name='user2')
-    creation_date = models.DateField(default=datetime.date.today,
+    creation_date = models.DateField(auto_now_add=True,
                                     blank=True, null=True)
-    last_modified_date = models.DateField(default=datetime.date.today,
+    last_modified_date = models.DateField(auto_now=True,
             blank=True, null=True)
     last_modified_by = models.ForeignKey(User, blank=True, null=True,
             related_name='last_modified_by')
@@ -1042,6 +1042,17 @@ class Answer(models.Model):
 
         unique_together = (('question', 'object_id', 'flexi_data'), )
 
+
+    def save(self, *args, **kwargs):
+        # custom save method
+        #pdb.set_trace()
+        from django.db import connection
+        connection.features.can_return_id_from_insert = False
+        print "save"
+
+        print "=================== status is", self.status
+        self.full_clean()
+        super(Answer, self).save(*args, **kwargs)
 
 register_model(Answer)  # Register model for to store information in fullhistory
 

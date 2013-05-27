@@ -160,8 +160,11 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
         if AssObj.flexi_assessment: 
 	   ansflexObj = list(set(Answer.objects.filter(question__in=question_list, object_id__in = studIdList).distinct().order_by('id').values_list('flexi_data',flat=True)))
         else:
-                ansflexObj = Answer.objects.filter(question__in=question_list, object_id__in = studIdList).values_list('flexi_data',flat=True)
-       
+                ansflexObj = Answer.objects.filter(question__in=question_list, object_id__in = studIdList).order_by('flexi_data').values_list('flexi_data',flat=True)
+        if ansflexObj:
+            ansflexObj = list(ansflexObj)
+            ansflexObj.sort()  
+        print ansflexObj,'FFFFFFFFFFFFFFFFFFFFL' 
 	qIdList=question_list.values_list('id',flat=True).distinct()
 	qNamesList=question_list.values_list('name',flat=True).distinct()
 	lookupfields=''
@@ -338,7 +341,7 @@ def MapStudents(request,id):
 		# if Student and Student Group Id
 		studentgroup =  StudentGroup.objects.get(pk = studentgroup_id)
 		school =  Institution.objects.get(pk = request.POST['school'])
-		academic =  Academic_Year.objects.get(pk = current_academic().id)
+		academic =  Academic_Year.objects.get(pk = current_academic().id) 
 		# Create Relation between Student and center
 		for student in student_id:
 			childObj = Child.objects.get(pk = student)
