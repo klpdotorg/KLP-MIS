@@ -30,7 +30,9 @@ class KLP_ChangeAns(Resource):
     """ To Create and Edit Answers answer/data/entry/"""
 
     def read(self, request):
+        
         user = request.user  # get Logged in user
+        print "logged user is ", user
         userid = user.id
         student = request.POST.get('student')  #  get Student
         programId = request.POST.get('programId')  #  get programme id
@@ -58,7 +60,7 @@ class KLP_ChangeAns(Resource):
 
             studentObj = studentObj1[0]
         elif assessmentObj.typ == 2:
-            modelName='studentgroup' 
+            modelName='student group' 
             studentObj = student_groupObj[0]
             instObj = studentObj.institution
         
@@ -180,13 +182,14 @@ class KLP_ChangeAns(Resource):
                         newanswerdata['form-0-object_id']=studentObj.id
                         newanswerdata['form-0-active']=2  
                         newanswerdata['form-0-user1']=ansObj.user1.id
-                        newanswerdata['form-0-user2']=ansObj.user2 #.id   
+                        newanswerdata['form-0-user2']=ansObj.user2.id #.id   
                         newanswerdata['form-0-id']=ansObj.id  
                         newanswerdata['form-INITIAL_FORMS']=1
                         #print newanswerdata,ansObjs[0].id 
                         request.POST=newanswerdata
+
                         ansForm=AnswerForm(request.POST,request,queryset=ansObjs)
-        
+            
                         if ansForm.errors:
                            if ansForm.errors[0].has_key('__all__'):
                               return 'Primary Value is already existing  '
@@ -320,8 +323,7 @@ def KLP_DataValidation(request):
                     if ansObj.answer_grade.lower() \
                         == validateValue.lower():
                         respStr = True
-                    elif float(ansObj.answer_grade) \
-                        == float(validateValue):
+                    elif (ansObj.answer_grade) == (validateValue):
                         respStr = True
                 else:
                     pass

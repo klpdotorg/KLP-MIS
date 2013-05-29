@@ -418,6 +418,17 @@ class Child(models.Model):
         return '/child/%d/update/' % self.id
 
 
+    def save(self, *args, **kwargs):
+        # custom save method
+        #pdb.set_trace()
+        from django.db import connection
+        connection.features.can_return_id_from_insert = False
+        print "save"
+
+        print "first name is", self.first_name
+        self.full_clean()
+        super(Child, self).save(*args, **kwargs)
+
 register_model(Child)  # Register model for to store information in fullhistory
 
 
@@ -688,6 +699,17 @@ class Student(models.Model):
             self.name,
             )
 
+
+    def save(self, *args, **kwargs):
+        # custom save method
+        #pdb.set_trace()
+        from django.db import connection
+        connection.features.can_return_id_from_insert = False
+        print "save"
+
+        print "active is", self.active
+        self.full_clean()
+        super(Student, self).save(*args, **kwargs)
 
 register_model(Student)  # Register model for to store information in fullhistory
 
