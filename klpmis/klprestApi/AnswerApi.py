@@ -17,6 +17,7 @@ from schools.models import *
 from django_restapi.authentication import *
 from django.db import IntegrityError
 from schools.receivers import KLP_obj_Perm
+import pdb
 
 from django.forms.models import modelformset_factory
 
@@ -30,7 +31,7 @@ class KLP_ChangeAns(Resource):
     """ To Create and Edit Answers answer/data/entry/"""
 
     def read(self, request):
-        
+
         user = request.user  # get Logged in user
         print "logged user is ", user
         userid = user.id
@@ -73,6 +74,7 @@ class KLP_ChangeAns(Resource):
         Questions_list = \
             Question.objects.filter(assessment__id=assessmentId)  # get questions under assessment
         dobleEntReq = assessmentObj.double_entry
+        #pdb.set_trace()
         if dobleEntReq:
             dE = 2 
         else:
@@ -170,7 +172,9 @@ class KLP_ChangeAns(Resource):
                         ansObj.double_entry = 2
                         ansObj.last_modified_by = user
                         ansObj.user2 = user
+                    #pdb.set_trace()
                     try:
+                        
                         newanswerdata['form-0-answer_score']=ansObj.answer_score
                         newanswerdata['form-0-last_modified_by']=ansObj.last_modified_by.id
                         #newanswerdata['form-0-answerText']=ansObj.answerText
@@ -182,18 +186,32 @@ class KLP_ChangeAns(Resource):
                         newanswerdata['form-0-object_id']=studentObj.id
                         newanswerdata['form-0-active']=2  
                         newanswerdata['form-0-user1']=ansObj.user1.id
-                        newanswerdata['form-0-user2']=ansObj.user2.id #.id   
+                        if ansObj.user2:
+                            newanswerdata['form-0-user2']=ansObj.user2.id #.id
+                            print " the user is **********", ansObj.user2.id
+                        else:
+                            newanswerdata['form-0-user2']=''
+                        
                         newanswerdata['form-0-id']=ansObj.id  
                         newanswerdata['form-INITIAL_FORMS']=1
                         #print newanswerdata,ansObjs[0].id 
                         request.POST=newanswerdata
 
+                        firstuserdata1 = Answer.objects.filter(question__id=\
+                        question.id, user1__id = user.id, object_id = \
+                        studentObj.id, flexi_data = primaryfieldVal)
                         ansForm=AnswerForm(request.POST,request,queryset=ansObjs)
-            
-                        if ansForm.errors:
-                           if ansForm.errors[0].has_key('__all__'):
-                              return 'Primary Value is already existing  '
-                        ansForm.save()
+                        if not firstuserdata1.count() == 0:
+                            f1 = firstuserdata1[0]
+                            f1.answer_score = answer_score
+                            f1.answer_grade = answer_grade
+                            f1.save()
+                            print "existing record id is", f1.id
+                        else:
+                            if ansForm.errors:
+                               if ansForm.errors[0].has_key('__all__'):
+                                  return 'Primary Value is already existing  '
+                            ansForm.save()
                         #ansObj.save()  # Save Answer object
                     except IntegrityError:
                         return 'Primary Value is already existing  '
@@ -259,14 +277,29 @@ class KLP_ChangeAns(Resource):
                         newanswerdata['form-0-user1']=user.id
                         newanswerdata['form-0-question']=question.id
                         newanswerdata['form-0-content_type']=cTObj.id
-                        newanswerdata['form-0-object_id']=studentObj.id         
-                        ansForm=AnswerForm(newanswerdata,request)
-        
-                        if ansForm.errors:
-                            if ansForm.errors[0].has_key('__all__'):
-                              return 'Primary Value is already existing  '
+                        newanswerdata['form-0-object_id']=studentObj.id
+
+
+                        firstuserdata = Answer.objects.filter(question__id=\
+                        question.id, user1__id = user.id, object_id = \
+                        studentObj.id, flexi_data = primaryfieldVal)
+                        if not firstuserdata.count() == 0:
+                            f =  firstuserdata[0]
+                            f.answer_score = answer_score
+                            f.answer_grade = answer_grade
+                            f.save()
+                            print "existing record id is", f.id
                             
-                        ansForm.save()
+                        else:
+                            ansForm=AnswerForm(newanswerdata,request)
+
+
+                            if ansForm.errors:
+                                if ansForm.errors[0].has_key('__all__'):
+                                  return 'Primary Value is already existing  '
+                            
+                            ansForm.save()
+                            
 
                         #ansObj.save()
                     except IntegrityError:
@@ -277,7 +310,8 @@ class KLP_ChangeAns(Resource):
 
 def KLP_DataValidation(request):
     """ To Validate data for Doble Entry answer/data/validation/"""
-
+    #import pdb 
+    #pdb.set_trace()
     validateId = request.POST.get('validateField')  #  Get ValidateId (student and question id)
     validateValue = request.POST.get('validateValue')  #  Get Text field value to validate
     listIds = validateId.split('_')
