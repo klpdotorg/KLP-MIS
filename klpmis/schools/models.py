@@ -7,7 +7,7 @@ from django.contrib.contenttypes import generic
 from django.contrib.auth.models import User
 from object_permissions import register
 from fullhistory import register_model
-
+from klpmis.settings.default import CURRENT_ACADEMIC_YEAR_MONTH
 # Table Structure For Klp
 
 register_model(User)
@@ -767,9 +767,9 @@ def default_end_date():
     currentYear = int(now.strftime('%Y'))
     currentMont = int(now.strftime('%m'))
     if currentMont > 5:
-        academic_end_date = datetime.date(currentYear + 1, 5, 30)
+        academic_end_date = datetime.date(currentYear + 1, CURRENT_ACADEMIC_YEAR_MONTH, 30)
     else:
-        academic_end_date = datetime.date(currentYear, 5, 30)
+        academic_end_date = datetime.date(currentYear, CURRENT_ACADEMIC_YEAR_MONTH, 30)
     return academic_end_date
 
 
