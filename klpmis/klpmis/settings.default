@@ -88,7 +88,7 @@ SITE_ID = 1
 # to load the internationalization machinery.
 
 # Current Academic Year Month
-CURRENT_ACADEMIC_YEAR_MONTH = 9
+LAST_MONTH_CUR_ACADEMIC_YEAR = 9
 
 USE_I18N = True
 
