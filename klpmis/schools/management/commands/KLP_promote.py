@@ -4,6 +4,9 @@
 from django.core.management.base import BaseCommand, CommandError
 from schools.models import *
 from datetime import datetime
+from django.db import connection
+import pdb
+
 
 
 class Command(BaseCommand):
@@ -12,13 +15,11 @@ class Command(BaseCommand):
     # help = 'Students Promoting to Next Year'
 
     def handle(self, *args, **options):
+        cursor = connection.cursor()
+        #pdb.set_trace()
+        currentAcademic = Academic_Year.objects.get(name='2012-2013')  # current_academic
 
-            # wrong=Student_StudentGroupRelation.objects.filter(active=4)
-            # wrong.update(active=2)
-
-        currentAcademic = Academic_Year.objects.get(name='2011-2012')  # current_academic
-
-        currentYear = 2012  # int(currentAcademic().name.split('-')[1])
+        currentYear = int(currentAcademic.name.split('-')[1])
         nextAcademic = str(currentYear) + '-' + str(currentYear + 1)
         currentAcademicObj = currentAcademic
         print 'CurrentAcademic Year :', current_academic().name
@@ -39,9 +40,10 @@ class Command(BaseCommand):
         totalpromotedStudDic = {}
         for inst in institutions:
             print 'Institution Name : ', inst.name, inst.id
+            #pdb.set_trace()
             studentGroups = \
-                StudentGroup.objects.filter(institution=inst, name='7',
-                    active__in=[2], group_type='Class').order_by('name'
+                StudentGroup.objects.filter(institution=inst,
+                    active__in=[2,1], group_type='Class').order_by('name'
                     ).reverse()
             sgdic = studentGroups.values_list('id', 'name')
             sgidlist = {}
@@ -78,7 +80,7 @@ class Command(BaseCommand):
             for sgid in sglist:
                 totalpromotedStud = 0
                 totalStud = 0
-                if sgid == 7:
+                if 1:
                     for k in sgidlist[sgid]:
 
                         sg = StudentGroup.objects.get(id=k)
@@ -86,7 +88,7 @@ class Command(BaseCommand):
                                 sg.name, sg.section)
                         sg_stRealtions = \
                             Student_StudentGroupRelation.objects.filter(student_group=sg,
-                                academic=currentAcademicObj, active=2)  # .defer('child')
+                                academic=currentAcademicObj, active__in=[1,2])  # .defer('child')
                         print 'Total Student in ', sg.name, sg.section, \
                             'is ', len(sg_stRealtions)
 
@@ -120,25 +122,33 @@ class Command(BaseCommand):
 
                                 print 'Next year student group [%s] activated' \
                                     % sg.id
-
+                                srgquery =''
                                 for sg_st in sg_stRealtions:
                                     studentObj = sg_st.student
                                     totalStud += 1
-                                    nxt_Sg_relation = \
-    Student_StudentGroupRelation.objects.get_or_create(student_group=nextSg,
-        student=studentObj, academic=nextAcademicObj)
-                                    nxt_Sg_relation = \
-    (nxt_Sg_relation if not type(nxt_Sg_relation)
-     is tuple else nxt_Sg_relation[0])
-                                    if nxt_Sg_relation.active != 2:
-                                        nxt_Sg_relation.active = 2
-                                        nxt_Sg_relation.save()
-                                    if sg_st.active != 1:
-                                        sg_st.active = 1  #
-                                        sg_st.save()
+
+                                     # raw sql query for inserting bulk student
+                                     # group relation 
+                                     # starts here
+                                    
+                                    
+                                    srgquery +=  ",(%s,%s,%s)"%(studentObj.id,nextSg.id,nextAcademicObj.id)
                                     totalpromotedStud += 1
                                     print 'Student %s promoted from %s %s to %s %s' \
     % (studentObj, sgid, sg.section, nextSg.name, nextSg.section)
+                                if srgquery:
+                                    try:
+                                        cursor.execute("insert into schools_student_studentgrouprelation (student_id, student_group_id, academic_id, active) values"+ srgquery[1:])
+                                    except:
+                                        print "records already exists with this student id, student group id and academic id",srgquery[1:] 
+                                    
+                                    if 1:
+                                        cursor.execute("insert into schools_student_studentgrouprelation_1(id, student_id, student_group_id, academic_id, active) select id, student_id, student_group_id, academic_id, 1 from schools_student_studentgrouprelation_2 where active=2 and academic_id=%s and student_group_id = %s" %(currentAcademicObj.id, nextSg.id))
+
+                                        cursor.execute(" delete from schools_student_studentgrouprelation_2 where active=2 and academic_id=%s and student_group_id = %s" %(currentAcademicObj.id,nextSg.id))
+                                    else:
+                                        print "Intstitution id or academic id doesn't exist", nextSg.institution.id, currentAcademicObj.id
+                                    # ends here
                             else:
                                 totalpromotedStud += 0
                                 sg_stRealtions.update(active=1)
@@ -165,6 +175,8 @@ class Command(BaseCommand):
                             totalpromotedStud
         print totalDic
         print totalpromotedStudDic
+
+
         self.stdout.write('Students Are Promoted ...\n')
 
             # prog=Programme.objects.filter(active=2) #end_date__range=[datetime.strptime(str(currentYear)+'-06-01','%Y-%m-%d'),datetime.strptime(str(currentYear+1)+'-05-31','%Y-%m-%d')])
