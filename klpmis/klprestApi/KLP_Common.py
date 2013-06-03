@@ -15,7 +15,7 @@ from schools.forms import *
 from django_restapi.model_resource import Collection, Entry
 from django_restapi.responder import *
 from django_restapi.receiver import *
-
+from django.db import connection
 from schools.receivers import KLP_user_Perm
 from django.views.decorators.csrf import csrf_exempt
 
@@ -81,6 +81,20 @@ class KLP_Delete(Resource):
                       modelDict[model_name1.lower()]._meta.module_name,
                       'Delete')  # Get Object based on id and model to delete
         obj = modelDict[model_name1.lower()].objects.get(pk=referKey)
+        cursor = connection.cursor()
+        print "----hfjdhfdhfdfjdf", model_name1.lower()
+        if model_name1.lower() in ['class', 'center', 'studentgroup']:
+
+            q1 = """ insert into schools_studentgroup_0(id,institution_id, name, section, active, group_type)
+            select id,institution_id, name, section, 0, group_type from schools_studentgroup_2 where id = %s """ %(referKey)
+
+            q2 = """ delete from schools_studentgroup_2 where id = %s """ %(referKey)
+
+            cursor.execute(q1)
+            cursor.execute(q2)
+        else:
+            print " This is not class or Center type "
+
         if model_name1.lower() == 'boundary':
             flag = obj.getChild(obj.boundary_type)
         elif model_name1.lower() in ['class', 'center', 'studentgroup']:
