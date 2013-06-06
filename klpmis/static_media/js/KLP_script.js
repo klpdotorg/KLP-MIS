@@ -133,7 +133,7 @@ var KLP_Del = function(referKey,type, msgText){
 				$("#dyncData").html("");
                                       nodeId.remove();
                                             }
-				$("#klp_MsgTxt").html(" Sucessfully deleted "+msgType+'  '+msgText);
+				$("#klp_MsgTxt").html(data);
 				$("#successMsgHead").show();
                     }
                 });

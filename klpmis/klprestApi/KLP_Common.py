@@ -84,14 +84,20 @@ class KLP_Delete(Resource):
         cursor = connection.cursor()
         print "----hfjdhfdhfdfjdf", model_name1.lower()
         if model_name1.lower() in ['class', 'center', 'studentgroup']:
-
-            q1 = """ insert into schools_studentgroup_0(id,institution_id, name, section, active, group_type)
+            if Student_StudentGroupRelation.objects.filter(student_group__id=referKey,
+                    active=2, academic=current_academic()).count():
+                message = model_name1.lower() \
+                + ' has child objects.So can not delete it.First delete the child object,then try to delete it'
+            else:
+                q1 = """ insert into schools_studentgroup_0(id,institution_id, name, section, active, group_type)
             select id,institution_id, name, section, 0, group_type from schools_studentgroup_2 where id = %s """ %(referKey)
 
-            q2 = """ delete from schools_studentgroup_2 where id = %s """ %(referKey)
-
-            cursor.execute(q1)
-            cursor.execute(q2)
+                q2 = """ delete from schools_studentgroup_2 where id = %s """ %(referKey)
+                obj = modelDict[model_name1.lower()].objects.get(pk=referKey)
+                name = obj.name
+                cursor.execute(q1)
+                cursor.execute(q2)
+                message = model_name1.lower() + " " + name + ' Successfully Deleted'
         else:
             print " This is not class or Center type "
 
@@ -114,7 +120,8 @@ class KLP_Delete(Resource):
         else:
             obj.active = 0  # Change active to 0(object is deleted)
             obj.save()  # Save Data
-            message = 'Deleted'
+            if not model_name1.lower() in ['class', 'center', 'studentgroup']:
+                message = model_name1.lower() + ' Successfully Deleted'
         return HttpResponse(message)
 
 

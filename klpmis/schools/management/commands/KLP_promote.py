@@ -76,7 +76,7 @@ class Command(BaseCommand):
                 # print sglist,len(studentGroups),inst.id,sgdic,sgidlist
                 # totalsg=len(sglist)
                 # totalpromotedStudDic={}
-
+            pdb.set_trace()
             for sgid in sglist:
                 totalpromotedStud = 0
                 totalStud = 0
@@ -132,23 +132,23 @@ class Command(BaseCommand):
                                      # starts here
                                     
                                     
-                                    srgquery +=  ",(%s,%s,%s)"%(studentObj.id,nextSg.id,nextAcademicObj.id)
+                                    srgquery +=  ",(%s,%s,%s,%s)"%(studentObj.id,nextSg.id,nextAcademicObj.id,2)
                                     totalpromotedStud += 1
                                     print 'Student %s promoted from %s %s to %s %s' \
     % (studentObj, sgid, sg.section, nextSg.name, nextSg.section)
-                                if srgquery:
-                                    try:
-                                        cursor.execute("insert into schools_student_studentgrouprelation (student_id, student_group_id, academic_id, active) values"+ srgquery[1:])
-                                    except:
-                                        print "records already exists with this student id, student group id and academic id",srgquery[1:] 
-                                    
-                                    if 1:
-                                        cursor.execute("insert into schools_student_studentgrouprelation_1(id, student_id, student_group_id, academic_id, active) select id, student_id, student_group_id, academic_id, 1 from schools_student_studentgrouprelation_2 where active=2 and academic_id=%s and student_group_id = %s" %(currentAcademicObj.id, nextSg.id))
+                                    if studentObj and nextSg and nextAcademicObj:
+                                        if 1:
+                                            cursor.execute("insert into schools_student_studentgrouprelation_2(student_id, student_group_id, academic_id, active) values ( %(sid)s, %(sgid)s, %(acid)s, %(active)s )",{'sid':studentObj.id,'sgid':nextSg.id,'acid':nextAcademicObj.id,'active':2})
+                                        else:
+                                            print "records already exists with this student id, student group id and academic id",srgquery[1:] 
+                                        
+                                        if 1:
+                                            cursor.execute("insert into schools_student_studentgrouprelation_1(id, student_id, student_group_id, academic_id, active) select id, student_id, student_group_id, academic_id, 1 from schools_student_studentgrouprelation_2 where active=2 and academic_id=%s and student_group_id = %s" %(currentAcademicObj.id, nextSg.id))
 
-                                        cursor.execute(" delete from schools_student_studentgrouprelation_2 where active=2 and academic_id=%s and student_group_id = %s" %(currentAcademicObj.id,nextSg.id))
-                                    else:
-                                        print "Intstitution id or academic id doesn't exist", nextSg.institution.id, currentAcademicObj.id
-                                    # ends here
+                                            cursor.execute(" delete from schools_student_studentgrouprelation_2 where active=2 and academic_id=%s and student_group_id = %s" %(currentAcademicObj.id,nextSg.id))
+                                        else:
+                                            print "Intstitution id or academic id doesn't exist", nextSg.institution.id, currentAcademicObj.id
+                                        # ends here
                             else:
                                 totalpromotedStud += 0
                                 sg_stRealtions.update(active=1)
