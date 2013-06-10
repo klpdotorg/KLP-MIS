@@ -84,6 +84,11 @@ class KLP_Delete(Resource):
         cursor = connection.cursor()
         print "----hfjdhfdhfdfjdf", model_name1.lower()
         if model_name1.lower() in ['class', 'center', 'studentgroup']:
+            sgtype = StudentGroup.objects.get(id=referKey)
+            if sgtype.group_type == "Class":
+                msg = "Class Successfully Deleted"
+            else:
+                msg = "Center Successfully Deleted"
             if Student_StudentGroupRelation.objects.filter(student_group__id=referKey,
                     active=2, academic=current_academic()).count():
                 message = model_name1.lower() \
@@ -97,7 +102,7 @@ class KLP_Delete(Resource):
                 name = obj.name
                 cursor.execute(q1)
                 cursor.execute(q2)
-                message = model_name1.lower() + " " + name + ' Successfully Deleted'
+                message = name + ' ' + msg
         else:
             print " This is not class or Center type "
 

@@ -20,6 +20,8 @@ from django.contrib.contenttypes.models import ContentType
 
 from schools.receivers import KLP_user_Perm
 from django.forms.models import modelformset_factory
+from emsdev3.settings import NUM_OF_FLEXI_ANSWER_FORM_RECORDS
+
 class KLP_StudentGroup(Collection):
     def get_entry(self, studentgroup_id):    
     	# Query For Selected Student Group based on studentgroup_id    
@@ -83,7 +85,7 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 	""" This Method is used for to generate student answers grid to enter data/answers for the assessment questions """
 	user = request.user  #get logged in user
 	url = "/studentgroup/%s/programme/%s/assessment/%s/view/" %(studentgroup_id, programme_id, assessment_id)
-	ordercounter=20
+	ordercounter=NUM_OF_FLEXI_ANSWER_FORM_RECORDS
 	# Query Childs based on studentgroup relation
         AssObj=Assessment.objects.get(id=assessment_id)
         if AssObj.typ ==3:
@@ -163,7 +165,9 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
                 ansflexObj = Answer.objects.filter(question__in=question_list, object_id__in = studIdList).order_by('flexi_data').values_list('flexi_data',flat=True)
         if ansflexObj:
             ansflexObj = list(ansflexObj)
-            ansflexObj.sort()  
+            ansflexObj.sort()
+        if len(ansflexObj) >= ordercounter:
+            ordercounter = 20
         print ansflexObj,'FFFFFFFFFFFFFFFFFFFFL' 
 	qIdList=question_list.values_list('id',flat=True).distinct()
 	qNamesList=question_list.values_list('name',flat=True).distinct()

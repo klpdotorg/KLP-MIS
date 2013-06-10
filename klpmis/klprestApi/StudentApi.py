@@ -81,25 +81,34 @@ def KLP_DeleteStudnet(request, id):
 	if len(students_list) > 0:
 		for stud_id in students_list:
 			# get Student Object to delete
-			obj = Student.objects.get(child__id=stud_id)  
-			try:	
-				relObjects = Student_StudentGroupRelation.objects.filter(student = obj, academic=current_academic, active=2)
-				if relObjects.count() <= 1:
-					obj.active = 0
-					obj.save()
-				sgRelObj = Student_StudentGroupRelation.objects.get(student = obj, student_group__id=id, academic=current_academic, active=2)
-				sgRelObj.active = 0
-				sgRelObj.save()
-				
-			except:
-				count = count + 1
-				delFailed += '%s %s ,'(obj.child.first_name, obj.child.last_name)
-				
+			obj = Student.objects.get(child__id=stud_id)
+			sgobj = StudentGroup.objects.filter(id=id, group_type='Class').count()
+			if 1:
+				from django.db import connection
+				cursor = connection.cursor()
+				q1 = """ insert into schools_student_0(id, child_id, other_student_id, active)
+						select id, child_id, other_student_id, 0 from schools_student_2 where id = %d """ %(obj.id)
+
+				q2 = """insert into schools_student_studentgrouprelation_0(id, student_id, student_group_id, academic_id, active) select id, student_id, student_group_id, academic_id, 0 from schools_student_studentgrouprelation_2 where student_id = %d  and student_group_id = %d """ %(obj.id, int(id))
+
+				q3 = """ delete from schools_student_studentgrouprelation_2 where student_id = %d and student_group_id = %d """ %(obj.id, int(id))
+
+				q4 = """ delete from schools_student_2 where id = %d """ %(obj.id)
+				if sgobj >=1:
+					cursor.execute(q1)
+				cursor.execute(q2)
+				cursor.execute(q3)
+				if sgobj >=1:
+					cursor.execute(q4)
+
+				delFailed += obj.child.first_name + " " + obj.child.last_name
+			else:
+				return HttpResponse("Students "+ delFailed+" Deletion Failed")
 			
-	if count == 0:	 
+
 		return HttpResponse("All Selected Students has been deleted successfully")
 	else:	
-		return HttpResponse("Studens"+ delFailed+" Deletion Failed")	
+		return HttpResponse("Please select students to delete")
 
 urlpatterns = patterns('',    
    url(r'^studentgroup/(?P<studentgroup_id>.*)/student/creator/$', KLP_Student_Create),

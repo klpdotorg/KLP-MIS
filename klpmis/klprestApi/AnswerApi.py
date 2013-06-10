@@ -203,8 +203,8 @@ class KLP_ChangeAns(Resource):
                         ansForm=AnswerForm(request.POST,request,queryset=ansObjs)
                         if not firstuserdata1.count() == 0:
                             f1 = firstuserdata1[0]
-                            f1.answer_score = answer_score
-                            f1.answer_grade = answer_grade
+                            f1.answer_score = ansObj.answer_score
+                            f1.answer_grade = ansObj.answer_grade
                             f1.save()
                             print "existing record id is", f1.id
                         else:
