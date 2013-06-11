@@ -7,9 +7,9 @@ from django.contrib.contenttypes import generic
 from django.contrib.auth.models import User
 from object_permissions import register
 from fullhistory import register_model
-from klpmis.settings.default import LAST_MONTH_CUR_ACADEMIC_YEAR
+from emsdev3.settings import LAST_MONTH_CUR_ACADEMIC_YEAR
 # Table Structure For Klp
-
+from django.db.models.signals import pre_delete, post_delete, post_save, pre_save
 register_model(User)
 
 primary_field_type = [(1, 'Integer'), (2, 'Char'), (3, 'Date'), (4,
@@ -178,6 +178,8 @@ class Boundary(models.Model):
         """ Used For ordering """
 
         ordering = ['name']
+
+
 
     def __unicode__(self):
         return '%s' % self.name
@@ -1093,3 +1095,21 @@ class UserAssessmentPermissions(models.Model):
         unique_together = (('user', 'instituion', 'assessment'), )
 
 
+def call(sender, method, instance):
+    func = getattr(sender, method, None)
+    if callable(func):
+        func(instance)
+
+def post_save_hook(sender, **kwargs):
+    if kwargs['created']:
+        call(sender, 'after_create', kwargs['instance'])
+        if kwargs['instance'].boundary_type.id == 2:
+            a=Boundary_Category.objects.get(id=13)
+            obj = Boundary.objects.get(id=kwargs['instance'].id)
+            obj.boundary_category = a
+            obj.save()
+    else:
+        call(sender, 'after_update', kwargs['instance'])
+    call(sender, 'after_save', kwargs['instance'])
+
+post_save.connect(post_save_hook, sender=Boundary)
