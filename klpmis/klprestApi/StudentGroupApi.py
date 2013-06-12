@@ -165,6 +165,7 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
                 ansflexObj = Answer.objects.filter(question__in=question_list, object_id__in = studIdList).order_by('flexi_data').values_list('flexi_data',flat=True)
         if ansflexObj:
             ansflexObj = list(ansflexObj)
+        if not AssObj.flexi_assessment:
             ansflexObj.sort()
         if len(ansflexObj) >= ordercounter:
             ordercounter = 20
