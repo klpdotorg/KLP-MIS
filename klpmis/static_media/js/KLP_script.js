@@ -125,14 +125,18 @@ var KLP_Del = function(referKey,type, msgText){
                 $.ajax({                    
                 	url: '/delete/'+type+'/'+referKey+'/',
                 	success: function(data) {
-				//nodeId.remove();
+                	if(data.match(/Successfully Deleted/g)){
+				        nodeId.remove();
+				    }
                                  if(type=='staff'){
                                                   $("#staff_"+referKey).remove();
                                         }
                                  else{
 				$("#dyncData").html("");
-                                      nodeId.remove();
+				                
+                                      //nodeId.remove();
                                             }
+                
 				$("#klp_MsgTxt").html(data);
 				$("#successMsgHead").show();
                     }
