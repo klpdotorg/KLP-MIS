@@ -1095,6 +1095,17 @@ class UserAssessmentPermissions(models.Model):
         unique_together = (('user', 'instituion', 'assessment'), )
 
 
+    def save(self, *args, **kwargs):
+        # custom save method
+        #pdb.set_trace()
+        from django.db import connection
+        connection.features.can_return_id_from_insert = False
+        print "save"
+
+        print "Access", self.access
+        self.full_clean()
+        super(UserAssessmentPermissions, self).save(*args, **kwargs)
+
 def call(sender, method, instance):
     func = getattr(sender, method, None)
     if callable(func):
@@ -1106,10 +1117,13 @@ def post_save_hook(sender, **kwargs):
         if kwargs['instance'].boundary_type.id == 2:
             a=Boundary_Category.objects.get(id=13)
             obj = Boundary.objects.get(id=kwargs['instance'].id)
-            obj.boundary_category = a
-            obj.save()
+            if obj.parent.id == 1:
+                obj.boundary_category = a
+                obj.save()
     else:
         call(sender, 'after_update', kwargs['instance'])
     call(sender, 'after_save', kwargs['instance'])
 
 post_save.connect(post_save_hook, sender=Boundary)
+
+
