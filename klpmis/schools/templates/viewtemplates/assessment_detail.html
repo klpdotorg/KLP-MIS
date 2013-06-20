@@ -1,8 +1,14 @@
 <div class="KLP_Button_Header">
 	<!-- This Block shows the buttons for add, edit and delete-->
+	
 	<span class="KLP_Sub">
+	    {% if not assessment.getAssessmentStatus %}
 		<a class="KLP_Button"  href="/assessment/question/{{assessment.id}}/creator" onclick="return KLP_View(this);">Add Question</a>
+		{% else %}
+		    <a class="KLP_Button" >Assessment is already started</a>
+	    {% endif %}
 	</span>
+	
 	<span class="KLP_Sub">
 		<a class="KLP_Button"  href="/assessment/{{assessment.id}}/update/" onclick="return KLP_View(this);">Edit</a>
 	</span>
@@ -22,7 +28,7 @@
 
 
 <div class="detailHead">
-<span class="hedText">Assessment Details</span>
+<span class="hedText">Assessment Details </span>
 </div>
 
 <div class="boundDetail">

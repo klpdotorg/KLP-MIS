@@ -3,7 +3,7 @@
 """
 TreeMenu is used to filter all objects to genrate tree menu
 """
-
+from django.contrib.auth.models import *
 from django.conf.urls.defaults import *
 from django_restapi.model_resource import Collection
 from django_restapi.responder import *
@@ -171,7 +171,7 @@ def TreeClass(request):
         seclist = [secFilter]
         secFilter = seclist
     if secFilter == 'None' and filterBy != 'None':
-        secFilter = GetAssementList(filterBy, showflag)
+        secFilter = GetAssementList(filterBy, logUser, showflag)
 
     boundaryType = request.GET['boundTyp']
     permFilter = request.GET.get('permission')
@@ -380,14 +380,20 @@ def TreeClass(request):
                             }).order_by('lower_name')
                     typ = 'sch'
         elif typ == 'programme':
-
+        
         # if typ is programme Query For active assessment based On programme id
 
             activelist = [1, 2]
+            userobj = User.objects.get(id=request.user.id)
             if showflag:
-                activelist = [1, 2]
-            query = Assessment.objects.filter(programme__id=model[1],
+
+                activelist = [1, 2 ]
+            if userobj.is_superuser:
+                query = Assessment.objects.filter(programme__id=model[1],
                     active__in=activelist)
+            else:
+                query = Assessment.objects.filter(programme__id=model[1],
+                    active=2)
         elif typ == 'assessment':
 
         # if typ is assessment Query For active Questions based On assessment id
@@ -397,7 +403,7 @@ def TreeClass(request):
         else:
             if typ == 'institution':
             
-
+            
             # if typ is Institution Query For active Sgs
 
                 if filterBy != 'None':
@@ -513,11 +519,20 @@ def getAssSG(secFilter, instid):
     return sg_listall
 
 
-def GetAssementList(programId, showflag=False):
+def GetAssementList(programId,loguser,showflag=False):
     activelist = [2]
 
+    userobj = ''
     if showflag:
-        activelist = [1, 2]
+        try:
+            userobj = User.objects.get(id=loguser.id)
+        except:
+            pass
+        
+        if userobj and userobj.is_superuser: 
+            activelist = [1, 2]
+        else:
+            activelist = [2]
     return Assessment.objects.filter(programme__id=programId,
             active__in=activelist).values_list('id', flat=True)
 
