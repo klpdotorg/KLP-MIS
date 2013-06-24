@@ -81,6 +81,7 @@ def KLP_StudentGroup_Update(request, studentgroup_id):
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assessment_id):
+
 	""" To Show Answer Entry Form studentgroup/(?P<studentgroup_id>\d+)/programme/(?P<programme_id>\d+)/assessment/(?P<assessment_id>\d+)/view/"""
 	""" This Method is used for to generate student answers grid to enter data/answers for the assessment questions """
 	user = request.user  #get logged in user
@@ -159,14 +160,16 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 	rDict, ansStudList={}, []
 	counter = counter +1 
 	previouslenth=len(studIdList)
+
+
         if AssObj.flexi_assessment: 
-	   ansflexObj = list(set(Answer.objects.filter(question__in=question_list, object_id__in = studIdList).distinct().order_by('id').values_list('flexi_data',flat=True)))
+            ansflexObj = list(set(Answer.objects.filter(question__in=question_list, object_id__in = studIdList).distinct().order_by('id').values_list('flexi_data',flat=True)))
+            ansflexObj.sort()
         else:
-                ansflexObj = Answer.objects.filter(question__in=question_list, object_id__in = studIdList).order_by('flexi_data').values_list('flexi_data',flat=True)
+            ansflexObj = Answer.objects.filter(question__in=question_list, object_id__in = studIdList).order_by('id').values_list('flexi_data',flat=True)
         if ansflexObj:
             ansflexObj = list(ansflexObj)
-        if not AssObj.flexi_assessment:
-            ansflexObj.sort()
+
         if len(ansflexObj) >= ordercounter:
             ordercounter = 20
         print ansflexObj,'FFFFFFFFFFFFFFFFFFFFL' 
@@ -232,7 +235,7 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 			ansStudListprefix=[]				
 			if ansObj:
 				for index,ansObj in enumerate(ansList):
-				
+					
 					# If answers is there get answer Information
 					ansDict=dict(dataDict)
 					dEntry = ansObj['double_entry']
@@ -330,7 +333,7 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 	#	lookupfields=Assessment_Lookup.objects.filter(assessment=AssObj)
         ResourceForm = modelformset_factory(Answer,form=Answer_Form)
         form = ResourceForm(queryset=ansObjs.model.objects.none())		
-	val=Collection(childs_list, permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'prgtemplates', template_object_name = 'childs', paginate_by=20, extra_context={'filter_id':programme_id, 'assessment_id':assessment_id, 'user':user, 'studentgroup_id':studentgroup_id, 'question_list':question_list,  'group_typ':grupObj, 'url':url, 'studIdList':studIdList ,  'qNamesList':qNamesList, 'chList':chList, 'childDict':childDict, 'rDict':rDict, 'qIdList':qIdList,'AssObj':AssObj, 'lookupfields':lookupfields,'studIdListprifix':noAnsListprefix,'ordercounter':ordercounter,'formmanage':form.management_form}), entry_class = ChoiceEntry)
+	val=Collection(childs_list, permitted_methods = ('GET', 'POST'), responder = TemplateResponder(template_dir = 'prgtemplates', template_object_name = 'childs', paginate_by=20, extra_context={'filter_id':programme_id, 'assessment_id':assessment_id, 'user':user, 'studentgroup_id':studentgroup_id, 'question_list':question_list,  'group_typ':grupObj, 'url':url, 'studIdList':studIdList ,  'qNamesList':qNamesList, 'chList':chList, 'childDict':childDict, 'rDict':rDict, 'qIdList':qIdList,'AssObj':AssObj,'loguser':request.user.id, 'lookupfields':lookupfields,'studIdListprifix':noAnsListprefix,'ordercounter':ordercounter,'formmanage':form.management_form}), entry_class = ChoiceEntry)
 	return HttpResponse(val(request))
 	
 
