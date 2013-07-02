@@ -229,15 +229,15 @@ class Child_Form(Relations_Form):
     def clean(self):
                 cleaned_data = self.cleaned_data
 
-                first_name = cleaned_data.get("first_name")
-                last_name = cleaned_data.get("last_name")
+                first_name = cleaned_data.get("first_name").strip()
+                last_name = cleaned_data.get("last_name").strip()
                 if not first_name:
-                      msg = u"Enter First Name"
+                      msg = u"Enter First Name "
                       self._errors["first_name"] = self.error_class([msg])
                       del cleaned_data["first_name"]
                       del cleaned_data["last_name"]
-                first_name = cleaned_data.get("motherfirstname")
-                last_name = cleaned_data.get("fatherfirstname")
+                first_name = cleaned_data.get("motherfirstname").strip()
+                last_name = cleaned_data.get("fatherfirstname").strip()
                 if not first_name and not last_name:
                       msg = u"Enter Mother Name or Father Name"
                       self._errors["fatherfirstname"] = self.error_class([msg])
@@ -247,6 +247,7 @@ class Child_Form(Relations_Form):
                 return cleaned_data
     
     def save(self, commit=True):
+          print self.errors ,'ERRRRRRRRRRRRRR'           
           childObj=CustomizeSave(self,Child_Form)
           #print self.files,'kwars' ,self.instance.id,dir(self.instance)
           relationdatarequest=self.files
@@ -572,9 +573,9 @@ class Assessment_Institution_Association_Form(ModelForm):
 
 
 class Answer_Form(ModelForm):
-    current_user = forms.IntegerField(initial=2, widget=forms.HiddenInput)
-    username = forms.CharField(initial=2, widget=forms.HiddenInput)
-    path_info = forms.IntegerField(initial='/', widget=forms.HiddenInput)
+    #current_user = forms.IntegerField(initial=2, widget=forms.HiddenInput)
+    #username = forms.CharField(initial=2, widget=forms.HiddenInput)
+    #path_info = forms.IntegerField(initial='/', widget=forms.HiddenInput)
     class Meta:
 
         model = Answer

@@ -52,7 +52,8 @@ def KLP_act_form(request):
 @csrf_exempt
 def KLP_Activation(request):
     """ To actiave the records>"""
-
+    import pdb
+    
     # Checking user Permissions
         # KLP_user_Perm(request.user, "Institution", "Add")
         # Get Button Type
@@ -61,7 +62,7 @@ def KLP_Activation(request):
 
     selCategoryTyp = request.POST.get('form-staging-modelname')
     selCategoryids = request.POST.get('form-staging-allids')
-    
+
     if selCategoryids == '':
         isExecute = False
         resStr = 'Please give atleast on id'
@@ -120,29 +121,34 @@ def KLP_Activation(request):
                 + ' .Please verify the ids.'
         else:
 
-            if actiontype == 1 and model_name1 != 'student':
+            if actiontype == 1 and model_name1 != 'student' and model_name1 != 'assessment':
                 childlength = hasChildObj(allids, model_name1)
             else:
                 childlength = []
-            if model_name1.lower() == 'student' and actiontype == 1:
+            if model_name1.lower() == 'student' and actiontype == 1 and model_name1 != 'assessment':
                 childi = obj3.values_list('id', flat=True)
                 relObjects = \
                     Student_StudentGroupRelation.objects.filter(student__id__in=childi,
                         academic=current_academic, active=2)
                 relObjects.update(active=1)
                 childlength = []
-            if len(childlength) == 0:
+            if len(childlength) == 0 :
                 obj2 = obj3  # modelDict[model_name1].objects.filter(id__in=allids)
                 isExecute = True
                 idlist2 = obj2.values_list('id')
                 idstr = ','.join(str(v1[0]) for v1 in idlist2)
                 obj2.update(active=actiontype)
 
-                SendingMail(idstr, obj2.model._meta.module_name)
+                SendingMail(idstr, obj2.model._meta.module_name,actiondic[actiontype])
                 receiver = settings.REPORTMAIL_RECEIVER
                 receiver = ','.join(str(v1) for v1 in receiver)
-                message = \
+                if not actiondic[actiontype] == "Deactivated":
+                    message = \
                     'A mail will be sent to %s as soon as all the records are activated .' \
+                    % receiver
+                else:
+                     message = \
+                    'A mail will be sent to %s as soon as all the records are deactivated .' \
                     % receiver
                 resStr = obj2.model._meta.module_name + ' Ids ' + idstr \
                     + ' are Successfully ' + actiondic[actiontype] \
@@ -196,12 +202,17 @@ def hasChildObj(idlists, model_name1):
     return haschildlist
 
 
-def SendingMail(idlist, mname):
+def SendingMail(idlist, mname,atype):
     inst_liststr = idlist
     sender = settings.REPORTMAIL_SENDER
     receiver = settings.REPORTMAIL_RECEIVER
-    subject = 'Activated list'
-    fullmsg = 'Following %s Ids are Activated  :  \n %s ' % (mname,
+    if atype == "Deactivated":
+        subject = 'Deactivated list'
+        fullmsg = 'Following %s Ids are Deactivated  :  \n %s ' % (mname,
+            inst_liststr)
+    else:
+        subject = 'Activated list'
+        fullmsg = 'Following %s Ids are Activated  :  \n %s ' % (mname,
             inst_liststr)
     send_mail(subject, fullmsg, sender, receiver)
 

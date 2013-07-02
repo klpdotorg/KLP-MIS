@@ -113,7 +113,7 @@
 				    </td>
 				    <td align="center">
 				    	<input type="hidden" name="counter" id="id_counter" value="{{extra_context|displayValue:'counter'}}"/>
-                                    	<input type="submit" name="save" id="id_save" value="Save" tabindex="1"/>
+                                    	<input type="submit" name="save{{extra_context|displayValue:'counter'}}" id="id_save" value="Save" tabindex="1"/>
                                     </td>
 				</tr>
 				<tr>
@@ -252,16 +252,16 @@
 	   				window.parent.parent.$("#klp_MsgTxt").html("Student Created Successfully");
 					}
 				}
-			    else {
+			    /*else {      
+                                       
 					$("#popData").html(data);
-					NFInit();
+					//NFInit();
 				
-				}
+				}*/
 		}	
                });
 	    }
-
-
+   
 var KLP_New_Pagination = function(resPerPage,Norecords,studentgroup){
 	var lastPage = window.parent.parent.$("#id_lastPage").val();
 	var url = window.parent.parent.$("#list_url").attr('value');

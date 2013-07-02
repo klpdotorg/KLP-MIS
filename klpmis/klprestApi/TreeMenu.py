@@ -530,7 +530,7 @@ def GetAssementList(programId,loguser,showflag=False):
             pass
         
         if userobj and userobj.is_superuser: 
-            activelist = [1, 2]
+            activelist = [2]
         else:
             activelist = [2]
     return Assessment.objects.filter(programme__id=programId,
