@@ -125,7 +125,7 @@ var KLP_Del = function(referKey,type, msgText){
                 $.ajax({                    
                 	url: '/delete/'+type+'/'+referKey+'/',
                 	success: function(data) {
-                	if(data.match(/Successfully Deleted/g)){
+				if(data.match(/Successfully Deleted/g)){
 				        nodeId.remove();
 				    }
                                  if(type=='staff'){
@@ -133,10 +133,8 @@ var KLP_Del = function(referKey,type, msgText){
                                         }
                                  else{
 				$("#dyncData").html("");
-				                
                                       //nodeId.remove();
                                             }
-                
 				$("#klp_MsgTxt").html(data);
 				$("#successMsgHead").show();
                     }
@@ -333,8 +331,11 @@ var KLP_validateScript=function(formId){
        				}
        				
        			});
-                        
-       			if (DeFlag == true && count == txtFields.length){ 
+                        if ($(txtFields[0]).attr('id').indexOf('primaryvalue')!=-1)
+                                txtlength=txtFields.length-1
+                        else
+                              txtlength=txtFields.length
+       			if ( DeFlag==true && count == txtlength){ 
        			    errLength = $(form).children().find('label.error:visible').length
                             //alert(errLength);
        			    if (errLength == 0){

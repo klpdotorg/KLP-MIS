@@ -7,9 +7,9 @@ from django.contrib.contenttypes import generic
 from django.contrib.auth.models import User
 from object_permissions import register
 from fullhistory import register_model
-from emsdev3.settings import LAST_MONTH_CUR_ACADEMIC_YEAR
+
 # Table Structure For Klp
-from django.db.models.signals import pre_delete, post_delete, post_save, pre_save
+
 register_model(User)
 
 primary_field_type = [(1, 'Integer'), (2, 'Char'), (3, 'Date'), (4,
@@ -178,8 +178,6 @@ class Boundary(models.Model):
         """ Used For ordering """
 
         ordering = ['name']
-
-
 
     def __unicode__(self):
         return '%s' % self.name
@@ -434,7 +432,6 @@ class Child(models.Model):
 register_model(Child)  # Register model for to store information in fullhistory
 
 
-
 class Relations(models.Model):
 
     ''' This class stores relation information of the childrens'''
@@ -580,7 +577,7 @@ class Academic_Year(models.Model):
     ''' Its stores the academic years information'''
 
     name = models.CharField(max_length=20, unique=True)
-
+    active = models.IntegerField(blank=True, null=True, default=0)
     def __unicode__(self):
         return self.name
 
@@ -590,20 +587,27 @@ register_model(Academic_Year)  # Register model for to store information in full
 
 def current_academic():
     ''' To select current academic year'''
-
-    now = datetime.date.today()
-    currentYear = int(now.strftime('%Y'))
-    currentMont = int(now.strftime('%m'))
-    if currentMont >= 1 and currentMont <= 7:
-        academic = '%s-%s' % (currentYear - 1, currentYear)
-    else:
-        academic = '%s-%s' % (currentYear, currentYear + 1)
     try:
-        academicObj = Academic_Year.objects.get(name=academic)
+        academicObj = Academic_Year.objects.get(active=1)
         return academicObj
     except Academic_Year.DoesNotExist:
         return 1
 
+
+
+def default_end_date():
+    ''' To select academic year end date'''
+
+    now = datetime.date.today()
+    currentYear = int(now.strftime('%Y'))
+    currentMont = int(now.strftime('%m'))
+    academicYear = current_academic().name
+    academicYear = academicYear.split('-')
+    if currentMont > 5 and int(academicYear[1]) == currentYear:
+        academic_end_date = datetime.date(currentYear, currentMont, 30)
+    else:
+        academic_end_date = datetime.date(currentYear, 5, 30)
+    return academic_end_date
 
 class Staff(models.Model):
 
@@ -762,17 +766,7 @@ class Staff_StudentGroupRelation(models.Model):
 register_model(Staff_StudentGroupRelation)  # Register model for to store information in fullhistory
 
 
-def default_end_date():
-    ''' To select academic year end date'''
 
-    now = datetime.date.today()
-    currentYear = int(now.strftime('%Y'))
-    currentMont = int(now.strftime('%m'))
-    if currentMont > 5:
-        academic_end_date = datetime.date(currentYear + 1, LAST_MONTH_CUR_ACADEMIC_YEAR, 30)
-    else:
-        academic_end_date = datetime.date(currentYear, LAST_MONTH_CUR_ACADEMIC_YEAR, 30)
-    return academic_end_date
 
 
 class Programme(models.Model):
@@ -938,6 +932,18 @@ class Assessment_StudentGroup_Association(models.Model):
     assessment = models.ForeignKey(Assessment)
     student_group = models.ForeignKey(StudentGroup)
     active = models.IntegerField(blank=True, null=True, default=2)
+
+
+    def save(self, *args, **kwargs):
+        # custom save method
+        #pdb.set_trace()
+        from django.db import connection
+        connection.features.can_return_id_from_insert = False
+        print "save"
+
+        print "Access", self.active
+        self.full_clean()
+        super(Assessment_StudentGroup_Association, self).save(*args, **kwargs)
 
     class Meta:
 
@@ -1125,5 +1131,4 @@ def post_save_hook(sender, **kwargs):
     call(sender, 'after_save', kwargs['instance'])
 
 post_save.connect(post_save_hook, sender=Boundary)
-
 
