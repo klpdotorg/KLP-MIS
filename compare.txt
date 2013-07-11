@@ -1,0 +1,20 @@
+Documentation For Promotion Compare Script
+
+1. Where the promotion compare script files exiist ?
+
+       Primary school: schools/management/commands/KLP_compare.py
+
+
+2. How to run promotion compare script ?
+
+    Example go to server shell: ssh klp@ems.klp.org.in, then go to respective project folder.
+    For example: In ems server for production: go to cd production.
+
+    Then run the command python manage.py KLP_compare filename
+    Example : python manage.py KLP_compare july11Compare
+
+
+3. How promotion compare script works ?
+
+    This will check the student records count for particular class between current year and next year student_studentgrouprelation table.
+    It will generate csv, where we can check the recoreds count.

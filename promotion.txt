@@ -1,0 +1,25 @@
+Documentation For Promotion Script
+
+1. Where the primary school and preschool promotion script files exiist ?
+
+       Primary school: schools/management/commands/KLP_promote.py
+       Preschool: schools/management/commands/KLP_Preschool_promote.py
+
+2. How to run promotion script ?
+
+    Example go to server shell: ssh klp@ems.klp.org.in, then go to respective project folder.
+    For example: In ems server for production: go to cd production.
+
+    Then run the command python manage.py KLP_promote for primary school and
+    KLP_Preschool_promote for preschool
+
+3. How promotion script works ?
+
+    Primary school:
+        For current year in particular institution students will be promoted from to next year.
+        Ex: 7 to 8.
+        If student group (class) is 10 means they are promoted from the school, the student
+        records will be inactivated and move to student_studentgrouprelation_3 table.
+
+    PreSchool:
+        We are promoting in bulk for all preschool children to next year.

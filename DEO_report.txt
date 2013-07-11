@@ -1,0 +1,20 @@
+Documentation For DEO History Script
+
+1. Where the DEO history script files exiist ?
+
+       Primary school: schools/management/commands/KLP_DEOHistoryquery
+
+
+2. How to run DEO History compare script ?
+
+    Example go to server shell: ssh klp@ems.klp.org.in, then go to respective project folder.
+    For example: In ems server for production: go to cd production.
+
+    Then run the command python manage.py KLP_DEOHistoryquery start_date end_date filename
+    Example : python manage.py KLP_DEOHistoryquery 30/01/2012 30/05/2013 may-03
+
+
+3. How promotion compare script works ?
+
+    This will generate csv which contains all DEO's history where we can check for
+    which caretory how many records manipulated by each DEO operator.
