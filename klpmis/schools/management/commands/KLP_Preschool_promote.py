@@ -3,7 +3,57 @@
 from django.core.management.base import BaseCommand, CommandError
 from schools.models import *
 from datetime import datetime
-from klp.settings import *
+import psycopg2
+import subprocess
+
+
+def exec_bulk_insert(sqlQuery):
+    """Function to execute a command and return stuff"""
+    query = "echo \"%s\">klpQuery.txt" % sqlQuery
+    p=subprocess.Popen(query,stdout=subprocess.PIPE, shell=True)
+    p=subprocess.Popen("psql -fklpQuery.txt emsdev3 emsdev3",stdout=subprocess.PIPE, shell=True)
+    (output,err) = p.communicate()
+    return output, err
+
+def run_query(db,sql):
+    db = psycopg2.connect (database="emsdev3", user="emsdev3", password="hgfyrtgasw232")
+    cursor1 = db.cursor()
+    cursor1.execute(sql)
+    recs=""
+    try:
+        recs = cursor1.fetchall()
+    except:
+        db.commit()
+    cursor1.close()
+    return recs
+
+
+def move_class_sql(currentAcademicId, nextAcademicId):
+
+
+    preSchooolPromoteSql = \
+            """insert into schools_Student_StudentGroupRelation_2( student_id ,student_group_id ,academic_id,active) (  select student_id ,student_group_id,%s, 2 from schools_Student_StudentGroupRelation_2 where academic_id=%s and student_group_id in (select id from schools_studentgroup_2 where institution_id in (select id from  schools_institution where cat_id in (11,10,12) and active=2)  and group_type='Class'))""" \
+            % (nextAcademicId,currentAcademicId)
+
+    preSchoolMoveInactivateSql = """insert into schools_Student_StudentGroupRelation_1( student_id ,student_group_id ,academic_id,active) (  select student_id ,student_group_id,academic_id, 1 from schools_Student_StudentGroupRelation_2 where academic_id=%s and student_group_id in (select id from schools_studentgroup_2 where institution_id in (select id from  schools_institution where cat_id in (11,10,12) and active=2)  and group_type='Class'))""" \
+            % (currentAcademicId)
+
+    preSchoolDeleteSql = """delete from schools_Student_StudentGroupRelation_2 where academic_id=%s and student_group_id in (select id from schools_studentgroup_2 where institution_id in (select id from  schools_institution where cat_id in (11,10,12) and active=2)  and group_type='Class')""" \
+            % (currentAcademicId)
+
+    status = exec_bulk_insert(preSchooolPromoteSql)
+    if status[1]:
+        print "Class Promotion failed: %s"%(currentAcademicId)
+
+    status = exec_bulk_insert(preSchoolMoveInactivateSql)
+    if status[1]:
+        print "Class Move failed: %s"%(currentAcademicId)
+
+
+    status = exec_bulk_insert(preSchoolDeleteSql)
+    if status[1]:
+        print "Class Deletion failed: %s"%(currentAcademicId)
+    return 1
 
 
 class Command(BaseCommand):
@@ -13,29 +63,28 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        currentAcademic = current_academic
-        currentYear = int(currentAcademic().name.split('-')[1])
-        nextAcademic = str(currentYear) + '-' + str(currentYear + 1)
-        currentAcademicObj = currentAcademic
-        print 'CurrentAcademic Year :', current_academic().name
-        print 'Next Academic Year  : ', nextAcademic
-        nextAcademicObj = \
-            Academic_Year.objects.get_or_create(name=nextAcademic)
-        nextAcademicObj = (nextAcademicObj if not type(nextAcademicObj)
-                           is tuple else nextAcademicObj[0])
-        queryStr = \
-            """insert into schools_Student_StudentGroupRelation( student_id ,student_group_id ,academic_id,active) (  select student_id ,student_group_id,121,2 from schools_Student_StudentGroupRelation where academic_id=%d and active=2 and student_group_id in (select id from schools_studentgroup where active=2 and institution_id in (select id from  schools_institution where cat_id in (11,10,12) and active=2) and active=2 and group_type='Class'))""" \
-            % nextAcademicObj.id
-        d = DATABASES['default']
-        datebase = d['NAME']
-        user = d['USER']
-        password = d['PASSWORD']
-        connection = psycopg2.connect(database=datebase, user=user,
-                password=password)
-        cursor = connection.cursor()
-        cursor.execute(queryStr)
-        cursor.close()
+        scriptStartTime = datetime.now()
 
-        self.stdout.write('Students Are Promoted ...\n')
+        db1 = psycopg2.connect (database="emsdev3", user="emsdev3", password="hgfyrtgasw232")
+        curAcObj = current_academic()
+        currentAcademicYearSql="select id,name from schools_academic_year where id=%s" %(curAcObj.id)
+        
+        currentAcademicYearRec = run_query(db1,currentAcademicYearSql)
+        currentAcademicId = currentAcademicYearRec[0][0]
+        currentAcademicYearName = currentAcademicYearRec[0][1]
+        currentYear = int(currentAcademicYearName.split('-')[1])
+        nextAcademicYear = str(currentYear) + '-' + str(currentYear + 1)
+        print 'CurrentAcademic Year :', currentAcademicYearName
+        print 'Next Academic Year  : ', nextAcademicYear
+        
+        nextAcademicYearSql="select id,name from schools_academic_year where name='%s'"%(nextAcademicYear)
+        print nextAcademicYearSql
+        nextAcademicRec = run_query(db1,nextAcademicYearSql)
+        nextAcademicId = nextAcademicRec[0][0]
+
+        move_class_sql(currentAcademicId, nextAcademicId)
+        totaltime = datetime.now() - scriptStartTime
+        print totaltime
+        print 'preschool students have been Promoted to ' ,nextAcademicYear
 
 
