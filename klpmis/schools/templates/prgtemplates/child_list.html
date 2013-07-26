@@ -16,6 +16,7 @@
 					    				<td class="KLP_td_width">
 					    					Name
 					    					<input type="hidden" name="studentgroup" id="studentgroup_id" value="{{studentgroup_id}}" />
+					    					<input type="hidden" id = "asId" name="asId" value="{{AssObj.id}}" />
 					    				</td>
 					    			</tr>
 					    		</table>
@@ -79,6 +80,9 @@
 									<input type="hidden" name="assessmentId" value="{{assessment_id}}"/>
 									<input type="hidden" name="student" value="{{i}}"/>
 									<input type="hidden" name="formcounter" id="formcounter" value="{{forloop.counter}}"/>
+									{% with i|getAsmAns:userAsmntDict as i_val %}
+									<input type="hidden" name="has_ans" id="has_answer_id_Student_{{i}}" value="{% if i_val.useransobj %}1{% else %}0{% endif %}" />
+								    {% endwith %}
 									<table>
 										<tr>
 										        <!-- Repeat Question -->
@@ -111,11 +115,26 @@
 									   					       
 									   			{% endif %}
 									   					
-												
-			                					
+												{% with i|getObjectId as obID %}
+												<input type="hidden" name="obID" id="obID_id_Student_{{i}}" value="{{ obID }}" />
+			                					{% endwith %}
 			            							</td>
 			            							{% if forloop.last %}
 			            								<td class="KLP_td_height"> <input id="id_Student_{{i}}_submit" type="submit" tabindex="1"   value="submit"  {% if not qDict|displayValue:'iBox' %}disabled{%endif%}/>       
+			            								
+	            								{% if not qDict|displayValue:'ansId' == None %}
+			            								
+		            								<td><span class="KLP_Sub">
+		            								{% if  qDict|displayValue:'iBox' %}
+		            								    {% with i|splitstr:userAsmntDict as i_val %}
+		            								       {% if i_val.useransobj %}
+		            								        <span class="KLP_SpanButton"  onclick="KLP_Del('{{i_val.objectval}}/{{ AssObj.id }}', 'answer', '{{i_val.objectval}},{{ AssObj.id }}')">Delete</span> <!-- Delete Button -->
+		            								     
+		            								      {% endif %}
+	            								        {% endwith %}
+            								        {% endif %}
+            								        </span></td>
+	            								{% endif %}
 			            								
 			            								<script>
 													$().ready(function() {
@@ -127,7 +146,7 @@
 			            							{% endwith%}
 			            							{% endwith%}
 			        						{% endfor %}
-											
+											<input type="hidden" id="refresh" value="0" />
 										</tr>
 									</table>
 			        				</form>
@@ -159,9 +178,11 @@
 <span id ="list_url" style="display:none;" value = "{{url}}"></span>
 <div class="KLP_DE_Submit">
 	<span class="KLP_SpanButton"  id="id_ans_global_submit">Submit</span>
+	{% if not group_typ == 'Center' %}
 	<span class="KLP_DE_AdStudent">
 		<a href="/studentgroup/{{studentgroup_id}}/student/creator/?keepThis=True&map_Student=1&assessment_id={{assessment_id}}&TB_iframe=True&height=400&width=800" title="Create New Student to Map" class="thickbox KLP_Button"> Add Student </a>
 	</span>
+	{% endif %}
 </div>
 
 
@@ -198,6 +219,30 @@ function Pagination(thisObj){
             }
         });
 	return false;
+}
+
+function KLP_deform(id)
+{
+    var aid = document.getElementById("asId").value;
+    var frm = "id_Student_"+id;
+    $.ajax({
+            type: "GET",
+            url:"/klp/getanswers/",
+            data: "aid="+aid,
+            success:function(data) {
+                if(data.match(/true/g)){
+                    $('#refresh').val(1);
+                }
+            }
+    });
+    if (parseInt($('#refresh').val()) < 1){
+        return KLP_validateScript(frm);
+    } else {
+        $("#KLP_overlay").hide();
+            $('#KLP_load').hide();
+            alert('Please reload page');
+            return false;
+    }
 }
 </script>
 
