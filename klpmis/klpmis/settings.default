@@ -5,15 +5,13 @@
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-SERVER_EMAIL = 'support@mahiti.org'
+SERVER_EMAIL = 'dev@klp.org.in'
 
 SEND_BROKEN_LINK_EMAILS = True
 
 IGNORABLE_404_ENDS = ('.css', '.html', 'favicon.ico')
 
-ADMINS = (('Sree', 'sree@mahiti.org'), ('RamaKrishna',
-          'ramakrishna.marouthu@mahiti.org'), ('Shivangi',
-          'shivangi@klp.org.in'), ('Megha', 'megha@klp.org.in'))  # ('Your Name', 'your_email@domain.com'),
+ADMINS = (('DEV', 'dev@klp.org.in'))  # ('Your Name', 'your_email@domain.com'),
 import os.path
 PROJECT_ROOT1 = os.path.realpath(os.path.dirname(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(PROJECT_ROOT1,
@@ -25,8 +23,7 @@ MANAGERS = ADMINS
 
 TESTING = 0
 REPORTMAIL_SENDER = 'KLP TEAM <dev@klp.org.in>'
-REPORTMAIL_RECEIVER = ['dev@klp.org.in', 'pushparanij@mahiti.org',
-                       'megha@klp.org.in']
+REPORTMAIL_RECEIVER = ['dev@klp.org.in']
 SESSION_COOKIE_AGE = 3600
 SESSION_SAVE_EVERY_REQUEST = True
 
@@ -37,9 +34,9 @@ DATABASES = {'default': {  # Add 'postgresql_psycopg2', 'postgresql', 'mysql', '
                            # Set to empty string for localhost. Not used with sqlite3.
                            # Set to empty string for default. Not used with sqlite3.
     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    'NAME': 'emsdev3',
-    'USER': '',
-    'PASSWORD': '',
+    'NAME': 'DATABASE NAME',
+    'USER': 'DATABASE USER',
+    'PASSWORD': 'DATABASE PASSWORD',
     'HOST': '',
     'PORT': '',
     'OPTIONS': {'autocommit': True},
@@ -61,8 +58,8 @@ DATABASES = {'default': {  # Add 'postgresql_psycopg2', 'postgresql', 'mysql', '
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'ems@klp.org.in'
-EMAIL_HOST_PASSWORD = 'k1P3Ms854'
+EMAIL_HOST_USER = 'USERNAME'
+EMAIL_HOST_PASSWORD = 'YOUR EMAIL HOST PASSWORD'
 EMAIL_PORT = 587
 
 # DEFAULT_FROM_EMAIL = 'support@mahiti.org'
@@ -87,11 +84,11 @@ SITE_ID = 1
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 
-# Current Academic Year Month
-LAST_MONTH_CUR_ACADEMIC_YEAR = 9
-NUM_OF_FLEXI_ANSWER_FORM_RECORDS = 20
-
 USE_I18N = True
+
+
+
+NUM_OF_FLEXI_ANSWER_FORM_RECORDS = 20
 
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale
@@ -101,7 +98,7 @@ USE_L10N = True
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 
-MEDIA_ROOT = '/home/mahiti/Desktop/emsdev3/static_media/'
+MEDIA_ROOT = '/<<PATH TO >>/static_media/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -137,7 +134,7 @@ MIDDLEWARE_CLASSES = (  # 'django.middleware.csrf.CsrfViewMiddleware',
     'schools.middleware.QueryLogMiddleware',
     )
 
-ROOT_URLCONF = 'emsdev3.urls'
+ROOT_URLCONF = 'klpmis.urls'
 
 TEMPLATE_CONTEXT_PROCESSORS = \
     ('django.contrib.auth.context_processors.auth',
@@ -146,7 +143,7 @@ TEMPLATE_CONTEXT_PROCESSORS = \
      'django.core.context_processors.media',
      'django.contrib.messages.context_processors.messages')
 
-TEMPLATE_DIRS = '/home/mahiti/Desktop/emsev3/schools/templates/'  # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".                                                        # Always use forward slashes, even on Windows.
+TEMPLATE_DIRS = ( os.path.join(PROJECT_ROOT, '/schools/templates'), )  # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".                                                        # Always use forward slashes, even on Windows.
                                                           # Don't forget to use absolute paths, not relative paths.
 
 INSTALLED_APPS = (  # Uncomment the next line to enable the admin:
