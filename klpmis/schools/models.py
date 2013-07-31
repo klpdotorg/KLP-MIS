@@ -12,7 +12,7 @@ from fullhistory import register_model
 
 register_model(User)
 
-primary_field_type = [(1, 'Integer'), (2, 'Char'), (3, 'Date'), (4,
+primary_field_type = [(0, 'Default'),(1, 'Integer'), (2, 'Char'), (3, 'Date'), (4,
                       'Lookup')]
 
 active_status = [
@@ -603,8 +603,8 @@ def default_end_date():
     currentMont = int(now.strftime('%m'))
     academicYear = current_academic().name
     academicYear = academicYear.split('-')
-    if currentMont > 5 and int(academicYear[1]) == currentYear:
-        academic_end_date = datetime.date(currentYear, currentMont, 30)
+    if currentMont > 5 and int(academicYear[0]) == currentYear:
+        academic_end_date = datetime.date(currentYear+1,12, 30)
     else:
         academic_end_date = datetime.date(currentYear, 5, 30)
     return academic_end_date
