@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from django.core.management.base import BaseCommand, CommandError
 from django.core.mail import send_mail
-from emsdev3clone.settings import PROJECT_NAME, PROJECT_ROOT
+from klpmis.settings import PROJECT_NAME, PROJECT_ROOT
 from django.conf import settings
 
 from schools.models import *

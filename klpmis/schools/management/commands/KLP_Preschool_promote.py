@@ -11,12 +11,12 @@ def exec_bulk_insert(sqlQuery):
     """Function to execute a command and return stuff"""
     query = "echo \"%s\">klpQuery.txt" % sqlQuery
     p=subprocess.Popen(query,stdout=subprocess.PIPE, shell=True)
-    p=subprocess.Popen("psql -fklpQuery.txt emsdev3 emsdev3",stdout=subprocess.PIPE, shell=True)
+    p=subprocess.Popen("psql -fklpQuery.txt klpmis klpmis",stdout=subprocess.PIPE, shell=True)
     (output,err) = p.communicate()
     return output, err
 
 def run_query(db,sql):
-    db = psycopg2.connect (database="emsdev3", user="emsdev3", password="hgfyrtgasw232")
+    db = psycopg2.connect (database="klpmis", user="klpmis", password="hgfyrtgasw232")
     cursor1 = db.cursor()
     cursor1.execute(sql)
     recs=""
@@ -65,7 +65,7 @@ class Command(BaseCommand):
 
         scriptStartTime = datetime.now()
 
-        db1 = psycopg2.connect (database="emsdev3", user="emsdev3", password="hgfyrtgasw232")
+        db1 = psycopg2.connect (database="klpmis", user="klpmis", password="hgfyrtgasw232")
         curAcObj = current_academic()
         currentAcademicYearSql="select id,name from schools_academic_year where id=%s" %(curAcObj.id)
         

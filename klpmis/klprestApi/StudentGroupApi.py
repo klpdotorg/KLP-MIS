@@ -20,7 +20,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from schools.receivers import KLP_user_Perm
 from django.forms.models import modelformset_factory
-from emsdev3.settings import NUM_OF_FLEXI_ANSWER_FORM_RECORDS
+from klpmis.settings import NUM_OF_FLEXI_ANSWER_FORM_RECORDS
 
 class KLP_StudentGroup(Collection):
     def get_entry(self, studentgroup_id):    

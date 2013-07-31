@@ -22,7 +22,7 @@ import simplejson
 from django.template import loader, RequestContext
 
 from django.core.mail import send_mail
-from emsdev3.settings import *
+from klpmis.settings import *
 from django.views.decorators.csrf import csrf_exempt
 
 
