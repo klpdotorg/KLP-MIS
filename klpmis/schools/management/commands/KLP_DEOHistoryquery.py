@@ -11,7 +11,7 @@ import datetime
 import os
 import csv
 import psycopg2
-from emsproduction.settings import *
+from klpmis.settings import *
 import pdb
 from django.db import connection
 debug_mode=0
@@ -116,11 +116,13 @@ class Command(BaseCommand):
                     00,
                     )
                 print 'sTime=', sTime, 'eTime=', eTime
-                # get all active assessments
+                userIdsList = FullHistory.objects.filter(action_time__range = (sTime, eTime)).only('request__user_pk').distinct().values_list('request__user_pk', flat=True)
+                userIds=[]
+                for i in userIdsList:
+                    if not i == None:
+                        userIds.append(i)
                 assessments = Assessment.objects.filter(active=2).distinct().only("id", "name")
                 cursor = connection.cursor()
-
-                # get answers which are in fullhistory
                 fullhistoryAnswers = \
                     cursor.execute("""select distinct CAST(object_id AS INT) from fullhistory_fullhistory where action_time > '%s' and action_time < '%s' and content_type_id in ( select id from django_content_type where name='%s')"""
                                     % (sTime, eTime,'answer'))
@@ -135,9 +137,8 @@ class Command(BaseCommand):
 
                 user_ids = tuple(userIds)
 
-                # iteatate on each assessment
                 for assessment in assessments:
-                    # get active questions for each assessment
+                    
                     questions = \
                         """select id from schools_question where assessment_id= %s and active= 2"""\
                          % assessment.id
@@ -147,7 +148,6 @@ class Command(BaseCommand):
 
                     for i in resq:
                         qlist += ", %s "%(i[0])
-                    # get answers for each assessment
                     answerQuery = \
                         """ select distinct id from schools_answer  where (user1_id in %s or  user2_id in %s  ) and  question_id in (%s)  and id in (%s)"""\
                          % (user_ids, user_ids, qlist,
@@ -177,27 +177,22 @@ class Command(BaseCommand):
                 historyFile.writerow(headerList)
 
                 count = 00
-                #get all active DEE, DEO's
-                users = User.objects.filter(groups__name__in=['Data Entry Executive', 'Data Entry Operator'], is_active=1).order_by("username")
+                users = User.objects.filter(groups__name__in=['Data Entry Executive', 'Data Entry Operator'], is_active=1, id__in = userIds).order_by("username")
                 if users:
                     for user in users:
                         count += 1
                         userId = user.id
                         dataList = [count, user.username]
-                        # get institutions for each user id
                         rawQuerySet = \
                         Institution.objects.raw(""" SELECT "id","obj_id" FROM "public"."object_permissions_institution_perms" WHERE "user_id" = '%s' AND "Acess" = 1 """  % userId)
                         inst_list = [permObj.obj_id for permObj in
                                 rawQuerySet]
 
                         # get the content objects(instituion, staff, student)
-                        # get the preschool list
                         preSchListSql = """select id from schools_institution where id in %s and boundary_id in (select id from schools_boundary where boundary_type_id in (select id from schools_boundary_type where id=%s))""" %(tuple(inst_list),2)
                         cursor.execute(preSchListSql)
                         res = cursor.fetchall()
                         preSchList = [i[0] for i in res]
-
-                        # get the primary school list
                         primarySchListSql = """select id from schools_institution where id in %s and boundary_id in (select id from schools_boundary where boundary_type_id in (select id from schools_boundary_type where id=%s))""" %(tuple(inst_list),1)
                         cursor.execute(primarySchListSql)
                         res = cursor.fetchall()
@@ -209,7 +204,6 @@ class Command(BaseCommand):
                             preSchList=[0,0]
                         if not primarySchList:
                             primarySchList=[0,0]
-                        # iteatate over each contentList
                         for content in contentList:
                             (preList, primaryList) = ([00], [00])
                             contObj = \
@@ -249,23 +243,18 @@ class Command(BaseCommand):
 
                                 preList = preBoundaryList
                                 primaryList = primaryBoundaryList
-                                # primary boundary list queries ends here
 
                             elif content == 'institution':
-                                # institution queries starts here
                                 preList = preSchList
                                 primaryList = primarySchList
-                                # institution queries ends here
 
                             elif content == 'staff':
-                                # staff queries starts here
-                                # preschool staff list
                                 cursor.execute("select id from schools_staff where institution_id in (select id from schools_institution where id in %s and boundary_id in (select id from schools_boundary where boundary_type_id in (select id from schools_boundary_type where id=%s)))",[tuple(preSchList),2])
                                 res = cursor.fetchall()
                                 preStaffList = [i[0] for i in res]
                                 if not preStaffList:
                                     preStaffList=[0,0]
-                                # primary school staff list
+                            
                                 cursor.execute("select id from schools_staff where institution_id in (select id from schools_institution where id in %s and boundary_id in (select id from schools_boundary where boundary_type_id in (select id from schools_boundary_type where id=%s)))",[tuple(primarySchList),1])
                                 res = cursor.fetchall()
                                 primaryStaffList = [i[0] for i in res]
@@ -273,29 +262,24 @@ class Command(BaseCommand):
                                     primaryStaffList=[0,0]
                                 preList = map(int, preStaffList)
                                 primaryList = map(int,primaryStaffList)
-                                # staff queries ends here
 
                             elif content == 'student':
-                                # student queries starts here
-                                # preschool students group query
                                 cursor.execute("select id from schools_studentgroup where institution_id in %s and institution_id in ( select id from schools_institution where boundary_id in (select id from schools_boundary where boundary_type_id in (select id from schools_boundary_type where id=%s)))",[tuple(preSchList),2])
                                 res = cursor.fetchall()
                                 preSGList = [i[0] for i in res]
                                 if not preSGList:
                                     preSGList=[0,0]
 
-                                #primary school students group query
                                 cursor.execute("select id from schools_studentgroup where institution_id in %s and institution_id in ( select id from schools_institution where boundary_id in (select id from schools_boundary where boundary_type_id in (select id from schools_boundary_type where id=%s)))",[tuple(primarySchList),1])
                                 res = cursor.fetchall()
                                 primarySGList = [i[0] for i in res]
                                 if not primarySGList:
                                     primarySGList=[0,0]
-                                # get preschool students
+
                                 cursor.execute("select student_id from schools_Student_StudentGroupRelation where student_group_id in %s",[tuple(preSGList)])
                                 res = cursor.fetchall()
                                 preStList = [i[0] for i in res]
 
-                                # get primary school students
                                 cursor.execute("select student_id from schools_Student_StudentGroupRelation where student_group_id in %s",[tuple(primarySGList)])
                                 res = cursor.fetchall()
                                 primaryStList = [i[0] for i in res]
@@ -313,7 +297,6 @@ class Command(BaseCommand):
                             res = cursor.fetchone()
                             dataList.append(int(res[0]))
 
-
                             cursor.execute("select count(id) as count from fullhistory_fullhistory where action_time > %s and action_time < %s and request_id in (select id from fullhistory_request where user_pk =%s ) and content_type_id in ( select id from django_content_type where id=%s) and CAST(object_id AS INT)  in %s and action=%s and data ~* %s",[sTime, eTime, userId, contId, tuple(preList),'U','active'])
                             res = cursor.fetchone()
                             dataList.append(int(res[0]))
@@ -322,7 +305,6 @@ class Command(BaseCommand):
                             res = cursor.fetchone()
                             dataList.append(int(res[0]))
 
-                            
 
                             #primary list fullhistory
                             primaryList = map(int, primaryList)
@@ -338,44 +320,48 @@ class Command(BaseCommand):
                             res = cursor.fetchone()
                             dataList.append(int(res[0]))
 
-
-
                         for asmId in asmList:
                             answers = asmDict[asmId]
+                            status = 'modifiedBy": ' + '[' + str(userId) + ',]'
+                            anscttyp = ContentType.objects.get(name='answer')
                             if answers:
+
                                 #correct entires sql
                                 crQuery = """select count(id) as count from fullhistory_fullhistory where action_time > '%s' and action_time < '%s' and request_id  in (select id from fullhistory_request where user_pk =%s )  and CAST(object_id AS INT)  in %s and action='C'""" % (sTime, eTime, userId, tuple(answers))
                                 cursor.execute(crQuery)
                                 res = cursor.fetchone()
                                 crEntries = int(res[0])
+
+                                crQueryData = """select object_id as count from fullhistory_fullhistory where action_time > '%s' and action_time < '%s' and request_id  in (select id from fullhistory_request where user_pk =%s )  and CAST(object_id AS INT)  in %s and action='C'""" % (sTime, eTime, userId, tuple(answers))
+                                cursor.execute(crQueryData)
+                                res = cursor.fetchall()
+                                crEntriesLis = [i[0] for i in res]
+                                
+                                if not crEntriesLis:
+                                    crEntriesLis = [0,0]
+                                crEntriesLisInt = [int(i) for i in crEntriesLis]
+                                if not crEntriesLisInt:
+                                    crEntriesLisInt = [0,0]
+
                                 if crEntries == 00:
                                     inCrEntries = 00
                                 else:
-                                    # objecct id's for incorrect entries sql
-                                    crQueryData = """select object_id as count from fullhistory_fullhistory where action_time > '%s' and action_time < '%s' and request_id  in (select id from fullhistory_request where user_pk =%s )  and CAST(object_id AS INT)  in %s and action='C'""" % (sTime, eTime, userId, tuple(answers))
-                                    cursor.execute(crQueryData)
-                                    res = cursor.fetchall()
-                                    crEntriesLis = [i[0] for i in res]
-                                    if not crEntriesLis:
-                                        crEntriesLis = [0,0]
                                     # incorrect entries sql
-                                    cursor.execute("select count(id) from fullhistory_fullhistory where request_id not in ( select id from fullhistory_request where user_pk=%s) and action_time > %s and action_time < %s and CAST(object_id AS INT) in %s and (data ~* %s or data ~* %s) and data ~* %s ",[userId, sTime, eTime, tuple(crEntriesLis),'answer','status','user2'])
+                                    cursor.execute("select count(id) from fullhistory_fullhistory where action_time > %s and action_time < %s and action = 'U' and not request_id in ( select id from fullhistory_request where user_pk = %s) and CAST(object_id AS INT) in %s and data ~* %s and (data ~* %s or data ~* %s ) and not (data ~* %s or data ~* %s or data ~* %s)",[sTime, eTime, userId, tuple(crEntriesLisInt),'user2','answer','status','id','question','student'])
                                     res = cursor.fetchone()
                                     inCrEntries = int(res[0])
-                                    crEntries = crEntries - inCrEntries
 
                                 # verified entries sql
-                                cursor.execute("select count(id) from fullhistory_fullhistory where (request_id in ( select id from fullhistory_request where user_pk=%s) and action_time > %s and action_time < %s and CAST(object_id AS INT) in %s and action = 'U' and data ~* %s and not (data ~* %s or data ~* %s or data ~* %s)) ",[userId,sTime,
-eTime,tuple(answers),'user2','id','question','student'])
+                                cursor.execute("select count(id) from fullhistory_fullhistory where action_time > %s and action_time < %s and action = 'U' and request_id in ( select id from fullhistory_request where user_pk = %s) and CAST(object_id AS INT) in %s and data ~* %s and not (data ~* %s or data ~* %s or data ~* %s or data ~* %s or data ~* %s)",[sTime, eTime, userId, tuple(answers),'user2','id','question','student','answer', 'status'])
                                 res = cursor.fetchone()
                                 vEntries = int(res[0])
 
                                 # rectfied entires sql
-                                cursor.execute("select count(id) from fullhistory_fullhistory where action_time > %s and action_time < %s and CAST(object_id AS INT) in %s and request_id in ( select id from fullhistory_request where user_pk=%s and (data ~* %s or data ~* %s ) and data ~* %s ) and action = 'U' and not (data ~* %s or data ~* %s or data ~* %s)" ,[sTime,eTime, tuple(answers),userId,'answer','status','user2','id','question','student'])
+                                cursor.execute("select count(id) from fullhistory_fullhistory where action_time > %s and action_time < %s and action = 'U' and request_id in ( select id from fullhistory_request where user_pk = %s) and CAST(object_id AS INT) in %s and data ~* %s and (data ~* %s or data ~* %s ) and not (data ~* %s or data ~* %s or data ~* %s)",[sTime, eTime, userId, tuple(answers),'user2','answer','status','id','question','student'])
                                 res = cursor.fetchone()
                                 rEntries = int(res[0])
 
-                                vEntries = vEntries - rEntries
+
                                 dataList.append(asmId)
                                 dataList.append(crEntries)
                                 dataList.append(inCrEntries)
