@@ -321,17 +321,20 @@ class Command(BaseCommand):
                             dataList.append(int(res[0]))
 
                         for asmId in asmList:
+
                             answers = asmDict[asmId]
                             status = 'modifiedBy": ' + '[' + str(userId) + ',]'
                             anscttyp = ContentType.objects.get(name='answer')
                             if answers:
 
                                 #correct entires sql
+                                # Hom many answers i created for an assessment...
                                 crQuery = """select count(id) as count from fullhistory_fullhistory where action_time > '%s' and action_time < '%s' and request_id  in (select id from fullhistory_request where user_pk =%s )  and CAST(object_id AS INT)  in %s and action='C'""" % (sTime, eTime, userId, tuple(answers))
                                 cursor.execute(crQuery)
                                 res = cursor.fetchone()
                                 crEntries = int(res[0])
 
+                                # ids of answer records that i created for an assessment...
                                 crQueryData = """select object_id as count from fullhistory_fullhistory where action_time > '%s' and action_time < '%s' and request_id  in (select id from fullhistory_request where user_pk =%s )  and CAST(object_id AS INT)  in %s and action='C'""" % (sTime, eTime, userId, tuple(answers))
                                 cursor.execute(crQueryData)
                                 res = cursor.fetchall()
@@ -346,17 +349,21 @@ class Command(BaseCommand):
                                 if crEntries == 00:
                                     inCrEntries = 00
                                 else:
+                                    # How many of my answers were wrong...; showing all recored, which were created by me, 
+                                    # but now updated by others for an assessment.
                                     # incorrect entries sql
                                     cursor.execute("select count(id) from fullhistory_fullhistory where action_time > %s and action_time < %s and action = 'U' and not request_id in ( select id from fullhistory_request where user_pk = %s) and CAST(object_id AS INT) in %s and data ~* %s and (data ~* %s or data ~* %s ) and not (data ~* %s or data ~* %s or data ~* %s)",[sTime, eTime, userId, tuple(crEntriesLisInt),'user2','answer','status','id','question','student'])
                                     res = cursor.fetchone()
                                     inCrEntries = int(res[0])
 
                                 # verified entries sql
+                                # how many others records I verified by double entry for an assessment...
                                 cursor.execute("select count(id) from fullhistory_fullhistory where action_time > %s and action_time < %s and action = 'U' and request_id in ( select id from fullhistory_request where user_pk = %s) and CAST(object_id AS INT) in %s and data ~* %s and not (data ~* %s or data ~* %s or data ~* %s or data ~* %s or data ~* %s)",[sTime, eTime, userId, tuple(answers),'user2','id','question','student','answer', 'status'])
                                 res = cursor.fetchone()
                                 vEntries = int(res[0])
 
                                 # rectfied entires sql
+                                # how many others wrong answers I corrected/ fixed by double entry for an assessment...
                                 cursor.execute("select count(id) from fullhistory_fullhistory where action_time > %s and action_time < %s and action = 'U' and request_id in ( select id from fullhistory_request where user_pk = %s) and CAST(object_id AS INT) in %s and data ~* %s and (data ~* %s or data ~* %s ) and not (data ~* %s or data ~* %s or data ~* %s)",[sTime, eTime, userId, tuple(answers),'user2','answer','status','id','question','student'])
                                 res = cursor.fetchone()
                                 rEntries = int(res[0])
