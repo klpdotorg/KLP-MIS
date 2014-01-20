@@ -11,7 +11,7 @@ import datetime
 import os
 import csv
 import psycopg2
-from klpmis.settings import *
+from emsproduction.settings import *
 import pdb
 from django.db import connection
 debug_mode=0

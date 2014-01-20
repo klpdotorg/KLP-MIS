@@ -110,37 +110,47 @@ $.ajaxSetup({
 
 
 /* KLP_Del method is used to call common delete method, to delete boundary, institution, sg, programme, assessment and question */
-var KLP_Del = function(referKey,type, msgText){
-	KLP_Hide_Msg();
-	if (type.toLowerCase()=='class' || type.toLowerCase()=='center')
-        	nodeId = $("#studentgroup_"+referKey) 
-        else
-                nodeId = $("#"+type+'_'+referKey)  
-        if (type=='assessmentdetail')
-                msgType = 'question'
-        else
-                msgType = type
-        var conf = confirm("Are you sure, you want to delete "+msgType +' '+msgText);
-        if (conf==true){                                
-                $.ajax({                    
-                	url: '/delete/'+type+'/'+referKey+'/',
-                	success: function(data) {
-				if(data.match(/Successfully Deleted/g)){
-				        nodeId.remove();
-				    }
-                                 if(type=='staff'){
-                                                  $("#staff_"+referKey).remove();
-                                        }
-                                 else{
-				$("#dyncData").html("");
-                                      //nodeId.remove();
-                                            }
-				$("#klp_MsgTxt").html(data);
-				$("#successMsgHead").show();
+var aid;
+var fid;
+var KLP_Del = function(referKey,type, msgText,fid, aid){
+	                KLP_Hide_Msg();
+                    if (type.toLowerCase()=='class' || type.toLowerCase()=='center')
+        	            nodeId = $("#studentgroup_"+referKey) 
+                    else
+                        nodeId = $("#"+type+'_'+referKey)  
+                    if (type=='assessmentdetail')
+                            msgType = 'question'
+                    else
+                            msgType = type
+                    var url = ''
+                    if (fid && aid){
+                        url = '/delete/'+type+'/'+referKey+'/'+fid+'/'+aid+'/';
+                    } else if (aid && !fid){
+                        url = '/delete/'+type+'/'+referKey+'/'+aid+'/';
+                    } else {
+                        url = '/delete/'+type+'/'+referKey+'/';
                     }
-                });
-        }
-}
+                    var conf = confirm("Are you sure, you want to delete "+msgType +' '+msgText);
+                    if (conf==true){                                
+                            $.ajax({       
+                            'url' : url,
+                        	'success': function(data) {
+                                	if(data.match(/Successfully Deleted/g)){
+				                        nodeId.remove();
+				                    }
+                                    if(type=='staff'){
+                                         $("#staff_"+referKey).remove();
+                                    }
+                                    else{
+				                        $("#dyncData").html("");
+                                        //nodeId.remove();
+                                    }
+				                    $("#klp_MsgTxt").html(data);
+				                    $("#successMsgHead").show();
+                                }
+                            });
+                    }
+    }
         
 var KLP_Boundary_Add = function(thisObj){
 	KLP_Hide_Msg();
@@ -309,7 +319,7 @@ var KLP_BredaCrumb = function(currentObj){
 var KLP_validateScript=function(formId){
  	$('#'+formId).validate({
       		submitHandler: function(){
-      			$("body").append("<div id='KLP_overlay' class='KLP_overlayBG'></div>");
+      			//$("body").append("<div id='KLP_overlay' class='KLP_overlayBG'></div>");
 			$("#KLP_overlay").show();
       			$("#"+formId+"_submit").hide();
       			formName = formId;

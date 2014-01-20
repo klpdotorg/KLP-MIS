@@ -80,9 +80,7 @@
 									<input type="hidden" name="assessmentId" value="{{assessment_id}}"/>
 									<input type="hidden" name="student" value="{{i}}"/>
 									<input type="hidden" name="formcounter" id="formcounter" value="{{forloop.counter}}"/>
-									{% with i|getAsmAns:userAsmntDict as i_val %}
-									<input type="hidden" name="has_ans" id="has_answer_id_Student_{{i}}" value="{% if i_val.useransobj %}1{% else %}0{% endif %}" />
-								    {% endwith %}
+									
 									<table>
 										<tr>
 										        <!-- Repeat Question -->
@@ -115,9 +113,7 @@
 									   					       
 									   			{% endif %}
 									   					
-												{% with i|getObjectId as obID %}
-												<input type="hidden" name="obID" id="obID_id_Student_{{i}}" value="{{ obID }}" />
-			                					{% endwith %}
+												
 			            							</td>
 			            							{% if forloop.last %}
 			            								<td class="KLP_td_height"> <input id="id_Student_{{i}}_submit" type="submit" tabindex="1"   value="submit"  {% if not qDict|displayValue:'iBox' %}disabled{%endif%}/>       
@@ -221,29 +217,7 @@ function Pagination(thisObj){
 	return false;
 }
 
-function KLP_deform(id)
-{
-    var aid = document.getElementById("asId").value;
-    var frm = "id_Student_"+id;
-    $.ajax({
-            type: "GET",
-            url:"/klp/getanswers/",
-            data: "aid="+aid,
-            success:function(data) {
-                if(data.match(/true/g)){
-                    $('#refresh').val(1);
-                }
-            }
-    });
-    if (parseInt($('#refresh').val()) < 1){
-        return KLP_validateScript(frm);
-    } else {
-        $("#KLP_overlay").hide();
-            $('#KLP_load').hide();
-            alert('Please reload page');
-            return false;
-    }
-}
+
 </script>
 
 
