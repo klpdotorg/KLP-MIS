@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 HomeApi is used
 1) To view home page based on user roles
@@ -9,17 +7,15 @@ HomeApi is used
 from django.conf.urls.defaults import *
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
+from django.contrib.auth import logout
+from django.http import HttpResponseRedirect
+
 from django_restapi.resource import Resource
-from django_restapi.model_resource import Collection, Entry
 from django_restapi.responder import *
 from django_restapi.receiver import *
-from klprestApi.BoundaryApi import ChoiceEntry
-from django.template import Template, Context, RequestContext
+from django_restapi.authentication import *
 from schools.forms import *
 from schools.models import *
-from django_restapi.authentication import *
-from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponseRedirect
 
 
 class KLP_Home(Resource):

@@ -1,6 +1,5 @@
 *.pyc
 *~
 *.csv
-settings.py
 *.s*
 *.log

@@ -1,0 +1,4 @@
+Django>=1.5.1
+simplejson>=3.3.0
+psycopg2>=2.5.1
+Unipath==1.0
