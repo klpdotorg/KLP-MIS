@@ -14,7 +14,7 @@ from django.forms.models import modelformset_factory
 from django.forms.extras.widgets import SelectDateWidget
 from django.contrib.auth.forms import *
 import psycopg2
-from emsproduction.settings import *
+from klpmis.settings import *
 from fullhistory.models import *
 from schools.models import current_academic
 d = DATABASES['default']

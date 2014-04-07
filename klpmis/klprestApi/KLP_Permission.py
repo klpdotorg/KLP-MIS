@@ -29,7 +29,7 @@ from django.conf import settings
 from subprocess import Popen
 from subprocess import call
 from klprestApi.TreeMenu import KLP_assignedInstitutions, getAssSG
-from emsproduction.settings import PROJECT_NAME, PROJECT_ROOT, PYTHON_PATH
+from klpmis.settings import PROJECT_NAME, PROJECT_ROOT, PYTHON_PATH
 
 from schools.models import *
 def KLP_Assign_Permissions(request):
