@@ -102,7 +102,7 @@ def KLP_password_change(request,
 
         if post_change_redirect is None:
             post_change_redirect = \
-                reverse('production.klprestApi.KLP_UserApi.KLP_password_change_done'
+                reverse('klprestApi.KLP_UserApi.KLP_password_change_done'
                         )
         if request.method == 'POST':
 

@@ -14,7 +14,7 @@ from django.forms.models import modelformset_factory
 from django.forms.extras.widgets import SelectDateWidget
 from django.contrib.auth.forms import *
 import psycopg2
-from klpmis.settings import *
+from emsproduction.settings import *
 from fullhistory.models import *
 from schools.models import current_academic
 d = DATABASES['default']
@@ -103,9 +103,10 @@ def CustomizeSave(selfObj,Form,commit=True,modelName=None):
               
               #print  selfObj.instances,'INSTANCE OBJ',selfObj.instances.id,insertedRow
               #print dir(selfObj)
-              selfObj.instance=Form.Meta.model.objects.get(id=insertedRow)
-
-
+              try:
+                  selfObj.instance=Form.Meta.model.objects.get(id=insertedRow)
+              except:
+                  pass
               userdetails={}
               selfObjfiles=selfObj.files
 	      try:
@@ -482,9 +483,9 @@ class Assessment_Lookup_Form(ModelForm):
 class Question_Form(ModelForm):
 
     question_type = forms.ChoiceField(choices=QuestionType)
-    score_min = forms.DecimalField(max_digits=5, decimal_places=2,
+    score_min = forms.DecimalField(max_digits=10, decimal_places=2,
                                   required=False)
-    score_max = forms.DecimalField(max_digits=5, decimal_places=2,
+    score_max = forms.DecimalField(max_digits=10, decimal_places=2,
                                   required=False)
     grade = forms.CharField(required=False)
     active = forms.IntegerField(initial=2, widget=forms.HiddenInput)

@@ -20,8 +20,6 @@ from django.contrib.contenttypes.models import ContentType
 from emsproduction.settings import NUM_OF_FLEXI_ANSWER_FORM_RECORDS
 from schools.receivers import KLP_user_Perm
 from django.forms.models import modelformset_factory
-from django.db import connection
-
 class KLP_StudentGroup(Collection):
     def get_entry(self, studentgroup_id):    
     	# Query For Selected Student Group based on studentgroup_id    
@@ -96,10 +94,9 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 	# Query Childs based on studentgroup relation
         AssObj=Assessment.objects.get(id=assessment_id)
         if AssObj.typ ==3:
-        	students = Student_StudentGroupRelation.objects.select_related("student").filter(student_group__id = studentgroup_id,academic=current_academic, active=2).values_list('student', flat=True).distinct()
-        	studentsObj = Student.objects.filter(id__in = students, active = 2).values_list('child', flat = True)
+        	students = Student_StudentGroupRelation.objects.select_related("student").filter(student_group__id = studentgroup_id,academic=current_academic, active=2).values_list('student__child', flat=True).distinct()
 	        grupObj = StudentGroup.objects.filter(pk = studentgroup_id).only("group_type")[0].group_type
-         	childs_list = Child.objects.filter(id__in=studentsObj).extra(select={'lower_firstname':'lower(trim("first_name"))' }).order_by('lower_firstname').defer("mt")
+         	childs_list = Child.objects.filter(id__in=students).extra(select={'lower_firstname':'lower(trim("first_name"))' }).order_by('lower_firstname').defer("mt")
         elif AssObj.typ ==2:
                                          childs_list=StudentGroup.objects.filter(pk = studentgroup_id)
                                          grupObj =childs_list.only("group_type")[0].group_type
@@ -177,7 +174,6 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 
         if len(ansflexObj) >= ordercounter:
             ordercounter = 20
-        print ansflexObj,'FFFFFFFFFFFFFFFFFFFFL' 
 	qIdList=question_list.values_list('id',flat=True).distinct()
 	qNamesList=question_list.values_list('name',flat=True).distinct()
 	lookupfields=''
@@ -363,15 +359,9 @@ def MapStudents(request,id):
 			student = Student.objects.get(child = childObj)
 			param={'id':None,'student':student,'student_group':studentgroup,'academic':academic,'active':2}
 			try:
-				cursor = connection.cursor()
 				sgRelObj = Student_StudentGroupRelation.objects.get(student=student, student_group=studentgroup, academic=academic)
-				if sgRelObj.active == 0:
-					q1 = """insert into schools_student_studentgrouprelation_2(id, student_id, student_group_id, academic_id, active) select id, student_id, student_group_id, academic_id, 2 from schools_student_studentgrouprelation_0 where student_id = %d  and student_group_id = %d """ %(student.id, int(studentgroup.id))
-					q1 = """ delete from schools_student_studentgrouprelation_0 where student_id = %d and student_group_id = %d """ %(student.id, int(studentgroup.id))
-					cursor.execute(q1)
-					cursor.execute(q2)
-				else:
-					pass
+				sgRelObj.active=2
+				sgRelObj.save()
 			except:
 				stdgrp_rels = Student_StudentGroupRelation(**param)
 				stdgrp_rels.save()

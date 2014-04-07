@@ -61,6 +61,8 @@ class KLP_Delete(Resource):
         request,
         model_name1,
         referKey,
+        fid='',
+        aid='',
         ):
         modelDict = {
             'boundary': Boundary,
@@ -73,6 +75,7 @@ class KLP_Delete(Resource):
             'staff': Staff,
             'class': StudentGroup,
             'center': StudentGroup,
+            'answer': Answer,
             }
 
         # Checking user Permissions
@@ -80,9 +83,10 @@ class KLP_Delete(Resource):
         KLP_user_Perm(request.user,
                       modelDict[model_name1.lower()]._meta.module_name,
                       'Delete')  # Get Object based on id and model to delete
-        obj = modelDict[model_name1.lower()].objects.get(pk=referKey)
+        if not model_name1.lower() == 'answer':
+            obj = modelDict[model_name1.lower()].objects.get(pk=referKey)
         cursor = connection.cursor()
-        print "----hfjdhfdhfdfjdf", model_name1.lower()
+
         if model_name1.lower() in ['class', 'center', 'studentgroup']:
             sgtype = StudentGroup.objects.get(id=referKey)
             if sgtype.group_type == "Class":
@@ -103,6 +107,7 @@ class KLP_Delete(Resource):
                 cursor.execute(q1)
                 cursor.execute(q2)
                 message = name + ' ' + msg
+
         else:
             print " This is not class or Center type "
 
@@ -119,15 +124,41 @@ class KLP_Delete(Resource):
               flag = obj.getChild()
             except:
                  flag=False
-        if flag:
+
+        if flag and  not model_name1.lower() == 'assessment':
             message = model_name1.lower() \
                 + ' has child objects.So can not delete it.First delete the child object,then try to delete it'
+        elif model_name1.lower() == 'answer':
+            if referKey and aid and fid:
+                obj = Answer.objects.filter(object_id=referKey, flexi_data=fid, question__assessment__id=aid)
+                if obj:
+                    obj.delete()
+                    message =  "Answer objects of  " + str(referKey) + "and " + str(fid) + " and" + str(aid) + " Deleted Successfully"
+            elif aid and not fid:
+                obj = Answer.objects.filter(object_id=referKey, flexi_data='', question__assessment__id=aid)
+                if obj:
+                    obj.delete()
+                    message =  "Answer objects of  " + str(referKey) + "and "  + str(aid) + " Deleted Successfully"
+            else:
+                message =  "Answer objects doesn't exist"
         else:
             obj.active = 0  # Change active to 0(object is deleted)
             obj.save()  # Save Data
             if not model_name1.lower() in ['class', 'center', 'studentgroup']:
-                message = model_name1.lower() + ' Successfully Deleted'
+                if model_name1.lower() == 'assessment':
+                    message = obj.name + ' ' + 'Assessment'+ ' Successfully Deleted'
+                elif model_name1.lower() == 'programme':
+                    message = obj.name + ' ' + 'Programme'+ ' Successfully Deleted'
+                elif model_name1.lower() == 'question':
+                    message =  'Question'+ ' Successfully Deleted'
+                elif model_name1.lower() == 'boundary':
+                    message = obj.name + ' ' + 'Boundary'+ ' Successfully Deleted'
+                elif model_name1.lower() == 'institution':
+                    message = obj.name + ' ' + 'Institution'+ ' Successfully Deleted'
+                else:
+                    message = model_name1.lower() + ' Successfully Deleted'
         return HttpResponse(message)
+
 
 
 @csrf_exempt
@@ -170,6 +201,12 @@ def KLP_flogin(request):
 
 urlpatterns = patterns('',
                        url(r'^delete/(?P<model_name1>\w+)/(?P<referKey>\d+)/$'
+                       , KLP_Delete(permitted_methods=('POST', 'GET'
+                       ))),
+                       url(r'^delete/(?P<model_name1>\w+)/(?P<referKey>\d+)/(?P<fid>[a-zA-Z0-9_ .-]+)/(?P<aid>\d+)/$'
+                       , KLP_Delete(permitted_methods=('POST', 'GET'
+                       ))),
+                       url(r'^delete/(?P<model_name1>\w+)/(?P<referKey>\d+)/(?P<aid>\d+)/$'
                        , KLP_Delete(permitted_methods=('POST', 'GET'
                        ))),
                        url(r'^createnew/(?P<model_name>\w+)/(?P<new_id>\d+)/$'

@@ -3,7 +3,7 @@
 """
 TreeMenu is used to filter all objects to genrate tree menu
 """
-from django.contrib.auth.models import *
+
 from django.conf.urls.defaults import *
 from django_restapi.model_resource import Collection
 from django_restapi.responder import *
@@ -380,20 +380,20 @@ def TreeClass(request):
                             }).order_by('lower_name')
                     typ = 'sch'
         elif typ == 'programme':
-        
+
         # if typ is programme Query For active assessment based On programme id
 
             activelist = [1, 2]
             userobj = User.objects.get(id=request.user.id)
             if showflag:
-
-                activelist = [1, 2 ]
+                activelist = [1, 2]
             if userobj.is_superuser:
                 query = Assessment.objects.filter(programme__id=model[1],
                     active__in=activelist)
             else:
                 query = Assessment.objects.filter(programme__id=model[1],
                     active=2)
+            
         elif typ == 'assessment':
 
         # if typ is assessment Query For active Questions based On assessment id
@@ -403,7 +403,7 @@ def TreeClass(request):
         else:
             if typ == 'institution':
             
-            
+
             # if typ is Institution Query For active Sgs
 
                 if filterBy != 'None':

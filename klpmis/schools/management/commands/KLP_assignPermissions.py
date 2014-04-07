@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from django.core.management.base import BaseCommand, CommandError
 from django.core.mail import send_mail
-from klpmis.settings import PROJECT_NAME, PROJECT_ROOT
+from emsproduction.settings import PROJECT_NAME, PROJECT_ROOT
 from django.conf import settings
 
 from schools.models import *
@@ -15,22 +15,6 @@ from django.contrib.contenttypes.models import ContentType
 from optparse import make_option
 from django.db import transaction
 
-
-def permission_status_message(assessList,assId,index_val):
-    if assessList[assId][index_val]:
-        perm_list = str(assessList[assId][index_val])
-        msg += '\t \t \t No of Institution : ' \
-                            + str(len(assessList[assId][index_val])) \
-                            + ''': 
-
-      \t \t \t ''' \
-                            + perm_list[1:len(perm_list) - 1] \
-                            + ''' .
-
-'''
-    else:
-        msg = ' \t \t \t None . \n\n'
-    return msg
 
 class Command(BaseCommand):
 
@@ -127,21 +111,45 @@ class Command(BaseCommand):
             assIds = dic[k][0]
             for assId in assIds:
                 assName = Assessment.objects.filter(id=assId)[0].name
-                permission_update_status()
                 detailmessage += \
                     ''' \t \t Permissions were already assigned to the following institutions for assessment %s :
  
 ''' \
                     % (str(assId) + '-' + assName)
-                detailmessage += permission_status_message(assIds,assId,0)
+                if assIds[assId][0]:
+                    allreadylist = str(assIds[assId][0])
+                    detailmessage += '\t \t \t No of Institution : ' \
+                        + str(len(assIds[assId][0])) \
+                        + ''': 
 
+  \t \t \t ''' \
+                        + allreadylist[1:len(allreadylist) - 1] \
+                        + ''' .
+
+'''
+                else:
+                    detailmessage += ''' \t \t \t None . 
+
+'''
                 detailmessage += \
                     ''' \t \t Permissions were newly assigned to the following institutions for assessment %s :
  
  ''' \
                     % (str(assId) + '-' + assName)
-                
-                detailmessage += permission_status_message(assIds,assId,1)
+                if assIds[assId][1]:
+                    newlylist = str(assIds[assId][1])
+                    detailmessage += '\t \t \t No of Institution : ' \
+                        + str(len(assIds[assId][1])) \
+                        + ''': 
+
+  \t \t \t ''' \
+                        + newlylist[1:len(newlylist) - 1] + '''
+
+'''
+                else:
+                    detailmessage += ''' \t \t \t None . 
+
+'''
             if not assIds:
                 detailmessage += \
                     '''\t \t Assessment assigned to the user: None 
@@ -152,15 +160,37 @@ class Command(BaseCommand):
                     ''' \t \t Permissions were newly assigned to the following institutions 
 
 '''
+                if dic[k][1]:
+                    allreadylist = str(dic[k][1])
+                    detailmessage += '\t \t \t No of Institution : ' \
+                        + str(len(dic[k][1])) + ''': 
 
-                detailmessage += permission_status_message(dic,k,1)
+  \t \t \t ''' \
+                        + allreadylist[1:len(allreadylist) - 1] \
+                        + ''' .
 
+'''
+                else:
+                    detailmessage += ''' \t \t \t None . 
+
+'''
                 detailmessage += \
                     ''' \t \t Permissions were already assigned to the following institutions
 
  '''
-                detailmessage += permission_status_message(dic,k,2)
+                if dic[k][2]:
+                    newlylist = str(dic[k][2])
+                    detailmessage += '\t \t \t No of Institution : ' \
+                        + str(len(dic[k][2])) + ''': 
 
+  \t \t \t ''' \
+                        + newlylist[1:len(newlylist) - 1] + ''' .
+
+'''
+                else:
+                    detailmessage += ''' \t \t \t None . 
+
+'''
         inst_liststr = ', '.join(str(x) for x in inst_list)
         boundarystr = ''
         if bound_list != ['']:  # print bound_list,"boundarylist"

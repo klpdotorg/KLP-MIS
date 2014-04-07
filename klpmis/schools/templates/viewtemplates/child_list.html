@@ -24,7 +24,7 @@
 </div>
 
 <div class="detailHead">
-<span class="hedText">Student Details</span>
+<span class="hedText">Student Details </span>
 <span id ="list_url" style="display:none;" value = "{{url}}"></span>
 </div>
 
@@ -57,7 +57,7 @@
 </table>
 </div>
 <div id="student_pagenation" style="{% if not students_list %}display:none;{% endif %}">
-	<!-- pagination -->
+	<!-- pagination --> 
 	page <span id="id_currentPage">{{page}}</span> of <span id="id_totPages">{{pages}}</span>
 	<input type="hidden" name="resultPerPage" id="id_resultPerPage" value="{{results_per_page}}" />
 	<input type="hidden" value = "{{Norecords}}" id="Norecords" name="Norecords"/>

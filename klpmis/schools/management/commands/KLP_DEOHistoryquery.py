@@ -16,40 +16,130 @@ import pdb
 from django.db import connection
 debug_mode=0
 
-def get_boundary_type(preboundarytypeId,btid):
+def getBoundaryRes(boundaryDict,boundaryType):
+    ''' Boundary Related Queries '''
+    sTime = boundaryDict['sTime']
+    eTime = boundaryDict['eTime']
+    userId = boundaryDict['userId']
+    contId = boundaryDict['contId']
+    from django.db import connection
     cursor = connection.cursor()
-    preboundarytypeId = \
-                    """select id from schools_boundary where boundary_type_id in (select id from schools_boundary_type where id=%d)""" % (btid)
-    cursor.execute(preboundarytypeId)
-    return [c[00] for c in cursor.fetchall()]
 
-def institution_query(cid):
-    catList="in (11,10,12)"
-    if cid==1:
-        catList="not %s" % catList
+    #boundary created query
+    cursor.execute("select count(id) from fullhistory_fullhistory where action_time  > %s and action_time < %s and action = 'C' and content_type_id = %s and request_id in ( select id from fullhistory_request where user_pk = %s) and cast(object_id as int) in ( select id from schools_boundary where boundary_type_id = %s)",[sTime, eTime, contId, userId, boundaryType])
+
+    res = cursor.fetchone()
+    created = int(res[0])
+
+    #boundary updated query
+    cursor.execute("select count(id) from fullhistory_fullhistory where action_time  > %s and action_time < %s and action = 'U' and content_type_id = %s and request_id in ( select id from fullhistory_request where user_pk = %s) and cast(object_id as int) in ( select id from schools_boundary where boundary_type_id = %s) and data ~* %s",[sTime, eTime, contId, userId, boundaryType, 'name'])
+
+    res = cursor.fetchone()
+    updated = int(res[0])
+
+    #boundary deleted query
+    cursor.execute("select count(id) from fullhistory_fullhistory where action_time  > %s and action_time < %s and action = 'U' and content_type_id = %s and request_id in ( select id from fullhistory_request where user_pk = %s) and cast(object_id as int) in ( select id from schools_boundary where boundary_type_id = %s) and data ~* %s",[sTime, eTime, contId, userId, boundaryType, 'active'])
+
+    res = cursor.fetchone()
+    removed = int(res[0])
+    cursor.close()
+    return {'created': created, 'updated': updated, 'removed': removed}
+
+
+
+def getInstRes(instdict, insttype):
+    sTime = instdict['sTime']
+    eTime = instdict['eTime']
+    userId = instdict['userId']
+    contId = instdict['contId']
+    from django.db import connection
     cursor = connection.cursor()
-    query = \
-"""SELECT distinct id from schools_institution where cat_id in (select id from schools_institution_category where category_type %s)""" % (catList)
-    return query
 
-def get_schoolIDs(preSchoolIds,fullhistoryQuery):
-    slist = \
-"""select distinct student_id  from schools_Student_StudentGroupRelation where student_group_id in (select id from schools_studentgroup where institution_id in  %s ) and student_id %s  """\
-                                 % (preSchoolIds, fullhistoryQuery)
-    return slist
+    # institution created by user
+    cursor.execute("select count(id) from fullhistory_fullhistory where action_time > %s and action_time < %s and content_type_id = %s and action = 'C' and request_id in ( select id from fullhistory_request where user_pk = %s) and cast(object_id as int) in ( select id from schools_institution where boundary_id in ( select id from schools_boundary where boundary_type_id = %s))",[sTime, eTime, contId,userId, insttype ])
+    res = cursor.fetchone()
+    created = int(res[0])
 
+    # institution updated by user
+    cursor.execute("select count(id) from fullhistory_fullhistory where action_time > %s and action_time < %s and content_type_id = %s and action = 'U' and request_id in ( select id from fullhistory_request where user_pk = %s) and not data = %s and cast(object_id as int) in ( select id from schools_institution where boundary_id in ( select id from schools_boundary where boundary_type_id = %s))",[sTime, eTime, contId, userId, '{"active": [2, 0]}', insttype ])
+    res = cursor.fetchone()
+    updated = int(res[0])
 
-def fhquery(qd):
-    q = """select count(id) as count from fullhistory_fullhistory where action_time > '%s' and action_time < '%s' and request_id not in (select id from fullhistory_request where user_pk =%s )  and CAST(object_id AS INT)  in %s and action='U' and (data ~* 'anwsers' or data ~* 'status' or data ~* 'user2') and request_id  not in (select id from fullhistory_request where user_pk =%s )""" \
-                                     % (qd['sTime'], qd['eTime'], qd['userId'], qd['answers'], qd['userId'])
-    return q
-
-def fhrquery(rd):
-    q = """select count(id) as count from fullhistory_fullhistory where action_time > '%s' and action_time < '%s' and request_id  in (select id from fullhistory_request where user_pk =%s ) and CAST(object_id AS INT)  in %s and action='U' and (data like '%%anwsers%%' or data like '%%status%%' or data like '%%user2%%') and request_id  not in (select id from fullhistory_request where user_pk =%s )  and (data not like '%%id%%' or data not like '%%question%%' or data not like '%%student%%')"""\
-                                 % (rd['sTime'], rd['eTime'], rd['userId'], rd['answers'],rd['userId'])
-    return q
+    # instituion removed by user
+    cursor = connection.cursor()
+    cursor.execute("select count(id) as count from fullhistory_fullhistory where action_time > %s and action_time < %s and request_id in (select id from fullhistory_request where user_pk =%s ) and content_type_id in ( select id from django_content_type where id=%s) and CAST(object_id AS INT)  in ( select id from schools_institution where boundary_id in ( select id from schools_boundary where boundary_type_id = %s)) and action=%s and data  = %s ",[sTime, eTime, userId, contId, insttype,'U','{"active": [2, 0]}'])
+    res = cursor.fetchone()
+    removed = int(res[0])
+    cursor.close()
+    return {'created': created, 'updated': updated, 'removed': removed}
 
 
+
+def getStaffRes(staffdict, stafftype):
+    sTime = staffdict['sTime']
+    eTime = staffdict['eTime']
+    userId = staffdict['userId']
+    contId = staffdict['contId']
+    from django.db import connection
+    cursor = connection.cursor()
+
+    # staff created query
+    cursor.execute("select count(id) from fullhistory_fullhistory where action_time > %s and action_time < %s and content_type_id in ( select id from django_content_type where id = %s) and request_id in ( select id from fullhistory_request where user_pk = %s) and action = 'C' and cast(object_id as int) in ( select id from schools_staff where institution_id in ( select id from schools_institution where boundary_id in ( select id from schools_boundary where boundary_type_id in ( select id from schools_boundary_type where id = %s))))",[sTime, eTime, contId, userId, stafftype ])
+
+    res = cursor.fetchone()
+    created = int(res[0])
+
+    # staff updated query
+    cursor.execute("select count(id) from fullhistory_fullhistory where action_time > %s and action_time < %s and content_type_id in ( select id from django_content_type where id = %s) and request_id in ( select id from fullhistory_request where user_pk = %s) and action = 'U' and not data ~* %s and cast(object_id as int) in ( select id from schools_staff where institution_id in ( select id from schools_institution where boundary_id in ( select id from schools_boundary where boundary_type_id in ( select id from schools_boundary_type where id = %s))))",[sTime, eTime, contId, userId,'active', stafftype ])
+
+    res = cursor.fetchone()
+    updated = int(res[0])
+
+    # staff removed query
+    cursor.execute("select count(id) from fullhistory_fullhistory where action_time > %s and action_time < %s and content_type_id in ( select id from django_content_type where id = %s) and request_id in ( select id from fullhistory_request where user_pk = %s) and action = 'U' and  data = %s and cast(object_id as int) in ( select id from schools_staff where institution_id in ( select id from schools_institution where boundary_id in ( select id from schools_boundary where boundary_type_id in ( select id from schools_boundary_type where id = %s))))",[sTime, eTime, contId, userId,'{"active": [2, 0]}', stafftype ])
+
+    res = cursor.fetchone()
+    removed = int(res[0])
+
+    cursor.close()
+
+    return {'created': created, 'updated': updated, 'removed': removed}
+
+
+
+
+def getStudentRes(studDict, studType):
+    sTime = studDict['sTime']
+    eTime = studDict['eTime']
+    userId = studDict['userId']
+    contId = studDict['contId']
+    from django.db import connection
+    cursor = connection.cursor()
+
+    #student created query
+    cursor.execute("select count(id) from fullhistory_fullhistory where action_time > %s and action_time < %s and action = 'C' and content_type_id = %s and request_id in ( select id from fullhistory_request where user_pk = %s) and cast(object_id as int) in (select child_id from schools_student where id in (select student_id from schools_student_studentgrouprelation where academic_id = 122  and student_group_id in ( select id from schools_studentgroup where institution_id in ( select id from schools_institution where boundary_id in (select id from schools_boundary where boundary_type_id = %s) ))))", [sTime, eTime, contId, userId, studType])
+    res = cursor.fetchone()
+    created = int(res[0])
+
+    #student updated query
+    cursor.execute("select (object_id) from fullhistory_fullhistory where action_time > %s and action_time < %s and action = 'U' and request_id in ( select id from fullhistory_request where user_pk = %s) and content_type_id = %s and revision > 2 and cast(object_id as int) in ( select child_id from schools_student where id in (select student_id from schools_student_studentgrouprelation where academic_id =122 and student_group_id in ( select id from schools_studentgroup where institution_id in ( select id from schools_institution where boundary_id in (select id from schools_boundary where boundary_type_id = %s) ) ))) group by object_id;", [sTime, eTime, userId, contId, studType])
+    res = cursor.fetchall()
+
+    if not res is None:
+        updated = len(res)
+    else:
+        updated = 0
+
+    #student remove query
+    contIdobj = ContentType.objects.get(model = 'student')
+    contId = contIdobj.id
+    cursor.execute("select count(id) from fullhistory_fullhistory where action_time > %s and action_time < %s and action = 'U' and data ~* 'inactive' and content_type_id = %s and request_id in (select id from fullhistory_request where user_pk = %s) and cast(object_id as int) in ( select id from schools_student where active = 0 and id in (select student_id from schools_student_studentgrouprelation where academic_id =122 and student_group_id in ( select id from schools_studentgroup where institution_id in ( select id from schools_institution where boundary_id in (select id from schools_boundary where boundary_type_id = %s) ) )))", [sTime, eTime, contId, userId, studType])
+
+
+    res = cursor.fetchone()
+
+    removed = int(res[0])
+    return {'created': created, 'updated':updated, 'removed':removed}
 
 class Command(BaseCommand):
 
@@ -62,7 +152,7 @@ class Command(BaseCommand):
         fileName = args[2]
         scriptStartTime = datetime.datetime.now()
         print scriptStartTime
-        contentList = ['boundary', 'institution', 'student', 'staff']
+        contentList = ['boundary', 'institution', 'child', 'staff']
 
         if fileName and start_date and end_date:
             if 1:
@@ -90,11 +180,7 @@ class Command(BaseCommand):
 
                 (asmDict, asmList) = ({}, [])
                 qlist=[]
-                users = \
-                    User.objects.filter(is_active=1).order_by('username'
-                        ).only('id', 'username')
-                userIds = users.values_list('id', flat=True)
-                
+
                 sDate = datetime.date(int(strDate[2]), int(strDate[1]),
                         int(strDate[00]))
                 eDate = datetime.date(int(enDate[2]), int(enDate[1]),
@@ -116,24 +202,30 @@ class Command(BaseCommand):
                     00,
                     )
                 print 'sTime=', sTime, 'eTime=', eTime
+
+
                 userIdsList = FullHistory.objects.filter(action_time__range = (sTime, eTime)).only('request__user_pk').distinct().values_list('request__user_pk', flat=True)
                 userIds=[]
                 for i in userIdsList:
                     if not i == None:
                         userIds.append(i)
-                assessments = Assessment.objects.filter(active=2).distinct().only("id", "name")
+                print "\n\n UserIds: ", userIds
+
+
+                asmids=Answer.objects.filter(creation_date__range=[sDate, eDate]).distinct('question__assessment').values_list('question__assessment', flat=True)
+                asmids =  [int(i) for i in asmids]
+                assessments = Assessment.objects.filter(active=2, id__in = asmids).distinct().only("id", "name")
+                print "assessments are: ", assessments
+
                 cursor = connection.cursor()
+
+                # get answers ids from fh
                 fullhistoryAnswers = \
                     cursor.execute("""select distinct CAST(object_id AS INT) from fullhistory_fullhistory where action_time > '%s' and action_time < '%s' and content_type_id in ( select id from django_content_type where name='%s')"""
                                     % (sTime, eTime,'answer'))
                 validAns = "0 "
                 for c in cursor.fetchall():
                     validAns += ", %s"%c[00] 
-
-
-                preBoundaryList = get_boundary_type("preboundarytypeId",2)
-
-                primaryBoundaryList = get_boundary_type("primaryboundarytypeId",1)
 
                 user_ids = tuple(userIds)
 
@@ -183,142 +275,87 @@ class Command(BaseCommand):
                         count += 1
                         userId = user.id
                         dataList = [count, user.username]
-                        rawQuerySet = \
-                        Institution.objects.raw(""" SELECT "id","obj_id" FROM "public"."object_permissions_institution_perms" WHERE "user_id" = '%s' AND "Acess" = 1 """  % userId)
-                        inst_list = [permObj.obj_id for permObj in
-                                rawQuerySet]
 
-                        # get the content objects(instituion, staff, student)
-                        preSchListSql = """select id from schools_institution where id in %s and boundary_id in (select id from schools_boundary where boundary_type_id in (select id from schools_boundary_type where id=%s))""" %(tuple(inst_list),2)
-                        cursor.execute(preSchListSql)
-                        res = cursor.fetchall()
-                        preSchList = [i[0] for i in res]
-                        primarySchListSql = """select id from schools_institution where id in %s and boundary_id in (select id from schools_boundary where boundary_type_id in (select id from schools_boundary_type where id=%s))""" %(tuple(inst_list),1)
-                        cursor.execute(primarySchListSql)
-                        res = cursor.fetchall()
-                        primarySchList = [i[0] for i in res]
-
-                        preSchList = map(int, preSchList)
-                        primarySchList = map(int, primarySchList)
-                        if not preSchList:
-                            preSchList=[0,0]
-                        if not primarySchList:
-                            primarySchList=[0,0]
                         for content in contentList:
                             (preList, primaryList) = ([00], [00])
                             contObj = \
                                 ContentType.objects.get(app_label='schools'
                                     , name=content)
                             contId = contObj.id
-
+                            querydict = {'sTime':sTime, 'eTime':eTime, 'userId': userId, 'contId':contId}
                             if content == 'boundary':
-                                (preBoundaryList,primaryBoundaryList) = ([], [])
-                                # preschool boundary queries starts here
-                                cursor.execute("select boundary_id from schools_institution where id in %s", [tuple(preSchList)])
-                                res = cursor.fetchall()
-                                BoundaryList = [i[0] for i in res]
-                                preBoundaryList.extend(list(BoundaryList))
 
-                                if not preBoundaryList:
-                                    preBoundaryList=[0,0]
-                                cursor.execute("select parent_id from schools_boundary where id in %s and boundary_type_id in ( select id from schools_boundary_type where id=%s)", [tuple(preBoundaryList),2])
-                                res = cursor.fetchall()
-                                BoundaryList = [i[0] for i in res]
-                                preBoundaryList.extend(list(BoundaryList))
+                                #primary boundary queries 
+                                querytype = 1
+                                primary_boundary = getBoundaryRes(querydict, querytype)
 
-                                # preschool boundary queries ends here
-
-                                # primary boundary list queries starts here
-                                cursor.execute("select boundary_id from schools_institution where id in %s", [tuple(primarySchList)])
-                                res = cursor.fetchall()
-                                BoundaryList = [i[0] for i in res]
-                                primaryBoundaryList.extend(list(BoundaryList))
-
-                                if not primaryBoundaryList:
-                                    primaryBoundaryList[0,0]
-                                cursor.execute("select parent_id from schools_boundary where id in %s and boundary_type_id in ( select id from schools_boundary_type where id=%s)", [tuple(primaryBoundaryList),1])
-                                res = cursor.fetchall()
-                                BoundaryList = [i[0] for i in res]
-                                primaryBoundaryList.extend(list(BoundaryList))
-
-                                preList = preBoundaryList
-                                primaryList = primaryBoundaryList
+                                #pre boundary queries 
+                                querytype = 2
+                                pre_boundary = getBoundaryRes(querydict, querytype)
 
                             elif content == 'institution':
-                                preList = preSchList
-                                primaryList = primarySchList
+
+                                #primary instituion queries 
+                                querytype = 1
+                                primary_institution = getInstRes(querydict, querytype)
+
+                                #pre instituion queries 
+                                querytype = 2
+                                pre_institution = getInstRes(querydict, querytype)
 
                             elif content == 'staff':
-                                cursor.execute("select id from schools_staff where institution_id in (select id from schools_institution where id in %s and boundary_id in (select id from schools_boundary where boundary_type_id in (select id from schools_boundary_type where id=%s)))",[tuple(preSchList),2])
-                                res = cursor.fetchall()
-                                preStaffList = [i[0] for i in res]
-                                if not preStaffList:
-                                    preStaffList=[0,0]
-                            
-                                cursor.execute("select id from schools_staff where institution_id in (select id from schools_institution where id in %s and boundary_id in (select id from schools_boundary where boundary_type_id in (select id from schools_boundary_type where id=%s)))",[tuple(primarySchList),1])
-                                res = cursor.fetchall()
-                                primaryStaffList = [i[0] for i in res]
-                                if not primaryStaffList:
-                                    primaryStaffList=[0,0]
-                                preList = map(int, preStaffList)
-                                primaryList = map(int,primaryStaffList)
 
-                            elif content == 'student':
-                                cursor.execute("select id from schools_studentgroup where institution_id in %s and institution_id in ( select id from schools_institution where boundary_id in (select id from schools_boundary where boundary_type_id in (select id from schools_boundary_type where id=%s)))",[tuple(preSchList),2])
-                                res = cursor.fetchall()
-                                preSGList = [i[0] for i in res]
-                                if not preSGList:
-                                    preSGList=[0,0]
+                                #primary staff queries 
+                                querytype = 1
+                                primary_staff = getStaffRes(querydict, querytype)
 
-                                cursor.execute("select id from schools_studentgroup where institution_id in %s and institution_id in ( select id from schools_institution where boundary_id in (select id from schools_boundary where boundary_type_id in (select id from schools_boundary_type where id=%s)))",[tuple(primarySchList),1])
-                                res = cursor.fetchall()
-                                primarySGList = [i[0] for i in res]
-                                if not primarySGList:
-                                    primarySGList=[0,0]
-
-                                cursor.execute("select student_id from schools_Student_StudentGroupRelation where student_group_id in %s",[tuple(preSGList)])
-                                res = cursor.fetchall()
-                                preStList = [i[0] for i in res]
-
-                                cursor.execute("select student_id from schools_Student_StudentGroupRelation where student_group_id in %s",[tuple(primarySGList)])
-                                res = cursor.fetchall()
-                                primaryStList = [i[0] for i in res]
-
-                                if not preStList:
-                                    preStList=[0,0]
-                                if not primaryStList:
-                                    primaryStList=[0,0]
-
-                                preList = map(int, preStList)
-                                primaryList = map(int,primaryStList)
-
-                            #pre list fullhistory
-                            cursor.execute("select count(id) from fullhistory_fullhistory where action_time>%s and action_time < %s and request_id in ( select id from fullhistory_request where user_pk = %s) and content_type_id in ( select id from django_content_type where id=%s) and CAST(object_id AS INT) in %s and action=%s",[sTime, eTime, userId, contId, tuple(preList),'C'])
-                            res = cursor.fetchone()
-                            dataList.append(int(res[0]))
-
-                            cursor.execute("select count(id) as count from fullhistory_fullhistory where action_time > %s and action_time < %s and request_id in (select id from fullhistory_request where user_pk =%s ) and content_type_id in ( select id from django_content_type where id=%s) and CAST(object_id AS INT)  in %s and action=%s and data ~* %s",[sTime, eTime, userId, contId, tuple(preList),'U','active'])
-                            res = cursor.fetchone()
-                            dataList.append(int(res[0]))
-
-                            cursor.execute("select count(id) as count from fullhistory_fullhistory where action_time > %s and action_time < %s and request_id in (select id from fullhistory_request where user_pk =%s ) and content_type_id in ( select id from django_content_type where id=%s) and CAST(object_id AS INT)  in %s and action=%s and not data  ~* %s ",[sTime, eTime, userId, contId, tuple(preList),'U','active'])
-                            res = cursor.fetchone()
-                            dataList.append(int(res[0]))
+                                #pre staff queries 
+                                querytype = 2
+                                pre_staff = getStaffRes(querydict, querytype)
 
 
-                            #primary list fullhistory
-                            primaryList = map(int, primaryList)
-                            cursor.execute("select count(id) from fullhistory_fullhistory where action_time>%s and action_time < %s and request_id in ( select id from fullhistory_request where user_pk = %s) and content_type_id in ( select id from django_content_type where id=%s) and CAST(object_id AS INT) in %s and action=%s",[sTime, eTime, userId, contId, tuple(primaryList),'C'])
-                            res = cursor.fetchone()
-                            dataList.append(int(res[0]))
+                            elif content == 'child':
 
-                            cursor.execute("select count(id) as count from fullhistory_fullhistory where action_time > %s and action_time < %s and request_id in (select id from fullhistory_request where user_pk =%s ) and content_type_id in ( select id from django_content_type where id=%s) and CAST(object_id AS INT)  in %s and action=%s and data ~* %s ",[sTime, eTime, userId, contId, tuple(primaryList),'U','active'])
-                            res = cursor.fetchone()
-                            dataList.append(int(res[0]))
+                                #primary student queries 
+                                querytype = 1
+                                primary_student = getStudentRes(querydict, querytype)
 
-                            cursor.execute("select count(id) as count from fullhistory_fullhistory where action_time > %s and action_time < %s and request_id in (select id from fullhistory_request where user_pk =%s ) and content_type_id in ( select id from django_content_type where id=%s) and CAST(object_id AS INT)  in %s and action=%s and not data  ~* %s ",[sTime, eTime, userId, contId, tuple(primaryList),'U','active'])
-                            res = cursor.fetchone()
-                            dataList.append(int(res[0]))
+                                #pre student queries 
+                                querytype = 2
+                                pre_student = getStudentRes(querydict, querytype)
+
+                        dataList.append(pre_boundary['created'])
+                        dataList.append(pre_boundary['updated'])
+                        dataList.append(pre_boundary['removed'])
+
+                        dataList.append(primary_boundary['created'])
+                        dataList.append(primary_boundary['updated'])
+                        dataList.append(primary_boundary['removed'])
+
+                        dataList.append(pre_institution['created'])
+                        dataList.append(pre_institution['updated'])
+                        dataList.append(pre_institution['removed'])
+
+                        dataList.append(primary_institution['created'])
+                        dataList.append(primary_institution['updated'])
+                        dataList.append(primary_institution['removed'])
+
+                        dataList.append(pre_student['created'])
+                        dataList.append(pre_student['updated'])
+                        dataList.append(pre_student['removed'])
+
+                        dataList.append(primary_student['created'])
+                        dataList.append(primary_student['updated'])
+                        dataList.append(primary_student['removed'])
+
+
+                        dataList.append(pre_staff['created'])
+                        dataList.append(pre_staff['updated'])
+                        dataList.append(pre_staff['removed'])
+
+                        dataList.append(primary_staff['created'])
+                        dataList.append(primary_staff['updated'])
+                        dataList.append(primary_staff['removed'])
 
                         for asmId in asmList:
 
@@ -377,8 +414,9 @@ class Command(BaseCommand):
                         historyFile = csv.writer(open(genFile, 'a'
                             ))
                         historyFile.writerow(dataList)
-                    print '%s.csv file has been created in %s/logFiles directory' % (fileName, cwd)
-                    print 'Time taken: %s' %(datetime.datetime.now() - scriptStartTime)
+                        print "\nuserId " + str(userId) + " is processed"
+                print '%s.csv file has been created in %s/logFiles directory' % (fileName, cwd)
+                print 'Time taken: %s' %(datetime.datetime.now() - scriptStartTime)
             else:
                 pass
             cursor.close()

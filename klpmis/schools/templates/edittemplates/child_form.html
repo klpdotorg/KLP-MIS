@@ -9,7 +9,7 @@
 <link rel="stylesheet" type="text/css" media="all" href="/static_media/css/form.css" />
 <link rel="stylesheet" type="text/css" media="all" href="/static_media/css/style.css" />
 <form action="." method="POST" enctype="multipart/form-data" id="childForm" onsubmit="return false;" >{% csrf_token %}
-			    
+ 
 			     <input type="hidden" name="url" id="id_StudUpdateUrl" value="/student/{{child.id}}/update/" />
 			     <input type="hidden" name="url" id="replace_id" value="{{child.id}}" />
 			     
@@ -182,6 +182,7 @@ var KLP_form_submit = function(parentVal, parentId){
     modelName=$('#model').val();
     replaceId =  'student_'+$('#replace_id').val()
     /* post data using post method */
+  
     $.post(  
         $("#id_StudUpdateUrl").val(),  
         $("#childForm").serialize(),  

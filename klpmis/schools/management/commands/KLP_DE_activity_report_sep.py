@@ -99,7 +99,7 @@ class Command(BaseCommand):
                         'primary_teacher_modified',
                         'primary_teacher_deleted',
                         ]
-
+                    
                     validFullHistoryRecords = \
                         FullHistory.objects.filter(action_time__range=(sTime,
                             eTime))
@@ -113,7 +113,7 @@ class Command(BaseCommand):
                             ).only('id', 'username'
                                    ).filter(id__in=validUserIds)
                     userIds = users.values_list('id', flat=True)
-
+                    pdb.set_trace()
                     answersUpdatedStrList = \
                         validFullHistoryRecords.filter(content_type__id=contentTypeIds['answer'
                             ]).only('object_id'
@@ -509,46 +509,52 @@ class Command(BaseCommand):
                                         ).values_list('object_id',
                                         flat=True)  # ids of answer records that i created
 
-                                answer_verified = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['answer'
-                                        ],
-                                        object_id__in=answersUpdatedForGivenAssessment,
-                                        action='U'
-                                        ).exclude(object_id__in=answerEnteredIds,
-                                        _data__icontains='answer'
-                                        ).count()  # how many others records I verified by double entry
+                                answer_verified = FullHistory.objects.filter(action_time__range=(sTime, eTime),
+                               request__user_pk=user.id,
+                               object_id__in=answersUpdatedForGivenAssessment, action='U',
+                               _data__icontains='user2'
+                               ).exclude(Q(_data__icontains='id')
+        | Q(_data__icontains='question') | Q(_data__icontains='student'
+        ) |  Q(_data__icontains='answer') |  Q(_data__icontains='status'
+        )).count()  # how many others records I verified by double entry
+
                                 if assObj.double_entry:
                                     answer_verified = \
-    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                   content_type__id=contentTypeIds['answer'
-                                   ],
-                                   object_id__in=answersUpdatedForGivenAssessment,
-                                   action='U'
-                                   ).exclude(object_id__in=answerEnteredIds,
-        _data__icontains='answer').count()  # how many others records I verified by double entry
+    FullHistory.objects.filter(action_time__range=(sTime, eTime),
+                               request__user_pk=user.id,
+                               object_id__in=answersUpdatedForGivenAssessment, action='U',
+                               _data__icontains='user2'
+                               ).exclude(Q(_data__icontains='id')
+        | Q(_data__icontains='question') | Q(_data__icontains='student'
+        ) |  Q(_data__icontains='answer') |  Q(_data__icontains='status'
+        )).count() # how many others records I verified by double entry
+
                                 assessmentsModified[str(assessmentId)
                                         + '_verified'] = answer_verified
 
                                 answer_rectified = \
-                                    validFullHistoryRecords.filter(request__user_pk=user.id,
-                                        content_type__id=contentTypeIds['answer'
-                                        ],
-                                        object_id__in=answersUpdatedForGivenAssessment,
-                                        action='U',
-                                        _data__icontains='answer'
-                                        ).exclude(object_id__in=answerEnteredIds).count()  # how many others wrong answers I corrected/ fixed by double entry
+                                     FullHistory.objects.filter((Q(_data__icontains='answer')
+                               | Q(_data__icontains='status'))
+                               & Q(_data__icontains='user2'),
+                               action_time__range=(sTime, eTime),
+                               request__user_pk=user.id,
+                               object_id__in=answersUpdatedForGivenAssessment, action='U'
+                               ).exclude(Q(_data__icontains='id')
+        | Q(_data__icontains='question') | Q(_data__icontains='student'
+        )).count() # how many others wrong answers I corrected/ fixed by double entry
                                 assessmentsModified[str(assessmentId)
                                         + '_rectified'] = \
                                     answer_rectified
 
                                 answer_wrong = \
-                                    validFullHistoryRecords.filter(content_type__id=contentTypeIds['answer'
-                                        ], action='U',
-                                        _data__contains='modifiedBy": ['
-                                         + str(user.id) + ', ',
-                                        _data__icontains='answer',
-                                        object_id__in=answersUpdatedForGivenAssessment).exclude(request__user_pk=user.id).count()  # How many of my answers were wrong...; showing all recored, which were created by me, but now updated by others.
+                                    FullHistory.objects.filter((Q(_data__icontains='answer')
+                               | Q(_data__icontains='status'))
+                               & Q(_data__icontains='user2'),
+                               action_time__range=(sTime, eTime),
+                               object_id__in=answerEnteredIds, action='U'
+                               ).exclude(request__user_pk=user.id).exclude(Q(_data__icontains='id')
+        | Q(_data__icontains='question') | Q(_data__icontains='student'
+        )).count()  # How many of my answers were wrong...; showing all recored, which were created by me, but now updated by others.
                                 assessmentsModified[str(assessmentId)
                                         + '_wrong'] = answer_wrong
 

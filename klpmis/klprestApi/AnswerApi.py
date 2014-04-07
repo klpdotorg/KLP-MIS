@@ -73,7 +73,7 @@ class KLP_ChangeAns(Resource):
         Questions_list = \
             Question.objects.filter(assessment__id=assessmentId)  # get questions under assessment
         dobleEntReq = assessmentObj.double_entry
-        
+        #pdb.set_trace()
         if dobleEntReq:
             dE = 2 
         else:
@@ -89,7 +89,7 @@ class KLP_ChangeAns(Resource):
         for (index, question) in enumerate(Questions_list):
             textField = 'student_%s_%s' % (str(question.id), student)
             textFieldVal = request.POST.get(textField)  # get each text field values
-            
+            #pdb.set_trace()
             primaryfield = 'primaryvalue_%s' % student
             primaryfieldVal = request.POST.get(primaryfield, '')
             ansIdfield = 'ansId_%s_%s' % (str(question.id), student)
@@ -171,7 +171,7 @@ class KLP_ChangeAns(Resource):
                         ansObj.double_entry = 2
                         ansObj.last_modified_by = user
                         ansObj.user2 = user
-                    
+                    #pdb.set_trace()
                     try:
                         
                         newanswerdata['form-0-answer_score']=ansObj.answer_score
@@ -325,7 +325,7 @@ class KLP_ChangeAns(Resource):
                     except IntegrityError:
                         return 'Primary  Value is already existing'
             try:
-                ansIds.append(str(ansObj.id))      
+                ansIds.append(str(ansObj.id))
             except:
                 pass
         return 'Data(s) Saved |'+','.join(ansIds)  # ,question.id,',',studentObj.id,',',dE,',',status,',',answer_grade,answer_score,user.id
@@ -335,7 +335,8 @@ class KLP_ChangeAns(Resource):
 
 def KLP_DataValidation(request):
     """ To Validate data for Doble Entry answer/data/validation/"""
-    
+    #import pdb 
+    #pdb.set_trace()
     validateId = request.POST.get('validateField')  #  Get ValidateId (student and question id)
     validateValue = request.POST.get('validateValue')  #  Get Text field value to validate
     listIds = validateId.split('_')
@@ -378,7 +379,7 @@ def KLP_DataValidation(request):
                     if ansObj.status == -1:
                         respStr = True
                 elif ansObj.question.question_type == 2:
-                    if 1:
+                    try:
 
                             # If question type is 2(Grade) then match with answer grade if matches return true
 
@@ -387,10 +388,12 @@ def KLP_DataValidation(request):
                             respStr = True
                         elif (ansObj.answer_grade) == (validateValue):
                             respStr = True
-                    else:
+                        elif float(ansObj.answer_grade) == float(validateValue):
+                            respStr = True
+                    except:
                         pass
                 else:
-                    if 1:
+                    try:
 
                             # If question type is 1(marks) then match with answer score if matches return true
                         
@@ -398,7 +401,7 @@ def KLP_DataValidation(request):
                         if float(ansObj.answer_score) \
                             == float(validateValue):
                             respStr = True
-                    else:
+                    except:
                         pass
             else:
                 respStr = False
@@ -406,25 +409,10 @@ def KLP_DataValidation(request):
         pass
     return HttpResponse(simplejson.dumps(respStr))
 
-def KLP_getAnswers(request):
-    resp=False
-    aid = request.GET.get('aid')  #  Get Assessment id
-    obid = request.GET.get('obid')
-    print "Assessment id", aid
-    try:
-        asobj = Answer.objects.filter(object_id=obid,question__assessment__id=aid)
-    except:
-        asobj = ''
-    print "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh", resp
-    if asobj:
-        resp = True
-    else:
-        pass
-    return HttpResponse(simplejson.dumps(resp))
+
 
 
 urlpatterns = patterns('', url(r'^answer/data/entry/$', KLP_DataEnry),
                        url(r'^answer/data/validation/$',
                        KLP_DataValidation),
-                       url(r'^klp/getanswers/$',KLP_getAnswers)
                        )

@@ -17,7 +17,7 @@ from django_restapi.responder import *
 from django_restapi.receiver import *
 from klprestApi.BoundaryApi import ChoiceEntry
 from django.contrib.contenttypes.models import ContentType
-
+from fullhistory.models import *
 from schools.receivers import KLP_user_Perm
 
 class KLP_Student(Collection):    
@@ -74,6 +74,7 @@ def KLP_Student_Update(request, student_id, counter=0):
 	
 def KLP_DeleteStudnet(request, id):
 	""" To delete selected Students"""
+	import datetime
 	students_list = request.POST.getlist("students")  # get all selected students
 	respStr = {}
 	count = 0 
@@ -94,6 +95,21 @@ def KLP_DeleteStudnet(request, id):
 				q3 = """ delete from schools_student_studentgrouprelation_2 where student_id = %d and student_group_id = %d """ %(obj.id, int(id))
 
 				q4 = """ delete from schools_student_2 where id = %d """ %(obj.id)
+
+				frinsert = """ insert into fullhistory_request(user_name, user_pk, request_path) values('%s', %s, '%s') """ %(str(request.user.username), str(request.user.id), "removing students")
+				cursor.execute(frinsert)
+
+				frgetid = """ select max(id) from fullhistory_request """
+				cursor.execute(frgetid)
+				froutput = cursor.fetchone()
+				froutput = int(froutput[0])
+
+				constud = ContentType.objects.get(model = 'student')
+				userinfo = " " + str(request.user.username) + " updated"
+				data = str(obj.id) + " inactive"
+				fhinsert = """ insert into fullhistory_fullhistory(content_type_id, object_id, revision, action_time, data, request_id, site_id, action, info) values(%s, %s, %s, '%s', '%s', %s, %s, '%s', '%s') """ %(constud.id, obj.id, 1,str(datetime.datetime.now()), data, froutput, 1, 'U', userinfo)
+				cursor.execute(fhinsert)
+				
 				if sgobj >=1:
 					cursor.execute(q1)
 				cursor.execute(q2)
@@ -101,7 +117,7 @@ def KLP_DeleteStudnet(request, id):
 				if sgobj >=1:
 					cursor.execute(q4)
 
-				delFailed += obj.child.first_name + " " + obj.child.last_name
+				delFailed += str(obj.child.first_name) + " " + str(obj.child.last_name)
 			else:
 				return HttpResponse("Students "+ delFailed+" Deletion Failed")
 			
@@ -109,6 +125,8 @@ def KLP_DeleteStudnet(request, id):
 		return HttpResponse("All Selected Students has been deleted successfully")
 	else:	
 		return HttpResponse("Please select students to delete")
+
+
 
 urlpatterns = patterns('',    
    url(r'^studentgroup/(?P<studentgroup_id>.*)/student/creator/$', KLP_Student_Create),

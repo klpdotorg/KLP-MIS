@@ -280,13 +280,13 @@ class Command(BaseCommand):
                                         assessment=assessmentObj,
                                         instituion=instObj).defer('user'
                                         , 'assessment')
-                                 if asmPerObj:
+                                 if asmPermObj:
 
 
                                        requestcopy['form-INITIAL_FORMS']=1
                                        #newrequest.POST=requestcopy
                                        requestcopy['form-0-id']=asmPermObj[0].id
-                                       rform = UserPermForm(requestcopy,requestcopy,queryset=asmPerObj)
+                                       rform = UserPermForm(requestcopy,requestcopy,queryset=asmPermObj)
                                  else:
                                        requestcopy['form-INITIAL_FORMS']=0
                                        #newrequest.POST=requestcopy

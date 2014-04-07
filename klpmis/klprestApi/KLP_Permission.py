@@ -29,7 +29,7 @@ from django.conf import settings
 from subprocess import Popen
 from subprocess import call
 from klprestApi.TreeMenu import KLP_assignedInstitutions, getAssSG
-from klpmis.settings import PROJECT_NAME, PROJECT_ROOT, PYTHON_PATH
+from emsproduction.settings import PROJECT_NAME, PROJECT_ROOT, PYTHON_PATH
 
 from schools.models import *
 def KLP_Assign_Permissions(request):
@@ -553,7 +553,7 @@ def KLP_Show_Permissions(request, boundary_id, user_id):
             ).filter(Q(boundary__id=boundary_id)
                      | Q(boundary__parent__id=boundary_id)
                      | Q(boundary__parent__parent__id=boundary_id),
-                     active=2).extra(where=['''schools_institution.id in (SELECT "obj_id" FROM "public"."object_permissions_institution_perms" WHERE "user_id" = '%s' AND "Acess" = 't')'''
+                     active=2).extra(where=['''schools_institution.id in (SELECT "obj_id" FROM "public"."object_permissions_institution_perms" WHERE "user_id" = '%s' AND "Acess" = '1')'''
              % user_id]).only('id', 'name', 'boundary'
                               ).order_by('boundary', 'boundary__parent'
             , 'name')

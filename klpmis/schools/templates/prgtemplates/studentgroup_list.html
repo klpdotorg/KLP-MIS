@@ -16,6 +16,7 @@
 					    				<td class="KLP_td_width">
 					    					Name
 					    					<input type="hidden" name="studentgroup" id="studentgroup_id" value="{{studentgroup_id}}" />
+					    					<input type="hidden" id = "asId" name="asId" value="{{AssObj.id}}" />
 					    				</td>
 					    			</tr>
 					    		</table>
@@ -76,6 +77,7 @@
 	     					</div>
 	     				</td>
 	     			</tr>
+	     			
 	                        <!-- shows grid for the each student -->
      				{% for studId in studIdList %} 
 				{% with studId|CatString:forloop.counter as i%}
@@ -84,11 +86,13 @@
 							<div class="KLP_Fix_Div">
 								<form name="student_{{i}}" id="id_Student_{{i}}" class="validForm" onsubmit="return false;">{% csrf_token %}{{formmanage}}
 									<input type="hidden" name="student_groupId" value="{{studentgroup_id}}" />
+									
 									<input type="hidden" name="programId" value="{{filter_id}}"/>
 									<input type="hidden" name="assessmentId" value="{{assessment_id}}"/>
 									<input type="hidden" name="student" value="{{i}}"/>
-										<input type="hidden" name="formcounter" id="formcounter" value="{{forloop.counter}}"/>
-								
+
+									<input type="hidden" name="formcounter" id="formcounter" value="{{forloop.counter}}"/>
+								   
 									<table>
 										<tr>
 										        <!-- Repeat Question -->
@@ -152,6 +156,22 @@
 			            										{% if forloop.last %}
 						    								<td class="KLP_td_height"> <input id="id_Student_{{i}}_submit" type="submit" tabindex="1"   value="submit"  {% if not qDict|displayValue:'iBox' %}disabled{% endif %}/>       
 						    								
+						    								{% if not qDict|displayValue:'ansId' == None %}  
+						    								    <td><span class="KLP_Sub">
+						    								    {% if  qDict|displayValue:'iBox' %}
+						    								        {% with i|splitstr:userAsmntDict as i_val %}
+						    								            {% if i_val.useransobj %}
+						                								    {% if AssObj.flexi_assessment %} 
+		            <span class="KLP_SpanButton"  onclick="KLP_Del('{{studentgroup_id}}/{{qDict|displayValue:'flexi_data'}}/{{ AssObj.id }}', 'answer', '{{studentgroup_id}},{{qDict|displayValue:'flexi_data'}},{{ AssObj.id }}')">Delete</span> <!-- Delete Button -->
+                                                                            {% else %}
+                                                                        <span class="KLP_SpanButton"  onclick="KLP_Del('{{studentgroup_id}}/{{ AssObj.id }}', 'answer', '{{studentgroup_id}},{{ AssObj.id }}')">Delete</span> <!-- Delete Button -->
+                                                                            {% endif %}
+                                                                        {% endif %}
+                                                                    {% endwith%}
+                                                                {% endif %}
+                                                                </span></td>
+                                                            {% endif %} 
+						    								
 						    								<script>
 															$().ready(function() {
 				                                                                                                 {% if AssObj.primary_field_type == 3 %}
@@ -197,10 +217,12 @@
 	
 </div>
 <span id ="list_url" style="display:none;" value = "{{url}}"></span>
-<div class="KLP_DE_Submit">
-	<span class="KLP_SpanButton"  id="id_ans_global_submit">Submit</span>
-</div>
 
+{% if not AssObj.flexi_assessment %}
+<div class="KLP_DE_Submit">
+	<!--<span class="KLP_SpanButton"  id="id_ans_global_submit">Submit</span> -->
+</div>
+{% endif %}
 
 <script>
 $(document).ready(function(){

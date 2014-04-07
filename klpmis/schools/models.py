@@ -348,9 +348,9 @@ class Institution(models.Model):
         #pdb.set_trace()
         from django.db import connection
         connection.features.can_return_id_from_insert = False
-        print "save"
+        #print "save"
 
-        print "name is",self.name, "=================== active is", self.active
+        #print "name is",self.name, "=================== active is", self.active
         self.full_clean()
         super(Institution, self).save(*args, **kwargs)
 
@@ -423,9 +423,9 @@ class Child(models.Model):
         #pdb.set_trace()
         from django.db import connection
         connection.features.can_return_id_from_insert = False
-        print "save"
+        #print "save"
 
-        print "first name is", self.first_name
+        #print "first name is", self.first_name
         self.full_clean()
         super(Child, self).save(*args, **kwargs)
 
@@ -563,9 +563,9 @@ class StudentGroup(models.Model):
         #pdb.set_trace()
         from django.db import connection
         connection.features.can_return_id_from_insert = False
-        print "save"
+        #print "save"
 
-        print "name is",self.name, "=================== active is", self.active
+        #print "name is",self.name, "=================== active is", self.active
         self.full_clean()
         super(StudentGroup, self).save(*args, **kwargs)
 
@@ -711,9 +711,9 @@ class Student(models.Model):
         #pdb.set_trace()
         from django.db import connection
         connection.features.can_return_id_from_insert = False
-        print "save"
+        #print "save"
 
-        print "active is", self.active
+        #print "active is", self.active
         self.full_clean()
         super(Student, self).save(*args, **kwargs)
 
@@ -739,9 +739,9 @@ class Student_StudentGroupRelation(models.Model):
         #pdb.set_trace()
         from django.db import connection
         connection.features.can_return_id_from_insert = False
-        print "save"
+        #print "save"
 
-        print "active is", self.active
+        #print "active is", self.active
         self.full_clean()
         super(Student_StudentGroupRelation, self).save(*args, **kwargs)
 
@@ -939,9 +939,9 @@ class Assessment_StudentGroup_Association(models.Model):
         #pdb.set_trace()
         from django.db import connection
         connection.features.can_return_id_from_insert = False
-        print "save"
+        #print "save"
 
-        print "Access", self.active
+        #print "Access", self.active
         self.full_clean()
         super(Assessment_StudentGroup_Association, self).save(*args, **kwargs)
 
@@ -989,9 +989,9 @@ class Question(models.Model):
     assessment = models.ForeignKey(Assessment)
     name = models.CharField(max_length=200)
     question_type = models.IntegerField(choices=QuestionType, default=1)
-    score_min = models.DecimalField(max_digits=5, decimal_places=2,
+    score_min = models.DecimalField(max_digits=10, decimal_places=2,
                                    blank=True, null=True)
-    score_max = models.DecimalField(max_digits=5, decimal_places=2,
+    score_max = models.DecimalField(max_digits=10, decimal_places=2,
                                    blank=True, null=True)
     grade = models.CharField(max_length=100, blank=True, null=True)
     order = models.IntegerField()
@@ -1051,7 +1051,7 @@ class Answer(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey('content_type',
             'object_id')
-    answer_score = models.DecimalField(max_digits=5, decimal_places=2,
+    answer_score = models.DecimalField(max_digits=10, decimal_places=2,
             blank=True, null=True)
     answer_grade = models.CharField(max_length=30, blank=True, null=True)
     double_entry = models.IntegerField(blank=True, null=True, default=0)
@@ -1078,9 +1078,9 @@ class Answer(models.Model):
         #pdb.set_trace()
         from django.db import connection
         connection.features.can_return_id_from_insert = False
-        print "save"
+        #print "save"
 
-        print "=================== status is", self.status
+        #print "=================== status is", self.status
         self.full_clean()
         super(Answer, self).save(*args, **kwargs)
 
@@ -1106,9 +1106,9 @@ class UserAssessmentPermissions(models.Model):
         #pdb.set_trace()
         from django.db import connection
         connection.features.can_return_id_from_insert = False
-        print "save"
+        #print "save"
 
-        print "Access", self.access
+        #print "Access", self.access
         self.full_clean()
         super(UserAssessmentPermissions, self).save(*args, **kwargs)
 

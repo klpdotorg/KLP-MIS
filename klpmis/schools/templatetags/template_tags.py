@@ -109,3 +109,28 @@ def make_widget(field, attributes):
     return field.as_widget(attrs=attr)
 
 
+
+@register.filter(name="splitstr")
+def splitstr(value, key):
+    val1 = value.split('_')
+    ansobj = Answer.objects.filter(object_id=val1[0],question__assessment__id=key['aid'],user1__id=key['luser'])
+    if ansobj:
+        return {'objectval':val1[0],'useransobj':ansobj}
+
+@register.filter(name="getAsmAns")
+def getAsmAns(value, key):
+    val1 = value.split('_')
+    ansobj = Answer.objects.filter(object_id=val1[0],question__assessment__id=key['aid'])
+    if ansobj:
+        return {'objectval':val1[0],'useransobj':ansobj}
+
+@register.filter(name="getObjectId")
+def getObjectId(value):
+    val1 = value.split('_')
+    return val1[0]
+
+@register.filter(name="getAsmAnsforSg")
+def getAsmAnsforSg(value, key):
+    ansobj = Answer.objects.filter(object_id=value,question__assessment__id=key['aid'])
+    if ansobj:
+        return {'objectval':value,'useransobj':ansobj}

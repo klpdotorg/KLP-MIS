@@ -22,7 +22,7 @@ import simplejson
 from django.template import loader, RequestContext
 
 from django.core.mail import send_mail
-from klpmis.settings import *
+from emsproduction.settings import *
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -52,8 +52,7 @@ def KLP_act_form(request):
 @csrf_exempt
 def KLP_Activation(request):
     """ To actiave the records>"""
-    import pdb
-    
+
     # Checking user Permissions
         # KLP_user_Perm(request.user, "Institution", "Add")
         # Get Button Type
@@ -62,7 +61,7 @@ def KLP_Activation(request):
 
     selCategoryTyp = request.POST.get('form-staging-modelname')
     selCategoryids = request.POST.get('form-staging-allids')
-
+    
     if selCategoryids == '':
         isExecute = False
         resStr = 'Please give atleast on id'
@@ -132,7 +131,7 @@ def KLP_Activation(request):
                         academic=current_academic, active=2)
                 relObjects.update(active=1)
                 childlength = []
-            if len(childlength) == 0 :
+            if len(childlength) == 0:
                 obj2 = obj3  # modelDict[model_name1].objects.filter(id__in=allids)
                 isExecute = True
                 idlist2 = obj2.values_list('id')
@@ -215,7 +214,6 @@ def SendingMail(idlist, mname,atype):
         fullmsg = 'Following %s Ids are Activated  :  \n %s ' % (mname,
             inst_liststr)
     send_mail(subject, fullmsg, sender, receiver)
-
 
 urlpatterns = patterns('', url(r'^KLP_activaterecords/$',
                        KLP_Activation),
