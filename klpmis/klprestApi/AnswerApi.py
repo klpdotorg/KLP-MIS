@@ -342,7 +342,7 @@ def KLP_DataValidation(request):
     listIds = validateId.split('_')
     AnsId=request.POST.get('ansId')
     # Query Answer object based on student and question id
-    print "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", AnsId
+    #print "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", AnsId
     if AnsId != "None":
        ansObj=Answer.objects.filter(id=AnsId).defer('object_id'
             , 'user1', 'user2', 'last_modified_by')[0]
