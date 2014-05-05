@@ -186,6 +186,8 @@ function inputRadio(el) { //extent Radio buttons
 }
 function inputCheck(el) { //extend Checkboxes
 	el.oldClassName = el.className;
+	el.oldevents=$('#'+el.id).data("events");
+	
 	el.dummy = document.createElement('img');
 	el.dummy.src = imagesPath + "0.png";
 	if(el.checked) {el.dummy.className = "NFCheck NFh";}
@@ -202,10 +204,27 @@ function inputCheck(el) { //extend Checkboxes
 			this.ref.checked = false;
 			this.className = el.oldClassName+" NFCheck";
 		}
+		currentObj=this;
+		
+		currentObjtri=!this.ref.checked;
+		
+		if($(currentObj).data("events")==undefined){
+		$.each(el.oldevents, function(i, event) {
+          
+         $.each(event, function(j, h) {
+            $(currentObj).bind(i,h.handler);
+			h.handler();
+			
+			
+			
+    });
+     });}
+
 	}
 	el.onclick = function() {
 		if(this.checked) {this.dummy.className = "NFCheck NFh";}
 		else {this.dummy.className = "NFCheck";}
+		
 	}
 	el.onfocus = function() {this.dummy.className += " NFfocused";}
 	el.onblur = function() {this.dummy.className = this.dummy.className.replace(/ NFfocused/g, "");}

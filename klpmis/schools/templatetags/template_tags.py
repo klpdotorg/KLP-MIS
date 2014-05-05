@@ -1,6 +1,9 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 This file contains user defined template tags to used templates to render values
 """
+
 from schools.models import *
 from schools.forms import *
 from django import template
@@ -8,19 +11,40 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 register = template.Library()
 
+
 # This filter is used for to return range value for pagination
-@register.filter  
-def KLPrange(value):  
+
+@register.filter
+def KLPrange(value):
     return range(value)
 
 
-# This filter is used to display key value from dictionary        
-@register.filter(name='displayValue')        
+# This filter is used to display key value from dictionary
+
+@register.filter(name='displayValue')
 def displayValue(dictionary, key):
     try:
         return dictionary[key]
     except:
-        pass     
+
+        pass
+
+
+@register.filter(name='split')
+def splitfirst(value, arg):
+    return value.split(arg)[0]
+
+
+@register.filter(name='split')
+def splitsecond(value, arg):
+    return value.split(arg)[1]
+
+
+@register.filter(name='CatString')
+def CatString(value, value1):
+
+    return str(value) + '_' + str(value1)
+
 
 @register.filter(name='dictValue')
 def dictValue(dictionary, key):
@@ -31,18 +55,19 @@ def dictValue(dictionary, key):
 
 
 # This filter is used to display key value from dictionary by adding '_u' to key.
-@register.filter(name='assesmentUpdation')        
+
+@register.filter(name='assesmentUpdation')
 def assesmentUpdation(dictionary, key):
     try:
-        return dictionary[key+'_u']
+        return dictionary[key + '_u']
     except:
-        pass    
-        
-                    
-# This filter is used to render field in edit/entry forms        
-@register.inclusion_tag("render_field.html")
-def render_field(field,attributes=''):
+        pass
 
+
+# This filter is used to render field in edit/entry forms
+
+@register.inclusion_tag('render_field.html')
+def render_field(field, attributes=''):
     """ render a field with its errors, optionally passing in 
 
         attributes eg.:  
@@ -61,24 +86,51 @@ def render_field(field,attributes=''):
 
     """
 
-    return {'errors':field.errors,'widget':make_widget(field,attributes)}
-    
-def make_widget(field,attributes):
+    return {'errors': field.errors, 'widget': make_widget(field,
+            attributes)}
+
+
+def make_widget(field, attributes):
 
     attr = {}
 
     if attributes:
 
-        attrs = attributes.split(",")
+        attrs = attributes.split(',')
 
         if attrs:
 
             for at in attrs:
 
-                key,value = at.split("=")
+                (key, value) = at.split('=')
 
                 attr[key] = value
 
     return field.as_widget(attrs=attr)
 
 
+
+@register.filter(name="splitstr")
+def splitstr(value, key):
+    val1 = value.split('_')
+    ansobj = Answer.objects.filter(object_id=val1[0],question__assessment__id=key['aid'],user1__id=key['luser'])
+    if ansobj:
+        return {'objectval':val1[0],'useransobj':ansobj}
+
+@register.filter(name="getAsmAns")
+def getAsmAns(value, key):
+    val1 = value.split('_')
+    ansobj = Answer.objects.filter(object_id=val1[0],question__assessment__id=key['aid'])
+    if ansobj:
+        return {'objectval':val1[0],'useransobj':ansobj}
+
+@register.filter(name="getObjectId")
+def getObjectId(value):
+    val1 = value.split('_')
+    return val1[0]
+
+@register.filter(name="getAsmAnsforSg")
+def getAsmAnsforSg(value, key):
+    ansobj = Answer.objects.filter(object_id=value,question__assessment__id=key['aid'])
+    if ansobj:
+        return {'objectval':value,'useransobj':ansobj}

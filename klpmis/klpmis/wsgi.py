@@ -1,5 +1,7 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
-WSGI config for klpmis project.
+WSGI config for klp project.
 
 This module contains the WSGI application used by Django's development server
 and any production WSGI deployments. It should expose a module-level variable
@@ -13,13 +15,15 @@ middleware here, or combine a Django application with an application of another
 framework.
 
 """
+
 import os
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "klpmis.settings")
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'c2staging.settings')
 
 # This application object is used by any WSGI server configured to use this
 # file. This includes Django's development server, if the WSGI_APPLICATION
 # setting points here.
+
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
 

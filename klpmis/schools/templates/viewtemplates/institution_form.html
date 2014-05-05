@@ -41,7 +41,7 @@
 					</td>
 					<td class="gallery clearfix">					    
 						<span class="adNewBoundTyp">
-						    <a href="/institution-category/creator/?keepThis=true&categoryType={% if extra_context|displayValue:'institutionType'|lower == 'institution' %}1{% else %}2{% endif %}&TB_iframe=true&height=400&width=800" title="Create Category" class="thickbox">+</a>
+						    <a href="/institution-category/creator/?keepThis=true&category_type={% if extra_context|displayValue:'institutionType'|lower == 'institution' %}1{% else %}2{% endif %}&TB_iframe=true&height=400&width=800" title="Create Category" class="thickbox">+</a>
 						</span>					    
 					</td>
 					<td>
@@ -195,13 +195,13 @@
                                 <tr>
                                     <td><label>Route Information:</label></td>
                                     <td>
-                                        {% render_field entryForm.routeInformation 'tabindex=11' %}
+                                        {% render_field entryForm.route_information 'tabindex=11' %}
                                         <!-- Route Information Field -->
                                     </td>
                                     <td>&nbsp;</td>
                                     <td>
-                                    	<!-- If routeInformation field has errors show errors -->
-                                    	{% for error in entryForm.routeInformation.errors %}
+                                    	<!-- If route_information field has errors show errors -->
+                                    	{% for error in entryForm.route_information.errors %}
 	                                	<span class="editErr">{{ error }}</span>
 	                                {% endfor %}
                                     </td>
@@ -213,9 +213,9 @@
                                     <td>
                                     	<input type="submit" name="save" id="id_save" value="Save" tabindex=10/>
                                     </td>
-                                    <td>
+                                    <!--td>
                                     	<input type="submit" name="save_and_continue" id="id_save_and_continue" value="Save And Continue" tabindex=11/>
-                                    </td>
+                                    </td-->
                                     <td colspan="2">
                     	    		<input type="submit" name="save_and_create" id="id_save_and_create" value="Save And Create Another" tabindex=12/>
       				    </td>

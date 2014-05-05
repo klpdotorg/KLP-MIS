@@ -1,6 +1,9 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
-LanguageApi is used to create new language
+LanguageApi is used to create new language 
 """
+
 from django.conf.urls.defaults import *
 from django_restapi.resource import Resource
 from schools.models import *
@@ -12,6 +15,7 @@ from klprestApi.BoundaryApi import ChoiceEntry
 
 
 class KLP_Language(Collection):
+
     """ To create new language language/creator/"""
 
     def get_entry(self, language_id):
@@ -21,20 +25,23 @@ class KLP_Language(Collection):
 
 def KLP_Language_Create(request):
     """ To Create new language language/creator/"""
+
     buttonType = request.POST.get('form-buttonType')
-    #Moi_Type.objects.all()
-    KLP_Language_Create = KLP_Language(queryset=
-    Moi_Type.objects.filter(pk=0), permitted_methods
-    = ('GET', 'POST'), responder =
-    TemplateResponder(template_dir = 'viewtemplates',
-    template_object_name = 'Language',
-    extra_context={'buttonType': buttonType}),
-    receiver = XMLReceiver(),)
-    response = KLP_Language_Create.responder.
-    create_form(request, form_class=Moi_Type_Form)
+
+        # Moi_Type.objects.all()
+
+    KLP_Language_Create = \
+        KLP_Language(queryset=Moi_Type.objects.filter(pk=0),
+                     permitted_methods=('GET', 'POST'),
+                     responder=TemplateResponder(template_dir='viewtemplates'
+                     , template_object_name='Language',
+                     extra_context={'buttonType': buttonType}),
+                     receiver=XMLReceiver())
+    response = KLP_Language_Create.responder.create_form(request,
+            form_class=Moi_Type_Form)
 
     return HttpResponse(response)
 
 
-urlpatterns = patterns('',
-   url(r'^language/creator/?$', KLP_Language_Create),)
+urlpatterns = patterns('', url(r'^language/creator/?$',
+                       KLP_Language_Create))

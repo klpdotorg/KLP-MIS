@@ -1,0 +1,247 @@
+{% load template_tags %}
+{% if  extra_context|displayValue:'replaceTrue'%}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>{{title}}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="/static_media/js/jquery.js"></script>
+<script language="javascript" type="text/javascript" src="/static_media/js/niceforms.js"></script>
+<script type="text/javascript" src="/static_media/js/thickbox.js" charset="utf-8"></script>
+
+
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/thickbox.css" charset="utf-8"/>
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/form.css" />
+<link rel="stylesheet" type="text/css" media="all" href="/static_media/css/style.css" />
+</head>
+
+<body>
+<div id="container">
+
+{% if entry == "Add" %}
+<fieldset>
+    <legend>{{legend}}</legend>
+{% else %}
+<div class="tablebg">
+<div id="popData">
+{% endif %}
+{% endif %}
+
+<form action="." method="POST" enctype="multipart/form-data" class="niceform" id="assessmentlookupForm" name="assessmentlookupForm" onsubmit="return false;">{% csrf_token %}
+	<input type="hidden" name="url" value="/programme/assessment/assessment_lookup/{{extra_context|displayValue:'referKey'}}/creator/" id="url" />
+     
+       
+     <!--input type="hidden" name="form-0-typ" id="id_form-0-typ" value="3"/-->
+           <input type="hidden" name="form-buttonType" id="id_form-buttonType" value="" />
+        <input type="hidden" id="assessment_id" size="15" value="{{extra_context|displayValue:'prevousId'}}" / >
+        <input type="hidden" id="success_status" size="15" value="{{extra_context|displayValue:'showsuccess'}}" / >
+         <input type="hidden" id="replaceTrue" name="replaceTrue" size="15" value="{{extra_context|displayValue:'replaceTrue'}}" / >
+
+        {{form.management_form}}
+        {% with form.forms|last as entryForm %}
+		<table>
+        		<tr>
+      	    			<td>
+      		    			<table class="tblprofile">      			          				  			                   	                                 <tr><td colspan="2" style="color:red">{{entryForm.non_field_errors}}</td></tr>
+      						<tr>
+      							<td class="rightprofile"><label class="KLP_required">Value </label></td>
+      							<td class="leftprofile">{{ entryForm.name.errors}}
+                            					{% render_field entryForm.name 'tabindex=1' %}
+                            					<!-- Assessment Name Field -->
+                            					<input type="hidden" name="form-0-assessment" id="id_form-0-assessment" value="{{extra_context|displayValue:'referKey'}}" />  <!-- Programme  Id for foreign key -->
+                            					  
+                        				</td>
+                        				<td>
+                        					<!-- If Name field has errors show errors -->
+                                    				{% for error in entryForm.name.errors %}
+	                                				<span class="editErr">{{ error }}</span>
+	                                			{% endfor %}
+                                    			</td> 
+      						</tr>
+      						<tr>
+      				    			<td class="rightprofile"><label >Description</label></td>
+      							<td class="leftprofile">
+                            					{% render_field entryForm.description 'tabindex=2' %}
+                            					<!-- Start Date Field -->
+                        				</td>
+                        				<td>
+                        					<!-- If Start Date field has errors show errors -->
+                                    				{% for error in entryForm.description.errors %}
+	                                				<span class="editErr">{{ error }}</span>
+	                                			{% endfor %}
+                                    			</td> 
+      						</tr>
+      			                             <tr>
+                                                        <td class="rightprofile"><label >Rank</label></td>
+                                                        <td class="leftprofile">
+                                                                <select name="form-0-rank" id="id_form-0-rank"> 
+                                                                         {% for i in extra_context|displayValue:'rankrange' %}
+                                                                          <option {% if i == extra_context|displayValue:'rank' %} selected {% endif %}>{{ i }}</option>
+                                                                        {% endfor %}
+                                                                       </select> 
+                                                                <!-- Start Date Field -->
+                                                        </td>
+                                                        <td>
+                                                                <!-- If Start Date field has errors show errors -->
+                                                                        
+                                                                {% for error in entryForm.rank.errors %}
+                                                                        <span class="editErr">{{ error }}</span>
+                                                                {% endfor %}
+                                                        </td>
+                                                </tr>
+									      						      										
+      						<tr>      				    
+      			        			
+                                                        <td class="leftprofile">
+      			            				<input type="hidden" name="form-0-active" id="id_form-0-active" value="2"/>
+      			        			</td>
+      			    			</tr>
+                                              
+                                                  
+                    				<tr><td> &nbsp;</td></tr>
+                    				<tr><td> &nbsp;</td></tr>
+      			    			<tr>
+                                    			<td>
+                                    				<input type="submit" class="lookupButton" name="save" id="id_save" value="Save and Close" tabindex=4 />
+                                    			</td>
+                                    			<td><input type="submit" class="lookupButton" name="save_and_create" id="id_save_and_create" value="Save And Create Another" tabindex=4 />
+                                    				
+                                    			</td>
+                                    			<td>&nbsp;
+                    	    					
+      				    			</td>
+                                		</tr> 
+      					</table>
+      				</td>
+      			</tr>
+    		</table>
+    {% endwith %}
+</form>
+<script>
+	$(document).ready(function(){
+		setTimeout(function(){
+        		$('input:visible:enabled:first').focus();
+    		},200);
+		 $("#id_form-0-flexi_assessment").click(function(){
+	
+	 $('.flexifield').toggle();
+	});
+
+$('.lookupButton').click(function(){
+if($(this).val()=='Save and Close'){
+$("#id_form-buttonType").val('');
+}
+else{
+  $("#id_form-buttonType").val('save and add another');
+}
+   buttontype=$("#id_form-buttonType").val()
+   newlyAdded = $("#id_form-0-name").val();
+                                newlyAdddescription = $("#id_form-0-description").val();
+                                  newlyAddrank=$('#id_form-0-rank').val();
+                                assessmentId=$("#id_form-0-assessment").val();
+                        $.post(  
+                                $('#url').val(),  
+                                $("#assessmentlookupForm").serialize(),  
+                                function(data){ 
+                                        /* Get Reponse */
+                                          //alert(buttontype);
+                                        $("#popData").html(data);        
+                                    
+                                        NFInit();
+                                    
+                                        $('input:visible:enabled:first').focus();
+                                        var successStatus = $("#success_status").val();
+                                        if (successStatus == 'True'){
+                                                idVal = $("#obj_id").val(); 
+                                                                        tableObj=$(".tot-border", window.parent.document);
+                                                                        v=$('#lookupdivlist').is(':visible')
+                                                                       if(v==false)
+                                                                                  $('#lookupdivlist').show() 
+                                                                        if(tableObj.css('display')=='none')
+                                                                                 tableObj.css('display','block');
+                                                $("#id_assessmentLooupDetail  table > tbody", window.parent.document).append('<tr id = "assessment_'+assessmentId+'_'+idVal+'"><td class="tot-border1" id="'+idVal+'_value">'+newlyAdded+'</td><td class="tot-border3 tot-border1" id="'+idVal+'_des">'+newlyAdddescription+'</td><td class="tot-border1" id="'+idVal+'_rank">'+newlyAddrank+'</td><td style="border-top:1px solid #000;border-left:1px solid #000" style="font-size:12px"> <span class="KLP_Form_status" id="'+idVal+'_status" style="text-align:center">&nbsp;</span><br/><button id ="'+idVal+'" name="assessment_lookup" class="lookupSave">Edit</button></td></tr>');
+                                                 
+                                              if(buttontype!='save and add another') {
+                                                window.parent.tb_remove();
+                                                           }
+                                        }       
+                                 
+                              }
+                        );
+
+
+
+});
+
+
+
+		$("#assessmentlookupForm1").submit(function(){   
+			/* Post data and get reponse on form submit */    
+   			newlyAdded = $("#id_form-0-name").val();
+				newlyAdddescription = $("#id_form-0-description").val();
+				assessmentId=$("#id_form-0-assessment").val()
+   			$.post(  
+        			$('#url').val(),  
+        			$("#assessmentlookupForm").serialize(),  
+                		function(data){ 
+                			/* Get Reponse */
+							
+                			$("#popData").html(data);        
+                			NFInit();
+                    			$('input:visible:enabled:first').focus();
+                    			var successStatus = $("#success_status").val();
+                    			if (successStatus == 'True'){
+                    				idVal = $("#obj_id").val(); 
+									tableObj=$(".tot-border", window.parent.document);
+									
+									if(tableObj.css('display')=='none')
+									         tableObj.css('display','block');
+                    				$("#id_assessmentLooupDetail  table > tbody", window.parent.document).append('<tr id = "assessment_'+assessmentId+'_'+idVal+'"><td class="tot-border1" id="'+idVal+'_value">'+newlyAdded+'</td><td class="tot-border2" id="'+idVal+'_des">'+newlyAdddescription+'</td><td style="border-top:1px solid #000;border-left:1px solid #000" style="font-size:12px"> <span class="KLP_Form_status" id="'+idVal+'_status" style="text-align:center">&nbsp;</span><br/><button id ="'+idVal+'" name="assessment_lookup" class="lookupSave">Edit</button></td></tr>');
+                                               // $('#'+idVal,window.parent.document).click(KLP_EditEvent);
+                    				window.parent.tb_remove();
+                    			}	
+               			}  
+           		);
+       		});  
+	
+var KLP_EditEvent1=function(){
+
+        lookupId=$(this).attr('id');
+                
+                valueTDObj=$('#'+lookupId+'_value');
+                desTDObj=$('#'+lookupId+'_des');
+                CurObj=$(this);
+                Curhtml=CurObj.html();
+                if(Curhtml=='Edit'){
+                
+                
+                valueTDObj.html('<input type="text" value="'+valueTDObj.html()+'" id="'+lookupId+'_valueinput" name="'+lookupId+'_value">');
+                desTDObj.html('<input type="text" value="'+desTDObj.html()+'" id="'+lookupId+'_desinput" name="'+lookupId+'_des">');
+                CurObj.html('Save');
+                }
+                else{
+                $.post(
+                "/assessment_lookup_value/inlineedit/",
+                'lookupId='+lookupId+'&name='+$('#'+lookupId+'_valueinput').val()+'&des='+$('#'+lookupId+'_desinput').val(),
+                function(data){ 
+                        
+                        $("#"+lookupId+'_status').html(data);
+                        $("#"+lookupId+'_status').show();
+                        if(data=='Data Saved'){
+                           valueTDObj.html($('#'+lookupId+'_valueinput').val())
+                           desTDObj.html($('#'+lookupId+'_desinput').val());
+                           }
+                         
+                CurObj.html('Edit');
+                
+                });
+                
+                }
+        return false;
+}
+});
+</script> 
+</div>
+</div>
+</body>
+</html>

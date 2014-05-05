@@ -15,14 +15,16 @@
 		<!-- Delete Class/Center Button -->
 		<span class="KLP_SpanButton" onclick="KLP_Del('{{studentgroup.id}}', '{{studentgroup.group_type}}', '{{studentgroup.name}}')">Delete {% if studentgroup.group_type|lower == 'center' %}Center{% else %}Class{% endif %}</span>
 	</span>
+	{% if not studentgroup.group_type == 'Center' %}
 	<span class="KLP_Sub">
 		<!-- Add Students Button -->
 		<a class="KLP_Button thickbox" href="/studentgroup/{{studentgroup.id}}/student/call/?keepThis=true&TB_iframe=true&height=600&width=950" title="Add Students">Add Students</a>
 	</span>
+	{% endif %}
 </div>
 
 <div class="detailHead">
-<span class="hedText">Student Details</span>
+<span class="hedText">Student Details </span>
 <span id ="list_url" style="display:none;" value = "{{url}}"></span>
 </div>
 
@@ -38,8 +40,8 @@
     {% with child.student_set.all|first as student %}
     <tr id = "student_{{child.id}}">
     	<!-- Child Information -->
-	<td class="tot-border1">{{child.firstName}}</td>
-	<td class="tot-border1">{{child.lastName}}</td>
+	<td class="tot-border1">{{child.first_name}}</td>
+	<td class="tot-border1">{{child.last_name}}</td>
 	<td class="tot-border1">{{child.dob|date:"d M Y" }}</td>
 	<td class="tot-border1">{{child.mt}}</td>
 	<td class="tot-border1">{{child.gender}}</td> 
@@ -55,7 +57,7 @@
 </table>
 </div>
 <div id="student_pagenation" style="{% if not students_list %}display:none;{% endif %}">
-	<!-- pagination -->
+	<!-- pagination --> 
 	page <span id="id_currentPage">{{page}}</span> of <span id="id_totPages">{{pages}}</span>
 	<input type="hidden" name="resultPerPage" id="id_resultPerPage" value="{{results_per_page}}" />
 	<input type="hidden" value = "{{Norecords}}" id="Norecords" name="Norecords"/>

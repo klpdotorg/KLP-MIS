@@ -1,0 +1,167 @@
+{% load template_tags %}
+<div  id="searchRes">
+{% if count != '0' %}
+<div id="insertStudent" style="font-size: 16px; font-weight: bold; background-color: green;">
+	{{count}} Students Mapped 
+</div>
+{% endif %}
+<div class="KLP_Button_Header">
+	<!-- This Block shows the buttons for add, edit and delete-->
+	
+	<span class="KLP_Sub">
+                <a class="KLP_Button"  href="/assessment/{{assessment_id}}/view/" onclick="return KLP_View(this);">View Assessement</a>
+        </span>
+	<span class="KLP_Sub" >
+                <a style="background: url(/static_media/images/price_bg.jpg) repeat scroll right center transparent;color: #FFFFFF !important;font-weight: bold;padding: 4px 8px;width: auto;"
+ href="/programme/assessment/assessment_lookup/{{assessment_id}}/creator?keepThis=true&referKey={{assessment_id}}&loadJSCSS=1&TB_iframe=true&height=200&width=450" title="Create  Lookup Value" class="thickbox"> Create Lookup Value</a>
+   </span>
+</div>
+
+<div class="detailHead">
+<span class="hedText">Lookup Value Details</span>
+<span id ="list_url" style="display:none;" value = "{{url}}"></span>
+</div>
+
+<form action="." method="POST" name="id_assessmentLooupDetail" id="id_assessmentLooupDetail">{% csrf_token %}
+<div class="tot-border" id="lookupdivlist" style="{% if not assessement_lookup_list %}display:none;{% endif %}">
+<table border="0" cellpadding="0" cellspacing="0"  style="width:100%;overflow:hidden;text-align:center;">
+   <tbody>
+    <tr>
+    	<!-- Header row -->
+	<th class="tot-border3">Lookup Value</th> <th class="tot-border3">Description</th>  <th class="tot-border3">Rank </th><th class="tot-border4">Select 
+	 </th> 
+    </tr>
+    {% for assessment_lookup in assessement_lookup_list %}
+   
+    <tr id = "assessment_{{assessment_id}}_{{assessment_lookup.id}}">
+    	<!-- Child Information -->
+     <td class="tot-border1" id="{{assessment_lookup.id}}_value">{{assessment_lookup.name}}</td>
+	<td class="tot-border1 tot-border3" id="{{assessment_lookup.id}}_des">{{assessment_lookup.description}}</td>
+           <td class="tot-border1 tot-border3" id="{{assessment_lookup.id}}_rank">{{assessment_lookup.rank}}</td>
+	<td style="border-top:1px solid #000;border-left:1px solid #000">
+	     <span class="KLP_Form_status" id="{{assessment_lookup.id}}_status" style="text-align:center">&nbsp;</span><br/>
+			<span><button id="{{assessment_lookup.id}}" name="assessment_lookup" class="lookupSave" style="font-size:12px">Edit</button><br/></span>
+			
+	</td>
+	
+    </tr>
+   
+    {% endfor %}
+   </tbody>
+</table>
+
+</div>
+<div>
+<span><span id ="list_url" style="display:none;" value = "{{url}}"></span>
+
+
+</span>
+</div>
+<div id="student_pagenation" style="{% if not students_list %}display:none;{% endif %}">
+	<!-- pagination -->
+	page <span id="id_currentPage">{{page}}</span> of <span id="id_totPages">{{pages}}</span>
+	<input type="hidden" name="resultPerPage" id="id_resultPerPage" value="{{results_per_page}}" />
+	<input type="hidden" value = "{{Norecords}}" id="Norecords" name="Norecords"/>
+	<input type="hidden" name="lastPage" id="id_lastPage" value="{{pages}}" />
+	{% if pages > 1 %}
+		<!-- Links for page if there are more pages -->
+		{% for i in pages|KLPrange %}  
+			<span page='page_{{forloop.counter}}' onclick="Pagination(this)" style="cursor:pointer;color:blue;padding-left:10px;">{{ forloop.counter }}</span>
+		{% endfor %}  
+	{% endif %}
+	
+</div>
+</form>
+<div id="id_No_students" style="color:black;text-align:center;font-weight:bold;{% if not assessment_lookup_list %}display:none;{% endif %}"> No Records Found</div>
+<script>
+$(document).ready(function(){
+var KLP_EditEvent=function(){
+
+    	lookupId=$(this).attr('id');
+	//alert(lookupId);	
+		valueTDObj=$('#'+lookupId+'_value');
+		desTDObj=$('#'+lookupId+'_des');
+                 rankTObj=$('#'+lookupId+'_rank');
+		CurObj=$(this);
+		Curhtml=CurObj.html();
+		if(Curhtml=='Edit'){
+	//	alert('Eidt');
+		
+		valueTDObj.html('<input type="text" value="'+valueTDObj.html()+'" id="'+lookupId+'_valueinput" name="'+lookupId+'_value">');
+		desTDObj.html('<input type="text" value="'+desTDObj.html()+'" id="'+lookupId+'_desinput" name="'+lookupId+'_des">');
+                rankTObj.html('<input type="text" value="'+rankTObj.html()+'" id="'+lookupId+'_rankinput" name="'+lookupId+'_rank">');
+		CurObj.html('Save');
+                        
+          //                   return false;
+		}
+		else{
+		$.post(
+		"/assessment_lookup_value/inlineedit/",
+		'lookupId='+lookupId+'&name='+$('#'+lookupId+'_valueinput').val()+'&des='+$('#'+lookupId+'_desinput').val()+'&rank='+$('#'+lookupId+'_rankinput').val(),
+		function(data){	
+			
+			$("#"+lookupId+'_status').html(data);
+			$("#"+lookupId+'_status').show();
+			if(data=='Data Saved'){
+			   valueTDObj.html($('#'+lookupId+'_valueinput').val())
+			   desTDObj.html($('#'+lookupId+'_desinput').val());
+                             rankTObj.html($('#'+lookupId+'_rankinput').val());
+			   }
+       			 
+		CurObj.html('Edit');
+            //     return false;
+		
+		});
+                
+		}
+        return false;
+}
+$(document).on('click',".lookupSave",KLP_EditEvent);
+	/*
+$("#assessementlookup_Edit").click(function(){
+    	opUrl = $("#assessementlookup_Edit").attr("href");
+		opUrl=opUrl+'?'+$('#id_assessmentLooupDetail').serialize()+'&keepThis=true&TB_iframe=true&height=400&width=400';
+		
+    	tb_show('Edit', opUrl, false);
+    	return false;
+    });
+	
+ $('input:checkbox[name=assessment_lookup]').live('change',function(){
+    	updateEditUrl();
+    });
+var updateEditUrl = function(){
+	
+	checkedassessmentlookup = $('input:checkbox[name=assessment_lookup]:checked');
+    	
+		
+    	
+    
+	if (checkedassessmentlookup.length >0){
+		$("#assessementlookup_Edit").removeAttr("disabled");
+		
+	}
+	else{
+		$("#assessementlookup_Edit").attr("disabled", true);
+		
+	}
+}	
+$('.checkAll').click(function(){
+allCheckboxes = $('input[name=assessment_lookup]:unchecked');
+allCheckboxes.each(function(index){
+		$(this).attr("checked", "true")
+	});
+	updateEditUrl();
+});	
+$('.uncheckAll').click(function(){
+ allCheckboxes = $('input[name=assessment_lookup]:checked')
+	allCheckboxes.each(function(index){
+		$(this).removeAttr("checked");
+	});
+	$("#assessementlookup_Edit").attr("disabled", true);
+	
+});*/
+});	
+
+
+</script>
+</div>

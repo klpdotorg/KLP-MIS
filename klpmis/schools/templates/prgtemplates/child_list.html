@@ -16,6 +16,7 @@
 					    				<td class="KLP_td_width">
 					    					Name
 					    					<input type="hidden" name="studentgroup" id="studentgroup_id" value="{{studentgroup_id}}" />
+					    					<input type="hidden" id = "asId" name="asId" value="{{AssObj.id}}" />
 					    				</td>
 					    			</tr>
 					    		</table>
@@ -32,7 +33,8 @@
 		    								{% with childDict|displayValue:i as cDic %}
 										<td class="KLP_td_width">{{cDic|displayValue:'studId'}}</td>
 										<td class="KLP_td_width" style="min-width:108px;max-width:108px;">
-											<span class="blue" title="Father: {{cDic|displayValue:'fName'}}, Mother: {{cDic|displayValue:'mName'}}, Gender: {{cDic|displayValue:'Gender'}}, DOB: {{cDic|displayValue:'dob'}}">{{cDic|displayValue:'firstName'}} {{cDic|displayValue:'lastName'}}</span><span class="KLP_Form_status" id="id_Student_{{cDic|displayValue:'studId'}}_status">Form Status</span>
+											<span class="blue" title="Father: {{cDic|displayValue:'fName'}}, Mother: {{cDic|displayValue:'mName'}}, Gender: {{cDic|displayValue:'Gender'}}, DOB: {{cDic|displayValue:'dob'}}">{{cDic|displayValue:'first_name'}} {{cDic|displayValue:'last_name'}}</span>
+											<span class="KLP_Form_status" name="answerstatus" id="id_Student_{{forloop.counter}}_status">Form Status</span>
 										
 										</td>
 										{% endwith%}
@@ -68,22 +70,23 @@
 	     				</td>
 	     			</tr>
 	                        <!-- shows grid for the each student -->
-	     			{% for i in studIdList%}
+	     			{% for i in studIdListprifix%}
 	     				<tr class="KLP_txt_cen">
 						<td class="KLP_Ans_Fix">
 							<div class="KLP_Fix_Div">
-								<form name="student_{{i}}" id="id_Student_{{i}}" class="validForm" onsubmit="return false;">{% csrf_token %}
+								<form name="student_{{i}}" id="id_Student_{{i}}" class="validForm" onsubmit="return false;">{% csrf_token %}{{formmanage}}
 									<input type="hidden" name="student_groupId" value="{{studentgroup_id}}" />
 									<input type="hidden" name="programId" value="{{filter_id}}"/>
 									<input type="hidden" name="assessmentId" value="{{assessment_id}}"/>
 									<input type="hidden" name="student" value="{{i}}"/>
-								
+									<input type="hidden" name="formcounter" id="formcounter" value="{{forloop.counter}}"/>
+									
 									<table>
 										<tr>
 										        <!-- Repeat Question -->
 											{% for qId in qIdList %}
-											{% with rDict|displayValue:qId as qData %}
-											{% with qData|displayValue:i as qDict %}
+										{% with qId|CatString:i as datadicKey %}
+												{% with rDict|displayValue:datadicKey as qDict %}
 											<!-- Get Question data based on question id and student id -->
 			        							<td class="KLP_td_height">
 			        								<!-- if ibox value false show answer value -->
@@ -93,9 +96,12 @@
 			        								<!-- else Show question order with input box -->
 			        								<span style="color:#736F6E;">{{qDict|displayValue:'qOrder'}}</span><br/>
 			        								<!-- If 2nd user login hide data and attributes dE and sE -->
+														<input type="hidden" class="ansIds" name="ansId_{{datadicKey}}" 
+																		   id="id_ansId_{{datadicKey}}" 
+																						   value="{{qDict|displayValue:'ansId'}}" size="10">
 												<input type="text"	
-									   					       name="student_{{i}}_{{qDict|displayValue:'qId'}}" 
-									   					       id="id_student_{{i}}_{{qDict|displayValue:'qId'}}" 
+									   					       name="student_{{datadicKey}}" 
+									   					       id="id_student_{{datadicKey}}" 
 									   					       tabindex="1"
 									   					       value="{%if qDict|displayValue:'shVal' %}{{qDict|displayValue:'ansVal'}}{% endif %}" 
 									   					       
@@ -108,10 +114,23 @@
 									   			{% endif %}
 									   					
 												
-			                					
 			            							</td>
 			            							{% if forloop.last %}
 			            								<td class="KLP_td_height"> <input id="id_Student_{{i}}_submit" type="submit" tabindex="1"   value="submit"  {% if not qDict|displayValue:'iBox' %}disabled{%endif%}/>       
+			            								
+	            								{% if not qDict|displayValue:'ansId' == None %}
+			            								
+		            								<td><span class="KLP_Sub">
+		            								{% if  qDict|displayValue:'iBox' %}
+		            								    {% with i|splitstr:userAsmntDict as i_val %}
+		            								       {% if i_val.useransobj %}
+		            								        <span class="KLP_SpanButton"  onclick="KLP_Del('{{i_val.objectval}}/{{ AssObj.id }}', 'answer', '{{i_val.objectval}},{{ AssObj.id }}')">Delete</span> <!-- Delete Button -->
+		            								     
+		            								      {% endif %}
+	            								        {% endwith %}
+            								        {% endif %}
+            								        </span></td>
+	            								{% endif %}
 			            								
 			            								<script>
 													$().ready(function() {
@@ -123,7 +142,7 @@
 			            							{% endwith%}
 			            							{% endwith%}
 			        						{% endfor %}
-											
+											<input type="hidden" id="refresh" value="0" />
 										</tr>
 									</table>
 			        				</form>
@@ -154,10 +173,12 @@
 </div>
 <span id ="list_url" style="display:none;" value = "{{url}}"></span>
 <div class="KLP_DE_Submit">
-	<span class="KLP_SpanButton"  id="id_ans_global_submit">Submit</span>
+	<!--<span class="KLP_SpanButton"  id="id_ans_global_submit">Submit</span> -->
+	{% if not group_typ == 'Center' %}
 	<span class="KLP_DE_AdStudent">
 		<a href="/studentgroup/{{studentgroup_id}}/student/creator/?keepThis=True&map_Student=1&assessment_id={{assessment_id}}&TB_iframe=True&height=400&width=800" title="Create New Student to Map" class="thickbox KLP_Button"> Add Student </a>
 	</span>
+	{% endif %}
 </div>
 
 
@@ -195,6 +216,8 @@ function Pagination(thisObj){
         });
 	return false;
 }
+
+
 </script>
 
 

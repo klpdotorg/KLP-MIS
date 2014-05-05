@@ -1,6 +1,6 @@
 {% load template_tags %}
 <tr id="staff_{{staff.id}}">
-<td  class="tot-border1">{{staff.firstName}} {{staff.middleName}} {{staff.lastName}}<input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / ></td>
+<td  class="tot-border1">{{staff.first_name}} {{staff.middle_name}} {{staff.last_name}}<input type="hidden" id="success_status" size="15" value="{{showsuccess}}" / ></td>
 <td  class="tot-border1">{{staff.doj|date:"d-m-Y"}}</td>
 <td  class="tot-border1">{{staff.gender}}</td>
 <td  class="tot-border1">{{staff.mt}}</td>
@@ -23,7 +23,7 @@
 	</a>
 </td>
 <td  class="tot-border2">
-	<span onclick="KLP_Del('{{staff.id}}', 'staff', '{{staff.firstName}} {{staff.lastName}}')" style="color: blue; cursor: pointer;">
+	<span onclick="KLP_Del('{{staff.id}}', 'staff', '{{staff.first_name}} {{staff.last_name}}')" style="color: blue; cursor: pointer;">
 		<img width="11" title="Delete" src="/static_media/images/PageRow_delete.gif">
 	</span>
 </td>

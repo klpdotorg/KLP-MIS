@@ -261,6 +261,9 @@ $.extend($.validator, {
 		email: "Please enter a valid email address.",
 		url: "Please enter a valid URL.",
 		date: "Please enter a valid date.",
+				characters: "Enter characters only.",
+                dateDE:"Enter a valid date dd-mm-yyyy",
+		numbersonly: "Enter a valid number.",
 		dateISO: "Please enter a valid date (ISO).",
 		number: "Digits or AB or UK.",
 		digits: "Digits or AB or UK",
@@ -753,6 +756,8 @@ $.extend($.validator, {
 		dateISO: {dateISO: true},
 		dateDE: {dateDE: true},
 		number: {number: true},
+		characters:{characters:true},
+		numbersonly:{numbersonly:true},
 		numberDE: {numberDE: true},
 		digits: {digits: true},
 		letters: {letters: true},
@@ -940,6 +945,7 @@ $.extend($.validator, {
 				var data = {};
 				data['validateField'] = element.name;
 				data['validateValue'] = value;
+                                data['ansId']=$(element.form).find('#id_ansId'+element.name.split('student')[1]).val()
 				data['csrfmiddlewaretoken']=$("input[name=csrfmiddlewaretoken]:first").val();
 				$.ajax($.extend(true, {
 					type: "POST",
@@ -1052,7 +1058,21 @@ $.extend($.validator, {
 				return this.optional(element) || /^-?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$/.test(value);
 			}
 		},
-	
+		numbersonly: function(value, element) {
+			
+				return this.optional(element) || /^-?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$/.test(value);
+			
+		},
+		characters: function(value, element) {
+			
+				return this.optional(element) || /^[a-zA-Z\ \']+$/.test(value);
+			
+		},
+                dateDE: function(value, element) {
+			
+				return this.optional(element) || /^\d\d?-\d\d-\d\d\d\d/.test(value); 
+			
+		},	
 		// http://docs.jquery.com/Plugins/Validation/Methods/digits
 		digits: function(value, element) {
 			if (value.toLowerCase() == 'ab' || value.toLowerCase() == 'uk'){
@@ -1113,23 +1133,24 @@ $.extend($.validator, {
 		
 		isinGrades: function(value, element, param) {
 			/* This is used to check entered grade value is valid grade or not */
-			var paramList = new Array()
+			var paramList = new Array();
+                         
 			paramList = param.split(",")
-			value2=value;
-			value1=parseInt(value);
-			if (!isNaN(value1))
-				ovalue=value1
+			//value2=value;
+			//value1=parseInt(value);
+			if (!isNaN(value))
+				ovalue=parseInt(value)
 			else
-				ovalue=value2.toLowerCase()
+				ovalue=value.toLowerCase()
 			resp = false
 			for (i=0; i<paramList.length; i++){
 				param=paramList[i];
-				param2=paramList[i];
-				param1=parseInt(param);
-				if (!isNaN(param1))
-					oparam=param1
+				//param2=paramList[i];
+				//param1=parseInt(param);
+				if (!isNaN(param))
+					oparam=parseInt(param)
 				else
-					oparam=param2.toLowerCase()
+					oparam=param.toLowerCase()
 					
 				if (oparam ==ovalue || ovalue == 'ab' || ovalue == 'uk'){
 					resp = true

@@ -27,8 +27,8 @@
 <body>
 <script type="text/javascript">
 	/* Add loading image to body */
-	$("body").append("<div id='KLP_overlay' class='KLP_overlayBG'></div>");
-	$("body").append("<div id='KLP_load'><img src='/static_media/images/loadingAnimation.gif' alt='Process'></div>");
+	$("body")
+	$("body")
         
 	$("#KLP_load").ajaxStart(function(){
 	  /* Check whether user is logged in or not and show process loading image on ajax start*/
@@ -267,5 +267,20 @@
 </div>
 {% endif %}
 </div>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3982320-15']);
+  _gaq.push(['_setDomainName', 'klp.org.in']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
 </body>
 </html>
