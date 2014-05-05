@@ -2,16 +2,17 @@
 # -*- coding: utf-8 -*-
 # Django settings for klp project.
 
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
+DEBUG = True #False
+TEMPLATE_DEBUG = True #False
 
-SERVER_EMAIL = 'dev@klp.org.in'
+SERVER_EMAIL = 'support@mahiti.org'
 
 SEND_BROKEN_LINK_EMAILS = True
 
 IGNORABLE_404_ENDS = ('.css', '.html', 'favicon.ico')
 
-ADMINS = (('DEV', 'dev@klp.org.in'))  # ('Your Name', 'your_email@domain.com'),
+ADMINS = (('admin', 'admin@admin.org'), ('admin',
+          'admin@admin.org'))  # ('Your Name', 'your_email@domain.com'),
 import os.path
 PROJECT_ROOT1 = os.path.realpath(os.path.dirname(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(PROJECT_ROOT1,
@@ -23,7 +24,7 @@ MANAGERS = ADMINS
 
 TESTING = 0
 REPORTMAIL_SENDER = 'KLP TEAM <dev@klp.org.in>'
-REPORTMAIL_RECEIVER = ['dev@klp.org.in']
+REPORTMAIL_RECEIVER = ['dev@klp.org.in',]
 SESSION_COOKIE_AGE = 3600
 SESSION_SAVE_EVERY_REQUEST = True
 
@@ -34,9 +35,9 @@ DATABASES = {'default': {  # Add 'postgresql_psycopg2', 'postgresql', 'mysql', '
                            # Set to empty string for localhost. Not used with sqlite3.
                            # Set to empty string for default. Not used with sqlite3.
     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    'NAME': 'DATABASE NAME',
-    'USER': 'DATABASE USER',
-    'PASSWORD': 'DATABASE PASSWORD',
+    'NAME': 'test',
+    'USER': 'test',
+    'PASSWORD': 'test',
     'HOST': '',
     'PORT': '',
     'OPTIONS': {'autocommit': True},
@@ -55,14 +56,8 @@ DATABASES = {'default': {  # Add 'postgresql_psycopg2', 'postgresql', 'mysql', '
 #    'autocommit': True,
 # }
 #    }
-
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'USERNAME'
-EMAIL_HOST_PASSWORD = 'YOUR EMAIL HOST PASSWORD'
 EMAIL_PORT = 587
 
-# DEFAULT_FROM_EMAIL = 'support@mahiti.org'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -98,7 +93,7 @@ USE_L10N = True
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 
-MEDIA_ROOT = '/<<PATH TO >>/static_media/'
+MEDIA_ROOT = '/home/mahiti/klpmis/static_media/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -143,7 +138,7 @@ TEMPLATE_CONTEXT_PROCESSORS = \
      'django.core.context_processors.media',
      'django.contrib.messages.context_processors.messages')
 
-TEMPLATE_DIRS = ( os.path.join(PROJECT_ROOT, '/schools/templates'), )  # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".                                                        # Always use forward slashes, even on Windows.
+TEMPLATE_DIRS = '/home/mahiti/klpmis/schools/templates/'  # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".                                                        # Always use forward slashes, even on Windows.
                                                           # Don't forget to use absolute paths, not relative paths.
 
 INSTALLED_APPS = (  # Uncomment the next line to enable the admin:
@@ -156,7 +151,7 @@ INSTALLED_APPS = (  # Uncomment the next line to enable the admin:
     'django.contrib.messages',
     'django.contrib.admin',
     'schools',
-#    'object_permissions',
+    'object_permissions',
     'fullhistory',
     )
 

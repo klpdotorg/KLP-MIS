@@ -22,6 +22,15 @@ class Request(models.Model):
     request_path = models.CharField(max_length=255, blank=True,
                                     null=True)
 
+    def save(self, *args, **kwargs):
+        from django.db import connection
+        connection.features.can_return_id_from_insert = False
+
+
+        #print "=========================="
+        self.full_clean()
+        super(Request, self).save(*args, **kwargs)
+
     def user(self):
         '''
         Returns the user entry responsible for this change
@@ -154,7 +163,7 @@ ACTIONS = (('C', 'Create'), ('U', 'Update'), ('D', 'Delete'))
 class FullHistory(models.Model):
 
     content_type = models.ForeignKey(ContentType)
-    object_id = models.CharField(max_length=255)
+    object_id = models.IntegerField()
     revision = models.PositiveIntegerField()
 
     content_object = generic.GenericForeignKey()
@@ -167,7 +176,17 @@ class FullHistory(models.Model):
     info = models.TextField()
 
     objects = FullHistoryManager()
+    
+    def save(self, *args, **kwargs):
+        from django.db import connection
+        connection.features.can_return_id_from_insert = False
 
+
+        #print "=========================="
+        self.full_clean()
+        super(FullHistory, self).save(*args, **kwargs)
+
+ 
     def set_data(self, val):
         self._data = encoder.encode(val)
 

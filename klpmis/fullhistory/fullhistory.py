@@ -77,7 +77,7 @@ def get_or_create_request():
 
 
 def create_history(entry, action):
-    print action, 'fullhistory.py'
+    #print action, 'fullhistory.py'
     request = get_or_create_request()
     if action == 'U':
         data = get_difference(entry)
@@ -140,7 +140,7 @@ def init_history_signal(instance, **kwargs):
 
 
 def save_history_signal(instance, created, **kwargs):
-    print created, 'created', 'fullhistory.py'
+    #print created, 'created', 'fullhistory.py'
     create_history(instance, created and 'C' or 'U')
 
 

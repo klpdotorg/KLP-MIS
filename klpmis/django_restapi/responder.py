@@ -249,7 +249,7 @@ class TemplateResponder(object):
 
         self.template_dir = template_dir
         self.paginate_by = paginate_by
-        print extra_context
+        #print extra_context
         self.template_loader = template_loader
         if not extra_context:
             extra_context = {}
@@ -257,8 +257,8 @@ class TemplateResponder(object):
             if callable(value):
                 extra_context[key] = value()
         self.extra_context = extra_context
-        print 'eeeee', self.extra_context, extra_context, \
-            'EEEEEEEEEEEEEEEEEEEEEe'
+        #print 'eeeee', self.extra_context, extra_context, \
+        #    'EEEEEEEEEEEEEEEEEEEEEe'
         self.allow_empty = allow_empty
         self.context_processors = context_processors
         self.template_object_name = template_object_name
@@ -325,11 +325,11 @@ class TemplateResponder(object):
 
         # Hide unexposed fields
 
-        print 'hssssssssdddddd', c
+        #print 'hssssssssdddddd', c
         for obj in object_list:
             self._hide_unexposed_fields(obj, self.expose_fields)
         c.update(self.extra_context)
-        print self.extra_context, 'in resp'
+        #print self.extra_context, 'in resp'
         t = self.template_loader.get_template(template_name)
         return HttpResponse(t.render(c), mimetype=self.mimetype)
 

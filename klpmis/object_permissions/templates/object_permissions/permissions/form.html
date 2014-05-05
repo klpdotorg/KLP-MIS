@@ -1,0 +1,50 @@
+{% comment  %} Form for setting user permissions on an object {% endcomment %}
+
+<script type="text/javascript" src="{{SITE_ROOT}}/object_permissions_media/js/autocomplete_user_search.js"></script>
+{# Only run autocomplete script if a user or group needs to be selected #}
+{% if user_id or group_id %}
+    <script> </script>
+{% else %}
+    <script>
+         $(function(){
+            autocomplete_user_search($("#id_user"),'{% url user-search %}',{'group':$("#id_group")});
+         });
+    </script>
+{% endif %}
+
+<form class="object_permissions_form" method="post" action="{{url}}">
+    <ul id="errors"></ul>
+    <table>
+    {# Only show object select when an object hasn't been preselected #}
+    {% if obj %}
+        <input type="hidden" name="obj" value="{{obj.pk|default:''}}"/>
+    {% else %}
+        <tr><td width="25%">{{form.obj.label}}</td><td>{{form.obj}}</td></tr>
+    {% endif %}
+
+    {# only show user/group when one hasn't been preselected #}
+    {% if user_id or group_id %}
+        <input type="hidden" name="user" value="{{user_id|default:''}}"/>
+        <input type="hidden" name="group" value="{{group_id|default:''}}"/>
+    {% else %}
+        <tr class="user"><td><b>{{form.user.label}}:</b></td><td>{{form.user}}</td></tr>
+        <tr class="group"><td><b>{{form.group.label}}:</b></td><td>{{form.group}}</td></tr>
+    {% endif %}
+    
+        {# Manually create permissions checkboxes so we can integrate it into the table #}
+        {% with form.data.permissions as data %}
+        {% for permission in form.fields.permissions.choices %}
+        <tr class="permission">
+            <td class="input">
+                <input id="id_permissions_{{forloop.counter0}}" name="permissions" type="checkbox" value="{{permission.0}}"
+                {%if permission.0 in data %}checked{%endif%}
+                />
+                <label for="id_permissions">{{permission.1.label}}{% if permission.1.description %}:{%endif%}</label>
+            </td>
+            <td>{{permission.1.description}}</td>
+        </tr>
+        {% endfor %}
+        {% endwith %}
+    </table>
+    <input type="submit" class="submit" value="Save"/>
+</form>
