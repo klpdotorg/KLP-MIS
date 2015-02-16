@@ -20,7 +20,7 @@ from django.template import RequestContext
 import psycopg2
 from django.db.models import Max
 from django.views.decorators.csrf import csrf_exempt
-from klpmis.settings import *
+from emsproduction.settings import *
 from fullhistory.models import *
 from django.contrib.contenttypes.models import *
 from django.db import transaction

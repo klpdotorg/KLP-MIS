@@ -11,7 +11,7 @@ import datetime
 import os
 import csv
 import psycopg2
-from klpmis.settings import *
+from emsproduction.settings import *
 import pdb
 from django.db import connection
 debug_mode=0
@@ -117,12 +117,12 @@ def getStudentRes(studDict, studType):
     cursor = connection.cursor()
 
     #student created query
-    cursor.execute("select count(id) from fullhistory_fullhistory where action_time > %s and action_time < %s and action = 'C' and content_type_id = %s and request_id in ( select id from fullhistory_request where user_pk = %s) and cast(object_id as int) in (select child_id from schools_student where id in (select student_id from schools_student_studentgrouprelation where academic_id = 122  and student_group_id in ( select id from schools_studentgroup where institution_id in ( select id from schools_institution where boundary_id in (select id from schools_boundary where boundary_type_id = %s) ))))", [sTime, eTime, contId, userId, studType])
+    cursor.execute("select count(id) from fullhistory_fullhistory where action_time > %s and action_time < %s and action = 'C' and content_type_id = %s and request_id in ( select id from fullhistory_request where user_pk = %s) and cast(object_id as int) in (select child_id from schools_student where id in (select student_id from schools_student_studentgrouprelation where academic_id = 123  and student_group_id in ( select id from schools_studentgroup where institution_id in ( select id from schools_institution where boundary_id in (select id from schools_boundary where boundary_type_id = %s) ))))", [sTime, eTime, contId, userId, studType])
     res = cursor.fetchone()
     created = int(res[0])
 
     #student updated query
-    cursor.execute("select (object_id) from fullhistory_fullhistory where action_time > %s and action_time < %s and action = 'U' and request_id in ( select id from fullhistory_request where user_pk = %s) and content_type_id = %s and revision > 2 and cast(object_id as int) in ( select child_id from schools_student where id in (select student_id from schools_student_studentgrouprelation where academic_id =122 and student_group_id in ( select id from schools_studentgroup where institution_id in ( select id from schools_institution where boundary_id in (select id from schools_boundary where boundary_type_id = %s) ) ))) group by object_id;", [sTime, eTime, userId, contId, studType])
+    cursor.execute("select (object_id) from fullhistory_fullhistory where action_time > %s and action_time < %s and action = 'U' and request_id in ( select id from fullhistory_request where user_pk = %s) and content_type_id = %s and revision > 2 and cast(object_id as int) in ( select child_id from schools_student where id in (select student_id from schools_student_studentgrouprelation where academic_id =123 and student_group_id in ( select id from schools_studentgroup where institution_id in ( select id from schools_institution where boundary_id in (select id from schools_boundary where boundary_type_id = %s) ) ))) group by object_id;", [sTime, eTime, userId, contId, studType])
     res = cursor.fetchall()
 
     if not res is None:
@@ -133,12 +133,13 @@ def getStudentRes(studDict, studType):
     #student remove query
     contIdobj = ContentType.objects.get(model = 'student')
     contId = contIdobj.id
-    cursor.execute("select count(id) from fullhistory_fullhistory where action_time > %s and action_time < %s and action = 'U' and data ~* 'inactive' and content_type_id = %s and request_id in (select id from fullhistory_request where user_pk = %s) and cast(object_id as int) in ( select id from schools_student where active = 0 and id in (select student_id from schools_student_studentgrouprelation where academic_id =122 and student_group_id in ( select id from schools_studentgroup where institution_id in ( select id from schools_institution where boundary_id in (select id from schools_boundary where boundary_type_id = %s) ) )))", [sTime, eTime, contId, userId, studType])
+    cursor.execute("select count(id) from fullhistory_fullhistory where action_time > %s and action_time < %s and action = 'U' and data ~* 'inactive' and content_type_id = %s and request_id in (select id from fullhistory_request where user_pk = %s) and cast(object_id as int) in ( select id from schools_student where active = 0 and id in (select student_id from schools_student_studentgrouprelation where academic_id =123 and student_group_id in ( select id from schools_studentgroup where institution_id in ( select id from schools_institution where boundary_id in (select id from schools_boundary where boundary_type_id = %s) ) )))", [sTime, eTime, contId, userId, studType])
 
 
     res = cursor.fetchone()
 
     removed = int(res[0])
+    cursor.close()
     return {'created': created, 'updated':updated, 'removed':removed}
 
 class Command(BaseCommand):
@@ -212,7 +213,7 @@ class Command(BaseCommand):
                 print "\n\n UserIds: ", userIds
 
 
-                asmids=Answer.objects.filter(creation_date__range=[sDate, eDate]).distinct('question__assessment').values_list('question__assessment', flat=True)
+                asmids=Answer.objects.filter(last_modified_date__range=[sDate, eDate]).distinct('question__assessment').values_list('question__assessment', flat=True)
                 asmids =  [int(i) for i in asmids]
                 assessments = Assessment.objects.filter(active=2, id__in = asmids).distinct().only("id", "name")
                 print "assessments are: ", assessments

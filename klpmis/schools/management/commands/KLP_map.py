@@ -158,6 +158,7 @@ class Command(BaseCommand):
                                                              cursor.execute(qu)
                                                          else:
                                                              print "record exist"
+                                                         cursor.close()
                                                  self.stdout.write('%s are Mapped ...\n'
          % MappingStr)
                                 '''

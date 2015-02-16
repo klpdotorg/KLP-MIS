@@ -118,6 +118,7 @@ def KLP_DeleteStudnet(request, id):
 					cursor.execute(q4)
 
 				delFailed += str(obj.child.first_name) + " " + str(obj.child.last_name)
+				cursor.close()
 			else:
 				return HttpResponse("Students "+ delFailed+" Deletion Failed")
 			

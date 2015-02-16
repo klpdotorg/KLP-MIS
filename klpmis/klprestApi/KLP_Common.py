@@ -106,6 +106,7 @@ class KLP_Delete(Resource):
                 name = obj.name
                 cursor.execute(q1)
                 cursor.execute(q2)
+                cursor.close()
                 message = name + ' ' + msg
 
         else:

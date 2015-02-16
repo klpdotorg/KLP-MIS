@@ -17,7 +17,7 @@ from django_restapi.responder import *
 from django_restapi.receiver import *
 from klprestApi.BoundaryApi import ChoiceEntry
 from django.contrib.contenttypes.models import ContentType
-from klpmis.settings import NUM_OF_FLEXI_ANSWER_FORM_RECORDS
+from emsproduction.settings import NUM_OF_FLEXI_ANSWER_FORM_RECORDS
 from schools.receivers import KLP_user_Perm
 from django.forms.models import modelformset_factory
 from django.db import connection
@@ -177,7 +177,6 @@ def KLP_StudentGroup_Answer_Entry(request, studentgroup_id, programme_id, assess
 
         if len(ansflexObj) >= ordercounter:
             ordercounter = 20
-        print ansflexObj,'FFFFFFFFFFFFFFFFFFFFL' 
 	qIdList=question_list.values_list('id',flat=True).distinct()
 	qNamesList=question_list.values_list('name',flat=True).distinct()
 	lookupfields=''
@@ -370,6 +369,7 @@ def MapStudents(request,id):
 					q1 = """ delete from schools_student_studentgrouprelation_0 where student_id = %d and student_group_id = %d """ %(student.id, int(studentgroup.id))
 					cursor.execute(q1)
 					cursor.execute(q2)
+					cursor.close()
 				else:
 					pass
 			except:
