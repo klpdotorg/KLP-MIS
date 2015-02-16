@@ -17,7 +17,7 @@ from django_restapi.responder import *
 from django_restapi.receiver import *
 from klprestApi.BoundaryApi import ChoiceEntry
 from django.contrib.contenttypes.models import ContentType
-from emsproduction.settings import NUM_OF_FLEXI_ANSWER_FORM_RECORDS
+from klpmis.settings import NUM_OF_FLEXI_ANSWER_FORM_RECORDS
 from schools.receivers import KLP_user_Perm
 from django.forms.models import modelformset_factory
 from django.db import connection
