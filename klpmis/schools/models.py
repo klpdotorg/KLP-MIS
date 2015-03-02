@@ -6,11 +6,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.contrib.auth.models import User
 from object_permissions import register
-from fullhistory import register_model
+#from fullhistory import #register_model
 
 # Table Structure For Klp
 
-register_model(User)
+#register_model(User)
 
 primary_field_type = [(0, 'Default'),(1, 'Integer'), (2, 'Char'), (3, 'Date'), (4,
                       'Lookup')]
@@ -59,7 +59,7 @@ class Institution_Category(models.Model):
         return '%s' % self.name
 
 
-register_model(Institution_Category)
+#register_model(Institution_Category)
 
 
 class Moi_Type(models.Model):
@@ -72,7 +72,7 @@ class Moi_Type(models.Model):
         return '%s' % self.name
 
 
-register_model(Moi_Type)
+#register_model(Moi_Type)
 
 
 class Institution_Management(models.Model):
@@ -85,7 +85,7 @@ class Institution_Management(models.Model):
         return '%s' % self.name
 
 
-register_model(Institution_Management)  # Register model for to store information in fullhistory
+#register_model(Institution_Management)  # Register model for to store information in fullhistory
 
 
 class Institution_address(models.Model):
@@ -105,7 +105,7 @@ class Institution_address(models.Model):
             null=True, help_text='Can be comma separated')
 
 
-register_model(Institution_address)  # Register model for to store information in fullhistory
+#register_model(Institution_address)  # Register model for to store information in fullhistory
 
 
 class Boundary_Category(models.Model):
@@ -118,7 +118,7 @@ class Boundary_Category(models.Model):
         return '%s' % self.boundary_category
 
 
-register_model(Boundary_Category)  # Register model for to store information in fullhistory
+#register_model(Boundary_Category)  # Register model for to store information in fullhistory
 
 
 class Boundary_Type(models.Model):
@@ -131,7 +131,7 @@ class Boundary_Type(models.Model):
         return '%s' % self.boundary_type
 
 
-register_model(Boundary_Type)  # Register model for to store information in fullhistory
+#register_model(Boundary_Type)  # Register model for to store information in fullhistory
 
 
 class Staff_Type(models.Model):
@@ -145,7 +145,7 @@ class Staff_Type(models.Model):
         return '%s' % self.staff_type
 
 
-register_model(Staff_Type)  # Register model for to store information in fullhistory
+#register_model(Staff_Type)  # Register model for to store information in fullhistory
 
 
 class Staff_Qualifications(models.Model):
@@ -158,7 +158,7 @@ class Staff_Qualifications(models.Model):
         return '%s' % self.qualification
 
 
-register_model(Staff_Qualifications)  # Register model for to store information in fullhistory
+#register_model(Staff_Qualifications)  # Register model for to store information in fullhistory
 
 
 class Boundary(models.Model):
@@ -236,7 +236,7 @@ class Boundary(models.Model):
                 % (self.id, userSel, self.name, self.name)
 
 
-register_model(Boundary)
+#register_model(Boundary)
 
 
 class Institution(models.Model):
@@ -355,7 +355,7 @@ class Institution(models.Model):
         super(Institution, self).save(*args, **kwargs)
 
 register(['Acess'], Institution)  # Register model for Object permissions
-register_model(Institution)  # Register model for to store information in fullhistory
+#register_model(Institution)  # Register model for to store information in fullhistory
 
 from django.db.models.signals import post_save, pre_save
 from schools.receivers import KLP_NewInst_Permission
@@ -429,7 +429,7 @@ class Child(models.Model):
         self.full_clean()
         super(Child, self).save(*args, **kwargs)
 
-register_model(Child)  # Register model for to store information in fullhistory
+#register_model(Child)  # Register model for to store information in fullhistory
 
 
 class Relations(models.Model):
@@ -450,7 +450,7 @@ class Relations(models.Model):
         return ''
 
 
-register_model(Relations)  # Register model for to store information in fullhistory
+#register_model(Relations)  # Register model for to store information in fullhistory
 
 
 class StudentGroup(models.Model):
@@ -569,7 +569,7 @@ class StudentGroup(models.Model):
         self.full_clean()
         super(StudentGroup, self).save(*args, **kwargs)
 
-register_model(StudentGroup)  # Register model for to store information in fullhistory
+#register_model(StudentGroup)  # Register model for to store information in fullhistory
 
 
 class Academic_Year(models.Model):
@@ -582,7 +582,7 @@ class Academic_Year(models.Model):
         return self.name
 
 
-register_model(Academic_Year)  # Register model for to store information in fullhistory
+#register_model(Academic_Year)  # Register model for to store information in fullhistory
 
 
 def current_academic():
@@ -643,7 +643,7 @@ class Staff(models.Model):
                 staff_studentgrouprelation__active=2)
 
 
-register_model(Staff)  # Register model for to store information in fullhistory
+#register_model(Staff)  # Register model for to store information in fullhistory
 
 
 class Student(models.Model):
@@ -717,7 +717,7 @@ class Student(models.Model):
         self.full_clean()
         super(Student, self).save(*args, **kwargs)
 
-register_model(Student)  # Register model for to store information in fullhistory
+#register_model(Student)  # Register model for to store information in fullhistory
 
 
 class Student_StudentGroupRelation(models.Model):
@@ -745,7 +745,7 @@ class Student_StudentGroupRelation(models.Model):
         self.full_clean()
         super(Student_StudentGroupRelation, self).save(*args, **kwargs)
 
-register_model(Student_StudentGroupRelation)  # Register model for to store information in fullhistory
+#register_model(Student_StudentGroupRelation)  # Register model for to store information in fullhistory
 
 
 class Staff_StudentGroupRelation(models.Model):
@@ -763,7 +763,7 @@ class Staff_StudentGroupRelation(models.Model):
         unique_together = (('staff', 'student_group', 'academic'), )
 
 
-register_model(Staff_StudentGroupRelation)  # Register model for to store information in fullhistory
+#register_model(Staff_StudentGroupRelation)  # Register model for to store information in fullhistory
 
 
 
@@ -834,7 +834,7 @@ class Programme(models.Model):
             )
 
 
-register_model(Programme)  # Register model for to store information in fullhistory
+#register_model(Programme)  # Register model for to store information in fullhistory
 
 
 class Assessment(models.Model):
@@ -902,7 +902,7 @@ class Assessment(models.Model):
             % (self.id, self.id, self.name, self.id, self.name)
 
 
-register_model(Assessment)  # Register model for to store information in fullhistory
+#register_model(Assessment)  # Register model for to store information in fullhistory
 
 
 class Assessment_Lookup(models.Model):
@@ -922,7 +922,7 @@ class Assessment_Lookup(models.Model):
         return '%s' % self.name
 
 
-register_model(Assessment_Lookup)
+#register_model(Assessment_Lookup)
 
 
 class Assessment_StudentGroup_Association(models.Model):
@@ -950,7 +950,7 @@ class Assessment_StudentGroup_Association(models.Model):
         unique_together = (('assessment', 'student_group'), )
 
 
-register_model(Assessment_StudentGroup_Association)  # Register model for to store information in fullhistory
+#register_model(Assessment_StudentGroup_Association)  # Register model for to store information in fullhistory
 
 
 class Assessment_Class_Association(models.Model):
@@ -966,7 +966,7 @@ class Assessment_Class_Association(models.Model):
         unique_together = (('assessment', 'student_group'), )
 
 
-register_model(Assessment_Class_Association)  # Register model for to store information in fullhistory
+#register_model(Assessment_Class_Association)  # Register model for to store information in fullhistory
 
 
 class Assessment_Institution_Association(models.Model):
@@ -1036,7 +1036,7 @@ class Question(models.Model):
             % (self.id, self.name, self.id, self.name)
 
 
-register_model(Question)  # Register model for to store information in fullhistory
+#register_model(Question)  # Register model for to store information in fullhistory
 
 
 class Answer(models.Model):
@@ -1079,12 +1079,11 @@ class Answer(models.Model):
         from django.db import connection
         connection.features.can_return_id_from_insert = False
         #print "save"
-
         #print "=================== status is", self.status
         self.full_clean()
         super(Answer, self).save(*args, **kwargs)
 
-register_model(Answer)  # Register model for to store information in fullhistory
+#register_model(Answer)  # Register model for to store information in fullhistory
 
 
 class UserAssessmentPermissions(models.Model):

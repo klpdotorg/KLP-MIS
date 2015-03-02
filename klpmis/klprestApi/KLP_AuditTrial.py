@@ -14,7 +14,7 @@ from django_restapi.receiver import *
 from schools.models import *
 
 from schools.receivers import KLP_user_Perm
-from fullhistory.models import FullHistory
+#from fullhistory.models import FullHistory
 from django.db.models import Q
 import datetime
 from django.contrib.contenttypes.models import ContentType

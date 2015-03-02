@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from schools.models import *
 from django.contrib.contenttypes.models import ContentType
-from fullhistory.models import FullHistory
+#from fullhistory.models import FullHistory
 from django.db.models import Q 
 from django.contrib.auth.models import User
 import django, datetime, os, csv

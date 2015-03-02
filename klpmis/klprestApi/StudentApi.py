@@ -17,7 +17,7 @@ from django_restapi.responder import *
 from django_restapi.receiver import *
 from klprestApi.BoundaryApi import ChoiceEntry
 from django.contrib.contenttypes.models import ContentType
-from fullhistory.models import *
+#from fullhistory.models import *
 from schools.receivers import KLP_user_Perm
 
 class KLP_Student(Collection):    
