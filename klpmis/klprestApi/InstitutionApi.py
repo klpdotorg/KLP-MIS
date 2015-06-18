@@ -119,7 +119,7 @@ def KLP_Institution_Update(request, institution_id):
     institutionType = 'Institution'
     category_type = 1
     if institutionObj.boundary.boundary_category.boundary_category \
-        == 'Circle':
+        == 'circle':
         institutionType = 'Anganwadi'
         category_type = 2
     categoryList = \
